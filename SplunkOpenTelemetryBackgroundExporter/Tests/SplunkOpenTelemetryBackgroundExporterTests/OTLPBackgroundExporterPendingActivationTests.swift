@@ -31,7 +31,7 @@ struct PendingEndpointActivationTests {
             rules: Rules(),
             encryption: NoneEncryption()
         )
-        let disk = PreInsertBlockingDiskStorage(wrapping: backingDisk)
+        let disk = InsertHookDiskStorage(wrapping: backingDisk)
         let exporter = OTLPBackgroundHTTPBaseExporter(
             endpoint: nil,
             qosConfig: SessionQOSConfiguration(),
@@ -45,29 +45,20 @@ struct PendingEndpointActivationTests {
         let requestID = UUID()
         let pendingKey = exporter.getPendingStorageKey().append(requestID.uuidString)
         let activeKey = exporter.getStorageKey().append(requestID.uuidString)
-        let pendingWriteReturned = DispatchSemaphore(value: 0)
         disk.observeDelete(for: pendingKey)
         defer {
-            disk.resumeInsert()
             try? disk.delete(forKey: pendingKey)
             try? disk.delete(forKey: activeKey)
         }
 
-        DispatchQueue.global(qos: .utility)
-            .async {
-                try? exporter.storePendingData(Data("payload".utf8), requestId: requestID)
-                pendingWriteReturned.signal()
-            }
-
-        #expect(disk.waitUntilInsertStarts(timeout: 5) == .success)
-
         let endpoint = try #require(URL(string: "https://example.com/v1/traces"))
-        exporter.setEndpoint(endpoint)
+        disk.beforeFirstInsert {
+            exporter.setEndpoint(endpoint)
+        }
+
+        try exporter.storePendingData(Data("payload".utf8), requestId: requestID)
+
         #expect(disk.waitUntilListReturns(timeout: 5) == .success)
-
-        disk.resumeInsert()
-
-        #expect(pendingWriteReturned.wait(timeout: .now() + 5) == .success)
         #expect(httpClient.waitForSend(timeout: 5) == .success)
         #expect(disk.waitUntilObservedDelete(timeout: 5) == .success)
         #expect(httpClient.sentEndpoints == [endpoint])
@@ -75,14 +66,12 @@ struct PendingEndpointActivationTests {
     }
 }
 
-private final class PreInsertBlockingDiskStorage: DiskStorage {
+private final class InsertHookDiskStorage: DiskStorage {
     private let wrapped: any DiskStorage
-    private let insertStarted = DispatchSemaphore(value: 0)
-    private let resumeInsertSemaphore = DispatchSemaphore(value: 0)
     private let listReturned = DispatchSemaphore(value: 0)
     private let observedDelete = DispatchSemaphore(value: 0)
     private let lock = NSLock()
-    private var shouldBlockInsert = true
+    private var beforeInsert: (() -> Void)?
     private var observedDeleteKey: String?
 
     init(wrapping wrapped: any DiskStorage) {
@@ -95,14 +84,11 @@ private final class PreInsertBlockingDiskStorage: DiskStorage {
 
     func insert(_ value: some Decodable & Encodable, forKey key: KeyBuilder) throws {
         lock.lock()
-        let shouldBlock = shouldBlockInsert
-        shouldBlockInsert = false
+        let beforeInsert = beforeInsert
+        self.beforeInsert = nil
         lock.unlock()
 
-        if shouldBlock {
-            insertStarted.signal()
-            resumeInsertSemaphore.wait()
-        }
+        beforeInsert?()
 
         try wrapped.insert(value, forKey: key)
     }
@@ -140,12 +126,14 @@ private final class PreInsertBlockingDiskStorage: DiskStorage {
         try wrapped.checkRules()
     }
 
-    func waitUntilInsertStarts(timeout: TimeInterval) -> DispatchTimeoutResult {
-        insertStarted.wait(timeout: .now() + timeout)
-    }
-
     func waitUntilListReturns(timeout: TimeInterval) -> DispatchTimeoutResult {
         listReturned.wait(timeout: .now() + timeout)
+    }
+
+    func beforeFirstInsert(_ action: @escaping () -> Void) {
+        lock.lock()
+        beforeInsert = action
+        lock.unlock()
     }
 
     func observeDelete(for key: KeyBuilder) {
@@ -156,10 +144,6 @@ private final class PreInsertBlockingDiskStorage: DiskStorage {
 
     func waitUntilObservedDelete(timeout: TimeInterval) -> DispatchTimeoutResult {
         observedDelete.wait(timeout: .now() + timeout)
-    }
-
-    func resumeInsert() {
-        resumeInsertSemaphore.signal()
     }
 }
 

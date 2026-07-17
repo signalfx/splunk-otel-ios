@@ -28,14 +28,11 @@ struct OTLPBackgroundExporterEndpointTests {
     @Test
     func settingEndpointDoesNotWaitForPendingDiskScan() throws {
         let disk = MockDiskStorage()
-        let scanStarted = DispatchSemaphore(value: 0)
-        let resumeScan = DispatchSemaphore(value: 0)
-        let callReturned = DispatchSemaphore(value: 0)
+        let scanFinished = DispatchSemaphore(value: 0)
         disk.onList = {
-            scanStarted.signal()
-            resumeScan.wait()
+            Thread.sleep(forTimeInterval: 0.5)
+            scanFinished.signal()
         }
-        defer { resumeScan.signal() }
 
         let exporter = OTLPBackgroundHTTPBaseExporter(
             endpoint: nil,
@@ -46,14 +43,11 @@ struct OTLPBackgroundExporterEndpointTests {
         )
         let endpoint = try #require(URL(string: "https://example.com/v1/traces"))
 
-        DispatchQueue.global()
-            .async {
-                exporter.setEndpoint(endpoint)
-                callReturned.signal()
-            }
+        let start = Date()
+        exporter.setEndpoint(endpoint)
 
-        #expect(scanStarted.wait(timeout: .now() + 5) == .success)
-        #expect(callReturned.wait(timeout: .now() + 5) == .success)
+        #expect(Date().timeIntervalSince(start) < 0.2)
+        #expect(scanFinished.wait(timeout: .now() + 5) == .success)
         #expect(exporter.endpoint == endpoint)
     }
 

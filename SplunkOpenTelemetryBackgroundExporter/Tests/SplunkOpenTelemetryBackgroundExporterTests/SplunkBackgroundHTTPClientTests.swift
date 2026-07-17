@@ -84,26 +84,25 @@ struct BackgroundHTTPClientTests {
     }
 
     @Test
-    func flushCallsCompletion() {
+    func flushCallsCompletion() async {
         let client = makeClient()
-        let didComplete = DispatchSemaphore(value: 0)
 
-        client.flush {
-            didComplete.signal()
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            client.flush {
+                continuation.resume()
+            }
         }
-
-        #expect(didComplete.wait(timeout: .now() + 5) == .success)
     }
 
     @Test
-    func getAllSessionsTasksReturnsTasks() {
+    func getAllSessionsTasksReturnsTasks() async {
         let client = makeClient()
-        let wasCalled = DispatchSemaphore(value: 0)
-        client.getAllSessionsTasks { _ in
-            wasCalled.signal()
-        }
 
-        #expect(wasCalled.wait(timeout: .now() + 5) == .success)
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            client.getAllSessionsTasks { _ in
+                continuation.resume()
+            }
+        }
     }
 
     @Test
