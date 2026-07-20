@@ -27,14 +27,25 @@ public class OTLPLogToSpanExporter: LogRecordExporter {
 
     private let agentVersion: String
 
+    private let tracerProvider: () -> any TracerProvider
+
     /// Internal Logger.
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "Log to Span Exporter")
 
 
     // MARK: - Initialization
 
-    init(agentVersion: String) {
+    convenience init(agentVersion: String) {
+        self.init(agentVersion: agentVersion, tracerProviderProvider: { OpenTelemetry.instance.tracerProvider })
+    }
+
+    convenience init(agentVersion: String, tracerProvider: any TracerProvider) {
+        self.init(agentVersion: agentVersion, tracerProviderProvider: { tracerProvider })
+    }
+
+    init(agentVersion: String, tracerProviderProvider: @escaping () -> any TracerProvider) {
         self.agentVersion = agentVersion
+        tracerProvider = tracerProviderProvider
     }
 
 
@@ -42,8 +53,7 @@ public class OTLPLogToSpanExporter: LogRecordExporter {
 
     public func export(logRecords: [OpenTelemetrySdk.ReadableLogRecord], explicitTimeout _: TimeInterval?) -> OpenTelemetrySdk.ExportResult {
 
-        let tracer = OpenTelemetry.instance
-            .tracerProvider
+        let tracer = tracerProvider()
             .get(
                 instrumentationName: "LogToSpan",
                 instrumentationVersion: agentVersion
