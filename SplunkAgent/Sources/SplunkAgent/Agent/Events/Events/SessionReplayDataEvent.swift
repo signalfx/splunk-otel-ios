@@ -120,7 +120,6 @@ class SessionReplayDataEvent: AgentEvent {
                 .replacingOccurrences(of: "\"", with: "\\\"")
             let start = metadata.startUnixMs
             let end = metadata.endUnixMs
-            // swiftlint:disable:next line_length
             return "{\"startUnixMs\":\(start),\"endUnixMs\":\(end),\"source\":\"\(src)\",\"userActivity\":[\(activityJSON)]}"
         }
 
