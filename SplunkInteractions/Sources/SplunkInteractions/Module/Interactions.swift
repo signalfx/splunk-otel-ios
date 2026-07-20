@@ -33,9 +33,11 @@ public final class Interactions: SplunkInteractionsModule {
 
     // MARK: - Internal properties
 
-    /// Stream of interaction timestamps.
+    /// Stream of interaction timestamps (best-effort).
     ///
-    /// Emits a value for every interaction event, regardless of type.
+    /// Yields a timestamp for every interaction event regardless of type.
+    /// Delivery is best-effort: the stream uses `.bufferingNewest(1_000)` and will drop
+    /// older timestamps if the consumer falls behind by more than 1 000 events.
     @_spi(SplunkInternal)
     public let activityStream: AsyncStream<Date>
 

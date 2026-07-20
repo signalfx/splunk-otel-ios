@@ -20,11 +20,14 @@ import Foundation
 /// Collects user interaction timestamps for inclusion in session replay metadata.
 ///
 /// Timestamps are stored as Unix milliseconds and flushed when a session replay segment is produced.
+/// Recording is best-effort: timestamps older than the oldest known segment window are discarded on flush.
 actor UserActivityCollector {
 
     // MARK: - Private properties
 
     private var timestamps: [Int] = []
+
+    private static let maxBufferSize = 10_000
 
 
     // MARK: - Interface
@@ -32,16 +35,24 @@ actor UserActivityCollector {
     /// Records a user interaction at the given time.
     func record(at date: Date) {
         let ms = Int(date.timeIntervalSince1970 * 1_000.0)
+        if timestamps.count >= Self.maxBufferSize {
+            timestamps.removeFirst()
+        }
         timestamps.append(ms)
     }
 
-    /// Returns timestamps that fall within [startMs, endMs] and removes them from the buffer.
+    /// Returns timestamps that fall within [startMs, endMs] and removes exactly those timestamps from the buffer.
     ///
-    /// Timestamps that fall after endMs are retained for the next segment flush.
-    /// Timestamps that fall before startMs are discarded as they do not belong to any known window.
+    /// Only timestamps in the given window are removed; timestamps outside the window
+    /// (both before startMs and after endMs) are retained for other segment flushes.
     func flush(startMs: Int, endMs: Int) -> [Int] {
         let collected = timestamps.filter { $0 >= startMs && $0 <= endMs }
-        timestamps = timestamps.filter { $0 > endMs }
+        timestamps = timestamps.filter { $0 < startMs || $0 > endMs }
         return collected
+    }
+
+    /// Clears all buffered timestamps. Call when session replay recording stops or resets.
+    func reset() {
+        timestamps.removeAll()
     }
 }
