@@ -37,7 +37,13 @@ public class OTLPBackgroundHTTPTraceExporter: OTLPBackgroundHTTPBaseExporter, Sp
 
         do {
             // Encode to JSON instead of protobuf binary
-            let storeData = try JSONEncoder().encode(request)
+            let encoder = JSONEncoder()
+            encoder.nonConformingFloatEncodingStrategy = .convertToString(
+                positiveInfinity: "Infinity",
+                negativeInfinity: "-Infinity",
+                nan: "NaN"
+            )
+            let storeData = try encoder.encode(request)
 
             // If no endpoint is configured, store in pending folder for later
             if isPendingEndpoint {
