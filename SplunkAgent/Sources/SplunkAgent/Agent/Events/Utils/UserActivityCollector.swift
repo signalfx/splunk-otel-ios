@@ -51,7 +51,9 @@ actor UserActivityCollector {
         return collected
     }
 
-    /// Clears all buffered timestamps. Call when session replay recording stops or resets.
+    /// Clears all buffered timestamps.
+    ///
+    /// Call when session replay recording stops or resets.
     func reset() {
         timestamps.removeAll()
     }
