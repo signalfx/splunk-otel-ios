@@ -115,8 +115,13 @@ class SessionReplayDataEvent: AgentEvent {
             let jsonString = String(data: data, encoding: .utf8)
         else {
             let activityJSON = userActivity.map(String.init).joined(separator: ",")
-            let escapedSource = metadata.source.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "\"", with: "\\\"")
-            return "{\"startUnixMs\":\(metadata.startUnixMs),\"endUnixMs\":\(metadata.endUnixMs),\"source\":\"\(escapedSource)\",\"userActivity\":[\(activityJSON)]}"
+            let src = metadata.source
+                .replacingOccurrences(of: "\\", with: "\\\\")
+                .replacingOccurrences(of: "\"", with: "\\\"")
+            let start = metadata.startUnixMs
+            let end = metadata.endUnixMs
+            // swiftlint:disable:next line_length
+            return "{\"startUnixMs\":\(start),\"endUnixMs\":\(end),\"source\":\"\(src)\",\"userActivity\":[\(activityJSON)]}"
         }
 
         return jsonString
