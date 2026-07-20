@@ -71,29 +71,12 @@ import XCTest
         func testFrozenFrameIsDetectedWhenFramesStop() async throws {
             let logic = try XCTUnwrap(logic)
             let mockDestination = try XCTUnwrap(mockDestination)
-            let hangTime = SlowFrameDetector.frozenFrameThreshold // 0.7 seconds
 
             await logic.handleFrame(timestamp: 0.0, targetTimestamp: cadence60Hz)
 
-            // Create an expectation that the frozenFrameCount becomes 1
-            let frozenFrameDetectedExpectation = XCTestExpectation(description: "Frozen frame detected by watchdog")
-
-            // Monitor the frozenFrameCount in a background task
-            Task {
-                var count = 0
-                while count < 1, !Task.isCancelled {
-                    count = await logic.testFrozenFrameCount
-                    if count >= 1 {
-                        frozenFrameDetectedExpectation.fulfill()
-                        break
-                    }
-                    try? await Task.sleep(nanoseconds: 10_000_000) // Check every 10ms
-                }
-            }
-
-            try await Task.sleep(nanoseconds: UInt64((hangTime + 0.05) * 1_000_000_000))
-
-            await fulfillment(of: [frozenFrameDetectedExpectation], timeout: 1.0)
+            // With no further frames, the watchdog must observe the stale heartbeat and count one
+            // frozen episode. The helper polls with proper task cleanup on both success and failure.
+            try await waitUntilTotalFrozenEpisodes(atLeast: 1, logic: logic, destination: mockDestination)
 
             await logic.flushBuffers()
 
@@ -192,8 +175,13 @@ import XCTest
 
             let pollTask = Task {
                 while !Task.isCancelled {
-                    let buffered = await logic.testFrozenFrameCount
+                    // Read the flushed count first, then the buffered count. The one-second flush loop
+                    // moves an event from the buffer to the destination between these two reads; reading
+                    // flushed first means a just-flushed event is missed here but caught on the next
+                    // poll. Reading buffered first would let the same event appear in both reads and
+                    // double-count.
                     let flushed = destination.reportedCounts["frozenRenders"] ?? 0
+                    let buffered = await logic.testFrozenFrameCount
                     if buffered + flushed >= count {
                         expectation.fulfill()
                         break
