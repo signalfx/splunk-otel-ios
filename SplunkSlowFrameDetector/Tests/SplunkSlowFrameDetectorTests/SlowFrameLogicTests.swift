@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2025 Splunk Inc.
+Copyright 2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -101,23 +101,22 @@ import XCTest
             XCTAssertEqual(counts["slowRenders"], 1)
         }
 
-        /// Verifies that no render event is produced for background time or the first callback
-        /// after foregrounding.
+        /// Verifies that no render event is produced for background time, a frame still in flight when
+        /// the app resigns active, or the first callback after foregrounding.
         func testNoEventsAcrossBackgroundForegroundTransition() async throws {
             let logic = try XCTUnwrap(logic)
             let mockDestination = try XCTUnwrap(mockDestination)
-
             await logic.handleFrame(timestamp: 0.0, targetTimestamp: cadence60Hz)
-
-            // App backgrounds; no frames arrive while inactive (simulated by simply not calling handleFrame).
             await logic.appWillResignActive()
+            // Simulates a frame already in flight when the lifecycle notification landed; must not
+            // re-arm the heartbeat or seed a stale baseline.
+            await logic.handleFrame(timestamp: 50.0, targetTimestamp: 50.0 + cadence60Hz)
+            let heartbeat = await logic.testLastHeartbeatTimestamp
+            XCTAssertEqual(heartbeat, 0, "A frame delivered while inactive must not re-arm the heartbeat.")
             await logic.appDidBecomeActive()
-
             // First callback after foregrounding establishes a new baseline, no event.
             await logic.handleFrame(timestamp: 100.0, targetTimestamp: 100.0 + cadence60Hz)
-
             await logic.flushBuffers()
-
             let counts = mockDestination.reportedCounts
             XCTAssertTrue(counts.isEmpty)
         }
@@ -276,6 +275,8 @@ import XCTest
 
         /// Verifies that a multi-second stall, observed directly via `handleFrame`, still produces
         /// exactly one frozen render (one continuous freeze episode), not multiple.
+        ///
+        /// Same `handleFrame` branch as the test above; kept separate since the test plan names it explicitly.
         func testMultiSecondStallIsDetectedAsOneFrozenEvent() async throws {
             let logic = try XCTUnwrap(logic)
             let mockDestination = try XCTUnwrap(mockDestination)

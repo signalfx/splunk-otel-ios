@@ -16,15 +16,12 @@ limitations under the License.
 */
 
 import Foundation
-import SplunkCommon
 import XCTest
 
 #if os(iOS) || os(tvOS) || os(visionOS)
     import UIKit
 
     @testable import SplunkSlowFrameDetector
-
-    // MARK: - Mock Ticker
 
     final class MockTicker: SlowFrameTicker {
         @MainActor
@@ -77,36 +74,6 @@ import XCTest
         @MainActor
         func simulateFrame(timestamp: TimeInterval, targetTimestamp: TimeInterval) {
             continuation.yield((timestamp, targetTimestamp))
-        }
-    }
-
-
-    // MARK: - Mock Destination
-
-    final class MockDestination: SlowFrameDetectorDestination {
-        // This dictionary will store the accumulated counts.
-        private var reportedCountsStorage: [String: Int] = [:]
-        private var onSend: ((String, Int) -> Void)?
-        private let lock = NSLock()
-
-        var reportedCounts: [String: Int] {
-            lock.lock()
-            defer { lock.unlock() }
-            return reportedCountsStorage
-        }
-
-        func send(type: String, count: Int, sharedState _: AgentSharedState?) {
-            lock.lock()
-            reportedCountsStorage[type, default: 0] += count
-            let handler = onSend
-            lock.unlock()
-            handler?(type, count)
-        }
-
-        func setOnSend(_ handler: ((String, Int) -> Void)?) {
-            lock.lock()
-            onSend = handler
-            lock.unlock()
         }
     }
 #endif

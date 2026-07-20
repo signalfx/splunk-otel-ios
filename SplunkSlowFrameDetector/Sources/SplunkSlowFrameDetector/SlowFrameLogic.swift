@@ -52,6 +52,15 @@ actor SlowFrameLogic {
     /// lateness of the frame that ends it.
     private var inFreezeEpisode = false
 
+    /// Whether the app is currently active (foregrounded).
+    ///
+    /// `handleFrame` is a no-op while this is `false`. This closes a race between the frame-consuming
+    /// `AsyncStream` loop and the lifecycle-notification loop, which run as separate tasks and have no
+    /// ordering guarantee against each other: without this guard, a frame still in flight when the app
+    /// resigns active can re-arm `lastHeartbeatTimestamp` after `appWillResignActive` clears it, letting
+    /// the watchdog count a spurious frozen frame while backgrounded.
+    private var isActive = true
+
 
     // MARK: - Test-only Properties
 
@@ -59,6 +68,11 @@ actor SlowFrameLogic {
         /// A test-only accessor for the current frozenFrameCount.
         var testFrozenFrameCount: Int {
             frozenFrameCount
+        }
+
+        /// A test-only accessor for the current lastHeartbeatTimestamp.
+        var testLastHeartbeatTimestamp: TimeInterval {
+            lastHeartbeatTimestamp
         }
     #endif
 
@@ -114,6 +128,10 @@ actor SlowFrameLogic {
     ///   - timestamp: The timestamp at which this frame was presented.
     ///   - targetTimestamp: The timestamp at which this frame's content should be presented.
     func handleFrame(timestamp: TimeInterval, targetTimestamp: TimeInterval) {
+        guard isActive else {
+            return
+        }
+
         lastHeartbeatTimestamp = CACurrentMediaTime()
 
         let cadence = targetTimestamp - timestamp
@@ -147,6 +165,9 @@ actor SlowFrameLogic {
     // MARK: - Lifecycle Handlers
 
     func appWillResignActive() {
+        // Stop accepting frames immediately, so one still in flight on the detector's frame-consuming
+        // task cannot re-arm the heartbeat after this reset.
+        isActive = false
         // Prevent watchdog from counting while paused in background.
         lastHeartbeatTimestamp = 0
         inFreezeEpisode = false
@@ -159,6 +180,8 @@ actor SlowFrameLogic {
         inFreezeEpisode = false
         slowFrameCount = 0
         frozenFrameCount = 0
+        // Resume accepting frames only after the baseline above is fully reset.
+        isActive = true
     }
 
     func appWillTerminate() {
