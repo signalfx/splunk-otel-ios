@@ -228,9 +228,9 @@ public class SplunkRumBuilder {
         return self
     }
 
-    /// Specifies whether the SlowFrameDetection should be activated and generate slow frame detection spans.
+    /// Specifies whether the SlowFrameDetection should be activated and generate slow and frozen frame detection spans.
     ///
-    /// - Parameter isEnabled: If `true`, the SlowFrameDetection module generates slow frame detection spans.
+    /// - Parameter isEnabled: If `true`, the SlowFrameDetection module generates slow and frozen frame detection spans.
     ///
     /// - Returns: The updated builder instance.
     @available(*, deprecated, message: "This builder method will be removed in a later version. Use the `SlowFrameDetectorModule` configuration instead.")
