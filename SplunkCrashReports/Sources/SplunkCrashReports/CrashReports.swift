@@ -21,6 +21,8 @@ import Foundation
 import OpenTelemetryApi
 @_spi(SplunkInternal) import SplunkCommon
 
+package typealias CrashReportPersistenceHandler = (@escaping (Bool) -> Void) -> Void
+
 public class CrashReports {
 
 
@@ -37,10 +39,16 @@ public class CrashReports {
     /// A reference to the Module's data publishing callback.
     var crashReportDataConsumer: ((CrashReportsMetadata, String) -> Void)?
 
+    /// Requests confirmation that the emitted crash span has reached durable storage.
+    package var crashReportPersistenceHandler: CrashReportPersistenceHandler?
+
 
     // MARK: - Private
 
     private var crashReporter: PLCrashReporter?
+
+    private let persistenceLock = NSLock()
+    private var isAwaitingPersistence = false
 
     var crashSpanName: String = CrashReportConstants.defaultSpanName
 
@@ -113,6 +121,10 @@ public class CrashReports {
             return
         }
 
+        guard beginPersistenceAttempt() else {
+            return
+        }
+
         do {
             allUsedImageNames.removeAll()
             let data = try crashReporter?.loadPendingCrashReportDataAndReturnError()
@@ -138,14 +150,14 @@ public class CrashReports {
             send(crashReport: reportPayload, sharedState: sharedState, timestamp: timestamp)
         }
         catch {
+            finishPersistenceAttempt()
             logger.log(level: .error) {
                 "CrashReporter failed to load/parse with error: \(error)"
             }
             return
         }
 
-        // Purge the report.
-        crashReporter?.purgePendingCrashReport()
+        requestCrashReportPersistence()
 
         // And indicate that crash occured
         logger.log(level: .warn) {
@@ -308,6 +320,55 @@ public class CrashReports {
         }
 
         crashSpan.end(time: timestamp)
+    }
+
+    private func finishPersistenceAttempt() {
+        persistenceLock.lock()
+        isAwaitingPersistence = false
+        persistenceLock.unlock()
+    }
+
+    private func beginPersistenceAttempt() -> Bool {
+        persistenceLock.lock()
+        defer {
+            persistenceLock.unlock()
+        }
+
+        guard !isAwaitingPersistence else {
+            return false
+        }
+
+        isAwaitingPersistence = true
+        return true
+    }
+
+    private func requestCrashReportPersistence() {
+        guard let crashReportPersistenceHandler else {
+            finishPersistenceAttempt()
+            logger.log(level: .error) {
+                "Crash Report retained because durable span persistence is unavailable."
+            }
+            return
+        }
+
+        crashReportPersistenceHandler { [weak self] succeeded in
+            DispatchQueue.main.async {
+                guard let self else {
+                    return
+                }
+
+                if succeeded {
+                    self.crashReporter?.purgePendingCrashReport()
+                }
+                else {
+                    self.logger.log(level: .error) {
+                        "Crash Report retained because its span could not be persisted."
+                    }
+                }
+
+                self.finishPersistenceAttempt()
+            }
+        }
     }
 }
 

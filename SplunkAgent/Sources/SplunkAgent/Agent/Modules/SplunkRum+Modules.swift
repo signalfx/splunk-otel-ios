@@ -235,6 +235,17 @@ extension SplunkRum {
             // We need to do this because we need to read `appState` from the agent in the instance of a crash.
             crashReportsModule?.sharedState = sharedState
 
+            if let eventManager = eventManager as? DefaultEventManager {
+                crashReportsModule?.crashReportPersistenceHandler = { [weak eventManager] completion in
+                    guard let eventManager else {
+                        completion(false)
+                        return
+                    }
+
+                    eventManager.concreteTraceProcessor.persistBufferedSpans(completion: completion)
+                }
+            }
+
             // Check if a crash ended the previous run of the app
             crashReportsModule?.reportCrashIfPresent()
         #endif

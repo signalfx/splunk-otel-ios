@@ -34,14 +34,14 @@ class SplunkStdoutSpanExporter: SpanExporter {
         proxyExporter = proxy
     }
 
-    func export(spans: [SpanData], explicitTimeout _: TimeInterval?) -> SpanExporterResultCode {
+    func export(spans: [SpanData], explicitTimeout: TimeInterval?) -> SpanExporterResultCode {
         for span in spans {
             logger.log {
                 self.spanMessage(for: span)
             }
         }
 
-        return proxyExporter.export(spans: spans)
+        return proxyExporter.export(spans: spans, explicitTimeout: explicitTimeout)
     }
 
     func flush(explicitTimeout: TimeInterval?) -> SpanExporterResultCode {
