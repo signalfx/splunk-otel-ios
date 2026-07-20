@@ -115,7 +115,8 @@ class SessionReplayDataEvent: AgentEvent {
             let jsonString = String(data: data, encoding: .utf8)
         else {
             let activityJSON = userActivity.map(String.init).joined(separator: ",")
-            return "{\"startUnixMs\":\(metadata.startUnixMs),\"endUnixMs\":\(metadata.endUnixMs),\"userActivity\":[\(activityJSON)]}"
+            let escapedSource = metadata.source.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "\"", with: "\\\"")
+            return "{\"startUnixMs\":\(metadata.startUnixMs),\"endUnixMs\":\(metadata.endUnixMs),\"source\":\"\(escapedSource)\",\"userActivity\":[\(activityJSON)]}"
         }
 
         return jsonString

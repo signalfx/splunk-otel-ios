@@ -21,7 +21,7 @@ import Foundation
 ///
 /// Keys that match OpenTelemetry semantic conventions (for example ``exceptionName`` and
 /// ``exceptionReason``) use the same wire names as ``SemanticConventions/Exception``.
-enum CrashReportKeys: String {
+public enum CrashReportKeys: String {
     case previousAppState = "ios.app.state"
 
     case crashTimestamp = "crash.timestamp"

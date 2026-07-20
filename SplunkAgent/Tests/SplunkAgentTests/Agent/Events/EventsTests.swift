@@ -89,7 +89,7 @@ final class EventsTests: XCTestCase {
         let metadataValue = try XCTUnwrap(processedEvent.attributes?["segmentMetadata"])
         let metadataData = try XCTUnwrap(metadataValue.description.data(using: .utf8))
         let json = try XCTUnwrap(JSONSerialization.jsonObject(with: metadataData) as? [String: Any])
-        let userActivity = try XCTUnwrap(json["userActivity"] as? [Int])
+        let userActivity = try XCTUnwrap(json["userActivity"] as? [NSNumber]).map(\.intValue)
 
         XCTAssertEqual(userActivity, timestamps)
 
@@ -109,7 +109,7 @@ final class EventsTests: XCTestCase {
         let metadataValue = try XCTUnwrap(processedEvent.attributes?["segmentMetadata"])
         let metadataData = try XCTUnwrap(metadataValue.description.data(using: .utf8))
         let json = try XCTUnwrap(JSONSerialization.jsonObject(with: metadataData) as? [String: Any])
-        let userActivity = try XCTUnwrap(json["userActivity"] as? [Int])
+        let userActivity = try XCTUnwrap(json["userActivity"] as? [NSNumber]).map(\.intValue)
 
         XCTAssertTrue(userActivity.isEmpty)
 

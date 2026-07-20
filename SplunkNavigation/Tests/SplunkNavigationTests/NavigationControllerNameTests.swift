@@ -15,9 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// swift-format-ignore-file
 import XCTest
 
-// swift-format-ignore-file
 @testable import SplunkNavigation
 
 #if canImport(SwiftUI)
