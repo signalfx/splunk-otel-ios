@@ -30,7 +30,7 @@ import SplunkCommon
 /// significant period. A slow frame and a frozen frame are mutually exclusive, and one continuous freeze
 /// is reported as a single frozen frame event regardless of its duration.
 ///
-/// These events are reported as metrics to the configured destination.
+/// Detected events are periodically flushed to the configured destination as aggregated counts.
 public final class SlowFrameDetector: NSObject {
 
     // MARK: - Public Properties

@@ -49,9 +49,10 @@ import XCTest
             try await super.setUp()
             let destination = MockDestination()
             mockDestination = destination
+            // Intentionally do not call `start()`. These tests drive `handleFrame` and `flushBuffers`
+            // directly, so the background watchdog and flush timers are omitted to keep them fully
+            // deterministic. Watchdog behavior is covered by `SlowFrameLogicWatchdogTests`.
             logic = SlowFrameLogic(destination: destination)
-
-            try await logic?.start()
         }
 
         override func tearDown() async throws {

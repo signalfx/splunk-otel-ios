@@ -67,8 +67,7 @@ import XCTest
         /// Verifies that a frozen frame is detected when the ticker stops firing entirely (a true main-thread hang),
         /// relying on the background watchdog.
         ///
-        /// This is the one test in the suite that depends on wall-clock timing, since it exercises
-        /// the watchdog's real-hang detection path.
+        /// Depends on wall-clock timing, since it exercises the watchdog's real-hang detection path.
         func testFrozenFrameIsDetectedWhenFramesStop() async throws {
             let logic = try XCTUnwrap(logic)
             let mockDestination = try XCTUnwrap(mockDestination)
