@@ -71,7 +71,10 @@ struct OTLPBackgroundHTTPTraceExporterTests {
         return exporter
     }
 
-    func makeSpanData(name: String = "test-span") -> SpanData {
+    func makeSpanData(
+        name: String = "test-span",
+        attributes: [String: AttributeValue] = [:]
+    ) -> SpanData {
         let exporter = NoOpSpanExporter()
         let processor = SimpleSpanProcessor(spanExporter: exporter)
         let tracerProvider = TracerProviderBuilder()
@@ -79,6 +82,9 @@ struct OTLPBackgroundHTTPTraceExporterTests {
             .build()
         let tracer = tracerProvider.get(instrumentationName: "trace-exporter-test", instrumentationVersion: "1.0")
         let span = tracer.spanBuilder(spanName: name).startSpan()
+        for (key, value) in attributes {
+            span.setAttribute(key: key, value: value)
+        }
         span.end()
 
         guard let readableSpan = span as? ReadableSpan else {
@@ -120,6 +126,36 @@ struct OTLPBackgroundHTTPTraceExporterTests {
 
         let entries = try disk.list(forKey: exporter.getStorageKey())
         #expect(entries.count == 1)
+    }
+
+    @Test
+    func exportEncodesBatchContainingNonFiniteDoubleAttributes() throws {
+        let disk = makeDisk(uniqueLabel: "non_finite_doubles_\(UUID().uuidString)")
+        let http = MockHTTPClient()
+        let exporter = try makeExporter(disk: disk, http: http)
+        let span = makeSpanData(
+            attributes: [
+                "nan": .double(.nan),
+                "positive.infinity": .double(.infinity),
+                "negative.infinity": .double(-.infinity)
+            ]
+        )
+
+        let result = exporter.export(
+            spans: [span, makeSpanData(name: "subsequent-span")],
+            explicitTimeout: nil
+        )
+
+        #expect(result == .success)
+        let sent = try #require(http.sent.first)
+        let fileKey = exporter.getStorageKey().append(sent.id.uuidString)
+        let finalURL = try disk.finalDestination(forKey: fileKey)
+        let payload = try Data(contentsOf: finalURL)
+        let json = try #require(String(data: payload, encoding: .utf8))
+        #expect(json.contains(#""doubleValue":"NaN""#))
+        #expect(json.contains(#""doubleValue":"Infinity""#))
+        #expect(json.contains(#""doubleValue":"-Infinity""#))
+        #expect(json.contains(#""name":"subsequent-span""#))
     }
 
     @Test
