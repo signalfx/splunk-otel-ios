@@ -131,14 +131,14 @@ import XCTest
             await logic.handleFrame(timestamp: 0.0, targetTimestamp: cadence60Hz)
 
             // First freeze, detected by the watchdog.
-            try await waitUntilFrozenFrameCount(atLeast: 1, on: logic)
+            try await waitUntilTotalFrozenEpisodes(atLeast: 1, logic: logic, destination: mockDestination)
 
             // Recovery frame: ends the open freeze episode without itself being counted, and re-arms
             // the heartbeat and cadence baseline for a new episode.
             await logic.handleFrame(timestamp: 100.0, targetTimestamp: 100.0 + cadence60Hz)
 
             // Second, distinct freeze: the watchdog must detect and count it independently of the first.
-            try await waitUntilFrozenFrameCount(atLeast: 2, on: logic)
+            try await waitUntilTotalFrozenEpisodes(atLeast: 2, logic: logic, destination: mockDestination)
 
             await logic.flushBuffers()
 
@@ -176,14 +176,26 @@ import XCTest
 
         // MARK: - Helper Methods
 
-        /// Polls `testFrozenFrameCount` until it reaches `count`, for watchdog tests that must wait on
-        /// the real background timer rather than a deterministic `handleFrame` call.
-        private func waitUntilFrozenFrameCount(atLeast count: Int, on logic: SlowFrameLogic) async throws {
-            let expectation = XCTestExpectation(description: "frozenFrameCount reached \(count)")
+        /// Polls the total number of frozen episodes observed so far until it reaches `count`, for
+        /// watchdog tests that must wait on the real background timer rather than a deterministic
+        /// `handleFrame` call.
+        ///
+        /// The total is the accumulated destination count plus the actor's currently buffered count.
+        /// The actor's one-second flush loop periodically drains the buffered count into the
+        /// destination, so the buffered count alone oscillates and never reflects the running total;
+        /// the sum is monotonic and is the correct thing to wait on.
+        private func waitUntilTotalFrozenEpisodes(
+            atLeast count: Int,
+            logic: SlowFrameLogic,
+            destination: MockDestination
+        ) async throws {
+            let expectation = XCTestExpectation(description: "total frozen episodes reached \(count)")
 
             let pollTask = Task {
                 while !Task.isCancelled {
-                    if await logic.testFrozenFrameCount >= count {
+                    let buffered = await logic.testFrozenFrameCount
+                    let flushed = destination.reportedCounts["frozenRenders"] ?? 0
+                    if buffered + flushed >= count {
                         expectation.fulfill()
                         break
                     }
