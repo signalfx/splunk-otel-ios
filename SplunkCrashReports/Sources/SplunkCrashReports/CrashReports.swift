@@ -21,7 +21,11 @@ import Foundation
 import OpenTelemetryApi
 @_spi(SplunkInternal) import SplunkCommon
 
-package typealias CrashReportPersistenceHandler = (@escaping (Bool) -> Void) -> Void
+package typealias CrashReportSpanEmitter = () -> SpanId
+package typealias CrashReportPersistenceHandler = (
+    @escaping CrashReportSpanEmitter,
+    @escaping (Bool) -> Void
+) -> Void
 
 public class CrashReports {
 
@@ -45,10 +49,10 @@ public class CrashReports {
 
     // MARK: - Private
 
-    private var crashReporter: PLCrashReporter?
+    var crashReporter: PLCrashReporter?
 
-    private let persistenceLock = NSLock()
-    private var isAwaitingPersistence = false
+    let persistenceLock = NSLock()
+    var isAwaitingPersistence = false
 
     var crashSpanName: String = CrashReportConstants.defaultSpanName
 
@@ -146,8 +150,11 @@ public class CrashReports {
                 }
             }
 
-            // Send the report to the backend
-            send(crashReport: reportPayload, sharedState: sharedState, timestamp: timestamp)
+            requestCrashReportPersistence(
+                crashReport: reportPayload,
+                sharedState: sharedState,
+                timestamp: timestamp
+            )
         }
         catch {
             finishPersistenceAttempt()
@@ -156,8 +163,6 @@ public class CrashReports {
             }
             return
         }
-
-        requestCrashReportPersistence()
 
         // And indicate that crash occured
         logger.log(level: .warn) {
@@ -303,7 +308,11 @@ public class CrashReports {
         return appState
     }
 
-    private func send(crashReport: [CrashReportKeys: Any], sharedState: (any AgentSharedState)?, timestamp: Date) {
+    func send(
+        crashReport: [CrashReportKeys: Any],
+        sharedState: (any AgentSharedState)?,
+        timestamp: Date
+    ) -> SpanId {
         let tracer = OpenTelemetry.instance
             .tracerProvider
             .get(
@@ -320,55 +329,7 @@ public class CrashReports {
         }
 
         crashSpan.end(time: timestamp)
-    }
-
-    private func finishPersistenceAttempt() {
-        persistenceLock.lock()
-        isAwaitingPersistence = false
-        persistenceLock.unlock()
-    }
-
-    private func beginPersistenceAttempt() -> Bool {
-        persistenceLock.lock()
-        defer {
-            persistenceLock.unlock()
-        }
-
-        guard !isAwaitingPersistence else {
-            return false
-        }
-
-        isAwaitingPersistence = true
-        return true
-    }
-
-    private func requestCrashReportPersistence() {
-        guard let crashReportPersistenceHandler else {
-            finishPersistenceAttempt()
-            logger.log(level: .error) {
-                "Crash Report retained because durable span persistence is unavailable."
-            }
-            return
-        }
-
-        crashReportPersistenceHandler { [weak self] succeeded in
-            DispatchQueue.main.async {
-                guard let self else {
-                    return
-                }
-
-                if succeeded {
-                    self.crashReporter?.purgePendingCrashReport()
-                }
-                else {
-                    self.logger.log(level: .error) {
-                        "Crash Report retained because its span could not be persisted."
-                    }
-                }
-
-                self.finishPersistenceAttempt()
-            }
-        }
+        return crashSpan.context.spanId
     }
 }
 

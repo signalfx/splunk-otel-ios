@@ -42,7 +42,20 @@ public class OTLPBackgroundHTTPBaseExporter {
     let envVarHeaders: [(String, String)]?
     let config: OTLPExporterConfiguration
     let diskStorage: DiskStorage
+
+    /// State used by the recovery extension.
+    ///
+    /// Access is serialized by `stalledUploadCheckLock`.
+    let stalledUploadCheckLock = NSLock()
+    var stalledUploadCheckGeneration: UInt64 = 0
     var checkStalledTask: Task<Void, Never>?
+
+    /// Delay before scanning active storage for persisted files without a matching upload task.
+    ///
+    /// Overridable by tests so recovery behavior can be exercised without a production-length wait.
+    var stalledUploadCheckDelayNanoseconds: UInt64 {
+        UInt64(Int.random(in: 5 ... 8) * 1_000_000_000)
+    }
 
     /// Thread-safe accessor for the endpoint URL.
     var endpoint: URL? {
@@ -112,7 +125,7 @@ public class OTLPBackgroundHTTPBaseExporter {
     }
 
     deinit {
-        checkStalledTask?.cancel()
+        cancelStalledUploadCheck()
     }
 
     // MARK: - Endpoint Management
@@ -135,14 +148,13 @@ public class OTLPBackgroundHTTPBaseExporter {
         }
 
         if performStalledUploadCheck {
-            startStalledUploadCheck()
+            startStalledUploadCheck(replacingExisting: true)
         }
     }
 
     /// Clears the endpoint, causing new data to be cached to pending storage.
     public func clearEndpoint() {
-        checkStalledTask?.cancel()
-        checkStalledTask = nil
+        cancelStalledUploadCheck()
 
         stateLock.lock()
         endpointRevision &+= 1
@@ -312,18 +324,6 @@ public class OTLPBackgroundHTTPBaseExporter {
 // MARK: - Private helpers
 
 extension OTLPBackgroundHTTPBaseExporter {
-    private func startStalledUploadCheck() {
-        checkStalledTask?.cancel()
-        // Wait 5-8s to clean caches content from abandoned or stalled files.
-        checkStalledTask = Task.detached(priority: .utility) { [weak self] in
-            try? await Task.sleep(nanoseconds: UInt64(Int.random(in: 5 ... 8) * 1_000_000_000))
-            self?.httpClient
-                .getAllSessionsTasks { [weak self] tasks in
-                    self?.checkStalledUploadsOperation(tasks: tasks)
-                }
-        }
-    }
-
     /// Flushes any data stored in pending storage by moving it to active storage and scheduling uploads.
     private func flushPendingData(for activationRevision: UInt64) {
         guard endpointState(for: activationRevision) != nil else {
