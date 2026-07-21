@@ -195,6 +195,11 @@ public class OTLPTraceProcessor: TraceProcessor {
         )
     }
 
+    /// Flushes the shared direct and log-derived span batch and reports durable completion.
+    package func forceFlushBufferedSpans(timeout: TimeInterval?) -> ExportResult {
+        batchSpanProcessor.forceFlushResult(timeout: timeout) ? .success : .failure
+    }
+
 
     // MARK: - Endpoint Management
 

@@ -63,7 +63,15 @@ public class OTLPLogToSpanEventProcessor: LogEventProcessor {
         let state = Self.makeInitializationState(
             resources: resources,
             debugEnabled: debugEnabled,
-            tracerProviderProvider: { OpenTelemetry.instance.tracerProvider }
+            tracerProviderProvider: { OpenTelemetry.instance.tracerProvider },
+            spanFlusher: { timeout in
+                guard let tracerProvider = OpenTelemetry.instance.tracerProvider as? TracerProviderSdk else {
+                    return .failure
+                }
+
+                tracerProvider.forceFlush(timeout: timeout)
+                return .failure
+            }
         )
 
         loggerProvider = state.loggerProvider
@@ -83,7 +91,10 @@ public class OTLPLogToSpanEventProcessor: LogEventProcessor {
             with: traceUrl,
             resources: resources,
             debugEnabled: debugEnabled,
-            tracerProvider: traceProcessor.tracerProvider
+            tracerProvider: traceProcessor.tracerProvider,
+            spanFlusher: { timeout in
+                traceProcessor.forceFlushBufferedSpans(timeout: timeout)
+            }
         )
     }
 
@@ -91,12 +102,14 @@ public class OTLPLogToSpanEventProcessor: LogEventProcessor {
         with _: URL?,
         resources: AgentResources,
         debugEnabled: Bool,
-        tracerProvider: any TracerProvider
+        tracerProvider: any TracerProvider,
+        spanFlusher: @escaping (TimeInterval?) -> ExportResult = { _ in .failure }
     ) {
         let state = Self.makeInitializationState(
             resources: resources,
             debugEnabled: debugEnabled,
-            tracerProviderProvider: { tracerProvider }
+            tracerProviderProvider: { tracerProvider },
+            spanFlusher: spanFlusher
         )
 
         loggerProvider = state.loggerProvider
@@ -109,7 +122,8 @@ public class OTLPLogToSpanEventProcessor: LogEventProcessor {
     private static func makeInitializationState(
         resources: AgentResources,
         debugEnabled: Bool,
-        tracerProviderProvider: @escaping () -> any TracerProvider
+        tracerProviderProvider: @escaping () -> any TracerProvider,
+        spanFlusher: @escaping (TimeInterval?) -> ExportResult
     ) -> InitializationState {
         #if DEBUG
             var resource = Resource()
@@ -119,7 +133,8 @@ public class OTLPLogToSpanEventProcessor: LogEventProcessor {
         let loggerProvider = makeLoggerProvider(
             agentVersion: resources.agentVersion,
             debugEnabled: debugEnabled,
-            tracerProviderProvider: tracerProviderProvider
+            tracerProviderProvider: tracerProviderProvider,
+            spanFlusher: spanFlusher
         )
 
         #if DEBUG
@@ -132,11 +147,13 @@ public class OTLPLogToSpanEventProcessor: LogEventProcessor {
     private static func makeLoggerProvider(
         agentVersion: String,
         debugEnabled: Bool,
-        tracerProviderProvider: @escaping () -> any TracerProvider
+        tracerProviderProvider: @escaping () -> any TracerProvider,
+        spanFlusher: @escaping (TimeInterval?) -> ExportResult
     ) -> LoggerProvider {
         let logToSpanExporter = OTLPLogToSpanExporter(
             agentVersion: agentVersion,
-            tracerProviderProvider: tracerProviderProvider
+            tracerProviderProvider: tracerProviderProvider,
+            spanFlusher: spanFlusher
         )
 
         // Initialize LogRecordProcessor

@@ -80,6 +80,73 @@ struct OTLPLogToSpanExporterTests {
         #expect(spanExporter.successfulSpanNames == ["test.event"])
     }
 
+    @Test
+    func forceFlushDrainsLogDerivedSpanBeforeReportingSuccess() async {
+        let spanExporter = BatchProcessorTestExporter()
+        let spanProcessor = OTLPBatchSpanProcessor(
+            spanExporter: spanExporter,
+            scheduleDelay: 5
+        )
+        let tracerProvider = TracerProviderBuilder()
+            .add(spanProcessor: spanProcessor)
+            .build()
+        let exporter = OTLPLogToSpanExporter(
+            agentVersion: "1.0.0",
+            tracerProviderProvider: { tracerProvider },
+            spanFlusher: { timeout in
+                spanProcessor.forceFlushResult(timeout: timeout) ? .success : .failure
+            }
+        )
+
+        let exportResult = exporter.export(logRecords: [makeLogRecord()], explicitTimeout: nil)
+        #expect(spanExporter.successfulSpanCount == 0)
+
+        let flushTask = Task.detached {
+            exporter.forceFlush(explicitTimeout: 1)
+        }
+        let flushResult = await flushTask.value
+
+        #expect(exportResult == .success)
+        #expect(flushResult == .success)
+        #expect(spanExporter.successfulSpanNames == ["test.event"])
+        #expect(spanExporter.flushCount == 1)
+    }
+
+    @Test
+    func forceFlushReportsFailureWhenLogDerivedSpanCannotBeExported() async {
+        let spanExporter = BatchProcessorTestExporter(results: [.failure, .success])
+        let spanProcessor = OTLPBatchSpanProcessor(
+            spanExporter: spanExporter,
+            scheduleDelay: 5
+        )
+        let tracerProvider = TracerProviderBuilder()
+            .add(spanProcessor: spanProcessor)
+            .build()
+        let exporter = OTLPLogToSpanExporter(
+            agentVersion: "1.0.0",
+            tracerProviderProvider: { tracerProvider },
+            spanFlusher: { timeout in
+                spanProcessor.forceFlushResult(timeout: timeout) ? .success : .failure
+            }
+        )
+
+        _ = exporter.export(logRecords: [makeLogRecord()], explicitTimeout: nil)
+        let flushTask = Task.detached {
+            exporter.forceFlush(explicitTimeout: 1)
+        }
+        let flushResult = await flushTask.value
+
+        #expect(flushResult == .failure)
+        #expect(spanExporter.successfulSpanCount == 0)
+        #expect(spanExporter.exportAttemptCount == 1)
+        #expect(spanExporter.flushCount == 1)
+
+        let cleanupTask = Task.detached {
+            spanProcessor.forceFlush(timeout: 1)
+        }
+        await cleanupTask.value
+    }
+
     private func makeLogRecord() -> ReadableLogRecord {
         ReadableLogRecord(
             resource: Resource(),

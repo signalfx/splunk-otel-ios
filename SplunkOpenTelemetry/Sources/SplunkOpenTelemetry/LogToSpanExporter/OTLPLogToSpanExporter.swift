@@ -29,6 +29,8 @@ public class OTLPLogToSpanExporter: LogRecordExporter {
 
     private let tracerProvider: () -> any TracerProvider
 
+    private let spanFlusher: (TimeInterval?) -> ExportResult
+
     /// Internal Logger.
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "Log to Span Exporter")
 
@@ -36,16 +38,31 @@ public class OTLPLogToSpanExporter: LogRecordExporter {
     // MARK: - Initialization
 
     convenience init(agentVersion: String) {
-        self.init(agentVersion: agentVersion, tracerProviderProvider: { OpenTelemetry.instance.tracerProvider })
+        self.init(
+            agentVersion: agentVersion,
+            tracerProviderProvider: { OpenTelemetry.instance.tracerProvider },
+            spanFlusher: Self.flushGlobalTracerProvider
+        )
     }
 
     convenience init(agentVersion: String, tracerProvider: any TracerProvider) {
-        self.init(agentVersion: agentVersion, tracerProviderProvider: { tracerProvider })
+        self.init(
+            agentVersion: agentVersion,
+            tracerProviderProvider: { tracerProvider },
+            spanFlusher: { timeout in
+                Self.flushWithoutResult(tracerProvider, timeout: timeout)
+            }
+        )
     }
 
-    init(agentVersion: String, tracerProviderProvider: @escaping () -> any TracerProvider) {
+    init(
+        agentVersion: String,
+        tracerProviderProvider: @escaping () -> any TracerProvider,
+        spanFlusher: @escaping (TimeInterval?) -> ExportResult
+    ) {
         self.agentVersion = agentVersion
         tracerProvider = tracerProviderProvider
+        self.spanFlusher = spanFlusher
     }
 
 
@@ -109,7 +126,21 @@ public class OTLPLogToSpanExporter: LogRecordExporter {
 
     public func shutdown(explicitTimeout _: TimeInterval?) {}
 
-    public func forceFlush(explicitTimeout _: TimeInterval?) -> OpenTelemetrySdk.ExportResult {
-        .success
+    public func forceFlush(explicitTimeout: TimeInterval?) -> OpenTelemetrySdk.ExportResult {
+        spanFlusher(explicitTimeout)
+    }
+
+    private static func flushGlobalTracerProvider(timeout: TimeInterval?) -> ExportResult {
+        flushWithoutResult(OpenTelemetry.instance.tracerProvider, timeout: timeout)
+    }
+
+    /// The generic provider API exposes only a void flush, so it can be triggered best effort but
+    /// cannot truthfully report successful completion to the log pipeline.
+    private static func flushWithoutResult(
+        _ tracerProvider: any TracerProvider,
+        timeout: TimeInterval?
+    ) -> ExportResult {
+        (tracerProvider as? TracerProviderSdk)?.forceFlush(timeout: timeout)
+        return .failure
     }
 }
