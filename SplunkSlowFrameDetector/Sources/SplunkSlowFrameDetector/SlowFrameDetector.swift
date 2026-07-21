@@ -42,12 +42,12 @@ public final class SlowFrameDetector: NSObject {
 
     // MARK: - Internal Constants
 
-    /// A small timestamp tolerance applied when comparing a frame's lateness against the current cadence,
+    /// A small slack margin subtracted from the current cadence when comparing a frame's lateness,
     /// to avoid false negatives on a frame that missed its presentation deadline by only a
     /// floating-point/measurement-jitter margin.
     ///
     /// - Note: Fixed for now; may become remotely configurable in the future.
-    static let slowFrameTolerance: TimeInterval = 0.001
+    static let cadenceJitterMargin: TimeInterval = 0.001
 
     /// The duration of main thread unresponsiveness that triggers a frozen frame report.
     static let frozenFrameThreshold: TimeInterval = 0.7

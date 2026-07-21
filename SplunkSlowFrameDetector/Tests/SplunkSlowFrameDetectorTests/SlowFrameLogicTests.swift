@@ -226,7 +226,7 @@ import XCTest
             XCTAssertNil(counts["frozenRenders"])
         }
 
-        /// Verifies that a frame arriving at (or just past) the tolerance boundary is correctly classified as slow.
+        /// Verifies that a frame arriving at (or just past) the detection boundary is correctly classified as slow.
         ///
         /// A tiny epsilon past the exact boundary avoids floating-point rounding flakiness in the
         /// `>=` comparison while still exercising the boundary condition.
@@ -235,7 +235,7 @@ import XCTest
             let mockDestination = try XCTUnwrap(mockDestination)
 
             let epsilon: TimeInterval = 1e-9
-            let latenessAtBoundary = cadence60Hz - SlowFrameDetector.slowFrameTolerance + epsilon
+            let latenessAtBoundary = cadence60Hz - SlowFrameDetector.cadenceJitterMargin + epsilon
 
             await logic.handleFrame(timestamp: 0.0, targetTimestamp: cadence60Hz)
             await logic.handleFrame(

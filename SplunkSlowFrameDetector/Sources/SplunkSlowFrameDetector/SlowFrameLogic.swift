@@ -154,7 +154,7 @@ actor SlowFrameLogic {
         if lateness >= SlowFrameDetector.frozenFrameThreshold {
             frozenFrameCount += 1
         }
-        else if lateness >= cadence - SlowFrameDetector.slowFrameTolerance {
+        else if lateness >= cadence - SlowFrameDetector.cadenceJitterMargin {
             slowFrameCount += 1
         }
 
