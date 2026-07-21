@@ -212,6 +212,11 @@ class DefaultEventManager: AgentEventManager {
             sessionReplayProcessor.sendEvent(event: event, immediateProcessing: false) { [weak self] processed in
                 if processed {
                     self?.removeSessionReplayIndex(sessionId: sessionId, timestamp: metadata.timestamp)
+                } else {
+                    // Return timestamps to the collector so they are included on retry.
+                    Task { [weak self] in
+                        await self?.userActivityCollector.restore(userActivity)
+                    }
                 }
                 completion(processed)
             }

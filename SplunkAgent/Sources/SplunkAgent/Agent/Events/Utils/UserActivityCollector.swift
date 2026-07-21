@@ -20,7 +20,8 @@ import Foundation
 /// Collects user interaction timestamps for inclusion in session replay metadata.
 ///
 /// Timestamps are stored as Unix milliseconds and flushed when a session replay segment is produced.
-/// Recording is best-effort: timestamps older than the oldest known segment window are discarded on flush.
+/// Delivery is best-effort: the buffer is capped at `maxBufferSize` and the oldest entries
+/// are dropped when the cap is exceeded.
 actor UserActivityCollector {
 
     // MARK: - Private properties
@@ -35,10 +36,10 @@ actor UserActivityCollector {
     /// Records a user interaction at the given time.
     func record(at date: Date) {
         let ms = Int(date.timeIntervalSince1970 * 1_000.0)
-        if timestamps.count >= Self.maxBufferSize {
-            timestamps.removeFirst()
-        }
         timestamps.append(ms)
+        if timestamps.count > Self.maxBufferSize {
+            timestamps.removeFirst(timestamps.count - Self.maxBufferSize)
+        }
     }
 
     /// Returns timestamps that fall within [startMs, endMs] and removes exactly those timestamps from the buffer.
@@ -49,6 +50,17 @@ actor UserActivityCollector {
         let collected = timestamps.filter { $0 >= startMs && $0 <= endMs }
         timestamps = timestamps.filter { $0 < startMs || $0 > endMs }
         return collected
+    }
+
+    /// Re-inserts timestamps that were previously flushed but whose segment failed to send.
+    ///
+    /// Called on the retry path so that the activity data is not silently lost.
+    func restore(_ restored: [Int]) {
+        timestamps.append(contentsOf: restored)
+        timestamps.sort()
+        if timestamps.count > Self.maxBufferSize {
+            timestamps.removeFirst(timestamps.count - Self.maxBufferSize)
+        }
     }
 
     /// Clears all buffered timestamps.

@@ -115,14 +115,33 @@ class SessionReplayDataEvent: AgentEvent {
             let jsonString = String(data: data, encoding: .utf8)
         else {
             let activityJSON = userActivity.map(String.init).joined(separator: ",")
-            let src = metadata.source
-                .replacingOccurrences(of: "\\", with: "\\\\")
-                .replacingOccurrences(of: "\"", with: "\\\"")
+            let src = jsonEscaped(metadata.source)
             let start = metadata.startUnixMs
             let end = metadata.endUnixMs
             return "{\"startUnixMs\":\(start),\"endUnixMs\":\(end),\"source\":\"\(src)\",\"userActivity\":[\(activityJSON)]}"
         }
 
         return jsonString
+    }
+
+    private func jsonEscaped(_ string: String) -> String {
+        var result = ""
+        result.reserveCapacity(string.utf16.count)
+        for char in string.unicodeScalars {
+            switch char.value {
+            case 0x22: result += "\\\""
+            case 0x5C: result += "\\\\"
+            case 0x08: result += "\\b"
+            case 0x09: result += "\\t"
+            case 0x0A: result += "\\n"
+            case 0x0C: result += "\\f"
+            case 0x0D: result += "\\r"
+            case 0x00 ..< 0x20:
+                result += String(format: "\\u%04X", char.value)
+            default:
+                result.unicodeScalars.append(char)
+            }
+        }
+        return result
     }
 }
