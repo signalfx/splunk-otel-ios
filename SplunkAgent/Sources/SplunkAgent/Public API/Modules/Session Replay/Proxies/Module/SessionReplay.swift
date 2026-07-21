@@ -36,6 +36,11 @@ final class SessionReplay: SessionReplayModule {
     let effectiveSamplingRate: Double
 
 
+    // MARK: - Internal callbacks
+
+    /// Called synchronously when `stop()` is invoked, before the underlying module stops.
+    var onStop: (() -> Void)?
+
     // MARK: - Test support
 
     var newSessionsCount = 0

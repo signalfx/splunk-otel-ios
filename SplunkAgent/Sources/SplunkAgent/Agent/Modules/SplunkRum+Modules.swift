@@ -284,10 +284,14 @@ extension SplunkRum {
         }
 
         if let collector = (eventManager as? DefaultEventManager)?.userActivityCollector,
-            sessionReplayProxy is SessionReplay
+            let srProxy = sessionReplayProxy as? SessionReplay
         {
             interactionsModule.onActivity = { date in
                 collector.record(at: date)
+            }
+
+            srProxy.onStop = {
+                collector.reset()
             }
         }
 

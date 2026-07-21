@@ -93,4 +93,32 @@ final class UserActivityCollectorTests: XCTestCase {
         let flushed = collector.flush(startMs: 0, endMs: 100_000)
         XCTAssertTrue(flushed.isEmpty)
     }
+
+    func testRecordingStopClearsBufferViaReset() {
+        // After recording stops, timestamps accumulated before stop must not bleed
+        // into the next recording session's segments.
+        let collector = UserActivityCollector()
+        collector.record(at: Date(timeIntervalSince1970: 1.0))
+        collector.record(at: Date(timeIntervalSince1970: 2.0))
+
+        // Simulate recording stop
+        collector.reset()
+
+        // Start recording again and add new activity
+        collector.record(at: Date(timeIntervalSince1970: 10.0))
+
+        let flushed = collector.flush(startMs: 0, endMs: 20_000)
+        XCTAssertEqual(flushed, [10_000])
+    }
+
+    func testTimestampsFromBeforeResetDoNotAppearAfterRestart() {
+        // Timestamps recorded before stop() must not appear in segments produced
+        // after a subsequent start() — i.e. reset() truly clears the buffer.
+        let collector = UserActivityCollector()
+        collector.record(at: Date(timeIntervalSince1970: 1.0)) // 1 000 ms — pre-stop
+        collector.reset()
+        // No new activity after restart
+        let flushed = collector.flush(startMs: 0, endMs: 100_000)
+        XCTAssertTrue(flushed.isEmpty)
+    }
 }

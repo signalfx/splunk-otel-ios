@@ -28,6 +28,7 @@ extension SessionReplay {
 
     @discardableResult
     func stop() -> any SessionReplayModule {
+        onStop?()
         module.stop()
 
         return self
