@@ -164,8 +164,10 @@ import XCTest
         ///
         /// The total is the accumulated destination count plus the actor's currently buffered count.
         /// The actor's one-second flush loop periodically drains the buffered count into the
-        /// destination, so the buffered count alone oscillates and never reflects the running total;
-        /// the sum is monotonic and is the correct thing to wait on.
+        /// destination, so the buffered count alone oscillates and never reflects the running total.
+        /// Reading flushed before buffered can transiently undercount if a flush lands between the two
+        /// reads, but never overcounts, and the next poll observes the correct total; so waiting on the
+        /// sum reaching `count` is safe.
         private func waitUntilTotalFrozenEpisodes(
             atLeast count: Int,
             logic: SlowFrameLogic,

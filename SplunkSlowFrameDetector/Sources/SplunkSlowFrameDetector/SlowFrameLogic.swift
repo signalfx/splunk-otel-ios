@@ -44,6 +44,13 @@ actor SlowFrameLogic {
     private var frozenFrameCount: Int = 0
 
     private var previousTargetTimestamp: TimeInterval?
+
+    /// The presentation timestamp of the previous frame.
+    ///
+    /// Used to measure the inter-frame gap for the frozen-frame test, matching the timebase the
+    /// background watchdog uses. Slow-frame detection instead uses `previousTargetTimestamp`.
+    private var previousFrameTimestamp: TimeInterval?
+
     private var lastHeartbeatTimestamp: TimeInterval = 0
 
     /// Whether a continuous freeze episode is currently open.
@@ -136,8 +143,12 @@ actor SlowFrameLogic {
 
         let cadence = targetTimestamp - timestamp
 
-        guard let previousTarget = previousTargetTimestamp, cadence > 0 else {
+        guard let previousTarget = previousTargetTimestamp,
+            let previousTimestamp = previousFrameTimestamp,
+            cadence > 0
+        else {
             previousTargetTimestamp = targetTimestamp
+            previousFrameTimestamp = timestamp
             return
         }
 
@@ -146,12 +157,17 @@ actor SlowFrameLogic {
         if inFreezeEpisode {
             inFreezeEpisode = false
             previousTargetTimestamp = targetTimestamp
+            previousFrameTimestamp = timestamp
             return
         }
 
+        // The inter-frame gap is measured against the previous frame, matching the watchdog's timebase,
+        // so both paths agree at the frozen threshold. Lateness is target-relative and drives the slow
+        // test, which is about missed presentation deadlines rather than main-thread unresponsiveness.
+        let gap = timestamp - previousTimestamp
         let lateness = timestamp - previousTarget
 
-        if lateness >= SlowFrameDetector.frozenFrameThreshold {
+        if gap >= SlowFrameDetector.frozenFrameThreshold {
             frozenFrameCount += 1
         }
         else if lateness >= cadence - SlowFrameDetector.cadenceJitterMargin {
@@ -159,6 +175,7 @@ actor SlowFrameLogic {
         }
 
         previousTargetTimestamp = targetTimestamp
+        previousFrameTimestamp = timestamp
     }
 
 
@@ -176,6 +193,7 @@ actor SlowFrameLogic {
 
     func appDidBecomeActive() {
         previousTargetTimestamp = nil
+        previousFrameTimestamp = nil
         lastHeartbeatTimestamp = 0
         inFreezeEpisode = false
         slowFrameCount = 0

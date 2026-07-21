@@ -297,6 +297,48 @@ import XCTest
             XCTAssertNil(counts["slowRenders"])
         }
 
+        /// Verifies that a stall whose inter-frame gap is exactly the frozen threshold is classified
+        /// as frozen, not slow.
+        ///
+        /// The second frame is constructed so the gap from the previous frame (not the target-relative
+        /// lateness) equals `frozenFrameThreshold`. The frozen classification measures the inter-frame
+        /// gap, matching the background watchdog, so both paths agree at the 700 ms boundary.
+        func testStallAtExactFrozenThresholdIsFrozenNotSlow() async throws {
+            let logic = try XCTUnwrap(logic)
+            let mockDestination = try XCTUnwrap(mockDestination)
+
+            await logic.handleFrame(timestamp: 0.0, targetTimestamp: cadence60Hz)
+
+            // Gap from the previous frame is exactly the threshold: timestamp == gap, not cadence + gap.
+            let gap = SlowFrameDetector.frozenFrameThreshold
+            await logic.handleFrame(timestamp: gap, targetTimestamp: gap + cadence60Hz)
+
+            await logic.flushBuffers()
+
+            let counts = mockDestination.reportedCounts
+            XCTAssertEqual(counts["frozenRenders"], 1)
+            XCTAssertNil(counts["slowRenders"])
+        }
+
+        /// Verifies that a stall whose inter-frame gap is just below the frozen threshold is classified
+        /// as slow, not frozen, proving the classification splits cleanly at the boundary.
+        func testStallJustBelowFrozenThresholdIsSlowNotFrozen() async throws {
+            let logic = try XCTUnwrap(logic)
+            let mockDestination = try XCTUnwrap(mockDestination)
+
+            await logic.handleFrame(timestamp: 0.0, targetTimestamp: cadence60Hz)
+
+            // Gap just under the frozen threshold, still well past one cadence, so it is slow.
+            let gap = SlowFrameDetector.frozenFrameThreshold - 0.001
+            await logic.handleFrame(timestamp: gap, targetTimestamp: gap + cadence60Hz)
+
+            await logic.flushBuffers()
+
+            let counts = mockDestination.reportedCounts
+            XCTAssertEqual(counts["slowRenders"], 1)
+            XCTAssertNil(counts["frozenRenders"])
+        }
+
         // MARK: Scenario 5 - flushing preserves signal names and count behavior
 
         /// Verifies that flushing preserves the existing signal names and count behavior, and does not
