@@ -19,6 +19,7 @@ limitations under the License.
 import CiscoDiskStorage
 import CiscoEncryption
 import Foundation
+import OpenTelemetryApi
 import OpenTelemetrySdk
 import Testing
 
@@ -70,6 +71,29 @@ struct OTLPBackgroundHTTPTraceExporterTests {
         return exporter
     }
 
+    func makeSpanData(
+        name: String = "test-span",
+        attributes: [String: AttributeValue] = [:]
+    ) -> SpanData {
+        let exporter = NoOpSpanExporter()
+        let processor = SimpleSpanProcessor(spanExporter: exporter)
+        let tracerProvider = TracerProviderBuilder()
+            .add(spanProcessor: processor)
+            .build()
+        let tracer = tracerProvider.get(instrumentationName: "trace-exporter-test", instrumentationVersion: "1.0")
+        let span = tracer.spanBuilder(spanName: name).startSpan()
+        for (key, value) in attributes {
+            span.setAttribute(key: key, value: value)
+        }
+        span.end()
+
+        guard let readableSpan = span as? ReadableSpan else {
+            fatalError("Could not get SpanData from span")
+        }
+
+        return readableSpan.toSpanData()
+    }
+
 
     // MARK: - Tests
 
@@ -91,6 +115,50 @@ struct OTLPBackgroundHTTPTraceExporterTests {
     }
 
     @Test
+    func exportReturnsSuccessWhenSchedulingFailsAfterPersistingBatch() throws {
+        let disk = makeDisk(uniqueLabel: "http_throw_\(UUID().uuidString)")
+        let http = ThrowingHTTPClient()
+        let exporter = try makeExporter(disk: disk, http: http, config: OTLPExporterConfiguration(timeout: 5))
+
+        let result = exporter.export(spans: [makeSpanData()], explicitTimeout: nil)
+
+        #expect(result == .success)
+
+        let entries = try disk.list(forKey: exporter.getStorageKey())
+        #expect(entries.count == 1)
+    }
+
+    @Test
+    func exportEncodesBatchContainingNonFiniteDoubleAttributes() throws {
+        let disk = makeDisk(uniqueLabel: "non_finite_doubles_\(UUID().uuidString)")
+        let http = MockHTTPClient()
+        let exporter = try makeExporter(disk: disk, http: http)
+        let span = makeSpanData(
+            attributes: [
+                "nan": .double(.nan),
+                "positive.infinity": .double(.infinity),
+                "negative.infinity": .double(-.infinity)
+            ]
+        )
+
+        let result = exporter.export(
+            spans: [span, makeSpanData(name: "subsequent-span")],
+            explicitTimeout: nil
+        )
+
+        #expect(result == .success)
+        let sent = try #require(http.sent.first)
+        let fileKey = exporter.getStorageKey().append(sent.id.uuidString)
+        let finalURL = try disk.finalDestination(forKey: fileKey)
+        let payload = try Data(contentsOf: finalURL)
+        let json = try #require(String(data: payload, encoding: .utf8))
+        #expect(json.contains(#""doubleValue":"NaN""#))
+        #expect(json.contains(#""doubleValue":"Infinity""#))
+        #expect(json.contains(#""doubleValue":"-Infinity""#))
+        #expect(json.contains(#""name":"subsequent-span""#))
+    }
+
+    @Test
     func forceFlushCallsHTTPClientFlushAndReturnsSuccess() throws {
         let disk = makeDisk(uniqueLabel: "flush_\(UUID().uuidString)")
         let http = FlushSpyHTTPClient()
@@ -100,6 +168,23 @@ struct OTLPBackgroundHTTPTraceExporterTests {
 
         #expect(result == .success)
         #expect(http.flushed == true)
+    }
+
+    @Test
+    func forceFlushReturnsFailureWhenHTTPClientDoesNotCompleteBeforeTimeout() throws {
+        let disk = makeDisk(uniqueLabel: "flush_timeout_\(UUID().uuidString)")
+        let http = MockHTTPClient()
+        let exporter = try makeExporter(
+            disk: disk,
+            http: http,
+            config: OTLPExporterConfiguration(timeout: 0.01)
+        )
+        let start = Date()
+
+        let result = exporter.flush(explicitTimeout: 0.01)
+
+        #expect(result == .failure)
+        #expect(Date().timeIntervalSince(start) < 1)
     }
 
     @Test
@@ -115,4 +200,17 @@ struct OTLPBackgroundHTTPTraceExporterTests {
         let result = exporter.export(spans: [], explicitTimeout: nil)
         #expect(result == .success)
     }
+}
+
+
+private final class NoOpSpanExporter: SpanExporter {
+    func export(spans _: [SpanData], explicitTimeout _: TimeInterval?) -> SpanExporterResultCode {
+        .success
+    }
+
+    func flush(explicitTimeout _: TimeInterval?) -> SpanExporterResultCode {
+        .success
+    }
+
+    func shutdown(explicitTimeout _: TimeInterval?) {}
 }

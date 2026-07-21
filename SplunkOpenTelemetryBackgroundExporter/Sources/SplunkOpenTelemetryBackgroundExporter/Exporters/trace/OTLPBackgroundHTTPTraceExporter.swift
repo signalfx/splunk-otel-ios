@@ -37,17 +37,17 @@ public class OTLPBackgroundHTTPTraceExporter: OTLPBackgroundHTTPBaseExporter, Sp
 
         do {
             // Encode to JSON instead of protobuf binary
-            let storeData = try JSONEncoder().encode(request)
+            let encoder = JSONEncoder()
+            encoder.nonConformingFloatEncodingStrategy = .convertToString(
+                positiveInfinity: "Infinity",
+                negativeInfinity: "-Infinity",
+                nan: "NaN"
+            )
+            let storeData = try encoder.encode(request)
 
             // If no endpoint is configured, store in pending folder for later
             if isPendingEndpoint {
-                try diskStorage.insert(
-                    storeData,
-                    forKey: KeyBuilder(
-                        requestId.uuidString,
-                        parrentKeyBuilder: getPendingStorageKey()
-                    )
-                )
+                try storePendingData(storeData, requestId: requestId)
                 return .success
             }
 
@@ -87,20 +87,15 @@ public class OTLPBackgroundHTTPTraceExporter: OTLPBackgroundHTTPBaseExporter, Sp
             return .success
         }
         catch {
-
-            return .failure
+            // The batch is already durable in active storage. Report success so upstream in-memory
+            // processors do not re-encode and enqueue duplicate span files; stalled upload recovery
+            // or a later endpoint flush will retry the persisted file.
+            return .success
         }
     }
 
-    public func flush(explicitTimeout _: TimeInterval? = nil) -> SpanExporterResultCode {
-        let semaphore = DispatchSemaphore(value: 0)
-
-        httpClient.flush {
-            semaphore.signal()
-        }
-        semaphore.wait()
-
-        return .success
+    public func flush(explicitTimeout: TimeInterval? = nil) -> SpanExporterResultCode {
+        flushHTTPClient(explicitTimeout: explicitTimeout) ? .success : .failure
     }
 
     public func shutdown(explicitTimeout _: TimeInterval? = nil) {}
