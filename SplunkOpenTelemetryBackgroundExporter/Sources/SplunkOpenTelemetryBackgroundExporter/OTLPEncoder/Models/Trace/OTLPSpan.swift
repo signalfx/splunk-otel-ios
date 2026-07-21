@@ -196,24 +196,24 @@ struct OTLPSpan: Encodable {
             try container.encode(attributes, forKey: .attributes)
         }
 
-        if let count = droppedAttributesCount, count > 0 {
-            try container.encode(count, forKey: .droppedAttributesCount)
+        if let droppedAttributesCount, droppedAttributesCount > 0 {
+            try container.encode(droppedAttributesCount, forKey: .droppedAttributesCount)
         }
 
         if let events, !events.isEmpty {
             try container.encode(events, forKey: .events)
         }
 
-        if let count = droppedEventsCount, count > 0 {
-            try container.encode(count, forKey: .droppedEventsCount)
+        if let droppedEventsCount, droppedEventsCount > 0 {
+            try container.encode(droppedEventsCount, forKey: .droppedEventsCount)
         }
 
         if let links, !links.isEmpty {
             try container.encode(links, forKey: .links)
         }
 
-        if let count = droppedLinksCount, count > 0 {
-            try container.encode(count, forKey: .droppedLinksCount)
+        if let droppedLinksCount, droppedLinksCount > 0 {
+            try container.encode(droppedLinksCount, forKey: .droppedLinksCount)
         }
 
         if let status {

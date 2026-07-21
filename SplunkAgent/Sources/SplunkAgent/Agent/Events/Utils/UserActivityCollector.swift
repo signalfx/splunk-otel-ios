@@ -63,7 +63,10 @@ final class UserActivityCollector {
     ///
     /// Called on the retry path so that the activity data is not silently lost.
     func restore(_ restored: [Int]) {
-        guard !restored.isEmpty else { return }
+        guard !restored.isEmpty else {
+            return
+        }
+
         lock.withLock {
             timestamps.append(contentsOf: restored)
             timestamps.sort()

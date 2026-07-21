@@ -24,13 +24,13 @@ final class UserActivityCollectorTests: XCTestCase {
 
     func testFlushReturnsOnlyWindowTimestamps() {
         let collector = UserActivityCollector()
-        collector.record(at: Date(timeIntervalSince1970: 1.0))   // 1000 ms
-        collector.record(at: Date(timeIntervalSince1970: 2.0))   // 2000 ms
-        collector.record(at: Date(timeIntervalSince1970: 3.0))   // 3000 ms
+        collector.record(at: Date(timeIntervalSince1970: 1.0)) // 1000 ms
+        collector.record(at: Date(timeIntervalSince1970: 2.0)) // 2000 ms
+        collector.record(at: Date(timeIntervalSince1970: 3.0)) // 3000 ms
 
-        let flushed = collector.flush(startMs: 1500, endMs: 2500)
+        let flushed = collector.flush(startMs: 1_500, endMs: 2_500)
 
-        XCTAssertEqual(flushed, [2000])
+        XCTAssertEqual(flushed, [2_000])
     }
 
     func testFlushDoesNotRemoveTimestampsOutsideWindow() {
@@ -39,50 +39,50 @@ final class UserActivityCollectorTests: XCTestCase {
         collector.record(at: Date(timeIntervalSince1970: 2.0))
         collector.record(at: Date(timeIntervalSince1970: 3.0))
 
-        _ = collector.flush(startMs: 1500, endMs: 2500)
-        let remaining = collector.flush(startMs: 500, endMs: 4000)
+        _ = collector.flush(startMs: 1_500, endMs: 2_500)
+        let remaining = collector.flush(startMs: 500, endMs: 4_000)
 
-        XCTAssertEqual(remaining.sorted(), [1000, 3000])
+        XCTAssertEqual(remaining.sorted(), [1_000, 3_000])
     }
 
     func testConcurrentFlushesDoNotStealEachOthersTimestamps() {
         let collector = UserActivityCollector()
-        collector.record(at: Date(timeIntervalSince1970: 1.0))  // segment A: [1000,2000]
+        collector.record(at: Date(timeIntervalSince1970: 1.0)) // segment A: [1000,2000]
         collector.record(at: Date(timeIntervalSince1970: 2.0))
-        collector.record(at: Date(timeIntervalSince1970: 3.0))  // segment B: [3000,4000]
+        collector.record(at: Date(timeIntervalSince1970: 3.0)) // segment B: [3000,4000]
         collector.record(at: Date(timeIntervalSince1970: 4.0))
 
-        let segmentA = collector.flush(startMs: 1000, endMs: 2000)
-        let segmentB = collector.flush(startMs: 3000, endMs: 4000)
+        let segmentA = collector.flush(startMs: 1_000, endMs: 2_000)
+        let segmentB = collector.flush(startMs: 3_000, endMs: 4_000)
 
-        XCTAssertEqual(segmentA.sorted(), [1000, 2000])
-        XCTAssertEqual(segmentB.sorted(), [3000, 4000])
+        XCTAssertEqual(segmentA.sorted(), [1_000, 2_000])
+        XCTAssertEqual(segmentB.sorted(), [3_000, 4_000])
     }
 
     func testRestoreReturnsTimestampsOnRetry() {
         let collector = UserActivityCollector()
-        collector.record(at: Date(timeIntervalSince1970: 1.5))  // 1500 ms
+        collector.record(at: Date(timeIntervalSince1970: 1.5)) // 1500 ms
 
-        let flushed = collector.flush(startMs: 1000, endMs: 2000)
-        XCTAssertEqual(flushed, [1500])
+        let flushed = collector.flush(startMs: 1_000, endMs: 2_000)
+        XCTAssertEqual(flushed, [1_500])
 
         // Simulate failed send — restore timestamps
         collector.restore(flushed)
 
-        let reflushed = collector.flush(startMs: 1000, endMs: 2000)
-        XCTAssertEqual(reflushed, [1500])
+        let reflushed = collector.flush(startMs: 1_000, endMs: 2_000)
+        XCTAssertEqual(reflushed, [1_500])
     }
 
     func testBufferCapDropsOldestEntries() {
         let collector = UserActivityCollector()
         // Record 10 001 timestamps: 0 ms … 10 000 ms
-        for i in 0 ..< 10_001 {
-            collector.record(at: Date(timeIntervalSince1970: Double(i)))
+        for idx in 0 ..< 10_001 {
+            collector.record(at: Date(timeIntervalSince1970: Double(idx)))
         }
-        // Cap is 10 000 — oldest entry (0 ms, i=0) must have been dropped
+        // Cap is 10 000 — oldest entry (0 ms, idx=0) must have been dropped
         let all = collector.flush(startMs: 0, endMs: 10_001_000)
         XCTAssertEqual(all.count, 10_000)
-        // After drop, first retained timestamp is i=1 → 1 000 ms
+        // After drop, first retained timestamp is idx=1 → 1 000 ms
         XCTAssertEqual(all.min(), 1_000)
     }
 
