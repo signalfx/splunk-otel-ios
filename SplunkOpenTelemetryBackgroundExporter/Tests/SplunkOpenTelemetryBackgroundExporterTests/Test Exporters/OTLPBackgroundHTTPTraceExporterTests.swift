@@ -117,15 +117,54 @@ struct OTLPBackgroundHTTPTraceExporterTests {
     @Test
     func exportReturnsSuccessWhenSchedulingFailsAfterPersistingBatch() throws {
         let disk = makeDisk(uniqueLabel: "http_throw_\(UUID().uuidString)")
-        let http = ThrowingHTTPClient()
-        let exporter = try makeExporter(disk: disk, http: http, config: OTLPExporterConfiguration(timeout: 5))
+        let http = FirstSendThrowingHTTPClient()
+        let endpoint = try #require(URL(string: "https://example.com"))
+        let exporter = ImmediateRecoveryTraceExporter(
+            endpoint: endpoint,
+            config: OTLPExporterConfiguration(timeout: 5),
+            qosConfig: SessionQOSConfiguration(),
+            envVarHeaders: nil,
+            diskStorage: disk,
+            performStalledUploadCheck: false
+        )
+        exporter.httpClient = http
 
         let result = exporter.export(spans: [makeSpanData()], explicitTimeout: nil)
 
         #expect(result == .success)
+        #expect(http.waitForRecoveredSend(timeout: 1) == .success)
 
         let entries = try disk.list(forKey: exporter.getStorageKey())
         #expect(entries.count == 1)
+        #expect(http.sendAttemptCount == 2)
+        #expect(http.successfulRequests.count == 1)
+    }
+
+    @Test
+    func repeatedSchedulingFailuresCoalesceRecoveryScan() throws {
+        let disk = makeDisk(uniqueLabel: "coalesced_recovery_\(UUID().uuidString)")
+        let http = AlwaysThrowingHTTPClient()
+        let endpoint = try #require(URL(string: "https://example.com"))
+        let exporter = DelayedRecoveryTraceExporter(
+            endpoint: endpoint,
+            qosConfig: SessionQOSConfiguration(),
+            envVarHeaders: nil,
+            diskStorage: disk,
+            performStalledUploadCheck: false
+        )
+        exporter.httpClient = http
+
+        let firstResult = exporter.export(spans: [makeSpanData(name: "first")], explicitTimeout: nil)
+        let secondResult = exporter.export(spans: [makeSpanData(name: "second")], explicitTimeout: nil)
+
+        #expect(firstResult == .success)
+        #expect(secondResult == .success)
+        #expect(http.waitForRecoveryScan(timeout: 1) == .success)
+        #expect(http.recoveryScanCount == 1)
+        #expect(http.sendAttemptCount == 4)
+
+        let entries = try disk.list(forKey: exporter.getStorageKey())
+        #expect(entries.count == 2)
     }
 
     @Test
@@ -213,4 +252,18 @@ private final class NoOpSpanExporter: SpanExporter {
     }
 
     func shutdown(explicitTimeout _: TimeInterval?) {}
+}
+
+
+private final class ImmediateRecoveryTraceExporter: OTLPBackgroundHTTPTraceExporter {
+    override var stalledUploadCheckDelayNanoseconds: UInt64 {
+        0
+    }
+}
+
+
+private final class DelayedRecoveryTraceExporter: OTLPBackgroundHTTPTraceExporter {
+    override var stalledUploadCheckDelayNanoseconds: UInt64 {
+        200_000_000
+    }
 }
