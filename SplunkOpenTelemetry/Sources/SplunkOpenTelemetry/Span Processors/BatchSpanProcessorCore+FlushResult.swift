@@ -21,8 +21,8 @@ extension BatchSpanProcessorCore {
 
     /// Flushes the current snapshot and returns an honest completion result.
     ///
-    /// Main-thread callers are never blocked: their flush is scheduled asynchronously and `false`
-    /// is returned because completion cannot be guaranteed before this method returns.
+    /// Main-thread callers are never blocked: their flush is scheduled asynchronously and success
+    /// indicates that the best-effort work was accepted. Off-main success indicates completion.
     func forceFlushResult(timeout: TimeInterval?) -> Bool {
         let waitTimeout = forceFlushWaitTimeout(for: timeout)
         let deadline = Date().addingTimeInterval(waitTimeout)
@@ -35,7 +35,7 @@ extension BatchSpanProcessorCore {
             processorQueue.async {
                 _ = self.performForceFlush(deadline: deadline)
             }
-            return false
+            return true
         }
 
         let completed = DispatchSemaphore(value: 0)

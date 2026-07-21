@@ -41,7 +41,9 @@ public class OTLPLogToSpanExporter: LogRecordExporter {
         self.init(
             agentVersion: agentVersion,
             tracerProviderProvider: { OpenTelemetry.instance.tracerProvider },
-            spanFlusher: Self.flushGlobalTracerProvider
+            spanFlusher: { timeout in
+                Self.flushTracerProvider(OpenTelemetry.instance.tracerProvider, timeout: timeout)
+            }
         )
     }
 
@@ -50,7 +52,7 @@ public class OTLPLogToSpanExporter: LogRecordExporter {
             agentVersion: agentVersion,
             tracerProviderProvider: { tracerProvider },
             spanFlusher: { timeout in
-                Self.flushWithoutResult(tracerProvider, timeout: timeout)
+                Self.flushTracerProvider(tracerProvider, timeout: timeout)
             }
         )
     }
@@ -130,17 +132,16 @@ public class OTLPLogToSpanExporter: LogRecordExporter {
         spanFlusher(explicitTimeout)
     }
 
-    private static func flushGlobalTracerProvider(timeout: TimeInterval?) -> ExportResult {
-        flushWithoutResult(OpenTelemetry.instance.tracerProvider, timeout: timeout)
-    }
-
-    /// The generic provider API exposes only a void flush, so it can be triggered best effort but
-    /// cannot truthfully report successful completion to the log pipeline.
-    private static func flushWithoutResult(
+    /// Flushes an SDK tracer provider and reports whether the request was accepted.
+    static func flushTracerProvider(
         _ tracerProvider: any TracerProvider,
         timeout: TimeInterval?
     ) -> ExportResult {
-        (tracerProvider as? TracerProviderSdk)?.forceFlush(timeout: timeout)
-        return .failure
+        guard let tracerProvider = tracerProvider as? TracerProviderSdk else {
+            return .failure
+        }
+
+        tracerProvider.forceFlush(timeout: timeout)
+        return .success
     }
 }

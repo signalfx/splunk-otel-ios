@@ -65,12 +65,10 @@ public class OTLPLogToSpanEventProcessor: LogEventProcessor {
             debugEnabled: debugEnabled,
             tracerProviderProvider: { OpenTelemetry.instance.tracerProvider },
             spanFlusher: { timeout in
-                guard let tracerProvider = OpenTelemetry.instance.tracerProvider as? TracerProviderSdk else {
-                    return .failure
-                }
-
-                tracerProvider.forceFlush(timeout: timeout)
-                return .failure
+                OTLPLogToSpanExporter.flushTracerProvider(
+                    OpenTelemetry.instance.tracerProvider,
+                    timeout: timeout
+                )
             }
         )
 

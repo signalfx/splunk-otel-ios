@@ -73,9 +73,10 @@ struct OTLPLogToSpanExporterTests {
         }
 
         let result = exporter.export(logRecords: [makeLogRecord()], explicitTimeout: nil)
-        spanProcessor.forceFlush(timeout: 1)
+        let flushResult = exporter.forceFlush(explicitTimeout: 1)
 
         #expect(result == .success)
+        #expect(flushResult == .success)
         #expect(spanExporter.waitForExport(timeout: 1) == .success)
         #expect(spanExporter.successfulSpanNames == ["test.event"])
     }
