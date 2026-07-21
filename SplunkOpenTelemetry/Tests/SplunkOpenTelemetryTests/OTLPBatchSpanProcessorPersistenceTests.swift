@@ -24,7 +24,7 @@ import Testing
 @Suite(.serialized)
 struct OTLPBatchSpanProcessorPersistenceTests {
     @Test
-    func specificSpanPersistenceReportsSuccessOnlyAfterThatSpanIsExported() {
+    func persistsTargetSpan() {
         let exporter = BatchProcessorTestExporter()
         let processor = OTLPBatchSpanProcessor(
             spanExporter: exporter,
@@ -54,7 +54,7 @@ struct OTLPBatchSpanProcessorPersistenceTests {
     }
 
     @Test
-    func specificSpanPersistenceReportsFailureWhenThatSpanIsDroppedByFullQueue() {
+    func rejectsDroppedTargetSpan() {
         let batchSize = 10
         let exporter = BatchProcessorTestExporter(
             results: [.success, .failure],

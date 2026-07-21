@@ -81,7 +81,7 @@ struct OTLPLogToSpanExporterTests {
     }
 
     @Test
-    func forceFlushDrainsLogDerivedSpanBeforeReportingSuccess() async {
+    func forceFlushExportsPendingSpan() async {
         let spanExporter = BatchProcessorTestExporter()
         let spanProcessor = OTLPBatchSpanProcessor(
             spanExporter: spanExporter,
@@ -113,7 +113,7 @@ struct OTLPLogToSpanExporterTests {
     }
 
     @Test
-    func forceFlushReportsFailureWhenLogDerivedSpanCannotBeExported() async {
+    func forceFlushReportsExportFailure() async {
         let spanExporter = BatchProcessorTestExporter(results: [.failure, .success])
         let spanProcessor = OTLPBatchSpanProcessor(
             spanExporter: spanExporter,
