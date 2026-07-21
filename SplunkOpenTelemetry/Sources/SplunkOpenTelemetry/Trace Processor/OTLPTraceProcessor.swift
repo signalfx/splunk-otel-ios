@@ -195,6 +195,18 @@ public class OTLPTraceProcessor: TraceProcessor {
         )
     }
 
+    /// Emits and persists one crash-report span, reporting success only for that exact span.
+    package func persistCrashReportSpan(
+        emitting emitSpan: @escaping () -> SpanId,
+        completion: @escaping (Bool) -> Void
+    ) {
+        batchSpanProcessor.persistSpan(
+            emitting: emitSpan,
+            timeout: Self.crashReportPersistenceTimeout,
+            completion: completion
+        )
+    }
+
     /// Flushes the shared direct and log-derived span batch and reports durable completion.
     package func forceFlushBufferedSpans(timeout: TimeInterval?) -> ExportResult {
         batchSpanProcessor.forceFlushResult(timeout: timeout) ? .success : .failure

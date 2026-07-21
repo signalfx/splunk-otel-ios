@@ -236,13 +236,16 @@ extension SplunkRum {
             crashReportsModule?.sharedState = sharedState
 
             if let eventManager = eventManager as? DefaultEventManager {
-                crashReportsModule?.crashReportPersistenceHandler = { [weak eventManager] completion in
+                crashReportsModule?.crashReportPersistenceHandler = { [weak eventManager] emitSpan, completion in
                     guard let eventManager else {
                         completion(false)
                         return
                     }
 
-                    eventManager.concreteTraceProcessor.persistBufferedSpans(completion: completion)
+                    eventManager.concreteTraceProcessor.persistCrashReportSpan(
+                        emitting: emitSpan,
+                        completion: completion
+                    )
                 }
             }
 
