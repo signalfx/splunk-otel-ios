@@ -198,7 +198,7 @@ class DefaultEventManager: AgentEventManager {
             // Use scriptInstanceId as a 16 character substring of a sessionId
             let scriptInstanceId = String(sessionId.prefix(upTo: sessionId.index(sessionId.startIndex, offsetBy: 16)))
 
-            let userActivity = await userActivityCollector.flush(startMs: metadata.startUnixMs, endMs: metadata.endUnixMs)
+            let userActivity = userActivityCollector.flush(startMs: metadata.startUnixMs, endMs: metadata.endUnixMs)
 
             let event = SessionReplayDataEvent(
                 metadata: metadata,
@@ -214,9 +214,7 @@ class DefaultEventManager: AgentEventManager {
                     self?.removeSessionReplayIndex(sessionId: sessionId, timestamp: metadata.timestamp)
                 } else {
                     // Return timestamps to the collector so they are included on retry.
-                    Task { [weak self] in
-                        await self?.userActivityCollector.restore(userActivity)
-                    }
+                    self?.userActivityCollector.restore(userActivity)
                 }
                 completion(processed)
             }

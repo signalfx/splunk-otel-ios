@@ -22,72 +22,75 @@ import XCTest
 
 final class UserActivityCollectorTests: XCTestCase {
 
-    func testFlushReturnsOnlyWindowTimestamps() async {
+    func testFlushReturnsOnlyWindowTimestamps() {
         let collector = UserActivityCollector()
-        await collector.record(at: Date(timeIntervalSince1970: 1.0))   // 1000 ms
-        await collector.record(at: Date(timeIntervalSince1970: 2.0))   // 2000 ms
-        await collector.record(at: Date(timeIntervalSince1970: 3.0))   // 3000 ms
+        collector.record(at: Date(timeIntervalSince1970: 1.0))   // 1000 ms
+        collector.record(at: Date(timeIntervalSince1970: 2.0))   // 2000 ms
+        collector.record(at: Date(timeIntervalSince1970: 3.0))   // 3000 ms
 
-        let flushed = await collector.flush(startMs: 1500, endMs: 2500)
+        let flushed = collector.flush(startMs: 1500, endMs: 2500)
 
         XCTAssertEqual(flushed, [2000])
     }
 
-    func testFlushDoesNotRemoveTimestampsOutsideWindow() async {
+    func testFlushDoesNotRemoveTimestampsOutsideWindow() {
         let collector = UserActivityCollector()
-        await collector.record(at: Date(timeIntervalSince1970: 1.0))
-        await collector.record(at: Date(timeIntervalSince1970: 2.0))
-        await collector.record(at: Date(timeIntervalSince1970: 3.0))
+        collector.record(at: Date(timeIntervalSince1970: 1.0))
+        collector.record(at: Date(timeIntervalSince1970: 2.0))
+        collector.record(at: Date(timeIntervalSince1970: 3.0))
 
-        _ = await collector.flush(startMs: 1500, endMs: 2500)
-        let remaining = await collector.flush(startMs: 500, endMs: 4000)
+        _ = collector.flush(startMs: 1500, endMs: 2500)
+        let remaining = collector.flush(startMs: 500, endMs: 4000)
 
         XCTAssertEqual(remaining.sorted(), [1000, 3000])
     }
 
-    func testConcurrentFlushesDoNotStealEachOthersTimestamps() async {
+    func testConcurrentFlushesDoNotStealEachOthersTimestamps() {
         let collector = UserActivityCollector()
-        await collector.record(at: Date(timeIntervalSince1970: 1.0))  // segment A: [1000,2000]
-        await collector.record(at: Date(timeIntervalSince1970: 2.0))
-        await collector.record(at: Date(timeIntervalSince1970: 3.0))  // segment B: [3000,4000]
-        await collector.record(at: Date(timeIntervalSince1970: 4.0))
+        collector.record(at: Date(timeIntervalSince1970: 1.0))  // segment A: [1000,2000]
+        collector.record(at: Date(timeIntervalSince1970: 2.0))
+        collector.record(at: Date(timeIntervalSince1970: 3.0))  // segment B: [3000,4000]
+        collector.record(at: Date(timeIntervalSince1970: 4.0))
 
-        let segmentA = await collector.flush(startMs: 1000, endMs: 2000)
-        let segmentB = await collector.flush(startMs: 3000, endMs: 4000)
+        let segmentA = collector.flush(startMs: 1000, endMs: 2000)
+        let segmentB = collector.flush(startMs: 3000, endMs: 4000)
 
         XCTAssertEqual(segmentA.sorted(), [1000, 2000])
         XCTAssertEqual(segmentB.sorted(), [3000, 4000])
     }
 
-    func testRestoreReturnsTimestampsOnRetry() async {
+    func testRestoreReturnsTimestampsOnRetry() {
         let collector = UserActivityCollector()
-        await collector.record(at: Date(timeIntervalSince1970: 1.5))  // 1500 ms
+        collector.record(at: Date(timeIntervalSince1970: 1.5))  // 1500 ms
 
-        let flushed = await collector.flush(startMs: 1000, endMs: 2000)
+        let flushed = collector.flush(startMs: 1000, endMs: 2000)
         XCTAssertEqual(flushed, [1500])
 
         // Simulate failed send — restore timestamps
-        await collector.restore(flushed)
+        collector.restore(flushed)
 
-        let reflushed = await collector.flush(startMs: 1000, endMs: 2000)
+        let reflushed = collector.flush(startMs: 1000, endMs: 2000)
         XCTAssertEqual(reflushed, [1500])
     }
 
-    func testBufferCapDropsOldestEntries() async {
+    func testBufferCapDropsOldestEntries() {
         let collector = UserActivityCollector()
+        // Record 10 001 timestamps: 0 ms … 10 000 ms
         for i in 0 ..< 10_001 {
-            await collector.record(at: Date(timeIntervalSince1970: Double(i)))
+            collector.record(at: Date(timeIntervalSince1970: Double(i)))
         }
-        let all = await collector.flush(startMs: 0, endMs: 10_001_000)
+        // Cap is 10 000 — oldest entry (0 ms, i=0) must have been dropped
+        let all = collector.flush(startMs: 0, endMs: 10_001_000)
         XCTAssertEqual(all.count, 10_000)
-        XCTAssertEqual(all.first, 1000, "Oldest entry (0 ms) should have been dropped")
+        // After drop, first retained timestamp is i=1 → 1 000 ms
+        XCTAssertEqual(all.min(), 1_000)
     }
 
-    func testResetClearsBuffer() async {
+    func testResetClearsBuffer() {
         let collector = UserActivityCollector()
-        await collector.record(at: Date(timeIntervalSince1970: 1.0))
-        await collector.reset()
-        let flushed = await collector.flush(startMs: 0, endMs: 100_000)
+        collector.record(at: Date(timeIntervalSince1970: 1.0))
+        collector.reset()
+        let flushed = collector.flush(startMs: 0, endMs: 100_000)
         XCTAssertTrue(flushed.isEmpty)
     }
 }

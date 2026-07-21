@@ -51,7 +51,6 @@ public class SplunkRum: ObservableObject {
     var moduleConfigurations: [Any]?
     var screenNameChangeCallback: ((String) -> Void)?
     var sessionReplayDecisionMade = false
-    var userActivityTask: Task<Void, Never>?
 
     // MARK: - Internal (Modules Proxy)
 
@@ -340,8 +339,4 @@ public class SplunkRum: ObservableObject {
 
     /// A version of this agent.
     public static let version = "2.3.2"
-
-    deinit {
-        userActivityTask?.cancel()
-    }
 }

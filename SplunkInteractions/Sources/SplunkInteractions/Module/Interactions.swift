@@ -33,17 +33,15 @@ public final class Interactions: SplunkInteractionsModule {
 
     // MARK: - Internal properties
 
-    /// Stream of interaction timestamps (best-effort).
+    /// Synchronous callback invoked on every interaction event, regardless of type.
     ///
-    /// Yields a timestamp for every interaction event regardless of type.
-    /// Delivery is best-effort: the stream uses `.bufferingNewest(1_000)` and will drop
-    /// older timestamps if the consumer falls behind by more than 1 000 events.
+    /// Called directly inside `handleEvent` before type-specific processing, so the
+    /// timestamp is recorded atomically with the event — no async hop, no race with
+    /// a concurrent segment flush.
     @_spi(SplunkInternal)
-    public let activityStream: AsyncStream<Date>
+    public var onActivity: ((Date) -> Void)?
 
     var interactionsDetector: InteractionsDetector<DefaultSwizzling>?
-
-    private let activityContinuation: AsyncStream<Date>.Continuation
 
     private let internalLogger = DefaultLogAgent(
         poolName: PackageIdentifier.instance(),
@@ -61,12 +59,10 @@ public final class Interactions: SplunkInteractionsModule {
 
     public required init() {
         destination = OTelDestination()
-        (activityStream, activityContinuation) = AsyncStream.makeStream(bufferingPolicy: .bufferingNewest(1_000))
     }
 
     init(destination: SplunkInteractionsDestination) {
         self.destination = destination
-        (activityStream, activityContinuation) = AsyncStream.makeStream(bufferingPolicy: .bufferingNewest(1_000))
     }
 
 
@@ -110,7 +106,7 @@ public final class Interactions: SplunkInteractionsModule {
     }
 
     func handleEvent(_ event: InteractionEvent) async {
-        activityContinuation.yield(event.time)
+        onActivity?(event.time)
 
         await handleEventType(
             event.type,
