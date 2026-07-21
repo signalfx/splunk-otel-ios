@@ -71,12 +71,15 @@ struct ReadableSpanQueue {
     /// Returns whether a span with the specified identifier is currently queued.
     func contains(spanId: SpanId) -> Bool {
         var index = head
+
         for _ in 0 ..< count {
             if storage[index]?.context.spanId == spanId {
                 return true
             }
+
             index = (index + 1) % storage.count
         }
+
         return false
     }
 

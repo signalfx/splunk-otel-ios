@@ -22,22 +22,20 @@ import Foundation
 /// The state this extension uses is `internal` because Swift requires cross-file extension members
 /// to have module visibility. All access remains serialized by `stalledUploadCheckLock`.
 extension OTLPBackgroundHTTPBaseExporter {
-    /// Schedules a coalesced scan after an active file could not be assigned a URLSession task.
+    /// Schedules a scan for active files without a matching URLSession task.
     ///
-    /// The file is already durable, so callers can report success without creating another copy in
-    /// the in-memory retry queue. If a scan is already pending, it will cover the newly persisted file.
-    func scheduleStalledUploadRecovery() {
-        startStalledUploadCheck(replacingExisting: false)
-    }
-
+    /// When `replacingExisting` is `false`, a pending scan is retained because it will cover files
+    /// persisted after the scan was scheduled.
     func startStalledUploadCheck(replacingExisting: Bool = false) {
         guard endpoint != nil else {
             return
         }
 
         stalledUploadCheckLock.lock()
+
         if !replacingExisting, checkStalledTask != nil {
             stalledUploadCheckLock.unlock()
+
             return
         }
 

@@ -90,7 +90,7 @@ public class OTLPBackgroundHTTPTraceExporter: OTLPBackgroundHTTPBaseExporter, Sp
             // The batch is already durable in active storage. Report success so upstream in-memory
             // processors do not re-encode and enqueue duplicate span files. Explicitly schedule a
             // recovery scan because the initialization scan may already have completed.
-            scheduleStalledUploadRecovery()
+            startStalledUploadCheck()
             return .success
         }
     }
