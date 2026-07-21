@@ -76,7 +76,7 @@ import XCTest
             // This would normally be a slow frame relative to the previous target.
             await logic.handleFrame(timestamp: 0.1, targetTimestamp: 0.1 + cadence60Hz)
 
-            await logic.appDidBecomeActive()
+            await logic.appDidBecomeActive(at: 10.0)
 
             // This frame should now be treated as the first frame, not triggering a report.
             await logic.handleFrame(timestamp: 10.0, targetTimestamp: 10.0 + cadence60Hz)
@@ -114,12 +114,43 @@ import XCTest
             await logic.handleFrame(timestamp: 50.0, targetTimestamp: 50.0 + cadence60Hz)
             let heartbeat = await logic.testLastHeartbeatTimestamp
             XCTAssertEqual(heartbeat, 0, "A frame delivered while inactive must not re-arm the heartbeat.")
-            await logic.appDidBecomeActive()
+            await logic.appDidBecomeActive(at: 100.0)
             // First callback after foregrounding establishes a new baseline, no event.
             await logic.handleFrame(timestamp: 100.0, targetTimestamp: 100.0 + cadence60Hz)
             await logic.flushBuffers()
             let counts = mockDestination.reportedCounts
             XCTAssertTrue(counts.isEmpty)
+        }
+
+        /// Verifies that a pre-background frame still buffered in the ticker stream, but not delivered to
+        /// the actor until after foregrounding, is discarded rather than seeding the baseline.
+        ///
+        /// The `isActive` guard alone cannot reject this frame: it is processed while active, so only its
+        /// timestamp (produced before the activation instant) distinguishes it. Without the cutoff, the
+        /// stale timestamp would seed the baseline and the next real frame's gap would span the whole
+        /// background interval, emitting a spurious frozen render.
+        func testStaleBufferedTickAfterForegroundIsDiscarded() async throws {
+            let logic = try XCTUnwrap(logic)
+            let mockDestination = try XCTUnwrap(mockDestination)
+
+            await logic.handleFrame(timestamp: 0.0, targetTimestamp: cadence60Hz)
+            await logic.appWillResignActive()
+            await logic.appDidBecomeActive(at: 100.0)
+
+            // Stale pre-background tick, delivered late; must be discarded, not seed the baseline.
+            await logic.handleFrame(timestamp: 1.0, targetTimestamp: 1.0 + cadence60Hz)
+            // First genuine foreground frame at/after the cutoff establishes the baseline, no event.
+            await logic.handleFrame(timestamp: 100.0, targetTimestamp: 100.0 + cadence60Hz)
+            // A subsequent steady frame produces no event.
+            await logic.handleFrame(
+                timestamp: 100.0 + cadence60Hz,
+                targetTimestamp: 100.0 + 2 * cadence60Hz
+            )
+
+            await logic.flushBuffers()
+
+            let counts = mockDestination.reportedCounts
+            XCTAssertTrue(counts.isEmpty, "A stale pre-background tick must not produce any render event.")
         }
 
 

@@ -68,6 +68,16 @@ actor SlowFrameLogic {
     /// the watchdog count a spurious frozen frame while backgrounded.
     private var isActive = true
 
+    /// A lower bound on acceptable frame timestamps after the app foregrounds.
+    ///
+    /// Set when the app becomes active and cleared once the first current frame is accepted. A
+    /// `CADisplayLink` tick produced before backgrounding can sit buffered in the frame stream and be
+    /// delivered to this actor only after `appDidBecomeActive` re-enables handling; `isActive` alone
+    /// cannot reject it, since it reflects when the tick is processed rather than when it was produced.
+    /// Without this cutoff the stale timestamp would seed the baseline, making the next real frame's gap
+    /// span the whole background interval and emit a spurious frozen render.
+    private var activationTimestamp: TimeInterval?
+
 
     // MARK: - Test-only Properties
 
@@ -139,6 +149,18 @@ actor SlowFrameLogic {
             return
         }
 
+        // Discard a tick produced before the app foregrounded (see activationTimestamp). This runs
+        // before the heartbeat and baseline updates so a stale tick neither re-arms the watchdog nor
+        // seeds a baseline.
+        if let cutoff = activationTimestamp {
+            guard timestamp >= cutoff else {
+                return
+            }
+
+            // First current frame accepted; the cutoff has done its job.
+            activationTimestamp = nil
+        }
+
         lastHeartbeatTimestamp = CACurrentMediaTime()
 
         let cadence = targetTimestamp - timestamp
@@ -191,7 +213,8 @@ actor SlowFrameLogic {
         flushBuffers()
     }
 
-    func appDidBecomeActive() {
+    func appDidBecomeActive(at cutoff: TimeInterval) {
+        activationTimestamp = cutoff
         previousTargetTimestamp = nil
         previousFrameTimestamp = nil
         lastHeartbeatTimestamp = 0

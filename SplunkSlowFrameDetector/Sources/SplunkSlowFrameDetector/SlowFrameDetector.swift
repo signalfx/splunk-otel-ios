@@ -16,6 +16,7 @@ limitations under the License.
 */
 
 import Foundation
+import QuartzCore
 import SplunkCommon
 
 #if os(iOS) || os(tvOS) || os(visionOS)
@@ -233,8 +234,12 @@ public final class SlowFrameDetector: NSObject {
                         await logic.appWillResignActive()
 
                     case .appDidBecomeActive:
+                        // Capture the foreground instant and reset the logic before resuming the ticker,
+                        // so a stale pre-background tick can be fenced out by timestamp and a fresh
+                        // post-resume tick is not accidentally rejected.
+                        let activationTimestamp = CACurrentMediaTime()
+                        await logic.appDidBecomeActive(at: activationTimestamp)
                         await ticker?.resume()
-                        await logic.appDidBecomeActive()
 
                     case .appWillTerminate:
                         await logic.appWillTerminate()
