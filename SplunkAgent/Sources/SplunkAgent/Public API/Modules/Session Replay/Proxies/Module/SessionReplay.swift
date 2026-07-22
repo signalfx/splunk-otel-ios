@@ -38,6 +38,9 @@ final class SessionReplay: SessionReplayModule {
 
     // MARK: - Internal callbacks
 
+    /// Called synchronously when `start()` is invoked, before the underlying module starts.
+    var onStart: (() -> Void)?
+
     /// Called synchronously when `stop()` is invoked, before the underlying module stops.
     var onStop: (() -> Void)?
 

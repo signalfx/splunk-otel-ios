@@ -198,7 +198,7 @@ class DefaultEventManager: AgentEventManager {
             // Use scriptInstanceId as a 16 character substring of a sessionId
             let scriptInstanceId = String(sessionId.prefix(upTo: sessionId.index(sessionId.startIndex, offsetBy: 16)))
 
-            let userActivity = userActivityCollector.flush(startMs: metadata.startUnixMs, endMs: metadata.endUnixMs)
+            let flush = userActivityCollector.flush(startMs: metadata.startUnixMs, endMs: metadata.endUnixMs)
 
             let event = SessionReplayDataEvent(
                 metadata: metadata,
@@ -206,7 +206,7 @@ class DefaultEventManager: AgentEventManager {
                 index: eventIndex,
                 sessionId: sessionId,
                 scriptInstanceId: scriptInstanceId,
-                userActivity: userActivity
+                userActivity: flush.timestamps
             )
 
             sessionReplayProcessor.sendEvent(event: event, immediateProcessing: false) { [weak self] processed in
@@ -215,7 +215,9 @@ class DefaultEventManager: AgentEventManager {
                 }
                 else {
                     // Return timestamps to the collector so they are included on retry.
-                    self?.userActivityCollector.restore(userActivity)
+                    // The generation guards against a stop/reset that happened while the
+                    // send was in flight — restore is a no-op in that case.
+                    self?.userActivityCollector.restore(flush.timestamps, generation: flush.generation)
                 }
                 completion(processed)
             }

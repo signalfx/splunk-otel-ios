@@ -283,20 +283,58 @@ extension SplunkRum {
             return
         }
 
-        if let collector = (eventManager as? DefaultEventManager)?.userActivityCollector,
-            let srProxy = sessionReplayProxy as? SessionReplay
-        {
-            interactionsModule.onActivity = { date in
-                collector.record(at: date)
-            }
-
-            srProxy.onStop = {
-                collector.reset()
-            }
-        }
+        wireUserActivityCollector(interactionsModule: interactionsModule)
 
         // Initialize proxy API for this module
         interactions = Interactions(for: interactionsModule)
+    }
+
+    /// Wire the `UserActivityCollector` to the Session Replay lifecycle and the
+    /// Interactions module's `onActivity` callback.
+    ///
+    /// The wiring is intentionally independent of `InteractionsConfiguration.isEnabled`.
+    /// The `onActivity` hook is installed on the module regardless of whether the
+    /// detector is currently running, because the module implementation may enable
+    /// the detector later (e.g. via remote configuration) and Session Replay
+    /// activity timestamps should not silently disappear when Interactions is
+    /// disabled at install time.
+    ///
+    /// The collector's recording state is toggled by `SessionReplay.start()` and
+    /// `SessionReplay.stop()` so events raised while Session Replay is not
+    /// recording never accumulate.
+    private func wireUserActivityCollector(interactionsModule: SplunkInteractions.Interactions) {
+        guard
+            let collector = (eventManager as? DefaultEventManager)?.userActivityCollector,
+            let srProxy = sessionReplayProxy as? SessionReplay
+        else {
+            return
+        }
+
+        interactionsModule.onActivity = { [weak collector] date in
+            collector?.record(at: date)
+        }
+
+        // The Cisco Session Replay module auto-starts recording as part of
+        // install(). By the time we get here, it is already recording, but no
+        // `SessionReplay.start()` was ever invoked (that's a public
+        // pause/resume surface). Prime the collector so activity is collected
+        // for the initial recording session without waiting for a manual
+        // start() call.
+        collector.setRecording(true)
+
+        srProxy.onStart = { [weak collector] in
+            // Clear any residual state (including outstanding failure-callback
+            // restores from the previous recording) before new activity flows.
+            collector?.reset()
+            collector?.setRecording(true)
+        }
+
+        srProxy.onStop = { [weak collector] in
+            // Gate off further collection immediately. The buffered activity for
+            // the final segment is preserved — publishSessionReplay flushes it
+            // asynchronously after `module.stop()` closes the last record.
+            collector?.setRecording(false)
+        }
     }
 
     /// Configure WebView Instrumentation module with shared state.

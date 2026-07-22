@@ -22,19 +22,33 @@ import XCTest
 
 final class UserActivityCollectorTests: XCTestCase {
 
-    func testFlushReturnsOnlyWindowTimestamps() {
+    // MARK: - Helpers
+
+    /// Returns a collector primed as-if Session Replay had started recording.
+    private func makeRecordingCollector() -> UserActivityCollector {
         let collector = UserActivityCollector()
+        collector.setRecording(true)
+        return collector
+    }
+
+
+    // MARK: - Basic flush semantics
+
+    func testFlushReturnsOnlyTimestampsUpToEndOfWindow() {
+        let collector = makeRecordingCollector()
         collector.record(at: Date(timeIntervalSince1970: 1.0)) // 1000 ms
         collector.record(at: Date(timeIntervalSince1970: 2.0)) // 2000 ms
         collector.record(at: Date(timeIntervalSince1970: 3.0)) // 3000 ms
 
         let flushed = collector.flush(startMs: 1_500, endMs: 2_500)
 
-        XCTAssertEqual(flushed, [2_000])
+        // 1000 ms belongs to a past window that was never flushed — it
+        // rides along with the current segment so it isn't orphaned.
+        XCTAssertEqual(flushed.timestamps.sorted(), [1_000, 2_000])
     }
 
-    func testFlushDoesNotRemoveTimestampsOutsideWindow() {
-        let collector = UserActivityCollector()
+    func testFlushRetainsTimestampsAfterEndOfWindow() {
+        let collector = makeRecordingCollector()
         collector.record(at: Date(timeIntervalSince1970: 1.0))
         collector.record(at: Date(timeIntervalSince1970: 2.0))
         collector.record(at: Date(timeIntervalSince1970: 3.0))
@@ -42,83 +56,122 @@ final class UserActivityCollectorTests: XCTestCase {
         _ = collector.flush(startMs: 1_500, endMs: 2_500)
         let remaining = collector.flush(startMs: 500, endMs: 4_000)
 
-        XCTAssertEqual(remaining.sorted(), [1_000, 3_000])
+        XCTAssertEqual(remaining.timestamps.sorted(), [3_000])
     }
 
-    func testConcurrentFlushesDoNotStealEachOthersTimestamps() {
-        let collector = UserActivityCollector()
-        collector.record(at: Date(timeIntervalSince1970: 1.0)) // segment A: [1000,2000]
+    func testSequentialFlushesDoNotStealEachOthersTimestamps() {
+        let collector = makeRecordingCollector()
+        collector.record(at: Date(timeIntervalSince1970: 1.0)) // segment A
         collector.record(at: Date(timeIntervalSince1970: 2.0))
-        collector.record(at: Date(timeIntervalSince1970: 3.0)) // segment B: [3000,4000]
+        collector.record(at: Date(timeIntervalSince1970: 3.0)) // segment B
         collector.record(at: Date(timeIntervalSince1970: 4.0))
 
         let segmentA = collector.flush(startMs: 1_000, endMs: 2_000)
         let segmentB = collector.flush(startMs: 3_000, endMs: 4_000)
 
-        XCTAssertEqual(segmentA.sorted(), [1_000, 2_000])
-        XCTAssertEqual(segmentB.sorted(), [3_000, 4_000])
+        XCTAssertEqual(segmentA.timestamps.sorted(), [1_000, 2_000])
+        XCTAssertEqual(segmentB.timestamps.sorted(), [3_000, 4_000])
     }
 
-    func testRestoreReturnsTimestampsOnRetry() {
-        let collector = UserActivityCollector()
+    func testLateArrivingEventJoinsNextSegment() {
+        // A tap that fires just after segment A's endMs but arrives after
+        // segment B has been prepared must still be delivered on segment C —
+        // it must never be silently dropped.
+        let collector = makeRecordingCollector()
+
+        // Segment A covers [1000, 2000]; nothing happened during it.
+        let segmentA = collector.flush(startMs: 1_000, endMs: 2_000)
+        XCTAssertTrue(segmentA.timestamps.isEmpty)
+
+        // Late-arriving event whose real timestamp was inside segment A.
+        // Use a millisecond value that is exactly representable in Double so
+        // the collector's floor-to-ms conversion returns exactly 1500.
         collector.record(at: Date(timeIntervalSince1970: 1.5)) // 1500 ms
 
-        let flushed = collector.flush(startMs: 1_000, endMs: 2_000)
-        XCTAssertEqual(flushed, [1_500])
-
-        // Simulate failed send — restore timestamps
-        collector.restore(flushed)
-
-        let reflushed = collector.flush(startMs: 1_000, endMs: 2_000)
-        XCTAssertEqual(reflushed, [1_500])
+        // Segment B [2000, 3000] — the late event fits <=endMs and rides.
+        let segmentB = collector.flush(startMs: 2_000, endMs: 3_000)
+        XCTAssertEqual(segmentB.timestamps, [1_500])
     }
 
-    func testBufferCapDropsOldestEntries() {
-        let collector = UserActivityCollector()
-        // Record 10 001 timestamps: 0 ms … 10 000 ms
-        for idx in 0 ..< 10_001 {
-            collector.record(at: Date(timeIntervalSince1970: Double(idx)))
-        }
-        // Cap is 10 000 — oldest entry (0 ms, idx=0) must have been dropped
-        let all = collector.flush(startMs: 0, endMs: 10_001_000)
-        XCTAssertEqual(all.count, 10_000)
-        // After drop, first retained timestamp is idx=1 → 1 000 ms
-        XCTAssertEqual(all.min(), 1_000)
-    }
 
-    func testResetClearsBuffer() {
-        let collector = UserActivityCollector()
+    // MARK: - Recording gate
+
+    func testRecordIgnoredWhenNotRecording() {
+        let collector = UserActivityCollector() // starts stopped by default
         collector.record(at: Date(timeIntervalSince1970: 1.0))
-        collector.reset()
+
         let flushed = collector.flush(startMs: 0, endMs: 100_000)
-        XCTAssertTrue(flushed.isEmpty)
+        XCTAssertTrue(flushed.timestamps.isEmpty)
     }
 
-    func testRecordingStopClearsBufferViaReset() {
-        // After recording stops, timestamps accumulated before stop must not bleed
-        // into the next recording session's segments.
-        let collector = UserActivityCollector()
+    func testSetRecordingFalseStopsFurtherCollection() {
+        let collector = makeRecordingCollector()
         collector.record(at: Date(timeIntervalSince1970: 1.0))
+        collector.setRecording(false)
         collector.record(at: Date(timeIntervalSince1970: 2.0))
 
-        // Simulate recording stop
-        collector.reset()
-
-        // Start recording again and add new activity
-        collector.record(at: Date(timeIntervalSince1970: 10.0))
-
-        let flushed = collector.flush(startMs: 0, endMs: 20_000)
-        XCTAssertEqual(flushed, [10_000])
+        let flushed = collector.flush(startMs: 0, endMs: 100_000)
+        XCTAssertEqual(flushed.timestamps, [1_000])
     }
 
-    func testTimestampsFromBeforeResetDoNotAppearAfterRestart() {
-        // Timestamps recorded before stop() must not appear in segments produced
-        // after a subsequent start() — i.e. reset() truly clears the buffer.
-        let collector = UserActivityCollector()
-        collector.record(at: Date(timeIntervalSince1970: 1.0)) // 1 000 ms — pre-stop
+
+    // MARK: - Retry / restore
+
+    func testRestoreOnMatchingGenerationReturnsTimestamps() {
+        let collector = makeRecordingCollector()
+        collector.record(at: Date(timeIntervalSince1970: 1.5))
+
+        let flushed = collector.flush(startMs: 1_000, endMs: 2_000)
+        XCTAssertEqual(flushed.timestamps, [1_500])
+
+        collector.restore(flushed.timestamps, generation: flushed.generation)
+
+        let reflushed = collector.flush(startMs: 1_000, endMs: 2_000)
+        XCTAssertEqual(reflushed.timestamps, [1_500])
+    }
+
+    func testRestoreAfterResetIsDropped() {
+        // A failure callback that fires after stop/reset must not smuggle the
+        // previous recording's activity into a new recording session.
+        let collector = makeRecordingCollector()
+        collector.record(at: Date(timeIntervalSince1970: 1.5))
+        let flushed = collector.flush(startMs: 1_000, endMs: 2_000)
+
         collector.reset()
-        // No new activity after restart
+        collector.setRecording(true)
+        collector.record(at: Date(timeIntervalSince1970: 10.0))
+
+        // Restore with the stale generation from before reset.
+        collector.restore(flushed.timestamps, generation: flushed.generation)
+
+        let after = collector.flush(startMs: 0, endMs: 100_000)
+        XCTAssertEqual(after.timestamps, [10_000])
+    }
+
+
+    // MARK: - Buffer cap
+
+    func testBufferCapAmortizedTrim() {
+        let collector = makeRecordingCollector()
+        // Overshoot the cap by more than trimSlack to force at least one trim.
+        for idx in 0 ..< 12_000 {
+            collector.record(at: Date(timeIntervalSince1970: Double(idx)))
+        }
+
+        let flushed = collector.flush(startMs: 0, endMs: 12_001_000)
+        XCTAssertLessThanOrEqual(flushed.timestamps.count, 10_000 + 1_024)
+        XCTAssertGreaterThanOrEqual(flushed.timestamps.count, 10_000)
+    }
+
+
+    // MARK: - Reset
+
+    func testResetClearsBufferAndInvalidatesOutstandingFlushes() {
+        let collector = makeRecordingCollector()
+        collector.record(at: Date(timeIntervalSince1970: 1.0))
+        collector.reset()
+
         let flushed = collector.flush(startMs: 0, endMs: 100_000)
-        XCTAssertTrue(flushed.isEmpty)
+        XCTAssertTrue(flushed.timestamps.isEmpty)
     }
 }
