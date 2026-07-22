@@ -7,6 +7,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+* Deployment environment resources now use the OpenTelemetry `deployment.environment.name` attribute instead of `deployment.environment`.
+
 ## [2.4.0] - 2026-07-20
 
 ### Fixed
