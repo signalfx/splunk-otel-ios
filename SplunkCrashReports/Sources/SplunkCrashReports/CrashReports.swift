@@ -21,6 +21,12 @@ import Foundation
 import OpenTelemetryApi
 @_spi(SplunkInternal) import SplunkCommon
 
+package typealias CrashReportSpanEmitter = () -> SpanId
+package typealias CrashReportPersistenceHandler = (
+    @escaping CrashReportSpanEmitter,
+    @escaping (Bool) -> Void
+) -> Void
+
 public class CrashReports {
 
 
@@ -37,10 +43,16 @@ public class CrashReports {
     /// A reference to the Module's data publishing callback.
     var crashReportDataConsumer: ((CrashReportsMetadata, String) -> Void)?
 
+    /// Requests confirmation that the emitted crash span has reached durable storage.
+    package var crashReportPersistenceHandler: CrashReportPersistenceHandler?
+
 
     // MARK: - Private
 
-    private var crashReporter: PLCrashReporter?
+    var crashReporter: PLCrashReporter?
+
+    let persistenceLock = NSLock()
+    var isAwaitingPersistence = false
 
     var crashSpanName: String = CrashReportConstants.defaultSpanName
 
@@ -113,6 +125,10 @@ public class CrashReports {
             return
         }
 
+        guard beginPersistenceAttempt() else {
+            return
+        }
+
         do {
             allUsedImageNames.removeAll()
             let data = try crashReporter?.loadPendingCrashReportDataAndReturnError()
@@ -134,18 +150,19 @@ public class CrashReports {
                 }
             }
 
-            // Send the report to the backend
-            send(crashReport: reportPayload, sharedState: sharedState, timestamp: timestamp)
+            requestCrashReportPersistence(
+                crashReport: reportPayload,
+                sharedState: sharedState,
+                timestamp: timestamp
+            )
         }
         catch {
+            finishPersistenceAttempt()
             logger.log(level: .error) {
                 "CrashReporter failed to load/parse with error: \(error)"
             }
             return
         }
-
-        // Purge the report.
-        crashReporter?.purgePendingCrashReport()
 
         // And indicate that crash occured
         logger.log(level: .warn) {
@@ -291,7 +308,11 @@ public class CrashReports {
         return appState
     }
 
-    private func send(crashReport: [CrashReportKeys: Any], sharedState: (any AgentSharedState)?, timestamp: Date) {
+    func send(
+        crashReport: [CrashReportKeys: Any],
+        sharedState: (any AgentSharedState)?,
+        timestamp: Date
+    ) -> SpanId {
         let tracer = OpenTelemetry.instance
             .tracerProvider
             .get(
@@ -308,6 +329,7 @@ public class CrashReports {
         }
 
         crashSpan.end(time: timestamp)
+        return crashSpan.context.spanId
     }
 }
 
