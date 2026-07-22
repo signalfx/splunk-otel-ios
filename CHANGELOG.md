@@ -7,6 +7,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.4.0] - 2026-07-20
+
 ### Fixed
 
 * Fixed non-finite floating-point span attributes blocking subsequent trace export from the in-memory batch queue.

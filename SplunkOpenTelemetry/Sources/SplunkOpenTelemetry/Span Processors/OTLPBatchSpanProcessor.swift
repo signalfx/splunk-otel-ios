@@ -101,6 +101,11 @@ struct OTLPBatchSpanProcessor: SpanProcessor {
         core.forceFlush(timeout: timeout)
     }
 
+    /// Flushes the current snapshot and reports whether it reached the exporter successfully.
+    func forceFlushResult(timeout: TimeInterval? = nil) -> Bool {
+        core.forceFlushResult(timeout: timeout)
+    }
+
     /// Flushes asynchronously and runs `completion` on the processor queue after the drain finishes.
     func forceFlush(timeout: TimeInterval? = nil, completion: @escaping () -> Void) {
         core.forceFlush(timeout: timeout, completion: completion)
@@ -160,7 +165,7 @@ final class BatchSpanProcessorCore: @unchecked Sendable {
         qos: .utility
     )
 
-    private let processorQueueKey = DispatchSpecificKey<Void>()
+    let processorQueueKey = DispatchSpecificKey<Void>()
 
     /// Guards `queue`, `isShutdown`, `isFlushScheduled`, and the drop-tracking counters.
     let lock = NSLock()
@@ -261,7 +266,7 @@ final class BatchSpanProcessorCore: @unchecked Sendable {
         let waitTimeout = forceFlushWaitTimeout(for: timeout)
         let deadline = Date().addingTimeInterval(waitTimeout)
         runOnProcessorQueue(wait: waitTimeout) {
-            self.performForceFlush(deadline: deadline)
+            _ = self.performForceFlush(deadline: deadline)
         }
     }
 
@@ -271,7 +276,7 @@ final class BatchSpanProcessorCore: @unchecked Sendable {
         let deadline = Date().addingTimeInterval(waitTimeout)
 
         processorQueue.async {
-            self.performForceFlush(deadline: deadline)
+            _ = self.performForceFlush(deadline: deadline)
             completion()
         }
     }
@@ -338,13 +343,18 @@ final class BatchSpanProcessorCore: @unchecked Sendable {
         min(Self.shutdownWaitTimeout, max(0, explicitTimeout ?? Self.shutdownWaitTimeout))
     }
 
-    private func forceFlushWaitTimeout(for explicitTimeout: TimeInterval?) -> TimeInterval {
+    func forceFlushWaitTimeout(for explicitTimeout: TimeInterval?) -> TimeInterval {
         max(0, explicitTimeout ?? Self.forceFlushWaitTimeout)
     }
 
-    private func performForceFlush(deadline: Date) {
-        drainSnapshot(deadline: deadline, requeueOnFailure: true, forwardDeadlineToExporter: false)
-        _ = spanExporter.flush(explicitTimeout: max(0, deadline.timeIntervalSinceNow))
+    func performForceFlush(deadline: Date) -> Bool {
+        let drained = drainSnapshot(
+            deadline: deadline,
+            requeueOnFailure: true,
+            forwardDeadlineToExporter: false
+        )
+        let exporterResult = spanExporter.flush(explicitTimeout: max(0, deadline.timeIntervalSinceNow))
+        return drained && exporterResult != .failure
     }
 
     // MARK: - Drop accounting

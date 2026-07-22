@@ -42,10 +42,6 @@ public class OTLPTraceProcessor: TraceProcessor {
         let activityTracker: ActivityTracker
     }
 
-    // MARK: - Constants
-
-    private static let crashReportPersistenceTimeout: TimeInterval = 2
-
     // MARK: - Internal properties
 
     /// OTel tracer provider shared by direct and log-derived spans.
@@ -187,12 +183,22 @@ public class OTLPTraceProcessor: TraceProcessor {
         )
     }
 
-    /// Persists buffered spans before a producer deletes its only source payload.
-    package func persistBufferedSpans(completion: @escaping (Bool) -> Void) {
-        batchSpanProcessor.persistBufferedSpans(
-            timeout: Self.crashReportPersistenceTimeout,
+    /// Emits and persists one span, reporting success only for that exact span.
+    package func emitAndPersistSpan(
+        emitting emitSpan: @escaping () -> SpanId,
+        timeout: TimeInterval,
+        completion: @escaping (Bool) -> Void
+    ) {
+        batchSpanProcessor.persistSpan(
+            emitting: emitSpan,
+            timeout: timeout,
             completion: completion
         )
+    }
+
+    /// Flushes the shared direct and log-derived span batch and reports durable completion.
+    package func forceFlushBufferedSpans(timeout: TimeInterval?) -> ExportResult {
+        batchSpanProcessor.forceFlushResult(timeout: timeout) ? .success : .failure
     }
 
 
