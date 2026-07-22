@@ -16,6 +16,7 @@ limitations under the License.
 */
 
 internal import CiscoSessionReplay
+import Combine
 import Foundation
 internal import SplunkAppStart
 internal import SplunkAppState
@@ -299,9 +300,18 @@ extension SplunkRum {
     /// activity timestamps should not silently disappear when Interactions is
     /// disabled at install time.
     ///
-    /// The collector's recording state is toggled by `SessionReplay.start()` and
-    /// `SessionReplay.stop()` so events raised while Session Replay is not
-    /// recording never accumulate.
+    /// The collector's recording state is driven by the Cisco Session Replay
+    /// module's `isRecording` publisher. That covers explicit start/stop calls,
+    /// redundant start calls (no reset when already recording), and autonomous
+    /// transitions such as `.diskCacheCapacityOverreached` or internal errors
+    /// that stop the module without going through our proxy.
+    ///
+    /// Reset semantics: the collector is reset on a stopped→recording edge (so
+    /// residual state from a previous recording — including outstanding
+    /// failure-callback restores — cannot bleed into the new session), but not
+    /// on a recording→stopped edge (so the buffered activity for the final
+    /// segment survives long enough for `publishSessionReplay` to flush it
+    /// after `module.stop()` closes the last record).
     private func wireUserActivityCollector(interactionsModule: SplunkInteractions.Interactions) {
         guard
             let collector = (eventManager as? DefaultEventManager)?.userActivityCollector,
@@ -314,27 +324,26 @@ extension SplunkRum {
             collector?.record(at: date)
         }
 
-        // The Cisco Session Replay module auto-starts recording as part of
-        // install(). By the time we get here, it is already recording, but no
-        // `SessionReplay.start()` was ever invoked (that's a public
-        // pause/resume surface). Prime the collector so activity is collected
-        // for the initial recording session without waiting for a manual
-        // start() call.
-        collector.setRecording(true)
+        // `$isRecording` is Combine-@Published; the first sink call fires
+        // synchronously with the current value, so this both seeds the
+        // collector and observes future transitions.
+        srProxy
+            .module
+            .state
+            .$isRecording
+            .removeDuplicates()
+            .sink { [weak collector] isRecording in
+                guard let collector else {
+                    return
+                }
 
-        srProxy.onStart = { [weak collector] in
-            // Clear any residual state (including outstanding failure-callback
-            // restores from the previous recording) before new activity flows.
-            collector?.reset()
-            collector?.setRecording(true)
-        }
+                if isRecording {
+                    collector.reset()
+                }
 
-        srProxy.onStop = { [weak collector] in
-            // Gate off further collection immediately. The buffered activity for
-            // the final segment is preserved — publishSessionReplay flushes it
-            // asynchronously after `module.stop()` closes the last record.
-            collector?.setRecording(false)
-        }
+                collector.setRecording(isRecording)
+            }
+            .store(in: &srProxy.cancellables)
     }
 
     /// Configure WebView Instrumentation module with shared state.

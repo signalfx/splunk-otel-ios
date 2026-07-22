@@ -17,6 +17,7 @@ limitations under the License.
 
 internal import CiscoLogger
 internal import CiscoSessionReplay
+import Combine
 import Foundation
 internal import SplunkCommon
 
@@ -27,6 +28,10 @@ final class SessionReplay: SessionReplayModule {
 
     unowned let module: CiscoSessionReplay.SessionReplay
 
+    /// Storage for Combine subscriptions owned by the proxy (e.g. the
+    /// `$isRecording` observation that drives `UserActivityCollector`).
+    var cancellables: Set<AnyCancellable> = []
+
 
     // MARK: - Private
 
@@ -35,14 +40,6 @@ final class SessionReplay: SessionReplayModule {
     /// The effective sampling rate for session replay.
     let effectiveSamplingRate: Double
 
-
-    // MARK: - Internal callbacks
-
-    /// Called synchronously when `start()` is invoked, before the underlying module starts.
-    var onStart: (() -> Void)?
-
-    /// Called synchronously when `stop()` is invoked, before the underlying module stops.
-    var onStop: (() -> Void)?
 
     // MARK: - Test support
 

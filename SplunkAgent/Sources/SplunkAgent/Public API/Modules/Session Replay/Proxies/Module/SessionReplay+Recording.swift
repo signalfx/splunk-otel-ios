@@ -21,10 +21,6 @@ extension SessionReplay {
 
     @discardableResult
     func start() -> any SessionReplayModule {
-        // Reset the collector *before* the module starts producing segments so
-        // any state left over from a previous recording (or a failed retry that
-        // arrived after stop) cannot bleed into the new session's segments.
-        onStart?()
         module.start()
 
         return self
@@ -32,11 +28,6 @@ extension SessionReplay {
 
     @discardableResult
     func stop() -> any SessionReplayModule {
-        // Stop accepting new activity synchronously, then let the module close
-        // its current record and flush the final segment. The collector is not
-        // cleared here — publishSessionReplay still needs to attach activity
-        // to that final segment. See `SessionReplay.start()` for reset timing.
-        onStop?()
         module.stop()
 
         return self
