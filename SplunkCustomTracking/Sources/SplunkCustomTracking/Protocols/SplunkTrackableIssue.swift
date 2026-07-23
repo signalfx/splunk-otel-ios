@@ -143,7 +143,7 @@ public struct SplunkExplicitIssue: SplunkTrackableIssue {
     ///
     /// Oversized messages are truncated first (the stacktrace is preferred) so the
     /// emitted span stays within OTLP/collector attribute limits.
-    static let messageCharacterLimit = 4096
+    static let messageCharacterLimit = 4_096
 
 
     // MARK: - Public
