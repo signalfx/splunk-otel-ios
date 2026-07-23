@@ -29,6 +29,13 @@ func startHttpSpan(request: URLRequest?) -> Span? {
         return nil
     }
 
+    if InternalNetworkRequestMarker.isMarked(request) {
+        NetworkInstrumentationManager.shared.logger.log(level: .debug) {
+            "URL excluded as an internal SDK request \(url.absoluteString)"
+        }
+        return nil
+    }
+
     if !(url.scheme?.lowercased().starts(with: "http") ?? false) {
         return nil
     }

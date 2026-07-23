@@ -208,8 +208,6 @@ final class ThreadSafeDictionaryTests: XCTestCase {
 
     func testConcurrentReads() {
         let dict = ThreadSafeDictionary<String, Int>()
-        let expectation = XCTestExpectation(description: "Concurrent reads")
-        expectation.expectedFulfillmentCount = 100
 
         // Initialize with some values
         for index in 0 ..< 10 {
@@ -217,31 +215,18 @@ final class ThreadSafeDictionaryTests: XCTestCase {
         }
 
         // Perform concurrent reads
-        for _ in 0 ..< 100 {
-            DispatchQueue.global()
-                .async {
-                    _ = dict["key\(Int.random(in: 0 ..< 10))"]
-                    expectation.fulfill()
-                }
+        DispatchQueue.concurrentPerform(iterations: 100) { _ in
+            _ = dict["key\(Int.random(in: 0 ..< 10))"]
         }
-
-        wait(for: [expectation], timeout: 5.0)
     }
 
     func testConcurrentWrites() {
         let dict = ThreadSafeDictionary<String, Int>()
-        let expectation = XCTestExpectation(description: "Concurrent writes")
-        expectation.expectedFulfillmentCount = 100
 
         // Perform concurrent writes
-        for index in 0 ..< 100 {
-            Task.detached {
-                dict["key\(index)"] = index
-                expectation.fulfill()
-            }
+        DispatchQueue.concurrentPerform(iterations: 100) { index in
+            dict["key\(index)"] = index
         }
-
-        wait(for: [expectation], timeout: 10.0)
 
         // Verify all values were written
         XCTAssertEqual(dict.count(), 100)
@@ -252,34 +237,20 @@ final class ThreadSafeDictionaryTests: XCTestCase {
 
     func testConcurrentReadsAndWrites() {
         let dict = ThreadSafeDictionary<String, Int>()
-        let readExpectation = XCTestExpectation(description: "Concurrent reads")
-        let writeExpectation = XCTestExpectation(description: "Concurrent writes")
-        readExpectation.expectedFulfillmentCount = 100
-        writeExpectation.expectedFulfillmentCount = 100
 
         for index in 0 ..< 10 {
             dict["key\(index)"] = index
         }
 
-        // Perform concurrent reads
-        for _ in 0 ..< 100 {
-            DispatchQueue.global()
-                .async {
-                    _ = dict["key\(Int.random(in: 0 ..< 10))"]
-                    readExpectation.fulfill()
-                }
+        DispatchQueue.concurrentPerform(iterations: 200) { index in
+            if index < 100 {
+                _ = dict["key\(Int.random(in: 0 ..< 10))"]
+            }
+            else {
+                let writeIndex = index - 100
+                dict["key\(writeIndex + 10)"] = writeIndex + 10
+            }
         }
-
-        // Perform concurrent writes
-        for index in 0 ..< 100 {
-            DispatchQueue.global()
-                .async {
-                    dict["key\(index + 10)"] = index + 10
-                    writeExpectation.fulfill()
-                }
-        }
-
-        wait(for: [readExpectation, writeExpectation], timeout: 5.0)
 
         // Verify all values were written
         XCTAssertEqual(dict.count(), 110)

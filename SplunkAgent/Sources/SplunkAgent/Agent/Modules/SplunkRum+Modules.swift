@@ -235,6 +235,23 @@ extension SplunkRum {
             // We need to do this because we need to read `appState` from the agent in the instance of a crash.
             crashReportsModule?.sharedState = sharedState
 
+            if let eventManager = eventManager as? DefaultEventManager {
+                let crashReportPersistenceTimeout: TimeInterval = 2
+
+                crashReportsModule?.crashReportPersistenceHandler = { [weak eventManager] emitSpan, completion in
+                    guard let eventManager else {
+                        completion(false)
+                        return
+                    }
+
+                    eventManager.concreteTraceProcessor.emitAndPersistSpan(
+                        emitting: emitSpan,
+                        timeout: crashReportPersistenceTimeout,
+                        completion: completion
+                    )
+                }
+            }
+
             // Check if a crash ended the previous run of the app
             crashReportsModule?.reportCrashIfPresent()
         #endif
@@ -292,7 +309,7 @@ extension SplunkRum {
     private func customizeCustomTracking() {
         if let customTrackingModule = modulesManager?.module(ofType: CustomTrackingInternal.self) {
             // Initialize proxy API for this module
-            customTrackingProxy = CustomTracking(for: customTrackingModule)
+            customTrackingProxy = customTrackingModule.isEnabled ? CustomTracking(for: customTrackingModule) : CustomTrackingNonOperational()
         }
     }
 

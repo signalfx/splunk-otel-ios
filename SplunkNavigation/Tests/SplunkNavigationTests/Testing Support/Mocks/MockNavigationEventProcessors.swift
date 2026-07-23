@@ -19,7 +19,6 @@ import Foundation
 
 @testable import SplunkNavigation
 
-
 // MARK: - Test processors
 
 final class PrefixingProcessor: NavigationEventProcessor {

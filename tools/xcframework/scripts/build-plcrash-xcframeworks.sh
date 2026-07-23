@@ -16,7 +16,7 @@
 #   - git (for cloning PLCrashReporter source)
 #
 # Environment variables:
-#   PLCRASH_VERSION  - Git tag to checkout (default: 1.12.0)
+#   PLCRASH_VERSION  - Git tag to checkout (default: 1.12.2)
 #   PLCRASH_REPO     - Git URL for PLCrashReporter (default: upstream GitHub)
 #   IOS_ONLY         - When true, build only iOS device and simulator slices
 #
@@ -44,7 +44,7 @@ ARCHIVES_DIR="${BUILD_DIR}/archives"
 OUTPUT_DIR="${TOOLS_ROOT}/output/xcframeworks"
 
 # PLCrashReporter version
-PLCRASH_VERSION="${PLCRASH_VERSION:-1.12.0}"
+PLCRASH_VERSION="${PLCRASH_VERSION:-1.12.2}"
 PLCRASH_REPO="${PLCRASH_REPO:-https://github.com/microsoft/plcrashreporter.git}"
 IOS_ONLY="${IOS_ONLY:-false}"
 

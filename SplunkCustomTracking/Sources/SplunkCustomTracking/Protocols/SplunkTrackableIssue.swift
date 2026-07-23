@@ -39,6 +39,10 @@ public protocol SplunkTrackableIssue: SplunkTrackable {
 
 extension SplunkTrackableIssue {
     public func toAttributesDictionary() -> [String: EventAttributeValue] {
+        toAttributesDictionary(includingExceptionThreads: true)
+    }
+
+    func toAttributesDictionary(includingExceptionThreads: Bool) -> [String: EventAttributeValue] {
         var attributes: [String: EventAttributeValue] = [:]
 
         // Set required attributes
@@ -48,6 +52,10 @@ extension SplunkTrackableIssue {
         // Optionally set stacktrace if it exists
         if let stacktrace {
             attributes[ErrorAttributeKeys.Exception.stacktrace.rawValue] = .string(stacktrace.formatted)
+
+            if includingExceptionThreads, let threadList = stacktrace.threadList {
+                attributes[ErrorAttributeKeys.Exception.threads.rawValue] = .string(threadList)
+            }
         }
 
         // Add code and domain for NSErrors if they exist
@@ -78,7 +86,6 @@ public struct SplunkIssue: SplunkTrackableIssue {
     public let exceptionCode: EventAttributeValue?
     public let codeNamespace: String?
 
-
     // MARK: - Initialization
 
     public init(from message: String) {
@@ -107,7 +114,10 @@ public struct SplunkIssue: SplunkTrackableIssue {
         message = exception.reason ?? "No reason provided"
         exceptionType = exception.name.rawValue
         timestamp = Date()
-        stacktrace = Stacktrace(frames: exception.callStackSymbols)
+
+        // Manually-created NSException instances may not carry a stack.
+        let frames = exception.callStackSymbols
+        stacktrace = Stacktrace(frames: frames.isEmpty ? Thread.callStackSymbols : frames)
         exceptionCode = nil
         codeNamespace = nil
     }

@@ -11,11 +11,38 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 * Added `customTracking.trackError(typeName:message:stacktrace:attributes:)` for reporting an error with an explicitly supplied stacktrace. Unlike the existing `trackError` overloads, the supplied stack is emitted verbatim as `exception.stacktrace` (no native stack is derived) and the resulting `component=error` span is named after `typeName` (falling back to `"error"`). This is the native emission path for caught JavaScript/Dart errors bridged from the React Native and Flutter agents. A matching Objective-C selector (`trackErrorWithType:message:stacktrace:attributes:`) is also available.
 
+## [2.4.0] - 2026-07-20
+
+### Fixed
+
+* Fixed non-finite floating-point span attributes blocking subsequent trace export from the in-memory batch queue.
+
+### Changed
+
+* Trace spans are now persisted in batches of up to 100 every 0.5 seconds, reducing disk activity and export overhead. Spans still buffered in memory may be lost if the app crashes or is force-terminated.
+
+## [2.3.2] - 2026-07-09
+
+### Added
+
+* Custom error and exception reporting now includes crash-report-style metadata: `crash.processPath`, `exception.images`, and `exception.threads` stack frames with resolved binary image names. Configure via `CustomTrackingConfiguration.includeBinaryImagesOnErrors` (Swift) or `SPLKCustomTrackingConfiguration.includeBinaryImagesOnErrors` (Objective-C). #677
+
+### Changed
+
+* OTLP exporter `User-Agent` headers now identify the Splunk RUM agent version, OS name/version, and OTLP exporter package version. #682
+
+### Fixed
+
+* Fixed SDK-owned exporter uploads incorrectly being emitted as Network Instrumentation HTTP spans. Internal SDK requests are now excluded from network telemetry. #683
+
+## [2.3.1] - 2026-06-15
+
 ### Fixed
 
 * Fixed `ShowVC` and `PresentationTransition` timing spans incorrectly emitting `last.screen.name` with the destination screen name instead of the actual previous screen name. #662
 * Fixed automated screen tracking incorrectly firing for internal UIKit controllers `UIEditingOverlayViewController` and `UITrackingElementWindowController`. #667
 * Fixed `app.ui.navigation` spans incorrectly emitting `last.screen.name` with the value `"unknown"` on the first navigation event. The attribute is now omitted when no previous screen has been shown. #661
+* Fixed the SwiftUI View modifier `sessionReplaySensitive` API ambiguity. #676
 
 ### Changed
 
@@ -88,7 +115,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 * Replaced OTLP binary protobuf with custom JSON encoding to reduce binary size. The SDK now uses `opentelemetry-swift-core` (API/SDK only) instead of the full `opentelemetry-swift` package with protocol exporters. #566
-  
+
 ## [2.0.7] - 2026-02-04
 
 ### Fixed

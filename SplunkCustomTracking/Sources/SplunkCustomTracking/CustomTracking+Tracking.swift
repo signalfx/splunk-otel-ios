@@ -29,6 +29,10 @@ extension CustomTrackingInternal {
     public func track(_ event: SplunkTrackableEvent) {
         // OTelEmitter.emitSpan(data: event, sharedState: sharedState, spanName: "customEvent")
 
+        guard isEnabled else {
+            return
+        }
+
         // Ensure the `onPublishBlock` is set
         guard let onPublishBlock else {
             print("onPublish block not set!")
@@ -78,6 +82,10 @@ extension CustomTrackingInternal {
     /// Shared by ``track(_:_:)`` and ``trackError(_:_:)``; the only difference
     /// between the two paths is the resolved span `name`.
     private func publishIssue(_ issue: SplunkTrackableIssue, spanName: String, _ attributes: [String: EventAttributeValue]) {
+        guard isEnabled else {
+            return
+        }
+
         // Ensure the `onPublishBlock` is set
         guard let onPublishBlock else {
             print("onPublish block not set!")
@@ -87,24 +95,51 @@ extension CustomTrackingInternal {
         // Metadata for the issue
         let metadata = CustomTrackingMetadata()
 
+        let diagnosticsIssue: SplunkIssue?
+        if let splunkIssue = issue as? SplunkIssue, splunkIssue.stacktrace != nil {
+            diagnosticsIssue = splunkIssue
+        }
+        else {
+            diagnosticsIssue = nil
+        }
+
         // Combine the provided attributes with attributes from the issue
         // Our toAttributesDictionary() also injects the issue.exceptionType
         let attributesToInject = ["error": EventAttributeValue.string("true")]
         let augmented = attributes.merging(attributesToInject) { $1 }
-        let combinedAttributes = augmented.merging(issue.toAttributesDictionary()) { $1 }
+        var combinedAttributes = augmented.merging(
+            issue.toAttributesDictionary(includingExceptionThreads: diagnosticsIssue == nil)
+        ) { $1 }
 
-        // Create the tracking data
-        let data = CustomTrackingData(
-            name: spanName,
-            component: "error",
-            attributes: combinedAttributes
-        )
+        let publish = { (attributes: [String: EventAttributeValue]) in
+            // Create the tracking data
+            let data = CustomTrackingData(
+                name: spanName,
+                component: "error",
+                attributes: attributes
+            )
 
-        // Publish the issue using the block
-        onPublishBlock(metadata, data)
+            // Publish the issue using the block
+            onPublishBlock(metadata, data)
+        }
+
+        guard let diagnosticsIssue else {
+            publish(combinedAttributes)
+            return
+        }
+
+        let diagnostics = diagnosticEnricher.diagnostics(for: diagnosticsIssue)
+        diagnostics.apply(to: &combinedAttributes)
+        publish(combinedAttributes)
     }
 
     public func track(_ workflowName: String) -> Span {
+        guard isEnabled else {
+            let span = DefaultTracer.instance.spanBuilder(spanName: workflowName).startSpan()
+            span.end()
+            return span
+        }
+
         // Ensure the tracer provider is properly configured
         let tracer = OpenTelemetry.instance
             .tracerProvider
