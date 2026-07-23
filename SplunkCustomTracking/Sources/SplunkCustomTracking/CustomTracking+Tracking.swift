@@ -53,7 +53,31 @@ extension CustomTrackingInternal {
 
     public func track(_ issue: SplunkTrackableIssue, _ attributes: [String: EventAttributeValue]) {
         // OTelEmitter.emitSpan(data: issue, sharedState: sharedState, spanName: "customError")
+        publishIssue(issue, spanName: "error", attributes)
+    }
 
+    /// Tracks an explicitly-supplied error/exception, naming the span after the
+    /// issue's `exceptionType` (falling back to `"error"` when it is empty).
+    ///
+    /// This is the emission path for the explicit-stacktrace `trackError` API used
+    /// by the hybrid agents. Unlike ``track(_:_:)``, which always names the span
+    /// `"error"`, it surfaces the error under its own type name and emits the
+    /// supplied stacktrace verbatim, matching the Android explicit-stack behavior.
+    ///
+    /// - Parameters:
+    ///   - issue: The explicitly-supplied issue to emit (see `SplunkExplicitIssue`).
+    ///   - attributes: Caller-provided attributes merged into the error span. The
+    ///     issue's own `exception.*` attributes take precedence on key conflicts.
+    public func trackError(_ issue: SplunkTrackableIssue, _ attributes: [String: EventAttributeValue]) {
+        let spanName = issue.exceptionType.isEmpty ? "error" : issue.exceptionType
+        publishIssue(issue, spanName: spanName, attributes)
+    }
+
+    /// Builds the `component=error` tracking data for an issue and publishes it.
+    ///
+    /// Shared by ``track(_:_:)`` and ``trackError(_:_:)``; the only difference
+    /// between the two paths is the resolved span `name`.
+    private func publishIssue(_ issue: SplunkTrackableIssue, spanName: String, _ attributes: [String: EventAttributeValue]) {
         // Ensure the `onPublishBlock` is set
         guard let onPublishBlock else {
             print("onPublish block not set!")
@@ -71,7 +95,7 @@ extension CustomTrackingInternal {
 
         // Create the tracking data
         let data = CustomTrackingData(
-            name: "error",
+            name: spanName,
             component: "error",
             attributes: combinedAttributes
         )

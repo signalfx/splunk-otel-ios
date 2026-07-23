@@ -24,6 +24,25 @@ public struct Stacktrace {
 }
 
 
+// MARK: - Stacktrace initialization
+
+extension Stacktrace {
+
+    /// Creates a stacktrace from a single, already-formatted verbatim string.
+    ///
+    /// Use this for explicitly-supplied stacks (for example cross-platform
+    /// JavaScript/Dart stacks bridged from React Native or Flutter) that must be
+    /// emitted exactly as provided, without re-deriving or reformatting frames.
+    /// ``formatted`` then returns the original string unchanged, preserving it as
+    /// the raw symbolication input.
+    ///
+    /// - Parameter raw: The verbatim stacktrace string to emit unmodified.
+    init(raw: String) {
+        frames = [raw]
+    }
+}
+
+
 // MARK: - Stacktrace formatting
 
 extension Stacktrace {

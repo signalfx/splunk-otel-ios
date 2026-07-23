@@ -112,3 +112,67 @@ public struct SplunkIssue: SplunkTrackableIssue {
         codeNamespace = nil
     }
 }
+
+
+// MARK: - SplunkExplicitIssue Struct
+
+/// A trackable issue whose type, message, and stacktrace are supplied explicitly
+/// by the caller, rather than derived from the native runtime.
+///
+/// This backs the explicit-stacktrace `trackError` API used by the hybrid agents
+/// (React Native, Flutter). Unlike `SplunkIssue`, it never reads
+/// `Thread.callStackSymbols`: the provided `stacktrace` is emitted verbatim as
+/// `exception.stacktrace` so it stays usable as the raw symbolication input. The
+/// `message` is truncated to a bounded length so an oversized payload still
+/// produces a valid span (the stacktrace is preferred and kept).
+public struct SplunkExplicitIssue: SplunkTrackableIssue {
+
+    // MARK: - Constants
+
+    /// Maximum number of characters retained for `exception.message`.
+    ///
+    /// Oversized messages are truncated first (the stacktrace is preferred) so the
+    /// emitted span stays within OTLP/collector attribute limits.
+    static let messageCharacterLimit = 4096
+
+
+    // MARK: - Public
+
+    public let message: String
+    public let exceptionType: String
+    public let timestamp: Date
+    public var stacktrace: Stacktrace?
+
+
+    // MARK: - Initialization
+
+    /// Creates an explicitly-supplied issue.
+    ///
+    /// - Parameters:
+    ///   - typeName: The error type reported as `exception.type` (for example `TypeError`).
+    ///   - message: The error message reported as `exception.message`. Truncated to
+    ///     ``messageCharacterLimit`` characters when longer.
+    ///   - stacktrace: The verbatim stacktrace reported as `exception.stacktrace`.
+    ///     Pass `nil` for string-only or stackless errors.
+    public init(typeName: String, message: String, stacktrace: String?) {
+        exceptionType = typeName
+        self.message = Self.truncate(message, limit: Self.messageCharacterLimit)
+        timestamp = Date()
+        self.stacktrace = stacktrace.map { Stacktrace(raw: $0) }
+    }
+
+
+    // MARK: - Helpers
+
+    /// Truncates `value` to at most `limit` characters, appending an ellipsis when shortened.
+    ///
+    /// Walks at most `limit` characters, avoiding a full traversal of a potentially huge string.
+    private static func truncate(_ value: String, limit: Int) -> String {
+        let prefix = value.prefix(limit)
+        if prefix.endIndex == value.endIndex {
+            return value
+        }
+
+        return String(prefix) + "…"
+    }
+}

@@ -71,6 +71,49 @@ public protocol CustomTrackingModule {
     func trackException(_ exception: NSException, _ attributes: MutableAttributes) -> any CustomTrackingModule
 
 
+    // MARK: - Track Errors with an explicit stacktrace
+
+    /// Track an error described by an explicit type, message, and stacktrace.
+    ///
+    /// Unlike the ``trackError(_:_:)-(Error,_)`` overloads, this method does not derive a
+    /// native stacktrace: the supplied `stacktrace` is emitted verbatim as
+    /// `exception.stacktrace`. It is intended for errors captured outside the native
+    /// runtime - for example caught JavaScript/Dart errors bridged from the React Native
+    /// or Flutter agents - whose stack must be preserved as-is for later symbolication.
+    ///
+    /// The resulting `component=error` span is named after `typeName` (falling back to
+    /// `"error"` when empty) and carries `exception.type`, `exception.message`, and, when
+    /// provided, `exception.stacktrace`. Provide cross-cutting context (such as
+    /// `error.source` or `exception.escaped`) through `attributes`.
+    ///
+    /// - Parameters:
+    ///   - typeName: The error type, reported as `exception.type` (for example `TypeError`).
+    ///   - message: A concise summary of the error, reported as `exception.message`.
+    ///   - stacktrace: The verbatim stacktrace, reported as `exception.stacktrace`.
+    ///     Pass `nil` for string-only or stackless errors.
+    ///   - attributes: Additional attributes to associate with the error span.
+    ///
+    /// - Returns: The updated ``CustomTrackingModule`` instance.
+    @discardableResult
+    func trackError(typeName: String, message: String, stacktrace: String?, attributes: [String: Any]) -> any CustomTrackingModule
+
+    /// Track an error described by an explicit type, message, and stacktrace.
+    ///
+    /// A convenience overload of
+    /// ``trackError(typeName:message:stacktrace:attributes:)`` that associates no
+    /// additional attributes with the error span.
+    ///
+    /// - Parameters:
+    ///   - typeName: The error type, reported as `exception.type` (for example `TypeError`).
+    ///   - message: A concise summary of the error, reported as `exception.message`.
+    ///   - stacktrace: The verbatim stacktrace, reported as `exception.stacktrace`.
+    ///     Pass `nil` for string-only or stackless errors.
+    ///
+    /// - Returns: The updated ``CustomTrackingModule`` instance.
+    @discardableResult
+    func trackError(typeName: String, message: String, stacktrace: String?) -> any CustomTrackingModule
+
+
     // MARK: - Track Custom Workflow
 
     /// Track a workflow with a name and return a `Span` object.
@@ -123,5 +166,15 @@ extension CustomTrackingModule {
     @discardableResult
     func trackException(_ exception: NSException) -> any CustomTrackingModule {
         trackException(exception, MutableAttributes())
+    }
+}
+
+extension CustomTrackingModule {
+
+    // MARK: - Explicit stacktrace error helper
+
+    @discardableResult
+    func trackError(typeName: String, message: String, stacktrace: String?) -> any CustomTrackingModule {
+        trackError(typeName: typeName, message: message, stacktrace: stacktrace, attributes: [:])
     }
 }
