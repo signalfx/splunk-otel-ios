@@ -122,3 +122,92 @@ public struct SplunkIssue: SplunkTrackableIssue {
         codeNamespace = nil
     }
 }
+
+
+// MARK: - SplunkExplicitIssue Struct
+
+/// A trackable issue whose type, message, and stacktrace are supplied explicitly
+/// by the caller, rather than derived from the native runtime.
+///
+/// This backs the explicit-stacktrace `trackError` API used by the hybrid agents
+/// (React Native, Flutter). Unlike `SplunkIssue`, it never reads
+/// `Thread.callStackSymbols`: the provided `stacktrace` is emitted verbatim as
+/// `exception.stacktrace` so it stays usable as the raw symbolication input.
+///
+/// All three caller-supplied fields are bounded so an oversized hybrid payload
+/// still produces a valid span and cannot trigger an unbounded allocation on the
+/// host app. The `message` is truncated most aggressively; the `stacktrace` is
+/// preferred and bounded more generously; the `exceptionType` (which also becomes
+/// the error span name) is kept short.
+public struct SplunkExplicitIssue: SplunkTrackableIssue {
+
+    // MARK: - Constants
+
+    /// Maximum number of characters retained for `exception.message`.
+    ///
+    /// Oversized messages are truncated first (the stacktrace is preferred) so the
+    /// emitted span stays within OTLP/collector attribute limits.
+    static let messageCharacterLimit = 4_096
+
+    /// Maximum number of characters retained for `exception.stacktrace`.
+    ///
+    /// The stacktrace is the primary symbolication input, so it is bounded more
+    /// generously than the message, but still capped to prevent an oversized
+    /// hybrid stack from causing an unbounded allocation during capture/encoding.
+    static let stacktraceCharacterLimit = 16_384
+
+    /// Maximum number of characters retained for `exception.type`.
+    ///
+    /// The type also becomes the error span name, which must stay short.
+    static let typeNameCharacterLimit = 256
+
+
+    // MARK: - Public
+
+    public let message: String
+    public let exceptionType: String
+    public let timestamp: Date
+    public var stacktrace: Stacktrace?
+
+
+    // MARK: - Initialization
+
+    /// Creates an explicitly-supplied issue.
+    ///
+    /// - Parameters:
+    ///   - typeName: The error type reported as `exception.type` (for example `TypeError`).
+    ///     Truncated to ``typeNameCharacterLimit`` characters when longer.
+    ///   - message: The error message reported as `exception.message`. Truncated to
+    ///     ``messageCharacterLimit`` characters when longer.
+    ///   - stacktrace: The verbatim stacktrace reported as `exception.stacktrace`.
+    ///     Truncated to ``stacktraceCharacterLimit`` characters when longer. Pass
+    ///     `nil` for string-only or stackless errors.
+    public init(typeName: String, message: String, stacktrace: String?) {
+        exceptionType = Self.truncate(typeName, limit: Self.typeNameCharacterLimit)
+        self.message = Self.truncate(message, limit: Self.messageCharacterLimit)
+        timestamp = Date()
+        self.stacktrace = stacktrace.map { Stacktrace(raw: Self.truncate($0, limit: Self.stacktraceCharacterLimit)) }
+    }
+
+
+    // MARK: - Helpers
+
+    /// Truncates `value` to at most `limit` characters.
+    ///
+    /// When shortening is required, the result keeps `limit - 1` characters and
+    /// appends a single-character ellipsis marker, so the returned string never
+    /// exceeds `limit` characters.
+    private static func truncate(_ value: String, limit: Int) -> String {
+        guard limit > 0 else {
+            return ""
+        }
+
+        // `prefix` walks at most `limit + 1` characters, avoiding a full traversal
+        // of a potentially huge string just to measure its length.
+        if value.prefix(limit + 1).count <= limit {
+            return value
+        }
+
+        return String(value.prefix(limit - 1)) + "…"
+    }
+}

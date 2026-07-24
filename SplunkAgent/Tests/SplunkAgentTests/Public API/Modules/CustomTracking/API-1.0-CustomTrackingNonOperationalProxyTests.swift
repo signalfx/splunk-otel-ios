@@ -59,6 +59,21 @@ final class CustomTrackingAPI10NoOpProxyTests: XCTestCase {
         XCTAssertNotNil(moduleProxy.trackException(testException))
     }
 
+    func testTrackErrorWithExplicitStacktrace() {
+        XCTAssertNotNil(
+            moduleProxy.trackError(
+                typeName: "TypeError",
+                message: "x is not a function",
+                stacktrace: "at f (index.bundle:1:537284)",
+                attributes: ["screen.name": "Cart"]
+            )
+        )
+    }
+
+    func testTrackErrorWithExplicitStacktraceNoAttributes() {
+        XCTAssertNotNil(moduleProxy.trackError(typeName: "Error", message: "Something failed", stacktrace: nil))
+    }
+
     func testTrackWorkflow() {
         let testWorkflowString = "TestWorkflow"
         XCTAssertNotNil(moduleProxy.trackWorkflow(testWorkflowString))
