@@ -76,6 +76,35 @@ final class CustomErrorTrackingExplicitTests: XCTestCase {
         // The supplied stack is emitted verbatim - no native frames are derived or appended.
         XCTAssertEqual(getStringValue(for: "exception.stacktrace", in: data), stacktrace)
         XCTAssertEqual(getStringValue(for: "screen.name", in: data), "Cart")
+
+        // A hybrid (JS/Dart) stack must not be parsed into iOS-native thread/image
+        // diagnostics: those parsers only understand Thread.callStackSymbols lines
+        // and would otherwise emit malformed native data for the whole raw stack.
+        XCTAssertNil(data.attributes["exception.threads"])
+        XCTAssertNil(data.attributes["exception.images"])
+    }
+
+    func testTrackError_explicit_neverEmitsNativeThreadsForNativeLookingStack() throws {
+        let module = try XCTUnwrap(module)
+        let expectation = try XCTUnwrap(expectation)
+
+        // A stack whose lines resemble native `Thread.callStackSymbols` frames must
+        // still be treated as verbatim (no exception.threads) because it was supplied
+        // explicitly rather than derived from the native runtime.
+        let stacktrace = """
+            0   AgentTestApp    0x0000000102a3c1d0 someSymbol + 40
+            1   UIKitCore       0x00000001a1b2c3d4 anotherSymbol + 128
+            """
+        let issue = SplunkExplicitIssue(typeName: "NativeLooking", message: "boom", stacktrace: stacktrace)
+
+        module.trackError(issue, [:])
+
+        wait(for: [expectation], timeout: 1.0)
+
+        let data = try XCTUnwrap(capturedData)
+        XCTAssertEqual(getStringValue(for: "exception.stacktrace", in: data), stacktrace)
+        XCTAssertNil(data.attributes["exception.threads"])
+        XCTAssertNil(data.attributes["exception.images"])
     }
 
     func testTrackError_explicit_withNilStacktrace_omitsStacktrace() throws {
@@ -148,8 +177,26 @@ final class CustomErrorTrackingExplicitTests: XCTestCase {
         let longMessage = String(repeating: "a", count: SplunkExplicitIssue.messageCharacterLimit + 100)
         let issue = SplunkExplicitIssue(typeName: "TypeError", message: longMessage, stacktrace: nil)
 
-        // Oversized messages are truncated to the limit plus a single ellipsis marker.
-        XCTAssertEqual(issue.message.count, SplunkExplicitIssue.messageCharacterLimit + 1)
+        // Oversized messages are truncated so the result never exceeds the limit,
+        // with the final character reserved for a single ellipsis marker.
+        XCTAssertEqual(issue.message.count, SplunkExplicitIssue.messageCharacterLimit)
         XCTAssertTrue(issue.message.hasSuffix("…"))
+    }
+
+    func testSplunkExplicitIssue_boundsOversizeStacktrace() throws {
+        let longStacktrace = String(repeating: "b", count: SplunkExplicitIssue.stacktraceCharacterLimit + 500)
+        let issue = SplunkExplicitIssue(typeName: "TypeError", message: "msg", stacktrace: longStacktrace)
+
+        let stacktrace = try XCTUnwrap(issue.stacktrace)
+        XCTAssertEqual(stacktrace.formatted.count, SplunkExplicitIssue.stacktraceCharacterLimit)
+        XCTAssertTrue(stacktrace.formatted.hasSuffix("…"))
+    }
+
+    func testSplunkExplicitIssue_boundsOversizeTypeName() {
+        let longTypeName = String(repeating: "T", count: SplunkExplicitIssue.typeNameCharacterLimit + 50)
+        let issue = SplunkExplicitIssue(typeName: longTypeName, message: "msg", stacktrace: nil)
+
+        XCTAssertEqual(issue.exceptionType.count, SplunkExplicitIssue.typeNameCharacterLimit)
+        XCTAssertTrue(issue.exceptionType.hasSuffix("…"))
     }
 }

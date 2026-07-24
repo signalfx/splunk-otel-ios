@@ -171,7 +171,19 @@ extension CustomTrackingModule {
 
 extension CustomTrackingModule {
 
-    // MARK: - Explicit stacktrace error helper
+    // MARK: - Explicit stacktrace error helpers
+
+    /// Default fallback for consumers that do not implement the explicit-stack API.
+    @discardableResult
+    func trackError(typeName: String, message: String, stacktrace: String?, attributes: [String: Any]) -> any CustomTrackingModule {
+        var forwarded = attributes
+        forwarded["exception.type"] = typeName
+        if let stacktrace {
+            forwarded["exception.stacktrace"] = stacktrace
+        }
+
+        return trackError(message, MutableAttributes(from: forwarded))
+    }
 
     @discardableResult
     func trackError(typeName: String, message: String, stacktrace: String?) -> any CustomTrackingModule {
