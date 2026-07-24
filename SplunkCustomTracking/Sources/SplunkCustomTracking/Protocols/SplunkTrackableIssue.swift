@@ -186,9 +186,7 @@ public struct SplunkExplicitIssue: SplunkTrackableIssue {
         exceptionType = Self.truncate(typeName, limit: Self.typeNameCharacterLimit)
         self.message = Self.truncate(message, limit: Self.messageCharacterLimit)
         timestamp = Date()
-        self.stacktrace = stacktrace
-            .map { Self.truncate($0, limit: Self.stacktraceCharacterLimit) }
-            .map { Stacktrace(raw: $0) }
+        self.stacktrace = stacktrace.map { Stacktrace(raw: Self.truncate($0, limit: Self.stacktraceCharacterLimit)) }
     }
 
 
