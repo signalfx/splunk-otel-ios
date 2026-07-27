@@ -30,9 +30,7 @@ extension Resource {
         let requiredAttributes: [String: AttributeValue] = [
 
             // App info
-            // Note: Using string literal to preserve backward compatibility with "deployment.environment"
-            // (SemanticConventions uses "deployment.environment.name" which is a newer convention)
-            "deployment.environment": .string(agentResources.appDeploymentEnvironment),
+            SemanticConventions.Deployment.environmentName.rawValue: .string(agentResources.appDeploymentEnvironment),
             "app": .string(agentResources.appName),
             "app.version": .string(agentResources.appVersion),
             "app.build_id": .string(agentResources.appBuild),
