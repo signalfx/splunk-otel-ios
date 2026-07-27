@@ -41,6 +41,13 @@ final class ResourcesTests: XCTestCase {
         let serviceName = try XCTUnwrap(otelResource.attributes[SemanticConventions.Service.name.rawValue])
         XCTAssertFalse(serviceName.description.isEmpty)
 
+        // Test deployment environment
+        let deploymentEnvironment = try XCTUnwrap(
+            otelResource.attributes[SemanticConventions.Deployment.environmentName.rawValue]
+        )
+        XCTAssertEqual(deploymentEnvironment, .string(configuration.deploymentEnvironment))
+        XCTAssertNil(otelResource.attributes["deployment.environment"])
+
         // Test telemetry sdk name
         let telemetrySdkName = try XCTUnwrap(otelResource.attributes[SemanticConventions.Telemetry.sdkName.rawValue])
         XCTAssertFalse(telemetrySdkName.description.isEmpty)
