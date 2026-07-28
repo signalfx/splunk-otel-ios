@@ -1,6 +1,6 @@
 # How to Release Splunk RUM for iOS
 
-This project is distributed as a Swift Package. Versioned Git tags define the versions available to Swift Package Manager.
+This project is distributed through Swift Package Manager and as signed XCFramework archives attached to GitHub releases. Versioned Git tags define the versions available to Swift Package Manager.
 
 ## Pre-flight
 
