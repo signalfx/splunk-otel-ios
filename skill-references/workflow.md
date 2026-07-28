@@ -115,7 +115,9 @@ Authorization Cookie Set-Cookie X-SF-Token X-API-Key API-Key Session-Token
 ```
 
 Before network changes, report that URL path/query can be captured and propose
-`ignoreURLs` or span redaction for sensitive routes.
+`ignoreURLs` for sensitive routes. There is no supported URL sanitization hook;
+if a URL must be kept but a sensitive path segment must be hidden, report it as
+a gap.
 
 ## Required output
 
