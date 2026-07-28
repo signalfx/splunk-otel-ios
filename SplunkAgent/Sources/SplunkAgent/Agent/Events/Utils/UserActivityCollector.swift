@@ -87,17 +87,24 @@ final class UserActivityCollector {
         }
     }
 
-    /// Returns timestamps eligible for the given segment window along with the
+    /// Returns timestamps that fall within `[startMs, endMs]` along with the
     /// generation token needed to restore them on failure.
     ///
-    /// Any timestamp `<= endMs` is attached to this segment. Late-arriving events
-    /// whose real time falls before `startMs` (they missed their own segment)
-    /// are therefore not orphaned — they ride the next segment. Timestamps
-    /// `> endMs` are retained for a later flush.
-    func flush(startMs _: Int, endMs: Int) -> (timestamps: [Int], generation: UInt64) {
+    /// Filtering is strict on both bounds so concurrent segment tasks cannot
+    /// steal each other's activity — a segment always receives exactly the
+    /// events that occurred inside its own window. Timestamps outside the
+    /// window (before `startMs` or after `endMs`) are retained so they can be
+    /// picked up by the segment that actually owns them, regardless of the
+    /// order in which segments finish publishing.
+    func flush(startMs: Int, endMs: Int) -> (timestamps: [Int], generation: UInt64) {
         lock.withLock {
-            let collected = timestamps.filter { $0 <= endMs }
-            timestamps = timestamps.filter { $0 > endMs }
+            let collected = timestamps.filter {
+                $0 >= startMs && $0 <= endMs
+            }
+            timestamps = timestamps.filter {
+                $0 < startMs || $0 > endMs
+            }
+
             return (collected, generation)
         }
     }

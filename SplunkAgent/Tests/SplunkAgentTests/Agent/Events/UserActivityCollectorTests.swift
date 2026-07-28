@@ -34,7 +34,7 @@ final class UserActivityCollectorTests: XCTestCase {
 
     // MARK: - Basic flush semantics
 
-    func testFlushReturnsOnlyTimestampsUpToEndOfWindow() {
+    func testFlushReturnsOnlyTimestampsInsideWindow() {
         let collector = makeRecordingCollector()
         collector.record(at: Date(timeIntervalSince1970: 1.0)) // 1000 ms
         collector.record(at: Date(timeIntervalSince1970: 2.0)) // 2000 ms
@@ -42,21 +42,24 @@ final class UserActivityCollectorTests: XCTestCase {
 
         let flushed = collector.flush(startMs: 1_500, endMs: 2_500)
 
-        // 1000 ms belongs to a past window that was never flushed — it
-        // rides along with the current segment so it isn't orphaned.
-        XCTAssertEqual(flushed.timestamps.sorted(), [1_000, 2_000])
+        // Only 2000 ms is inside [1500, 2500]. 1000 ms and 3000 ms are
+        // retained for whichever segment actually owns their window.
+        XCTAssertEqual(flushed.timestamps.sorted(), [2_000])
     }
 
-    func testFlushRetainsTimestampsAfterEndOfWindow() {
+    func testFlushRetainsTimestampsOutsideWindow() {
         let collector = makeRecordingCollector()
         collector.record(at: Date(timeIntervalSince1970: 1.0))
         collector.record(at: Date(timeIntervalSince1970: 2.0))
         collector.record(at: Date(timeIntervalSince1970: 3.0))
 
         _ = collector.flush(startMs: 1_500, endMs: 2_500)
+
+        // Both 1000 (before window) and 3000 (after window) must survive the
+        // first flush and become available to a subsequent wider window.
         let remaining = collector.flush(startMs: 500, endMs: 4_000)
 
-        XCTAssertEqual(remaining.timestamps.sorted(), [3_000])
+        XCTAssertEqual(remaining.timestamps.sorted(), [1_000, 3_000])
     }
 
     func testSequentialFlushesDoNotStealEachOthersTimestamps() {
@@ -73,24 +76,37 @@ final class UserActivityCollectorTests: XCTestCase {
         XCTAssertEqual(segmentB.timestamps.sorted(), [3_000, 4_000])
     }
 
-    func testLateArrivingEventJoinsNextSegment() {
-        // A tap that fires just after segment A's endMs but arrives after
-        // segment B has been prepared must still be delivered on segment C —
-        // it must never be silently dropped.
+    func testSegmentBFlushedBeforeSegmentAStillPreservesOwnership() {
+        // Two segments run concurrently. Segment B finishes preparing first
+        // and calls `flush` before segment A. Segment A must still receive
+        // its own activity — B cannot consume it, even though B ran first.
         let collector = makeRecordingCollector()
+        collector.record(at: Date(timeIntervalSince1970: 1.0)) // owned by A
+        collector.record(at: Date(timeIntervalSince1970: 2.0)) // owned by A
+        collector.record(at: Date(timeIntervalSince1970: 3.0)) // owned by B
+        collector.record(at: Date(timeIntervalSince1970: 4.0)) // owned by B
 
-        // Segment A covers [1000, 2000]; nothing happened during it.
+        let segmentB = collector.flush(startMs: 3_000, endMs: 4_000)
         let segmentA = collector.flush(startMs: 1_000, endMs: 2_000)
-        XCTAssertTrue(segmentA.timestamps.isEmpty)
 
-        // Late-arriving event whose real timestamp was inside segment A.
-        // Use a millisecond value that is exactly representable in Double so
-        // the collector's floor-to-ms conversion returns exactly 1500.
+        XCTAssertEqual(segmentB.timestamps.sorted(), [3_000, 4_000])
+        XCTAssertEqual(segmentA.timestamps.sorted(), [1_000, 2_000])
+    }
+
+    func testEventOutsideAnyKnownWindowIsRetainedNotOrphaned() {
+        // Events that do not fit any active segment window remain in the
+        // buffer until a matching (or wider) window flushes them, so a
+        // future retry or wider window can still recover them.
+        let collector = makeRecordingCollector()
         collector.record(at: Date(timeIntervalSince1970: 1.5)) // 1500 ms
 
-        // Segment B [2000, 3000] — the late event fits <=endMs and rides.
-        let segmentB = collector.flush(startMs: 2_000, endMs: 3_000)
-        XCTAssertEqual(segmentB.timestamps, [1_500])
+        // A neighbouring segment [2000, 3000] must not consume it.
+        let neighbour = collector.flush(startMs: 2_000, endMs: 3_000)
+        XCTAssertTrue(neighbour.timestamps.isEmpty)
+
+        // A subsequent wider window that actually covers it still can.
+        let recovery = collector.flush(startMs: 0, endMs: 3_000)
+        XCTAssertEqual(recovery.timestamps, [1_500])
     }
 
 
@@ -146,6 +162,30 @@ final class UserActivityCollectorTests: XCTestCase {
 
         let after = collector.flush(startMs: 0, endMs: 100_000)
         XCTAssertEqual(after.timestamps, [10_000])
+    }
+
+    func testFailedSegmentAActivityIsNotConsumedBySegmentB() {
+        // Segment A publishes and fails. Its activity is restored to the
+        // collector. Segment B then runs its own flush — because B filters
+        // strictly by its own window, it must not steal A's timestamps, and
+        // A's restored activity remains available for A's retry.
+        let collector = makeRecordingCollector()
+        collector.record(at: Date(timeIntervalSince1970: 1.0))
+        collector.record(at: Date(timeIntervalSince1970: 2.0)) // both belong to A
+        collector.record(at: Date(timeIntervalSince1970: 3.0))
+        collector.record(at: Date(timeIntervalSince1970: 4.0)) // both belong to B
+
+        // A flushes, publish fails, activity is restored.
+        let segmentA = collector.flush(startMs: 1_000, endMs: 2_000)
+        collector.restore(segmentA.timestamps, generation: segmentA.generation)
+
+        // B flushes its own window while A's retry hasn't happened yet.
+        let segmentB = collector.flush(startMs: 3_000, endMs: 4_000)
+        XCTAssertEqual(segmentB.timestamps.sorted(), [3_000, 4_000])
+
+        // A's timestamps are still recoverable for its retry.
+        let retryA = collector.flush(startMs: 1_000, endMs: 2_000)
+        XCTAssertEqual(retryA.timestamps.sorted(), [1_000, 2_000])
     }
 
 
