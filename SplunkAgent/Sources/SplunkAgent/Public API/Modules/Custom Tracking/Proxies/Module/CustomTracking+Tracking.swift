@@ -56,6 +56,18 @@ extension CustomTracking {
         return self
     }
 
+
+    // MARK: - Custom Tracking - Errors with an explicit stacktrace
+
+    @discardableResult
+    func trackError(typeName: String, message: String, stacktrace: String?, attributes: [String: Any] = [:]) -> any CustomTrackingModule {
+        let issue = SplunkExplicitIssue(typeName: typeName, message: message, stacktrace: stacktrace)
+        let eventAttributes = MutableAttributes(from: attributes).toEventAttributes()
+        module.trackError(issue, eventAttributes)
+
+        return self
+    }
+
     // MARK: - Custom Tracking - Workflows
 
     func trackWorkflow(_ workflowName: String) -> Span {

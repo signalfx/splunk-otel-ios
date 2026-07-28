@@ -92,6 +92,27 @@ final class CustomTrackingAPI10ModuleProxyTests: XCTestCase {
         XCTAssertNoThrow(moduleProxy.trackException(exception, attributes))
     }
 
+    func testTrackError_withExplicitStacktrace() throws {
+        let moduleProxy = try XCTUnwrap(moduleProxy)
+
+        XCTAssertNoThrow(
+            moduleProxy.trackError(
+                typeName: "TypeError",
+                message: "x is not a function",
+                stacktrace: "at f (index.bundle:1:537284)",
+                attributes: ["screen.name": "Cart", "error.source": "custom"]
+            )
+        )
+    }
+
+    func testTrackError_withExplicitStacktrace_noAttributes() throws {
+        let moduleProxy = try XCTUnwrap(moduleProxy)
+
+        XCTAssertNoThrow(
+            moduleProxy.trackError(typeName: "Error", message: "Something failed", stacktrace: nil)
+        )
+    }
+
     func testTrackWorkflow() throws {
         let moduleProxy = try XCTUnwrap(moduleProxy)
 

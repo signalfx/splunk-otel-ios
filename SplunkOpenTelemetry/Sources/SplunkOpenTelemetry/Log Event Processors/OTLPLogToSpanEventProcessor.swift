@@ -24,6 +24,16 @@ import SplunkOpenTelemetryBackgroundExporter
 /// OTLPLogEventProcessor converts OpenTelemetry Logs to Spans and emits them through a standard infrastructure for Span.
 public class OTLPLogToSpanEventProcessor: LogEventProcessor {
 
+    // MARK: - Inline types
+
+    private struct InitializationState {
+        let loggerProvider: LoggerProvider
+
+        #if DEBUG
+            let resource: Resource
+        #endif
+    }
+
     // MARK: - Private properties
 
     /// OTel logger provider.
@@ -50,17 +60,99 @@ public class OTLPLogToSpanEventProcessor: LogEventProcessor {
         resources: AgentResources,
         debugEnabled: Bool
     ) {
-        // Store resources object for Unit tests
+        let state = Self.makeInitializationState(
+            resources: resources,
+            debugEnabled: debugEnabled,
+            tracerProviderProvider: { OpenTelemetry.instance.tracerProvider },
+            spanFlusher: { timeout in
+                OTLPLogToSpanExporter.flushTracerProvider(
+                    OpenTelemetry.instance.tracerProvider,
+                    timeout: timeout
+                )
+            }
+        )
+
+        loggerProvider = state.loggerProvider
+
         #if DEBUG
-            // Build Resources
+            resource = state.resource
+        #endif
+    }
+
+    package convenience init(
+        with traceUrl: URL?,
+        resources: AgentResources,
+        debugEnabled: Bool,
+        traceProcessor: OTLPTraceProcessor
+    ) {
+        self.init(
+            with: traceUrl,
+            resources: resources,
+            debugEnabled: debugEnabled,
+            tracerProvider: traceProcessor.tracerProvider,
+            spanFlusher: { timeout in
+                traceProcessor.forceFlushBufferedSpans(timeout: timeout)
+            }
+        )
+    }
+
+    init(
+        with _: URL?,
+        resources: AgentResources,
+        debugEnabled: Bool,
+        tracerProvider: any TracerProvider,
+        spanFlusher: @escaping (TimeInterval?) -> ExportResult = { _ in .failure }
+    ) {
+        let state = Self.makeInitializationState(
+            resources: resources,
+            debugEnabled: debugEnabled,
+            tracerProviderProvider: { tracerProvider },
+            spanFlusher: spanFlusher
+        )
+
+        loggerProvider = state.loggerProvider
+
+        #if DEBUG
+            resource = state.resource
+        #endif
+    }
+
+    private static func makeInitializationState(
+        resources: AgentResources,
+        debugEnabled: Bool,
+        tracerProviderProvider: @escaping () -> any TracerProvider,
+        spanFlusher: @escaping (TimeInterval?) -> ExportResult
+    ) -> InitializationState {
+        #if DEBUG
             var resource = Resource()
             resource.merge(with: resources)
-
-            self.resource = resource
         #endif
 
+        let loggerProvider = makeLoggerProvider(
+            agentVersion: resources.agentVersion,
+            debugEnabled: debugEnabled,
+            tracerProviderProvider: tracerProviderProvider,
+            spanFlusher: spanFlusher
+        )
 
-        let logToSpanExporter = OTLPLogToSpanExporter(agentVersion: resources.agentVersion)
+        #if DEBUG
+            return InitializationState(loggerProvider: loggerProvider, resource: resource)
+        #else
+            return InitializationState(loggerProvider: loggerProvider)
+        #endif
+    }
+
+    private static func makeLoggerProvider(
+        agentVersion: String,
+        debugEnabled: Bool,
+        tracerProviderProvider: @escaping () -> any TracerProvider,
+        spanFlusher: @escaping (TimeInterval?) -> ExportResult
+    ) -> LoggerProvider {
+        let logToSpanExporter = OTLPLogToSpanExporter(
+            agentVersion: agentVersion,
+            tracerProviderProvider: tracerProviderProvider,
+            spanFlusher: spanFlusher
+        )
 
         // Initialize LogRecordProcessor
         let simpleLogRecordProcessor = SimpleLogRecordProcessor(
@@ -80,7 +172,7 @@ public class OTLPLogToSpanEventProcessor: LogEventProcessor {
         // Set default logger provider
         OpenTelemetry.registerLoggerProvider(loggerProvider: loggerProvider)
 
-        self.loggerProvider = loggerProvider
+        return loggerProvider
     }
 
 
