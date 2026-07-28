@@ -82,6 +82,11 @@ actor SlowFrameLogic {
     // MARK: - Test-only Properties
 
     #if DEBUG
+        /// A test-only accessor for the current slowFrameCount.
+        var testSlowFrameCount: Int {
+            slowFrameCount
+        }
+
         /// A test-only accessor for the current frozenFrameCount.
         var testFrozenFrameCount: Int {
             frozenFrameCount

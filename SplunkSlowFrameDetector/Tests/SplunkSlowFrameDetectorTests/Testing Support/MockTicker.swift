@@ -30,11 +30,19 @@ import XCTest
         var stopped = false
         @MainActor
         var startCallCount = 0
+        @MainActor
+        var pauseCallCount = 0
+        @MainActor
+        var resumeCallCount = 0
 
         @MainActor
         var onStart: (() -> Void)?
         @MainActor
         var onStop: (() -> Void)?
+        @MainActor
+        var onPause: (() -> Void)?
+        @MainActor
+        var onResume: (() -> Void)?
 
         let onFrameStream: AsyncStream<(TimeInterval, TimeInterval)>
         private let continuation: AsyncStream<(TimeInterval, TimeInterval)>.Continuation
@@ -66,10 +74,16 @@ import XCTest
         }
 
         @MainActor
-        func pause() {}
+        func pause() {
+            pauseCallCount += 1
+            onPause?()
+        }
 
         @MainActor
-        func resume() {}
+        func resume() {
+            resumeCallCount += 1
+            onResume?()
+        }
 
         @MainActor
         func simulateFrame(timestamp: TimeInterval, targetTimestamp: TimeInterval) {
