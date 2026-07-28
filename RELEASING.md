@@ -16,23 +16,29 @@ This project is distributed as a Swift Package. Versioned Git tags define the ve
 
 ## Sign and upload XCFrameworks
 
-7. With the Apple Distribution certificate in your keychain and the Session Replay repository checked out locally, replace `<VERSION>` with the release version and upload both distributions:
+7. With the Apple Distribution certificate and private key in your keychain and the Session Replay repository checked out locally, replace `<VERSION>` and `<APPLE_DISTRIBUTION_SIGNING_IDENTITY>` with the release values and upload both distributions:
    ```bash
    export SESSION_REPLAY_LOCAL_PATH=/path/to/session-replay
-   tools/xcframework/scripts/sign-and-upload.sh <VERSION> --upload-to <VERSION>
-   tools/xcframework/scripts/sign-and-upload.sh <VERSION> --ios-only --upload-to <VERSION>
+   tools/xcframework/scripts/sign-and-upload.sh <VERSION> \
+     --identity "<APPLE_DISTRIBUTION_SIGNING_IDENTITY>" \
+     --upload-to <VERSION>
+   tools/xcframework/scripts/sign-and-upload.sh <VERSION> \
+     --identity "<APPLE_DISTRIBUTION_SIGNING_IDENTITY>" \
+     --ios-only \
+     --upload-to <VERSION>
    ```
+8. Open the GitHub release for `<VERSION>` and confirm both `SplunkAgent-XCFrameworks.zip` and `SplunkAgent-XCFrameworks-iOS-only.zip` are attached and downloadable. This check validates the uploaded XCFramework distributions; the SPM smoke test below does not validate these archives.
 
 ## Back-merge
 
-8. On the back-merge PR, click **"Approve workflows to run"** when prompted, obtain the required approvals, and wait for the required checks.
-9. Ask a repository administrator to temporarily disable **"Require linear history"** for `develop`, merge the PR into `develop` with a **regular merge commit only** (not squash or rebase), and immediately re-enable the rule. If the CLA check remains pending after everything else passes, the administrator should bypass it during this merge.
+9. On the back-merge PR, click **"Approve workflows to run"** when prompted, obtain the required approvals, and wait for the required checks.
+10. Ask a repository administrator to temporarily disable **"Require linear history"** for `develop`, merge the PR into `develop` with a **regular merge commit only** (not squash or rebase), and immediately re-enable the rule. If the CLA check remains pending after everything else passes, the administrator should bypass it during this merge.
 
 ## Smoke test
 
-10. In a test app, add an SPM dependency on `signalfx/splunk-otel-ios` at the new version.
-11. In Xcode: **File → Packages → Reset Package Caches**, then **File → Packages → Resolve Package Versions**.
-12. Build and run. Confirm the session appears in a testing realm with `rum.sdk.version` matching the new version.
+11. In a test app, add an SPM dependency on `signalfx/splunk-otel-ios` at the new version.
+12. In Xcode: **File → Packages → Reset Package Caches**, then **File → Packages → Resolve Package Versions**.
+13. Build and run. Confirm the session appears in a testing realm with `rum.sdk.version` matching the new version.
 
 ## Manual recovery
 
