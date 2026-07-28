@@ -114,10 +114,9 @@ Reject obvious sensitive header capture:
 Authorization Cookie Set-Cookie X-SF-Token X-API-Key API-Key Session-Token
 ```
 
-Before network changes, report that URL path/query can be captured and propose
-`ignoreURLs` for sensitive routes. There is no supported URL sanitization hook;
-if a URL must be kept but a sensitive path segment must be hidden, report it as
-a gap.
+Before network changes, report URL capture risk and load
+`instrumentation/network.md` for supported drop-or-transform options. Do not
+invent a Network module redaction setting.
 
 ## Required output
 

@@ -16,11 +16,13 @@ captured headers, network privacy review, or no-network-telemetry symptoms.
 
 ## Guidance
 
-Network instrumentation can capture URL path/query and full URL attributes.
-Before changing network behavior, report sensitive route risk and consider
-`ignoreURLs`. There is no supported hook to sanitize a captured URL while
-keeping the span; if a URL must be kept but a sensitive path segment must be
-hidden, report it as a gap rather than inventing an unsupported solution.
+Network instrumentation can capture URL-derived attributes, including path,
+query, and the full URL. Before changing network behavior, report sensitive
+route risk. Use `ignoreURLs` when dropping the matching span is acceptable.
+The Network module has no URL-rewrite setting. When the span must be retained,
+use the public `AgentConfiguration.spanInterceptor` only with explicit approval,
+scope the transform to matching network spans, and inspect current source for
+every URL-bearing attribute that must be removed or replaced.
 
 Swift module configuration types live in `SplunkNetwork`; import it when using
 `NetworkInstrumentationConfiguration` or `IgnoreURLs`:
