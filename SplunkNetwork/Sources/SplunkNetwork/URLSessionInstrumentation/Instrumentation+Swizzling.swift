@@ -67,6 +67,10 @@ extension URLSessionTask {
             return
         }
 
+        if wasSkippedForInstrumentation(self) {
+            return
+        }
+
         // Check if we already have a span from a previous resume call
         let existingSpan: Span? = objc_getAssociatedObject(self, &associatedKeySpanResume) as? Span
         if existingSpan != nil {

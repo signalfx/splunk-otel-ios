@@ -32,8 +32,7 @@ extension SplunkRum {
         // Try to update the event manager if available
         if let eventManager = eventManager as? DefaultEventManager {
             // Temporarily exclude BOTH old and new collector URLs before the
-            // endpoint update (which flushes pending data). This prevents
-            // self-instrumentation of flush requests while keeping the old
+            // endpoint update. This prevents self-instrumentation while keeping the old
             // collector excluded in case the update fails.
             let previousEndpoint = currentEndpoint
             let previousUrls = [previousEndpoint?.traceEndpoint, previousEndpoint?.sessionReplayEndpoint].compactMap(\.self)
@@ -69,10 +68,9 @@ extension SplunkRum {
     /// Data is cached to pending storage for later sending when a new endpoint is
     /// configured via ``updateEndpoint(_:)``.
     public func disableEndpoint() {
-        currentEndpoint = nil
-
         if let eventManager = eventManager as? DefaultEventManager {
             eventManager.disableEndpoint()
+            currentEndpoint = nil
             updateNetworkExclusionList(for: nil)
 
             logger.log(level: .info, isPrivate: false) {
@@ -80,6 +78,7 @@ extension SplunkRum {
             }
         }
         else {
+            currentEndpoint = nil
             logger.log(level: .warn, isPrivate: false) {
                 "Endpoint disabled but event manager is not available."
             }

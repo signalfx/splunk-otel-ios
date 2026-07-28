@@ -38,4 +38,19 @@ final class TracerProviderTestBuilder {
             .add(spanProcessor: SimpleSpanProcessor(spanExporter: exporter))
             .build()
     }
+
+    /// Builds a tracer provider whose only span processor is the given in-memory batching processor.
+    static func buildBatch(processor: OTLPBatchSpanProcessor) -> any TracerProvider {
+        TracerProviderBuilder()
+            .add(spanProcessor: processor)
+            .build()
+    }
+
+    /// Builds a tracer provider that drops all spans (never samples), wired to the given batch processor.
+    static func buildBatchNeverSampled(processor: OTLPBatchSpanProcessor) -> any TracerProvider {
+        TracerProviderBuilder()
+            .with(sampler: Samplers.alwaysOff)
+            .add(spanProcessor: processor)
+            .build()
+    }
 }

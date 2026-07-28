@@ -78,6 +78,13 @@ struct CustomTrackingDemoView: View {
                 )
 
                 FeatureSection(
+                    title: "Explicit Stacktrace Error Tracking (hybrid agents)",
+                    content: FeatureButton(label: "Track Explicit Error (JS stack)") {
+                        trackExplicitError()
+                    }
+                )
+
+                FeatureSection(
                     title: "Legacy Tracking",
                     content: VStack(spacing: 8) {
                         FeatureButton(label: "Track Legacy Error (String)") {
@@ -133,6 +140,33 @@ struct CustomTrackingDemoView: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + 15) {
             customSpan.end()
         }
+    }
+
+
+    // MARK: - Explicit stacktrace error tracking
+
+    /// Simulates how the React Native / Flutter bridge reports a caught JS/Dart
+    /// error: an explicit type, message, and verbatim (here Hermes-style) stack,
+    /// with the hybrid layer's context carried through `attributes`.
+    func trackExplicitError() {
+        let frames = [
+            "TypeError: undefined is not a function (evaluating 'cart.checkout()')",
+            "    at Checkout (index.android.bundle:1:537284)",
+            "    at onPress (index.android.bundle:1:540122)"
+        ]
+        let stacktrace = frames.joined(separator: "\n")
+
+        SplunkRum.shared.customTracking.trackError(
+            typeName: "TypeError",
+            message: "undefined is not a function (evaluating 'cart.checkout()')",
+            stacktrace: stacktrace,
+            attributes: [
+                "screen.name": "Cart",
+                "error.source": "custom",
+                "exception.escaped": false,
+                "rum.sdk.rn.version": "react-native"
+            ]
+        )
     }
 
 

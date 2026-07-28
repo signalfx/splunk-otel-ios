@@ -108,7 +108,6 @@ import XCTest
             XCTAssertEqual(counts["slowRenders"], 1)
         }
 
-
         // MARK: - Frame Detection Tests
 
         /// Verifies that the very first frame processed does not trigger a report.

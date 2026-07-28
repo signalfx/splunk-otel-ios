@@ -7,22 +7,38 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+* Deployment environment resources now use the OpenTelemetry `deployment.environment.name` attribute instead of `deployment.environment`
+
 ### Added
 
 * Added `SKILLS.md` and `skill-references/` — a skill bundle for coding agents instrumenting customer iOS apps with Splunk RUM. Covers install, endpoint setup, navigation, network, Session Replay, Objective-C, dSYM, and verification workflows.
-* Custom error and exception reporting may now include `crash.processPath` and stack-referenced `exception.images` metadata, matching the crash report payload shape. Configure binary images via `CustomTrackingConfiguration.includeBinaryImagesOnErrors`.
-* Objective-C installs can configure Custom Tracking binary image metadata via `SPLKCustomTrackingConfiguration.includeBinaryImagesOnErrors`.
-* Custom error and exception reporting with stack traces now includes `exception.threads` stack frame metadata, matching the crash report payload shape.
-* Custom error and exception `exception.threads` stack frame image names are now resolved from loaded binary image metadata when binary image metadata is enabled.
+* Added `customTracking.trackError(typeName:message:stacktrace:attributes:)` for reporting an error with an explicitly supplied stacktrace. Unlike the existing `trackError` overloads, the supplied stack is emitted verbatim as `exception.stacktrace` (no native stack is derived) and the resulting `component=error` span is named after `typeName` (falling back to `"error"`). This is the native emission path for caught JavaScript/Dart errors bridged from the React Native and Flutter agents. A matching Objective-C selector (`trackErrorWithType:message:stacktrace:attributes:`) is also available.
+
+## [2.4.0] - 2026-07-20
 
 ### Fixed
 
-* Custom error and exception binary image enrichment no longer generates PLCrashReporter live reports on the caller thread or at install time.
-* Objective-C Custom Tracking configuration conversion now preserves `SPLKCustomTrackingConfiguration.isEnabled`.
+* Fixed non-finite floating-point span attributes blocking subsequent trace export from the in-memory batch queue.
+
+### Changed
+
+* Trace spans are now persisted in batches of up to 100 every 0.5 seconds, reducing disk activity and export overhead. Spans still buffered in memory may be lost if the app crashes or is force-terminated.
+
+## [2.3.2] - 2026-07-09
+
+### Added
+
+* Custom error and exception reporting now includes crash-report-style metadata: `crash.processPath`, `exception.images`, and `exception.threads` stack frames with resolved binary image names. Configure via `CustomTrackingConfiguration.includeBinaryImagesOnErrors` (Swift) or `SPLKCustomTrackingConfiguration.includeBinaryImagesOnErrors` (Objective-C). #677
 
 ### Changed
 
 * OTLP exporter `User-Agent` headers now identify the Splunk RUM agent version, OS name/version, and OTLP exporter package version. #682
+
+### Fixed
+
+* Fixed SDK-owned exporter uploads incorrectly being emitted as Network Instrumentation HTTP spans. Internal SDK requests are now excluded from network telemetry. #683
 
 ## [2.3.1] - 2026-06-15
 
@@ -104,7 +120,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 * Replaced OTLP binary protobuf with custom JSON encoding to reduce binary size. The SDK now uses `opentelemetry-swift-core` (API/SDK only) instead of the full `opentelemetry-swift` package with protocol exporters. #566
-  
+
 ## [2.0.7] - 2026-02-04
 
 ### Fixed
