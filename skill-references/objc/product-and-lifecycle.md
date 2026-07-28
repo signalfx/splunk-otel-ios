@@ -27,6 +27,7 @@ SPLKAgentConfiguration *config =
 self.splunkRum = [SPLKAgent installWith:config error:&error];
 if (self.splunkRum == nil) {
     // Non-fatal. Do not log raw error; it may contain config values.
+    NSLog(@"Splunk RUM agent did not start. Check configuration values.");
 }
 ```
 

@@ -87,6 +87,7 @@ func startSplunkRum() {
         splunkRum = try SplunkRum.install(with: config)
     } catch {
         // Non-fatal. Do not print the raw error; it may contain config values.
+        print("Splunk RUM agent did not start. Check configuration values.")
     }
 }
 ```

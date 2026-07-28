@@ -52,8 +52,11 @@ Require explicit approval and use placeholders in any example.
 
 ## Post-apply handoff
 
-After writing initialization code, deliver this handoff and **stop — wait for
-the user to confirm before proceeding to build or verification steps.**
+After writing initialization code, run a static build check to confirm the
+import, target membership, and API call compile correctly — deferred endpoint
+setup means no credentials are needed to build or launch. Only after the build
+passes, deliver this handoff and **stop — wait for the user to confirm before
+proceeding to telemetry or backend verification steps.**
 
 Tell the user: the agent is installed and will start, but telemetry is queued
 locally and not sent until an endpoint is configured. To start sending data,
@@ -61,10 +64,13 @@ they need to add the following after the `SplunkRum.install` call — in their
 local editor, not through this conversation:
 
 ```swift
-// Add your realm (not a secret; safe to commit). Supply the token via your
-// app's existing secret/config mechanism — never paste it here or commit it.
+// Supply both the realm and token via your app's existing secret/config
+// mechanism — never paste either here or commit them. Use a placeholder
+// in tracked code and route the real values through gitignored config,
+// CI secrets, or a secrets manager alongside the token.
+let realm = ProcessInfo.processInfo.environment["SPLUNK_REALM"] ?? ""
 let token = ProcessInfo.processInfo.environment["SPLUNK_RUM_TOKEN"] ?? ""
-let endpoint = EndpointConfiguration(realm: "<YOUR_REALM>", rumAccessToken: token)
+let endpoint = EndpointConfiguration(realm: realm, rumAccessToken: token)
 splunkRum?.preferences.endpointConfiguration = endpoint
 ```
 
