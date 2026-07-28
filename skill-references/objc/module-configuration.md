@@ -13,6 +13,8 @@ Verified configuration classes:
 
 - `SPLKNavigationConfiguration`
 - `SPLKNetworkInstrumentationConfiguration`
+- `SPLKNetworkMonitorConfiguration`
+- `SPLKCustomTrackingConfiguration` (includes `includeBinaryImagesOnErrors`)
 - `SPLKCrashReportsConfiguration`
 - `SPLKInteractionsConfiguration`
 - `SPLKSlowFrameDetectorConfiguration`
