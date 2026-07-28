@@ -15,13 +15,16 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 * Added `customTracking.trackError(typeName:message:stacktrace:attributes:)` for reporting an error with an explicitly supplied stacktrace. Unlike the existing `trackError` overloads, the supplied stack is emitted verbatim as `exception.stacktrace` (no native stack is derived) and the resulting `component=error` span is named after `typeName` (falling back to `"error"`). This is the native emission path for caught JavaScript/Dart errors bridged from the React Native and Flutter agents. A matching Objective-C selector (`trackErrorWithType:message:stacktrace:attributes:`) is also available.
 
+### Fixed
+
+* Improved accuracy of `slowRenders` and `frozenRenders` detection: the detector now derives the expected cadence per frame, counts a continuous freeze once, and makes slow and frozen classifications mutually exclusive. #696
+* Fixed a spurious `frozenRenders` event that could be emitted when the app backgrounded while a frame was in flight. #696
+
 ## [2.4.0] - 2026-07-20
 
 ### Fixed
 
 * Fixed non-finite floating-point span attributes blocking subsequent trace export from the in-memory batch queue.
-* Improved accuracy of `slowRenders` and `frozenRenders` detection: the detector now derives the expected cadence per frame, counts a continuous freeze once, and makes slow and frozen classifications mutually exclusive. #696
-* Fixed a spurious `frozenRenders` event that could be emitted when the app backgrounded while a frame was in flight. #696
 
 ### Changed
 
