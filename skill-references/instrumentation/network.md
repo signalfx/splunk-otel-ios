@@ -1,20 +1,10 @@
 # Network
 
-Load for `URLSession`, network monitoring, ignored URLs, trace headers,
-captured headers, network privacy review, or no-network-telemetry symptoms.
-
-## Depth guidance
-
-- `baseline`: keep default network instrumentation. Add URL exclusions only
-  for inspected sensitive routes or the user's explicit request. Do not capture
-  headers.
-- `targeted`: add narrow URL exclusions, trace-header compatibility notes, or
-  approved non-sensitive header allowlists for specific inspected services.
-- `comprehensive`: inventory network wrappers, session creation, sensitive
-  routes, trace propagation, and approved header capture needs. Keep suppression
-  patterns narrow.
-
 ## Guidance
+
+Keep default network instrumentation. Add URL exclusions only for inspected
+sensitive routes or the user's explicit request, and do not capture headers by
+default.
 
 Network instrumentation can capture URL-derived attributes, including path,
 query, and the full URL. Before changing network behavior, report sensitive

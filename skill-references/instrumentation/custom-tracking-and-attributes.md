@@ -1,22 +1,11 @@
 # Custom Tracking And Attributes
 
-Load for custom events, handled errors, workflows, user/session/global
-attributes, or business telemetry recommendations.
-
-## Depth guidance
-
-- `baseline`: do not add custom telemetry unless the user asks for it or a
-  specific gap is blocking useful verification.
-- `targeted`: add a small number of stable events, handled errors, or
-  attributes for inspected critical flows.
-- `comprehensive`: propose a business-signal map covering key milestones,
-  handled failures, and timed workflows with clear owners for span completion.
-  Apply only approved signals.
-
 ## Guidance
 
-Recommend custom events for business milestones, handled errors for expected
-error paths, and workflows for timed operations with clear start/end points.
+Do not add custom telemetry unless the user asks or an inspected gap blocks
+useful verification. Use custom events for business milestones, handled errors
+for expected error paths, and workflows for timed operations with clear
+start/end points.
 
 Source-backed Swift APIs:
 

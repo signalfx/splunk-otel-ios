@@ -1,17 +1,9 @@
 # Default Modules
 
-Load when explaining SDK defaults, app startup/state, crash runtime behavior,
-slow/frozen frames, or interaction tracking.
-
-## Depth guidance
-
-- `baseline`: rely on current safe defaults. Avoid explicit module configuration
-  unless required for install, privacy, or the user's stated goal.
-- `targeted`: configure only inspected modules needed for the requested topic.
-- `comprehensive`: inventory default and optional modules, then propose a staged
-  coverage plan. High-risk features still require their own approvals.
-
 ## Guidance
+
+Rely on current safe defaults. Configure only inspected modules needed for
+installation, privacy, or the user's stated goal.
 
 Distinguish module presence from active signal behavior. Current source builds
 the default module pool from: app start, app state, crash reports, Session

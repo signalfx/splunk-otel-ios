@@ -1,8 +1,5 @@
 # Fresh Install
 
-Load for new Splunk RUM integration, dependency/product selection, platform
-checks, lifecycle entry-point decisions, or core configuration.
-
 ## Platform
 
 Target normal iOS/iPadOS apps for full RUM telemetry. Do not ask users to add

@@ -1,8 +1,5 @@
 # Objective-C UIKit, Storyboards, And Navigation
 
-Load for Objective-C UIKit apps, storyboard apps, ObjC navigation tracking, or
-mixed apps where navigation code is ObjC.
-
 ## Guidance
 
 Do not edit storyboards just to install RUM. Initialize in the app delegate and

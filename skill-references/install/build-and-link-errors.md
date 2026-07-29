@@ -1,8 +1,5 @@
 # Build And Link Errors
 
-Load when package resolution, product linkage, imports, minimum platform,
-binary target resolution, or clean-build failures appear.
-
 ## Triage
 
 Check:

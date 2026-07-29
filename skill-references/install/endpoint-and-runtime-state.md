@@ -1,9 +1,5 @@
 # Endpoint And Runtime State
 
-Load for deferred endpoint setup, endpoint update/disable, install status,
-sampling, duplicate install, runtime state, or endpoint/config redaction. Also
-load for every fresh install apply (see post-apply handoff below).
-
 ## Guidance
 
 Endpoint is optional in current public API. Use deferred endpoint setup when the

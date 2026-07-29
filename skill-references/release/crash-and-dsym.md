@@ -1,8 +1,5 @@
 # Crash Symbolication And dSYM Upload
 
-Load for crash symbolication, dSYM upload, archive/release builds, CI upload,
-Xcode build phases, API-token handling, or old crash setup migration.
-
 ## Guidance
 
 Crash runtime capture is SDK behavior; dSYM upload is an external

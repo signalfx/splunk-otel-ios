@@ -1,21 +1,10 @@
 # Navigation
 
-Load for SwiftUI screen tracking, UIKit view-controller tracking, storyboards,
-tabs, navigation stacks, modals, custom containers, or screen-name migration.
-
-## Depth guidance
-
-- `baseline`: track only the key screen boundaries needed for the user's
-  stated goal. Prefer manual or SwiftUI modifier placement at meaningful
-  existing boundaries.
-- `targeted`: cover primary user flows found during inspection, including
-  tabs, modals, detail screens, or storyboard view controllers that automatic
-  tracking would miss.
-- `comprehensive`: propose a screen inventory across SwiftUI, UIKit,
-  storyboards, custom containers, and mixed flows. Use automated tracking only
-  after explaining its naming and coverage tradeoffs.
-
 ## Guidance
+
+Track only meaningful screen boundaries required by the user's goal. Broaden
+coverage from an inspected screen inventory, and explain automated tracking's
+naming and coverage tradeoffs before enabling it.
 
 For SwiftUI, prefer `.trackScreen(...)` at meaningful screen boundaries:
 

@@ -1,7 +1,5 @@
 # Workflow
 
-Load for every task using this Skill Bundle.
-
 ## Procedure
 
 1. Use the mode and instrumentation depth selected under `SKILLS.md`.

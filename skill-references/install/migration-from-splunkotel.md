@@ -1,8 +1,5 @@
 # Migration From SplunkOtel
 
-Load when `SplunkOtel`, `SplunkRumBuilder`, deprecated static APIs, old crash
-setup, or pre-2.0 migration symptoms are detected.
-
 ## Detector groups
 
 Search for:

@@ -1,18 +1,5 @@
 # WebView
 
-Load for `WKWebView`, Browser RUM session correlation, WebView migration, or
-WebView troubleshooting.
-
-## Depth guidance
-
-- `baseline`: inventory WebViews and report whether bridging is applicable.
-  Do not bridge by default.
-- `targeted`: bridge only approved, app-owned WebViews whose loaded pages are
-  instrumented with Splunk Browser RUM.
-- `comprehensive`: inventory all WebViews, ownership, load timing, Browser RUM
-  readiness, and verification needs. Recommend against third-party or arbitrary
-  content unless the user provides a clear trust model.
-
 ## Approval gate
 
 Do not bridge a `WKWebView` unless the user approves and evidence shows the app

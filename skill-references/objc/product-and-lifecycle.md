@@ -1,8 +1,5 @@
 # Objective-C Product And Lifecycle
 
-Load when the Host App has `.m`, `.h`, `main.m`, `UIApplicationMain`,
-Objective-C app delegates, bridging headers, or `SplunkAgentObjC`.
-
 ## Guidance
 
 If initialization lives in Objective-C, link `SplunkAgentObjC`. Do not link both

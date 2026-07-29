@@ -1,9 +1,5 @@
 # Hybrid Apps
 
-Load when the Host App shows React Native, Flutter, or another generated native
-iOS wrapper. For native `WKWebView` inside a native app, use
-`instrumentation/webview.md` instead.
-
 ## Guidance
 
 Hybrid apps have their own Splunk SDK surfaces, package managers, generated

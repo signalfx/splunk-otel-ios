@@ -1,7 +1,5 @@
 # Objective-C Module Configuration
 
-Load when configuring SDK modules from Objective-C or mixed apps.
-
 ## Guidance
 
 Verify each ObjC configuration class before writing snippets. Module coverage
