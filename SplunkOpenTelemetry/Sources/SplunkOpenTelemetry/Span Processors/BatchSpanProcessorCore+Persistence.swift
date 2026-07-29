@@ -16,6 +16,7 @@ limitations under the License.
 */
 
 import Foundation
+import OpenTelemetryApi
 
 extension BatchSpanProcessorCore {
     /// Drains a snapshot to the exporter without waiting for background URLSession activity.
@@ -28,6 +29,36 @@ extension BatchSpanProcessorCore {
         let deadline = Date().addingTimeInterval(boundedTimeout)
 
         processorQueue.async {
+            let succeeded = self.drainSnapshot(
+                deadline: deadline,
+                requeueOnFailure: true,
+                forwardDeadlineToExporter: false
+            )
+            completion(succeeded)
+        }
+    }
+
+    /// Emits a span on the processor queue and persists a snapshot containing that exact span.
+    func persistSpan(
+        emitting emitSpan: @escaping () -> SpanId,
+        timeout: TimeInterval,
+        completion: @escaping (Bool) -> Void
+    ) {
+        let boundedTimeout = timeout.isFinite ? max(0, timeout) : 0
+        let deadline = Date().addingTimeInterval(boundedTimeout)
+
+        processorQueue.async {
+            let spanId = emitSpan()
+
+            self.lock.lock()
+            let wasAdmitted = self.queue.contains(spanId: spanId)
+            self.lock.unlock()
+
+            guard wasAdmitted else {
+                completion(false)
+                return
+            }
+
             let succeeded = self.drainSnapshot(
                 deadline: deadline,
                 requeueOnFailure: true,

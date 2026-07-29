@@ -15,6 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import OpenTelemetryApi
 import OpenTelemetrySdk
 
 /// A fixed-capacity, first-in-first-out queue for ended spans awaiting export.
@@ -65,6 +66,21 @@ struct ReadableSpanQueue {
         tail = (tail + 1) % storage.count
         count += 1
         return true
+    }
+
+    /// Returns whether a span with the specified identifier is currently queued.
+    func contains(spanId: SpanId) -> Bool {
+        var index = head
+
+        for _ in 0 ..< count {
+            if storage[index]?.context.spanId == spanId {
+                return true
+            }
+
+            index = (index + 1) % storage.count
+        }
+
+        return false
     }
 
     /// Removes up to the requested number of oldest spans.
