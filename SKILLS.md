@@ -104,7 +104,9 @@ Start with:
 | Custom events, handled errors, workflows, user/session/global attributes | [`instrumentation/custom-tracking-and-attributes.md`](skill-references/instrumentation/custom-tracking-and-attributes.md) |
 | SwiftUI/UIKit screen tracking, tabs, navigation stacks, storyboards, custom containers | [`instrumentation/navigation.md`](skill-references/instrumentation/navigation.md) |
 | `URLSession`, URL exclusions, trace headers, captured headers | [`instrumentation/network.md`](skill-references/instrumentation/network.md) |
-| Session Replay, masking, sensitivity, sampling, recording state, custom IDs, rendering mode, recording masks | [`instrumentation/session-replay.md`](skill-references/instrumentation/session-replay.md) |
+| Session Replay enablement, sampling, endpoints, recording control, or state | [`instrumentation/session-replay.md`](skill-references/instrumentation/session-replay.md) |
+| Session Replay masking, sensitivity, custom IDs, rendering mode, or recording masks | [`instrumentation/session-replay.md`](skill-references/instrumentation/session-replay.md) and [`instrumentation/session-replay-privacy.md`](skill-references/instrumentation/session-replay-privacy.md) |
+| Objective-C Session Replay | [`instrumentation/session-replay.md`](skill-references/instrumentation/session-replay.md) and [`objc/session-replay.md`](skill-references/objc/session-replay.md); also load [`instrumentation/session-replay-privacy.md`](skill-references/instrumentation/session-replay-privacy.md) for sensitivity, custom IDs, rendering, or recording masks |
 | `WKWebView`, Browser RUM bridge, native session bridge exposure | [`instrumentation/webview.md`](skill-references/instrumentation/webview.md) |
 | Objective-C or mixed app product/lifecycle decisions | [`objc/product-and-lifecycle.md`](skill-references/objc/product-and-lifecycle.md) |
 | Objective-C UIKit/storyboard/navigation details | [`objc/uikit-storyboards-navigation.md`](skill-references/objc/uikit-storyboards-navigation.md) |
