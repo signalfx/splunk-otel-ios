@@ -44,7 +44,12 @@ let networkConfig = NetworkInstrumentationConfiguration(
 anchored patterns for sensitive routes instead of broad host-wide suppression.
 
 Header capture is opt-in and high risk. Require explicit user approval and a
-narrow allowlist. Reject the sensitive headers listed in `workflow.md`.
+narrow allowlist. Reject these sensitive names:
+
+```text
+Authorization Cookie Set-Cookie X-SF-Token X-API-Key API-Key Session-Token
+```
+
 `capturedRequestHeaders` and `capturedResponseHeaders` default to `nil`; only
 add non-sensitive names such as `Content-Type` or a request correlation header
 after approval.

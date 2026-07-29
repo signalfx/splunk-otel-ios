@@ -3,8 +3,10 @@
 Use this skill when a coding agent must plan, review, apply, or verify Splunk
 Real User Monitoring instrumentation in a customer iOS app using this SDK.
 
-The Skill Bundle is public-release safe. Keep `SKILLS.md` as a router: load
-only the `skill-references/` files needed for the Host App and requested mode.
+The Skill Bundle is public-release safe. Keep `SKILLS.md` as the canonical
+router for modes, depth, hard gates, source selection, and reference loading.
+Load only the `skill-references/` files needed for the Host App and requested
+mode.
 
 ## Modes
 
