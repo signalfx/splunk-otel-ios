@@ -21,7 +21,7 @@ import CiscoSwizzling
 import Foundation
 import XCTest
 
-@testable import SplunkInteractions
+@_spi(SplunkInternal) @testable import SplunkInteractions
 
 final class SplunkInteractionsTests: XCTestCase {
 
@@ -80,6 +80,43 @@ final class SplunkInteractionsTests: XCTestCase {
         await interactions.handleEventType(.gestureRageTap, viewHierarchy: nil, targetElement: nil, time: Date())
 
         XCTAssertEqual(destination.didReceiveInteractionCallCount, 0)
+    }
+
+    func testOnActivityIsThreadSafeAcrossConcurrentReadsAndWrites() {
+        // Regression test for the P1 race between the detector task reading
+        // `onActivity` and the host-app install path writing it: the property
+        // must be safely assignable while concurrently read.
+        let interactions = Interactions()
+
+        let readers = 4
+        let writers = 4
+        let iterations = 5_000
+
+        let group = DispatchGroup()
+        let readQueue = DispatchQueue(label: "test.reader", attributes: .concurrent)
+        let writeQueue = DispatchQueue(label: "test.writer", attributes: .concurrent)
+
+        for _ in 0 ..< readers {
+            group.enter()
+            readQueue.async {
+                for _ in 0 ..< iterations {
+                    _ = interactions.onActivity
+                }
+                group.leave()
+            }
+        }
+
+        for _ in 0 ..< writers {
+            group.enter()
+            writeQueue.async {
+                for idx in 0 ..< iterations {
+                    interactions.onActivity = idx.isMultiple(of: 2) ? nil : { _ in }
+                }
+                group.leave()
+            }
+        }
+
+        XCTAssertEqual(group.wait(timeout: .now() + 10), .success)
     }
 
     func testHandlingEvents() {
