@@ -49,10 +49,10 @@ Require explicit approval and use placeholders in any example.
 ## Post-apply handoff
 
 After writing initialization code, run a static build check to confirm the
-import, target membership, and API call compile correctly — deferred endpoint
-setup means no credentials are needed to build or launch. Only after the build
-passes, deliver this handoff and **stop — wait for the user to confirm before
-proceeding to telemetry or backend verification steps.**
+import, target membership, and API call compile correctly; deferred setup needs
+no credentials for this check. After the build passes, deliver this handoff and
+**stop — wait for the user to confirm before proceeding to telemetry or backend
+verification steps.**
 
 Tell the user the agent is installed and will start, but telemetry remains
 queued until an endpoint is configured. Ask which existing Host App runtime

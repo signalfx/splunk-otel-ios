@@ -108,16 +108,12 @@ path inside the archive, for example:
 path/to/MyApp.xcarchive/dSYMs/
 ```
 
-Do not invent provider-specific artifact retrieval instructions. If the Host
-App does not already expose the archive or dSYM artifact path, report this as a
-blocker or follow-up.
-
 Run Script Build Phase options:
 
-- Call `splunk-rum ios upload --path "${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}"`
-  if the CLI is installed on the build machine. Do not pass the bare
-  `${DWARF_DSYM_FOLDER_PATH}` directory; the CLI requires a `.dSYM` bundle, a
-  `dSYMs/` directory, or a supported zip — not a generic build-products folder.
+- Prefer a post-archive upload of the complete archive `dSYMs/` directory.
+- For a pre-archive Run Script phase, enumerate every `.dSYM` bundle in
+  `${DWARF_DSYM_FOLDER_PATH}` and call the CLI once per bundle. Do not hardcode
+  `${DWARF_DSYM_FILE_NAME}` or pass the generic build-products folder.
 - Copy and call `upload-dsyms.sh` if the project wants a self-contained script.
 
 Gate upload to archive/install/release/tag paths. Debug/local builds should

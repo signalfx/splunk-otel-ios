@@ -65,8 +65,9 @@ App dependency policy.
 
 ## Safe Swift initialization pattern
 
-Write deferred-endpoint initialization during `apply`. Do not log raw errors.
-The endpoint is added by the user after apply — see the post-apply handoff in
+Before `apply`, get the app name and deployment environment from Host App
+configuration or the user; never write placeholders. Defer the endpoint and
+redact errors; see
 `endpoint-and-runtime-state.md`.
 
 ```swift
@@ -74,10 +75,10 @@ import SplunkAgent
 
 private var splunkRum: SplunkRum?
 
-func startSplunkRum() {
+func startSplunkRum(appName: String, deploymentEnvironment: String) {
     let config = AgentConfiguration(
-        appName: "<YOUR_APP_NAME>",
-        deploymentEnvironment: "<YOUR_ENVIRONMENT>"
+        appName: appName,
+        deploymentEnvironment: deploymentEnvironment
     )
 
     do {

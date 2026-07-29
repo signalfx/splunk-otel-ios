@@ -12,8 +12,9 @@ static checks when useful.
 5. Safe local signal exercise
 6. Backend — only with user-provided public Splunk access
 
-Do not require Splunk credentials for build and launch when using deferred
-endpoint setup.
+Deferred setup needs no credentials to build. A launch still persists telemetry;
+use an approved non-production endpoint or delete the disposable simulator
+installation before configuring a real endpoint.
 
 ## Build and launch
 
@@ -26,11 +27,11 @@ requires an iOS/iPadOS runtime.
 
 ## Safe local signal exercise
 
-Run only when current source and runtime evidence indicate an operational agent.
-If `agent.state.status` is `.notRunning(.unsupportedPlatform)` or
-`.notRunning(.sampledOut)`, report the status instead.
+Run only for an operational agent with an approved non-production endpoint.
+Report `.notRunning(.unsupportedPlatform)` or `.notRunning(.sampledOut)`
+instead.
 
-Safe exercises (no credentials needed):
+Exercise only:
 
 - app start and launch
 - one screen/navigation event

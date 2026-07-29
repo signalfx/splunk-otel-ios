@@ -9,22 +9,26 @@ Objective-C app.
 Use the existing ObjC app delegate when present. For mixed apps, choose the file
 that already owns startup.
 
-Write deferred-endpoint initialization during `apply`. Do not log raw `NSError`.
-The endpoint is added by the user after apply — see the post-apply handoff in
+Before `apply`, get the app name and deployment environment from Host App
+configuration or the user; never write placeholders. Defer the endpoint and
+redact `NSError`; see
 `endpoint-and-runtime-state.md`.
 
 ```objc
 @import SplunkAgentObjC;
 
-NSError *error = nil;
-SPLKAgentConfiguration *config =
-    [[SPLKAgentConfiguration alloc] initWithEndpoint:nil
-                                             appName:@"<YOUR_APP_NAME>"
-                               deploymentEnvironment:@"<YOUR_ENVIRONMENT>"];
-self.splunkRum = [SPLKAgent installWith:config error:&error];
-if (self.splunkRum == nil) {
-    // Non-fatal. Do not log raw error; it may contain config values.
-    NSLog(@"Splunk RUM agent did not start. Check configuration values.");
+- (void)startSplunkRumWithAppName:(NSString *)appName
+            deploymentEnvironment:(NSString *)deploymentEnvironment {
+    NSError *error = nil;
+    SPLKAgentConfiguration *config =
+        [[SPLKAgentConfiguration alloc] initWithEndpoint:nil
+                                                 appName:appName
+                                   deploymentEnvironment:deploymentEnvironment];
+    self.splunkRum = [SPLKAgent installWith:config error:&error];
+    if (self.splunkRum == nil) {
+        // Non-fatal. Do not log raw error; it may contain config values.
+        NSLog(@"Splunk RUM agent did not start. Check configuration values.");
+    }
 }
 ```
 
