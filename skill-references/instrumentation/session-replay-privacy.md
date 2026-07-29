@@ -32,6 +32,8 @@ checkoutButton.splunkRumId = "checkout.submit"
 agent.sessionReplay.customIdentifiers[totalLabel] = "checkout.total"
 ```
 
+`splunkRumId` labels both Session Replay and interaction spans. Direct
+`sessionReplay.customIdentifiers` assignments affect Session Replay only.
 Custom IDs do not mask views.
 
 ## Rendering mode and recording masks

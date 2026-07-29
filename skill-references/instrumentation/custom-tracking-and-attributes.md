@@ -22,9 +22,10 @@ agent.customTracking.trackError("checkout_validation_failed")
 `trackWorkflow(_:)` returns an OpenTelemetry `Span`; only recommend workflows
 when the Host App has a clear owner for ending the span.
 
-Keep attributes low-cardinality and non-sensitive. Do not add names, emails,
-addresses, account numbers, auth identifiers, or other PII unless the user has
-explicit product/privacy approval and a safe policy.
+Keep attributes low-cardinality and non-sensitive. Never add raw names, emails,
+addresses, account numbers, auth identifiers, or other PII. Use the Host App's
+existing privacy-approved redaction or tokenization before values reach
+telemetry.
 
 For ObjC, verify bridged API availability before suggesting selectors. Current
 ObjC bridge supports custom events, error messages, `NSError`, and `NSException`;

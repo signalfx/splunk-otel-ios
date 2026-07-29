@@ -27,15 +27,23 @@ bspScheduleDelay SplunkRum.integrateWithBrowserRum
 5. Remove separate old crash setup; crash reporting is integrated.
 6. Load feature references only for stale APIs that appear.
 
-Source-backed direct replacements:
+Source-backed call-compatible rewrites:
 
 - `SplunkRum.getSessionId()` -> `SplunkRum.shared.session.state.id`
-- `SplunkRum.isInitialized()` -> `SplunkRum.shared.state.status`
-- `SplunkRum.setGlobalAttributes` / `removeGlobalAttribute` ->
-  `SplunkRum.shared.globalAttributes`
-- `SplunkRum.reportError` / `reportEvent` ->
-  `SplunkRum.shared.customTracking`
-- `SplunkRum.setScreenName` -> `SplunkRum.shared.navigation.track(screen:)`
+- `SplunkRum.isInitialized()` ->
+  `SplunkRum.shared.state.status == .running`
+- `SplunkRum.setGlobalAttributes(legacyAttributes)` -> convert the legacy
+  values to `MutableAttributes`, then call
+  `SplunkRum.shared.globalAttributes.addDictionary(attributes.getAll())`
+- `SplunkRum.removeGlobalAttribute(key)` ->
+  `SplunkRum.shared.globalAttributes.remove(for: key)`
+- `SplunkRum.reportError(...)` -> the matching
+  `SplunkRum.shared.customTracking.trackError(_:)` or `trackException(_:)`
+- `SplunkRum.reportEvent(name:attributes:)` -> convert the legacy attributes to
+  `MutableAttributes`, then call
+  `SplunkRum.shared.customTracking.trackCustomEvent(name, attributes)`
+- `SplunkRum.setScreenName(name)` ->
+  `SplunkRum.shared.navigation.track(screen: name)`
 
 Manual-review or no-effect legacy calls:
 

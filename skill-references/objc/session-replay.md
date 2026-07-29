@@ -33,10 +33,15 @@ For sensitivity, custom IDs, rendering, or recording-mask work, load
 ```objc
 [agent.sessionReplay.sensitivity setSensitivity:@YES forView:paymentField];
 [agent.sessionReplay.sensitivity setSensitivity:@YES forViewClass:UITextField.class];
-[agent.sessionReplay.customIdentifiers setCustomID:@"checkout.submit"
-                                           forView:checkoutButton];
+
+checkoutButton.splk_splunkRumID = @"checkout.submit";
+[agent.sessionReplay.customIdentifiers setCustomID:@"checkout.total"
+                                           forView:totalLabel];
 
 agent.sessionReplay.preferences.renderingMode = SPLKRenderingMode.wireframeOnly;
 ```
+
+`splk_splunkRumID` labels both Session Replay and interaction spans.
+`setCustomID:forView:` affects Session Replay only.
 
 Do not add a Swift wrapper only to configure Session Replay.

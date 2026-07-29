@@ -21,17 +21,27 @@ Swift module configuration types live in `SplunkNetwork`; import it when using
 import SplunkAgent
 import SplunkNetwork
 
-let ignored = try IgnoreURLs(patterns: [
-    #"^https://api\.example\.com/private/"#
-])
+let networkConfig: NetworkInstrumentationConfiguration
 
-let networkConfig = NetworkInstrumentationConfiguration(
-    ignoreURLs: ignored
-)
+do {
+    let ignored = try IgnoreURLs(patterns: [
+        #"^https://api\.example\.com/private/"#
+    ])
+
+    networkConfig = NetworkInstrumentationConfiguration(
+        ignoreURLs: ignored
+    )
+} catch {
+    // Non-fatal and fail-closed. Do not print the raw error.
+    networkConfig = NetworkInstrumentationConfiguration(isEnabled: false)
+    print("Splunk RUM network instrumentation is disabled: invalid URL exclusions.")
+}
 ```
 
 `IgnoreURLs` uses regular expressions against URL strings. Prefer narrow,
 anchored patterns for sensitive routes instead of broad host-wide suppression.
+Never use `try!` or silently restore default URL capture when required
+exclusions are invalid.
 
 Header capture is opt-in and high risk. Require explicit user approval and a
 narrow allowlist. Reject these sensitive names:
