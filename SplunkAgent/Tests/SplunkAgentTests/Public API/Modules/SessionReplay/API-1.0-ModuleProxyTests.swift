@@ -67,6 +67,51 @@ final class SessionReplayAPI10ModuleProxyTests: XCTestCase {
     }
 
 
+    // MARK: - Interaction capture
+
+    func testAssignedPreferencesPreserveInteractionCapture() {
+        let preferences = SessionReplayPreferences()
+        preferences.interactionCapture.isKeyboardEnabled = false
+        preferences.interactionCapture.isTouchEnabled = true
+        preferences.interactionCapture.isGestureEnabled = false
+        preferences.interactionCapture.isFocusEnabled = true
+        preferences.interactionCapture.isRageTapEnabled = false
+
+        moduleProxy.preferences = preferences
+
+        let moduleCapture = moduleProxy.module.preferences.interactionCapture
+        XCTAssertFalse(moduleCapture.isKeyboardEnabled)
+        XCTAssertTrue(moduleCapture.isTouchEnabled)
+        XCTAssertFalse(moduleCapture.isGestureEnabled)
+        XCTAssertTrue(moduleCapture.isFocusEnabled)
+        XCTAssertFalse(moduleCapture.isRageTapEnabled)
+
+        preferences.interactionCapture.enableAll()
+
+        XCTAssertTrue(moduleCapture.isKeyboardEnabled)
+        XCTAssertTrue(moduleCapture.isTouchEnabled)
+        XCTAssertTrue(moduleCapture.isGestureEnabled)
+        XCTAssertTrue(moduleCapture.isFocusEnabled)
+        XCTAssertTrue(moduleCapture.isRageTapEnabled)
+    }
+
+    func testInteractionCaptureReferenceUsesCurrentModulePreferences() {
+        let capture = moduleProxy.preferences.interactionCapture
+        moduleProxy.preferences = SessionReplayPreferences(renderingMode: .native)
+
+        capture.disableAll()
+
+        let moduleCapture = moduleProxy.module.preferences.interactionCapture
+        XCTAssertFalse(moduleCapture.isKeyboardEnabled)
+        XCTAssertFalse(moduleCapture.isTouchEnabled)
+        XCTAssertFalse(moduleCapture.isGestureEnabled)
+        XCTAssertFalse(moduleCapture.isFocusEnabled)
+        XCTAssertFalse(moduleCapture.isRageTapEnabled)
+
+        moduleCapture.enableAll()
+    }
+
+
     // MARK: - State
 
     func testState() {

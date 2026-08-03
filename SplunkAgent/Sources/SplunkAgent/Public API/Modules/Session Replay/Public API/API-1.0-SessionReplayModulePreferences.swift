@@ -18,6 +18,15 @@ limitations under the License.
 /// Defines a public API for the user's preferred settings.
 public protocol SessionReplayModulePreferences {
 
+    // MARK: - Interaction capture
+
+    /// Configuration that controls which detected interaction categories are captured.
+    ///
+    /// All categories are enabled by default. Updating this object affects only
+    /// interactions received after the change.
+    var interactionCapture: any SessionReplayModuleInteractionCapture { get }
+
+
     // MARK: - Rendering
 
     /// The video ``RenderingMode`` for captured data.

@@ -32,26 +32,20 @@ public final class SessionReplayPreferences: SessionReplayModulePreferences, Cod
 
     // MARK: - Internal
 
-    unowned var module: CiscoSessionReplay.SessionReplay?
-
-
-    // MARK: - Initialization
-
-    required init() {
-        module = nil
+    unowned var module: CiscoSessionReplay.SessionReplay? {
+        didSet {
+            (interactionCapture as? SessionReplayInteractionCapture)?.module = module
+        }
     }
 
-    init(for module: CiscoSessionReplay.SessionReplay?) {
-        self.module = module
-        renderingMode = RenderingMode(with: module?.preferences.renderingMode)
-    }
+    // MARK: - Interaction capture
 
-
-    // MARK: - Codable
-
-    private enum CodingKeys: String, CodingKey {
-        case renderingMode
-    }
+    /// Configuration that controls which detected interaction categories are captured.
+    ///
+    /// All categories are enabled by default. Updating this object affects only
+    /// interactions received after the change.
+    public private(set) lazy var interactionCapture: any SessionReplayModuleInteractionCapture =
+        SessionReplayInteractionCapture(for: module)
 
 
     // MARK: - Rendering
@@ -79,6 +73,29 @@ public final class SessionReplayPreferences: SessionReplayModulePreferences, Cod
 
         return self
     }
+
+
+    // MARK: - Initialization
+
+    init(
+        for module: CiscoSessionReplay.SessionReplay? = nil,
+        interactionCapture: (any SessionReplayModuleInteractionCapture)? = nil
+    ) {
+        self.module = module
+        renderingMode = RenderingMode(with: module?.preferences.renderingMode)
+
+        if let interactionCapture {
+            self.interactionCapture = interactionCapture
+        }
+    }
+
+
+    // MARK: - Codable
+
+    /// Interaction capture contains runtime-only state and is intentionally excluded.
+    private enum CodingKeys: String, CodingKey {
+        case renderingMode
+    }
 }
 
 
@@ -90,7 +107,7 @@ extension SessionReplayPreferences {
     ///
     /// - Parameter renderingMode: The ``RenderingMode`` to use for the session replay.
     public convenience init(renderingMode: RenderingMode) {
-        self.init(for: nil)
+        self.init()
 
         self.renderingMode = renderingMode
     }
