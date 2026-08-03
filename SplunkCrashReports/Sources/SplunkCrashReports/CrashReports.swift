@@ -18,8 +18,8 @@ limitations under the License.
 internal import CiscoLogger
 import Foundation
 import OpenTelemetryApi
-internal import SplunkCrashReporter
 @_spi(SplunkInternal) import SplunkCommon
+internal import SplunkCrashReporter
 
 package typealias CrashReportSpanEmitter = () -> SpanId
 package typealias CrashReportPersistenceHandler = (

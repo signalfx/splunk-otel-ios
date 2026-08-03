@@ -15,8 +15,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-internal import SplunkCrashReporter
 import Foundation
+internal import SplunkCrashReporter
 
 // Support for Threads
 
