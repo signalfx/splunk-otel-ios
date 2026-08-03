@@ -6,6 +6,8 @@ This project is a Swift Package and manages most of its dependencies via the `Pa
 
 Some dependencies, such as Session Replay, are included as pre-compiled binaries. A reference list of major dependencies can also be found in `dependencies.txt`.
 
+Crash reporting uses the vendored, symbol-prefixed `SplunkCrashReporter` target rather than a remote PLCrashReporter package dependency. Keep its source target synchronized with the xcframework manifest when updating it.
+
 ### Session Replay Dependency Mode
 
 Session Replay uses binary dependencies by default. For development, the dependency source can be changed with these environment variables:
@@ -58,4 +60,3 @@ The dSYM upload helper is documented separately in `dsymUploader/README.md`.
 ## Contributing
 
 See [the CONTRIBUTING document](./CONTRIBUTING.md) for details on our contribution process, including how to submit pull requests.
-

@@ -34,7 +34,7 @@ EXPECTED_IOS_ONLY_SLICE_NAMES=(
 EXPECTED_FRAMEWORKS=(
     "OpenTelemetryApi"
     "OpenTelemetrySdk"
-    "CrashReporter"
+    "SplunkCrashReporter"
     "CiscoCommon"
     "CiscoLogger"
     "CiscoEncryption"
@@ -62,7 +62,7 @@ EXPECTED_FRAMEWORKS=(
     "SplunkAgentObjC"
 )
 
-NO_VISIONOS_MODULES="SplunkCrashReports CrashReporter"
+NO_VISIONOS_MODULES="SplunkCrashReporter SplunkCrashReports"
 
 while [[ $# -gt 0 ]]; do
     case "$1" in

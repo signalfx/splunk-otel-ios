@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import CrashReporter
+internal import SplunkCrashReporter
 import Foundation
 
 // Report formatting extension
@@ -23,7 +23,7 @@ import Foundation
 extension CrashReports {
 
     /// Report formatting.
-    func formatCrashReport(report: PLCrashReport) -> [CrashReportKeys: Any] {
+    func formatCrashReport(report: SPLKPLCrashReport) -> [CrashReportKeys: Any] {
 
         var reportDict: [CrashReportKeys: Any] = [:]
 
@@ -71,7 +71,7 @@ extension CrashReports {
         return reportDict
     }
 
-    func addCustomData(from report: PLCrashReport, to reportDict: inout [CrashReportKeys: Any]) {
+    func addCustomData(from report: SPLKPLCrashReport, to reportDict: inout [CrashReportKeys: Any]) {
         guard let customData = report.customData else {
             return
         }
