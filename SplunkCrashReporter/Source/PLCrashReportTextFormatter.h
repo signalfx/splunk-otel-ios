@@ -33,8 +33,8 @@
 
 #import <Foundation/Foundation.h>
 
-#if __has_include(<CrashReporter/PLCrashReportFormatter.h>)
-#import <CrashReporter/PLCrashReportFormatter.h>
+#if __has_include(<SplunkCrashReporter/PLCrashReportFormatter.h>)
+#import <SplunkCrashReporter/PLCrashReportFormatter.h>
 #else
 #import "PLCrashReportFormatter.h"
 #endif

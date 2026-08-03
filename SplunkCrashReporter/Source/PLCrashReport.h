@@ -33,20 +33,20 @@
 #ifndef PLCRASH_REPORT_H
 #define PLCRASH_REPORT_H
 
-#if __has_include(<CrashReporter/PLCrashReportApplicationInfo.h>)
-#import <CrashReporter/PLCrashReportApplicationInfo.h>
-#import <CrashReporter/PLCrashReportBinaryImageInfo.h>
-#import <CrashReporter/PLCrashReportExceptionInfo.h>
-#import <CrashReporter/PLCrashReportMachineInfo.h>
-#import <CrashReporter/PLCrashReportMachExceptionInfo.h>
-#import <CrashReporter/PLCrashReportProcessInfo.h>
-#import <CrashReporter/PLCrashReportProcessorInfo.h>
-#import <CrashReporter/PLCrashReportRegisterInfo.h>
-#import <CrashReporter/PLCrashReportSignalInfo.h>
-#import <CrashReporter/PLCrashReportStackFrameInfo.h>
-#import <CrashReporter/PLCrashReportSymbolInfo.h>
-#import <CrashReporter/PLCrashReportSystemInfo.h>
-#import <CrashReporter/PLCrashReportThreadInfo.h>
+#if __has_include(<SplunkCrashReporter/PLCrashReportApplicationInfo.h>)
+#import <SplunkCrashReporter/PLCrashReportApplicationInfo.h>
+#import <SplunkCrashReporter/PLCrashReportBinaryImageInfo.h>
+#import <SplunkCrashReporter/PLCrashReportExceptionInfo.h>
+#import <SplunkCrashReporter/PLCrashReportMachineInfo.h>
+#import <SplunkCrashReporter/PLCrashReportMachExceptionInfo.h>
+#import <SplunkCrashReporter/PLCrashReportProcessInfo.h>
+#import <SplunkCrashReporter/PLCrashReportProcessorInfo.h>
+#import <SplunkCrashReporter/PLCrashReportRegisterInfo.h>
+#import <SplunkCrashReporter/PLCrashReportSignalInfo.h>
+#import <SplunkCrashReporter/PLCrashReportStackFrameInfo.h>
+#import <SplunkCrashReporter/PLCrashReportSymbolInfo.h>
+#import <SplunkCrashReporter/PLCrashReportSystemInfo.h>
+#import <SplunkCrashReporter/PLCrashReportThreadInfo.h>
 #else
 #import "PLCrashReportApplicationInfo.h"
 #import "PLCrashReportBinaryImageInfo.h"

@@ -33,9 +33,9 @@
 #ifndef PLCRASH_REPORT_THREAD_INFO_H
 #define PLCRASH_REPORT_THREAD_INFO_H
 
-#if __has_include(<CrashReporter/PLCrashReportStackFrameInfo.h>)
-#import <CrashReporter/PLCrashReportStackFrameInfo.h>
-#import <CrashReporter/PLCrashReportRegisterInfo.h>
+#if __has_include(<SplunkCrashReporter/PLCrashReportStackFrameInfo.h>)
+#import <SplunkCrashReporter/PLCrashReportStackFrameInfo.h>
+#import <SplunkCrashReporter/PLCrashReportRegisterInfo.h>
 #else
 #import "PLCrashReportStackFrameInfo.h"
 #import "PLCrashReportRegisterInfo.h"

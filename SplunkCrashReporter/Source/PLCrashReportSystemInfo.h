@@ -30,8 +30,8 @@
 
 #import <Foundation/Foundation.h>
 
-#if __has_include(<CrashReporter/PLCrashMacros.h>)
-#import <CrashReporter/PLCrashMacros.h>
+#if __has_include(<SplunkCrashReporter/PLCrashMacros.h>)
+#import <SplunkCrashReporter/PLCrashMacros.h>
 #else
 #import "PLCrashMacros.h"
 #endif

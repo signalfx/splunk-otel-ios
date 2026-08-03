@@ -40,8 +40,8 @@
 
 #import <stdatomic.h>
 
-#if __has_include(<CrashReporter/PLCrashReport.h>)
-#import <CrashReporter/PLCrashReport.h>
+#if __has_include(<SplunkCrashReporter/PLCrashReport.h>)
+#import <SplunkCrashReporter/PLCrashReport.h>
 #else
 #import "PLCrashReport.h"
 #endif

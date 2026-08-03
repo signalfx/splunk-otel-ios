@@ -26,8 +26,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#if __has_include(<CrashReporter/PLCrashReportBinaryImageInfo.h>)
-#import <CrashReporter/PLCrashReportBinaryImageInfo.h>
+#if __has_include(<SplunkCrashReporter/PLCrashReportBinaryImageInfo.h>)
+#import <SplunkCrashReporter/PLCrashReportBinaryImageInfo.h>
 #else
 #import "PLCrashReportBinaryImageInfo.h"
 #endif

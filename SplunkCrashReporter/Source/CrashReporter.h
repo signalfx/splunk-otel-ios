@@ -34,16 +34,16 @@
 #import <AvailabilityMacros.h>
 #endif
 
-#if __has_include(<CrashReporter/PLCrashReport.h>)
+#if __has_include(<SplunkCrashReporter/PLCrashReport.h>)
 
 // This must be included before any other PLCrashReporter includes, as
 // it redefines symbol names
-#import <CrashReporter/PLCrashNamespace.h>
+#import <SplunkCrashReporter/PLCrashNamespace.h>
 
 /* Library Imports */
-#import <CrashReporter/PLCrashReporter.h>
-#import <CrashReporter/PLCrashReport.h>
-#import <CrashReporter/PLCrashReportTextFormatter.h>
+#import <SplunkCrashReporter/PLCrashReporter.h>
+#import <SplunkCrashReporter/PLCrashReport.h>
+#import <SplunkCrashReporter/PLCrashReportTextFormatter.h>
 #else
 #import "PLCrashNamespace.h"
 #import "PLCrashReporter.h"

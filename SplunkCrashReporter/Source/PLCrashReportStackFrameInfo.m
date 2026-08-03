@@ -26,8 +26,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#if __has_include(<CrashReporter/PLCrashReportStackFrameInfo.h>)
-#import <CrashReporter/PLCrashReportStackFrameInfo.h>
+#if __has_include(<SplunkCrashReporter/PLCrashReportStackFrameInfo.h>)
+#import <SplunkCrashReporter/PLCrashReportStackFrameInfo.h>
 #else
 #import "PLCrashReportStackFrameInfo.h"
 #endif

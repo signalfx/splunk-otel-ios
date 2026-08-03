@@ -30,8 +30,8 @@
 
 #import <Foundation/Foundation.h>
 
-#if __has_include(<CrashReporter/PLCrashFeatureConfig.h>)
-#import <CrashReporter/PLCrashFeatureConfig.h>
+#if __has_include(<SplunkCrashReporter/PLCrashFeatureConfig.h>)
+#import <SplunkCrashReporter/PLCrashFeatureConfig.h>
 #else
 #import "PLCrashFeatureConfig.h"
 #endif
@@ -183,4 +183,3 @@ typedef NS_OPTIONS(NSUInteger, PLCrashReporterSymbolicationStrategy) {
 @property(nonatomic, readonly) BOOL shouldRegisterUncaughtExceptionHandler;
 
 @end
-

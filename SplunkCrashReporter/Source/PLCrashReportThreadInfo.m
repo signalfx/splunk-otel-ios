@@ -26,8 +26,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#if __has_include(<CrashReporter/PLCrashReportThreadInfo.h>)
-#import <CrashReporter/PLCrashReportThreadInfo.h>
+#if __has_include(<SplunkCrashReporter/PLCrashReportThreadInfo.h>)
+#import <SplunkCrashReporter/PLCrashReportThreadInfo.h>
 #else
 #import "PLCrashReportThreadInfo.h"
 #endif
@@ -78,4 +78,3 @@
 
 
 @end
-

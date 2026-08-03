@@ -26,9 +26,9 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#if __has_include(<CrashReporter/PLCrashReportSystemInfo.h>)
-#import <CrashReporter/PLCrashReportSystemInfo.h>
-#import <CrashReporter/PLCrashReportProcessorInfo.h>
+#if __has_include(<SplunkCrashReporter/PLCrashReportSystemInfo.h>)
+#import <SplunkCrashReporter/PLCrashReportSystemInfo.h>
+#import <SplunkCrashReporter/PLCrashReportProcessorInfo.h>
 #else
 #import "PLCrashReportSystemInfo.h"
 #import "PLCrashReportProcessorInfo.h"

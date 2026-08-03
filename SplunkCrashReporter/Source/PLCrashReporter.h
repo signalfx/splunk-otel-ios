@@ -34,9 +34,9 @@
 #ifndef PLCRASH_REPORTER_H
 #define PLCRASH_REPORTER_H
 
-#if __has_include(<CrashReporter/PLCrashReporterConfig.h>)
-#import <CrashReporter/PLCrashReporterConfig.h>
-#import <CrashReporter/PLCrashMacros.h>
+#if __has_include(<SplunkCrashReporter/PLCrashReporterConfig.h>)
+#import <SplunkCrashReporter/PLCrashReporterConfig.h>
+#import <SplunkCrashReporter/PLCrashMacros.h>
 #else
 #import "PLCrashReporterConfig.h"
 #import "PLCrashMacros.h"
