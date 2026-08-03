@@ -211,6 +211,32 @@ validate_no_nested_frameworks() {
     fi
 }
 
+validate_crash_reporter_resources() {
+    local framework_path="$1"
+    local slice_name="$2"
+    local umbrella_header="${framework_path}/Headers/SplunkCrashReporter.h"
+    local privacy_manifest="${framework_path}/PrivacyInfo.xcprivacy"
+    local module_map="${framework_path}/Modules/module.modulemap"
+
+    if [[ -f "${umbrella_header}" ]]; then
+        check_pass "Slice ${slice_name}: SplunkCrashReporter umbrella header present"
+    else
+        check_fail "Slice ${slice_name}: SplunkCrashReporter umbrella header missing"
+    fi
+
+    if [[ -f "${module_map}" ]] && grep -q 'umbrella header "SplunkCrashReporter.h"' "${module_map}"; then
+        check_pass "Slice ${slice_name}: module map uses SplunkCrashReporter umbrella header"
+    else
+        check_fail "Slice ${slice_name}: module map does not use SplunkCrashReporter umbrella header"
+    fi
+
+    if [[ -f "${privacy_manifest}" ]] && plutil -lint "${privacy_manifest}" >/dev/null; then
+        check_pass "Slice ${slice_name}: crash reporter privacy manifest present and valid"
+    else
+        check_fail "Slice ${slice_name}: crash reporter privacy manifest missing or invalid"
+    fi
+}
+
 read_xcframework_library_value() {
     local info_plist="$1"
     local index="$2"
@@ -304,6 +330,10 @@ validate_xcframework() {
         local framework_path="${xcfw_path}/${slice_name}/${library_path}"
         if [[ -d "${framework_path}" ]]; then
             validate_no_nested_frameworks "${framework_path}" "${slice_name}"
+
+            if [[ "${name}" == "SplunkCrashReporter" ]]; then
+                validate_crash_reporter_resources "${framework_path}" "${slice_name}"
+            fi
         else
             check_fail "Slice ${slice_name}: framework missing at ${framework_path}"
         fi

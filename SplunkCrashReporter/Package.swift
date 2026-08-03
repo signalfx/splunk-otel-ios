@@ -48,13 +48,15 @@ let package = Package(
                 "Source",
                 "Dependencies/protobuf-c"
             ],
+            resources: [
+                .process("Resources/PrivacyInfo.xcprivacy")
+            ],
             cSettings: [
                 .define("PLCR_PRIVATE"),
                 .define("PLCF_RELEASE_BUILD"),
                 .define("PLCRASHREPORTER_PREFIX", to: "SPLK"),
                 .define("SWIFT_PACKAGE"), // Should be defined by default, Xcode 11.1 workaround.
-                .headerSearchPath("Dependencies/protobuf-c"),
-                .unsafeFlags(["-w"]) // Suppresses "Implicit conversion" warnings in protobuf.c
+                .headerSearchPath("Dependencies/protobuf-c")
             ],
             linkerSettings: [
                 .linkedFramework("Foundation")

@@ -180,6 +180,43 @@ func ciscoSessionReplayDependencies() -> [TargetDependency] {
     ]
 }
 
+/// Vendored and symbol-prefixed PLCrashReporter implementation.
+///
+/// Kept as a typed declaration so the compiler does not have to infer this
+/// mixed-source target as part of the complete project target array.
+let crashReporterTarget = Target.target(
+    name: "SplunkCrashReporter",
+    destinations: platformsNoCrashReporter,
+    product: .framework,
+    bundleId: "com.splunk.rum.crashreporter",
+    sources: [
+        .glob("\(repoRoot)/SplunkCrashReporter/Source/**/*.c"),
+        .glob("\(repoRoot)/SplunkCrashReporter/Source/**/*.m"),
+        .glob("\(repoRoot)/SplunkCrashReporter/Source/**/*.mm"),
+        .glob("\(repoRoot)/SplunkCrashReporter/Source/**/*.cpp"),
+        .glob("\(repoRoot)/SplunkCrashReporter/Source/**/*.S"),
+        .glob("\(repoRoot)/SplunkCrashReporter/Dependencies/protobuf-c/**/*.c")
+    ],
+    resources: [
+        .glob(pattern: "\(repoRoot)/SplunkCrashReporter/Resources/PrivacyInfo.xcprivacy")
+    ],
+    headers: .headers(
+        public: crashReporterPublicHeaders,
+        private: [
+            "\(repoRoot)/SplunkCrashReporter/Source/**/*.h",
+            "\(repoRoot)/SplunkCrashReporter/Dependencies/protobuf-c/**/*.h"
+        ],
+        project: []
+    ),
+    settings: .settings(
+        base: crashReporterSettings.merging([
+            "PRODUCT_MODULE_NAME": "SplunkCrashReporter",
+            "INFOPLIST_KEY_CFBundleDisplayName": "SplunkCrashReporter",
+            "PRODUCT_NAME": "SplunkCrashReporter"
+        ]) { _, new in new }
+    )
+)
+
 
 // ---------------------------------------------------------------------------
 // MARK: - Project Definition
@@ -293,35 +330,7 @@ let project = Project(
         // =================================================================
         // Vendored and symbol-prefixed PLCrashReporter implementation.
         // The SPLK prefix prevents collisions with another copy linked by a host app.
-        .target(
-            name: "SplunkCrashReporter",
-            destinations: platformsNoCrashReporter,
-            product: .framework,
-            bundleId: "com.splunk.rum.crashreporter",
-            sources: [
-                .glob("\(repoRoot)/SplunkCrashReporter/Source/**/*.c"),
-                .glob("\(repoRoot)/SplunkCrashReporter/Source/**/*.m"),
-                .glob("\(repoRoot)/SplunkCrashReporter/Source/**/*.mm"),
-                .glob("\(repoRoot)/SplunkCrashReporter/Source/**/*.cpp"),
-                .glob("\(repoRoot)/SplunkCrashReporter/Source/**/*.S"),
-                .glob("\(repoRoot)/SplunkCrashReporter/Dependencies/protobuf-c/**/*.c")
-            ],
-            headers: .headers(
-                public: crashReporterPublicHeaders,
-                private: [
-                    "\(repoRoot)/SplunkCrashReporter/Source/**/*.h",
-                    "\(repoRoot)/SplunkCrashReporter/Dependencies/protobuf-c/**/*.h"
-                ],
-                project: []
-            ),
-            settings: .settings(
-                base: crashReporterSettings.merging([
-                    "PRODUCT_MODULE_NAME": "SplunkCrashReporter",
-                    "INFOPLIST_KEY_CFBundleDisplayName": "SplunkCrashReporter",
-                    "PRODUCT_NAME": "SplunkCrashReporter"
-                ]) { _, new in new }
-            )
-        ),
+        crashReporterTarget,
 
 
         // =================================================================
