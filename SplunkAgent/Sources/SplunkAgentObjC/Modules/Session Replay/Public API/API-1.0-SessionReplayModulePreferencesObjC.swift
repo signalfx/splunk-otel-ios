@@ -27,6 +27,13 @@ public final class SessionReplayModulePreferencesObjC: NSObject {
     private unowned let owner: SplunkRumObjC
 
 
+    // MARK: - Interaction capture
+
+    /// Configuration that controls which detected interaction categories are captured.
+    @objc
+    public let interactionCapture: SessionReplayModuleInteractionCaptureObjC
+
+
     // MARK: - Rendering
 
     /// The video rendering mode for captured data.
@@ -58,5 +65,6 @@ public final class SessionReplayModulePreferencesObjC: NSObject {
 
     init(for owner: SplunkRumObjC) {
         self.owner = owner
+        interactionCapture = SessionReplayModuleInteractionCaptureObjC(for: owner)
     }
 }
