@@ -313,7 +313,8 @@ func generateMainTargets() -> [Target] {
             name: "SplunkCrashReportsTests",
             dependencies: [
                 "SplunkCrashReports",
-                "SplunkCommon"
+                "SplunkCommon",
+                "SplunkCrashReporter"
             ],
             path: "SplunkCrashReports/Tests",
             plugins: lintTargetPlugins()
