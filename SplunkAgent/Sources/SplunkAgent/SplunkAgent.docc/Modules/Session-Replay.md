@@ -38,6 +38,9 @@ capture?.isRageTapEnabled = false
 Use ``SessionReplayModuleInteractionCapture/enableAll()`` or
 ``SessionReplayModuleInteractionCapture/disableAll()`` to update every configurable category at once.
 
+Interaction capture preferences are included when ``SessionReplayPreferences`` is encoded. When decoding
+older or partial data, missing interaction categories remain enabled by default.
+
 ## Privacy and Sensitivity
 
 By default, common sensitive views like `UITextField` and `UITextView` are masked. You can mark any `UIView` as sensitive to ensure it is redacted from the recording.

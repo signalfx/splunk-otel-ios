@@ -62,10 +62,63 @@ final class SessionReplayInteractionCaptureTests: XCTestCase {
     }
 
 
+    // MARK: - Codable
+
+    func testPreferencesCodableRoundTripPreservesInteractionCapture() throws {
+        let preferences = SessionReplayPreferences(renderingMode: .wireframeOnly)
+        let capture = preferences.interactionCapture
+        capture.isKeyboardEnabled = false
+        capture.isTouchEnabled = true
+        capture.isGestureEnabled = false
+        capture.isFocusEnabled = true
+        capture.isRageTapEnabled = false
+
+        let data = try JSONEncoder().encode(preferences)
+        let decodedPreferences = try JSONDecoder().decode(SessionReplayPreferences.self, from: data)
+        let decodedCapture = decodedPreferences.interactionCapture
+
+        XCTAssertEqual(decodedPreferences.renderingMode, .wireframeOnly)
+        XCTAssertFalse(decodedCapture.isKeyboardEnabled)
+        XCTAssertTrue(decodedCapture.isTouchEnabled)
+        XCTAssertFalse(decodedCapture.isGestureEnabled)
+        XCTAssertTrue(decodedCapture.isFocusEnabled)
+        XCTAssertFalse(decodedCapture.isRageTapEnabled)
+    }
+
+    func testPreferencesDecodingLegacyPayloadUsesInteractionCaptureDefaults() throws {
+        let data = try JSONEncoder().encode(LegacyPreferences(renderingMode: .native))
+
+        let preferences = try JSONDecoder().decode(SessionReplayPreferences.self, from: data)
+
+        XCTAssertEqual(preferences.renderingMode, .native)
+        assertAllCategoriesEnabled(preferences.interactionCapture)
+    }
+
+    func testPreferencesDecodingPartialInteractionCaptureUsesCategoryDefaults() throws {
+        let data = Data(
+            #"{"interactionCapture":{"isKeyboardEnabled":false,"isRageTapEnabled":false}}"#.utf8
+        )
+
+        let capture = try JSONDecoder()
+            .decode(SessionReplayPreferences.self, from: data)
+            .interactionCapture
+
+        XCTAssertFalse(capture.isKeyboardEnabled)
+        XCTAssertTrue(capture.isTouchEnabled)
+        XCTAssertTrue(capture.isGestureEnabled)
+        XCTAssertTrue(capture.isFocusEnabled)
+        XCTAssertFalse(capture.isRageTapEnabled)
+    }
+
+
     // MARK: - Fixtures
 
     private func makeCapture() -> any SessionReplayModuleInteractionCapture {
         SessionReplayPreferences(renderingMode: .native).interactionCapture
+    }
+
+    private struct LegacyPreferences: Encodable {
+        let renderingMode: RenderingMode?
     }
 
 

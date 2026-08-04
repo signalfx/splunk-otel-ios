@@ -28,7 +28,7 @@ import Foundation
 ///
 /// - Note: If you want to set up a parameter, you can change the appropriate property
 ///         or use the proper method. Both approaches are comparable and give the same result.
-public final class SessionReplayPreferences: SessionReplayModulePreferences, Codable {
+public final class SessionReplayPreferences: SessionReplayModulePreferences {
 
     // MARK: - Internal
 
@@ -88,13 +88,65 @@ public final class SessionReplayPreferences: SessionReplayModulePreferences, Cod
             self.interactionCapture = interactionCapture
         }
     }
+}
 
+
+extension SessionReplayPreferences: Codable {
 
     // MARK: - Codable
 
-    /// Interaction capture contains runtime-only state and is intentionally excluded.
     private enum CodingKeys: String, CodingKey {
         case renderingMode
+        case interactionCapture
+    }
+
+    private struct InteractionCaptureState: Codable {
+        let isKeyboardEnabled: Bool
+        let isTouchEnabled: Bool
+        let isGestureEnabled: Bool
+        let isFocusEnabled: Bool
+        let isRageTapEnabled: Bool
+
+        init(_ capture: any SessionReplayModuleInteractionCapture) {
+            isKeyboardEnabled = capture.isKeyboardEnabled
+            isTouchEnabled = capture.isTouchEnabled
+            isGestureEnabled = capture.isGestureEnabled
+            isFocusEnabled = capture.isFocusEnabled
+            isRageTapEnabled = capture.isRageTapEnabled
+        }
+
+        init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+
+            isKeyboardEnabled = try container.decodeIfPresent(Bool.self, forKey: .isKeyboardEnabled) ?? true
+            isTouchEnabled = try container.decodeIfPresent(Bool.self, forKey: .isTouchEnabled) ?? true
+            isGestureEnabled = try container.decodeIfPresent(Bool.self, forKey: .isGestureEnabled) ?? true
+            isFocusEnabled = try container.decodeIfPresent(Bool.self, forKey: .isFocusEnabled) ?? true
+            isRageTapEnabled = try container.decodeIfPresent(Bool.self, forKey: .isRageTapEnabled) ?? true
+        }
+    }
+
+    public convenience init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        self.init()
+
+        renderingMode = try container.decodeIfPresent(RenderingMode.self, forKey: .renderingMode)
+
+        if let state = try container.decodeIfPresent(InteractionCaptureState.self, forKey: .interactionCapture) {
+            interactionCapture.isKeyboardEnabled = state.isKeyboardEnabled
+            interactionCapture.isTouchEnabled = state.isTouchEnabled
+            interactionCapture.isGestureEnabled = state.isGestureEnabled
+            interactionCapture.isFocusEnabled = state.isFocusEnabled
+            interactionCapture.isRageTapEnabled = state.isRageTapEnabled
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        try container.encodeIfPresent(renderingMode, forKey: .renderingMode)
+        try container.encode(InteractionCaptureState(interactionCapture), forKey: .interactionCapture)
     }
 }
 
