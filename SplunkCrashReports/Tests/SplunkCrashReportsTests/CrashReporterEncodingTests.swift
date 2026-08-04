@@ -71,7 +71,8 @@ final class CrashReporterEncodingTests: XCTestCase {
                 }
 
                 index = endIndex
-            } else {
+            }
+            else {
                 try skipField(wireType: wireType, bytes: bytes, index: &index)
             }
         }
@@ -89,7 +90,7 @@ final class CrashReporterEncodingTests: XCTestCase {
 
             let byte = bytes[index]
             index += 1
-            result |= UInt64(byte & 0x7f) << UInt64(shift)
+            result |= UInt64(byte & 0x7F) << UInt64(shift)
 
             if byte & 0x80 == 0 {
                 return result
