@@ -66,6 +66,10 @@ final class SessionReplayAPI10ModuleProxyTests: XCTestCase {
         _ = SessionReplayPreferences(renderingMode: .native)
     }
 
+    func testDetachedPreferencesHaveNoRenderingMode() {
+        XCTAssertNil(SessionReplayPreferences().renderingMode)
+    }
+
 
     // MARK: - Interaction capture
 

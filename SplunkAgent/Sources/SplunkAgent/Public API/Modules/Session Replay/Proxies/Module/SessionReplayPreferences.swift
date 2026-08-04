@@ -82,7 +82,7 @@ public final class SessionReplayPreferences: SessionReplayModulePreferences {
         interactionCapture: (any SessionReplayModuleInteractionCapture)? = nil
     ) {
         self.module = module
-        renderingMode = RenderingMode(with: module?.preferences.renderingMode)
+        renderingMode = module?.preferences.renderingMode.map(RenderingMode.init(with:))
 
         if let interactionCapture {
             self.interactionCapture = interactionCapture

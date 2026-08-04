@@ -40,10 +40,12 @@ limitations under the License.
 - (void)setUp {
     [super setUp];
 
-    agent = [AgentTestBuilderObjC buildDefaultForTestNamed:@"sessionReplayInteractionCaptureTest"];
+    agent = [AgentTestBuilderObjC
+        buildWithOperationalSessionReplayForTestNamed:@"sessionReplayInteractionCaptureTest"];
 }
 
 - (void)tearDown {
+    [agent.sessionReplay.preferences.interactionCapture enableAll];
     agent = nil;
 
     [super tearDown];
@@ -56,26 +58,29 @@ limitations under the License.
     SPLKSessionReplayModuleInteractionCapture *capture = agent.sessionReplay.preferences.interactionCapture;
 
     XCTAssertNotNil(capture);
-    XCTAssertFalse([capture isKeyboardEnabled]);
-    XCTAssertFalse([capture isTouchEnabled]);
-    XCTAssertFalse([capture isGestureEnabled]);
-    XCTAssertFalse([capture isFocusEnabled]);
-    XCTAssertFalse([capture isRageTapEnabled]);
+    XCTAssertTrue([capture isKeyboardEnabled]);
+    XCTAssertTrue([capture isTouchEnabled]);
+    XCTAssertTrue([capture isGestureEnabled]);
+    XCTAssertTrue([capture isFocusEnabled]);
+    XCTAssertTrue([capture isRageTapEnabled]);
 }
 
 - (void)testSetters {
     SPLKSessionReplayModuleInteractionCapture *capture = agent.sessionReplay.preferences.interactionCapture;
 
-    capture.keyboardEnabled = YES;
-    capture.touchEnabled = YES;
-    capture.gestureEnabled = YES;
-    capture.focusEnabled = YES;
-    capture.rageTapEnabled = YES;
-
+    capture.keyboardEnabled = NO;
     XCTAssertFalse([capture isKeyboardEnabled]);
+
+    capture.touchEnabled = NO;
     XCTAssertFalse([capture isTouchEnabled]);
+
+    capture.gestureEnabled = NO;
     XCTAssertFalse([capture isGestureEnabled]);
+
+    capture.focusEnabled = NO;
     XCTAssertFalse([capture isFocusEnabled]);
+
+    capture.rageTapEnabled = NO;
     XCTAssertFalse([capture isRageTapEnabled]);
 }
 
@@ -85,14 +90,6 @@ limitations under the License.
 - (void)testBulkUpdates {
     SPLKSessionReplayModuleInteractionCapture *capture = agent.sessionReplay.preferences.interactionCapture;
 
-    [capture enableAll];
-
-    XCTAssertFalse(capture.keyboardEnabled);
-    XCTAssertFalse(capture.touchEnabled);
-    XCTAssertFalse(capture.gestureEnabled);
-    XCTAssertFalse(capture.focusEnabled);
-    XCTAssertFalse(capture.rageTapEnabled);
-
     [capture disableAll];
 
     XCTAssertFalse(capture.keyboardEnabled);
@@ -100,6 +97,14 @@ limitations under the License.
     XCTAssertFalse(capture.gestureEnabled);
     XCTAssertFalse(capture.focusEnabled);
     XCTAssertFalse(capture.rageTapEnabled);
+
+    [capture enableAll];
+
+    XCTAssertTrue(capture.keyboardEnabled);
+    XCTAssertTrue(capture.touchEnabled);
+    XCTAssertTrue(capture.gestureEnabled);
+    XCTAssertTrue(capture.focusEnabled);
+    XCTAssertTrue(capture.rageTapEnabled);
 }
 
 @end
