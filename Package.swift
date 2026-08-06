@@ -67,7 +67,10 @@ func generateMainTargets() -> [Target] {
             name: "SplunkAgent",
             dependencies: [
                 "SplunkCommon",
-                "SplunkCrashReports",
+                .target(
+                    name: "SplunkCrashReports",
+                    condition: .when(platforms: [.iOS, .tvOS, .macCatalyst])
+                ),
                 "SplunkSessionReplayProxy",
                 "SplunkNavigation",
                 "SplunkNetwork",
@@ -118,7 +121,11 @@ func generateMainTargets() -> [Target] {
                 "SplunkInteractions",
                 "SplunkNavigation",
                 "SplunkNetworkMonitor",
-                "SplunkSlowFrameDetector"
+                "SplunkSlowFrameDetector",
+                .target(
+                    name: "SplunkCrashReports",
+                    condition: .when(platforms: [.iOS, .tvOS, .macCatalyst])
+                )
             ],
             path: "SplunkAgent/Sources/SplunkAgentObjC",
             resources: [
@@ -303,7 +310,10 @@ func generateMainTargets() -> [Target] {
             name: "SplunkCrashReports",
             dependencies: [
                 "SplunkCommon",
-                "SplunkCrashReporter",
+                .target(
+                    name: "SplunkCrashReporter",
+                    condition: .when(platforms: [.iOS, .tvOS, .macCatalyst])
+                ),
                 .product(name: "OpenTelemetryApi", package: "opentelemetry-swift-core")
             ],
             path: "SplunkCrashReports/Sources",
