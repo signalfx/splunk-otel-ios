@@ -213,7 +213,22 @@ let crashReporterTarget = Target.target(
             "PRODUCT_MODULE_NAME": "SplunkCrashReporter",
             "INFOPLIST_KEY_CFBundleDisplayName": "SplunkCrashReporter",
             "PRODUCT_NAME": "SplunkCrashReporter"
-        ]) { _, new in new }
+        ]) { _, new in new },
+        configurations: [
+            .debug(name: "Debug", settings: [:]),
+            .release(
+                name: "Release",
+                settings: [
+                    "GCC_PREPROCESSOR_DEFINITIONS": [
+                        "PLCR_PRIVATE=1",
+                        "PLCF_RELEASE_BUILD=1",
+                        "NDEBUG=1",
+                        "PLCRASHREPORTER_PREFIX=SPLK",
+                        "SWIFT_PACKAGE=1"
+                    ]
+                ]
+            )
+        ]
     )
 )
 
