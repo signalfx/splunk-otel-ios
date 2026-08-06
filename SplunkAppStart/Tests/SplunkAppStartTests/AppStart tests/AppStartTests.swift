@@ -17,7 +17,7 @@ limitations under the License.
 
 import XCTest
 
-@testable import SplunkAppStart
+@testable @_spi(SplunkInternal) import SplunkAppStart
 
 final class AppStartTests: XCTestCase {
 
@@ -201,9 +201,10 @@ final class AppStartTests: XCTestCase {
         // Check type and dates
         try checkDeterminedType(.cold, in: destination)
         try checkDates(in: destination)
+        XCTAssertEqual(destination.storedAppStart?.end, didBecomeActive)
     }
 
-    func testManualTrackWithMinimumParameters() throws {
+    func testManualTrackWithIncompleteUnknownOriginDoesNotSend() throws {
         let destination = DebugDestination()
 
         let appStart = AppStart()
@@ -216,8 +217,128 @@ final class AppStartTests: XCTestCase {
 
         appStart.track(didBecomeActive: didBecomeActive, didFinishLaunching: nil, willEnterForeground: nil)
 
-        // Check type and dates
+        try checkNotDeterminedType(in: destination)
+    }
+
+    func testManualTrackWithForegroundOriginAndLongLaunchIsCold() throws {
+        let destination = DebugDestination()
+        let didBecomeActive = Date()
+        let processStart = didBecomeActive.addingTimeInterval(-20.0)
+        let didFinishLaunching = didBecomeActive.addingTimeInterval(-19.0)
+        let willEnterForeground = didBecomeActive.addingTimeInterval(-1.0)
+
+        let appStart = AppStart()
+        appStart.processStartTimestamp = processStart
+        appStart.destination = destination
+
+        appStart.track(
+            didBecomeActive: didBecomeActive,
+            didFinishLaunching: didFinishLaunching,
+            willEnterForeground: willEnterForeground,
+            launchOrigin: .foreground
+        )
+
         try checkDeterminedType(.cold, in: destination)
-        try checkDates(in: destination)
+        XCTAssertEqual(destination.storedAppStart?.start, processStart)
+        XCTAssertEqual(destination.storedAppStart?.end, didBecomeActive)
+    }
+
+    func testCompleteBackgroundSnapshotTracksAfterUIKitActivationAlreadyOccurred() throws {
+        let destination = DebugDestination()
+        let didBecomeActive = Date()
+        let didFinishLaunching = didBecomeActive.addingTimeInterval(-5.0)
+        let willEnterForeground = didBecomeActive.addingTimeInterval(-1.0)
+
+        // These notifications occur before the native SDK starts listening, as they can when a
+        // hybrid SDK is installed from JavaScript or Dart after the application becomes active.
+        simulateColdStartNotifications()
+
+        let appStart = AppStart()
+        appStart.processStartTimestamp = didFinishLaunching.addingTimeInterval(-1.0)
+        appStart.destination = destination
+        appStart.startDetection()
+
+        appStart.track(initialLifecycle: AppStartLifecycleSnapshot(
+            launchOrigin: .background,
+            didFinishLaunching: didFinishLaunching,
+            willEnterForeground: willEnterForeground,
+            didBecomeActive: didBecomeActive
+        ))
+
+        try checkDeterminedType(.warm, in: destination)
+        XCTAssertEqual(destination.storedAppStart?.start, willEnterForeground)
+        XCTAssertEqual(destination.storedAppStart?.end, didBecomeActive)
+    }
+
+    func testPartialBackgroundSnapshotCompletesWithNativeActivation() throws {
+        let destination = DebugDestination()
+        let didFinishLaunching = Date().addingTimeInterval(-5.0)
+        let willEnterForeground = Date().addingTimeInterval(-1.0)
+
+        let appStart = AppStart()
+        appStart.destination = destination
+        appStart.startDetection()
+
+        appStart.track(initialLifecycle: AppStartLifecycleSnapshot(
+            launchOrigin: .background,
+            didFinishLaunching: didFinishLaunching,
+            willEnterForeground: willEnterForeground,
+            didBecomeActive: nil
+        ))
+
+        try checkNotDeterminedType(in: destination)
+
+        NotificationCenter.default.post(name: UIApplication.didBecomeActiveNotification, object: nil)
+
+        try checkDeterminedType(.warm, in: destination)
+        XCTAssertEqual(destination.storedAppStart?.start, willEnterForeground)
+    }
+
+    func testAutomaticActivationAfterManualBackgroundTrackDoesNotSendDuplicate() throws {
+        let destination = DebugDestination()
+        let didBecomeActive = Date()
+        let didFinishLaunching = didBecomeActive.addingTimeInterval(-5.0)
+        let willEnterForeground = didBecomeActive.addingTimeInterval(-1.0)
+
+        let appStart = AppStart()
+        appStart.processStartTimestamp = didBecomeActive.addingTimeInterval(-6.0)
+        appStart.destination = destination
+
+        appStart.track(
+            didBecomeActive: didBecomeActive,
+            didFinishLaunching: didFinishLaunching,
+            willEnterForeground: willEnterForeground,
+            launchOrigin: .background
+        )
+        appStart.withStateAccess {
+            appStart.didBecomeActiveTimestamp = didBecomeActive.addingTimeInterval(1.0)
+            appStart.determineAndSendWithStateAccess()
+        }
+
+        try checkDeterminedType(.warm, in: destination)
+        XCTAssertEqual(destination.storedAppStart?.start, willEnterForeground)
+        XCTAssertEqual(destination.storedAppStart?.end, didBecomeActive)
+    }
+
+    func testManualTrackWithUnknownOriginAndLongBackgroundResidenceIsWarm() throws {
+        let destination = DebugDestination()
+        let didBecomeActive = Date()
+        let didFinishLaunching = didBecomeActive.addingTimeInterval(-12.0 * 60.0 * 60.0)
+        let willEnterForeground = didBecomeActive.addingTimeInterval(-1.0)
+
+        let appStart = AppStart()
+        appStart.processStartTimestamp = didFinishLaunching.addingTimeInterval(-1.0)
+        appStart.destination = destination
+
+        appStart.track(
+            didBecomeActive: didBecomeActive,
+            didFinishLaunching: didFinishLaunching,
+            willEnterForeground: willEnterForeground,
+            launchOrigin: .unknown
+        )
+
+        try checkDeterminedType(.warm, in: destination)
+        XCTAssertEqual(destination.storedAppStart?.start, willEnterForeground)
+        XCTAssertEqual(destination.storedAppStart?.end, didBecomeActive)
     }
 }

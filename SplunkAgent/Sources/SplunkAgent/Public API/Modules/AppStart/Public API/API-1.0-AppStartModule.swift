@@ -16,6 +16,15 @@ limitations under the License.
 */
 
 import Foundation
+@_spi(SplunkInternal) public import SplunkAppStart
+
+/// The canonical initial lifecycle snapshot consumed by the native AppStart module.
+@_spi(SplunkInternal)
+public typealias AppStartLifecycleSnapshot = SplunkAppStart.AppStartLifecycleSnapshot
+
+/// Compatibility name for the canonical AppStart launch-origin type.
+@_spi(SplunkInternal)
+public typealias AppStartLaunchOrigin = SplunkAppStart.AppStartLaunchOrigin
 
 /// Defines a public API for the AppStart module.
 ///
@@ -46,6 +55,16 @@ public protocol AppStartModule {
     /// - Warning: Internal use only.
     @_spi(SplunkInternal)
     func track(didBecomeActive: Date, didFinishLaunching: Date?, willEnterForeground: Date?) -> any AppStartModule
+
+    /// Adopts initial lifecycle evidence captured before a hybrid agent installed the native SDK.
+    ///
+    /// - Parameter snapshot: Immutable initial lifecycle evidence captured by a hybrid agent. A partial
+    ///   snapshot is retained until the native observer receives `didBecomeActive`.
+    /// - Returns: The actual ``AppStartModule`` instance.
+    ///
+    /// - Warning: Internal use only.
+    @_spi(SplunkInternal)
+    func track(initialLifecycle snapshot: AppStartLifecycleSnapshot) -> any AppStartModule
 }
 
 /// Default implementation required for BUILD_LIBRARY_FOR_DISTRIBUTION
@@ -55,10 +74,33 @@ extension AppStartModule {
 
     @_spi(SplunkInternal)
     public func track(didBecomeActive: Date, didFinishLaunching: Date?, willEnterForeground: Date?) -> any AppStartModule {
+        track(initialLifecycle: AppStartLifecycleSnapshot(
+            launchOrigin: .unknown,
+            didFinishLaunching: didFinishLaunching,
+            willEnterForeground: willEnterForeground,
+            didBecomeActive: didBecomeActive
+        ))
+    }
+
+    @_spi(SplunkInternal)
+    public func track(
+        didBecomeActive: Date,
+        didFinishLaunching: Date?,
+        willEnterForeground: Date?,
+        launchOrigin: AppStartLaunchOrigin
+    ) -> any AppStartModule {
+        track(initialLifecycle: AppStartLifecycleSnapshot(
+            launchOrigin: launchOrigin,
+            didFinishLaunching: didFinishLaunching,
+            willEnterForeground: willEnterForeground,
+            didBecomeActive: didBecomeActive
+        ))
+    }
+
+    @_spi(SplunkInternal)
+    public func track(initialLifecycle snapshot: AppStartLifecycleSnapshot) -> any AppStartModule {
         // Intentionally unused
-        _ = didBecomeActive
-        _ = didFinishLaunching
-        _ = willEnterForeground
+        _ = snapshot
 
         return self
     }

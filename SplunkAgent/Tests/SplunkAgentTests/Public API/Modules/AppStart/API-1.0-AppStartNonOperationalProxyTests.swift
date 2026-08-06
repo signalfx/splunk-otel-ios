@@ -17,7 +17,7 @@ limitations under the License.
 
 import XCTest
 
-@testable import SplunkAgent
+@testable @_spi(SplunkInternal) import SplunkAgent
 
 final class AppStartAPI10NoOpProxyTests: XCTestCase {
 
@@ -31,5 +31,21 @@ final class AppStartAPI10NoOpProxyTests: XCTestCase {
     func testManualTracking() {
         XCTAssertNotNil(moduleProxy.track(didBecomeActive: Date(), didFinishLaunching: Date(), willEnterForeground: Date()))
         XCTAssertNotNil(moduleProxy.track(didBecomeActive: Date(), didFinishLaunching: nil, willEnterForeground: nil))
+        XCTAssertNotNil(
+            moduleProxy.track(
+                didBecomeActive: Date(),
+                didFinishLaunching: Date(),
+                willEnterForeground: Date(),
+                launchOrigin: .background
+            )
+        )
+        XCTAssertNotNil(
+            moduleProxy.track(initialLifecycle: AppStartLifecycleSnapshot(
+                launchOrigin: .background,
+                didFinishLaunching: Date(),
+                willEnterForeground: Date(),
+                didBecomeActive: Date()
+            ))
+        )
     }
 }

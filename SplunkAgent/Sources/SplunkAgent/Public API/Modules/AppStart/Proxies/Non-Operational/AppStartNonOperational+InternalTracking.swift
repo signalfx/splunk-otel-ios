@@ -31,4 +31,13 @@ extension AppStartNonOperational {
 
         return self
     }
+
+    @discardableResult
+    func track(initialLifecycle snapshot: AppStartLifecycleSnapshot) -> any AppStartModule {
+        logAccess(toApi: #function)
+        // Intentionally unused
+        _ = snapshot
+
+        return self
+    }
 }

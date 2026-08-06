@@ -21,7 +21,6 @@ extension AppStart {
 
     /// Start listening to UIApplication app lifecycle notifications.
     func startNotificationListeners() {
-
         // Don't start listening if we are already are listening
         if notificationTokens != nil {
             return
@@ -31,62 +30,72 @@ extension AppStart {
 
         // didFinishLaunching notification - store the notification timestamp
         listen(to: UIApplication.didFinishLaunchingNotification, in: &tokens) {
-            self.didFinishLaunchingTimestamp = Date()
+            self.withStateAccess {
+                self.didFinishLaunchingTimestamp = Date()
 
-            self.logger.log(level: .debug) { "UIApplication.didFinishLaunchingNotification triggered" }
+                self.logger.log(level: .debug) { "UIApplication.didFinishLaunchingNotification triggered" }
+            }
         }
 
         // willEnterForeground notification - store the notification timestamp and detect background launch
         listen(to: UIApplication.willEnterForegroundNotification, in: &tokens) {
-            self.willEnterForegroundTimestamp = Date()
+            let timestamp = Date()
+            let applicationState = UIApplication.shared.applicationState
 
-            // Detect background launch.
-            // For a background launch, the app was in .background state before this notification,
-            // OR significant time has passed since didFinishLaunching (indicating the app was
-            // sitting in background).
-            //
-            // For a cold start, willEnterForeground fires immediately after didFinishLaunching
-            // and the app state is typically .inactive (transitioning).
-            //
-            // We use both checks because the applicationState check alone can be unreliable
-            // due to race conditions during state transitions.
-            if self.backgroundLaunchDetected == nil {
-                let currentState = UIApplication.shared.applicationState
-                let isCurrentlyInBackground = currentState == .background
+            self.withStateAccess {
+                self.willEnterForegroundTimestamp = timestamp
 
-                // If more than `backgroundLaunchThreshold` seconds have passed since didFinishLaunching,
-                // the app was likely running in background before coming to foreground
-                var significantDelayFromLaunch = false
-                if let launchTime = self.didFinishLaunchingTimestamp {
-                    significantDelayFromLaunch = Date().timeIntervalSince(launchTime) > self.backgroundLaunchThreshold
+                // Detect background launch.
+                // For a background launch, the app was in .background state before this notification,
+                // OR significant time has passed since didFinishLaunching (indicating the app was
+                // sitting in background).
+                //
+                // For a cold start, willEnterForeground fires immediately after didFinishLaunching
+                // and the app state is typically .inactive (transitioning).
+                //
+                // We use both checks because the applicationState check alone can be unreliable
+                // due to race conditions during state transitions.
+                if self.backgroundLaunchDetected == nil {
+                    let isCurrentlyInBackground = applicationState == .background
+
+                    // If more than `backgroundLaunchThreshold` seconds have passed since didFinishLaunching,
+                    // the app was likely running in background before coming to foreground
+                    var significantDelayFromLaunch = false
+                    if let launchTime = self.didFinishLaunchingTimestamp {
+                        significantDelayFromLaunch = timestamp.timeIntervalSince(launchTime) > self.backgroundLaunchThreshold
+                    }
+
+                    if isCurrentlyInBackground || significantDelayFromLaunch {
+                        self.backgroundLaunchDetected = true
+                    }
                 }
 
-                if isCurrentlyInBackground || significantDelayFromLaunch {
-                    self.backgroundLaunchDetected = true
-                }
+                self.logger.log(level: .debug) { "UIApplication.willEnterForegroundNotification triggered" }
             }
-
-            self.logger.log(level: .debug) { "UIApplication.willEnterForegroundNotification triggered" }
         }
 
         // didBecomeActive notification - store the timestamp, determine app start type and send results
         listen(to: UIApplication.didBecomeActiveNotification, in: &tokens) {
-            self.didBecomeActiveTimestamp = Date()
+            self.withStateAccess {
+                self.didBecomeActiveTimestamp = Date()
 
-            if self.backgroundLaunchDetected == nil {
-                self.backgroundLaunchDetected = false
+                if self.backgroundLaunchDetected == nil {
+                    self.backgroundLaunchDetected = false
+                }
+
+                self.logger.log(level: .debug) { "UIApplication.didBecomeActiveNotification triggered" }
+
+                self.determineAndSendWithStateAccess()
             }
-
-            self.logger.log(level: .debug) { "UIApplication.didBecomeActiveNotification triggered" }
-
-            self.determineAndSend()
         }
 
         // willResignActive notification - store the timestamp
         listen(to: UIApplication.willResignActiveNotification, in: &tokens) {
-            self.willResignActiveTimestamp = Date()
+            self.withStateAccess {
+                self.willResignActiveTimestamp = Date()
 
-            self.logger.log(level: .debug) { "UIApplication.willResignActiveNotification triggered" }
+                self.logger.log(level: .debug) { "UIApplication.willResignActiveNotification triggered" }
+            }
         }
 
         // didEnterBackground notification - no op atm
@@ -99,12 +108,14 @@ extension AppStart {
 
     /// Stop listening to UIApplication app lifecycle notifications.
     func stopNotificationListeners() {
-        if let notificationTokens {
-            for notificationToken in notificationTokens {
-                NotificationCenter.default.removeObserver(notificationToken)
-            }
+        withStateAccess {
+            if let notificationTokens {
+                for notificationToken in notificationTokens {
+                    NotificationCenter.default.removeObserver(notificationToken)
+                }
 
-            self.notificationTokens = nil
+                self.notificationTokens = nil
+            }
         }
     }
 
