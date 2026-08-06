@@ -179,6 +179,13 @@ public class CrashReports {
             return false
         }
 
+        guard NSGetUncaughtExceptionHandler() == nil else {
+            logger.log(level: .warn) {
+                "Could not enable crash reporter: An uncaught exception handler is already installed."
+            }
+            return false
+        }
+
         guard !isDebuggerAttached() else {
             logger.log(level: .warn) {
                 "Could not enable crash reporter: Debugger Attached."

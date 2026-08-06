@@ -583,7 +583,7 @@ static PLCrashReporter *sharedReporter = nil;
      * crash reporters. */
     {
         static BOOL enforceOne = NO;
-        pthread_mutex_t enforceOneLock = PTHREAD_MUTEX_INITIALIZER;
+        static pthread_mutex_t enforceOneLock = PTHREAD_MUTEX_INITIALIZER;
         pthread_mutex_lock(&enforceOneLock); {
             if (enforceOne) {
                 pthread_mutex_unlock(&enforceOneLock);
