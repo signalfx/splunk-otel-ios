@@ -544,16 +544,76 @@ func generateBinaryWrapperTargets() -> [Target] {
             dependencies: ["CiscoRuntimeCache", resolveDependency("logger")],
             path: "TargetWrappers/CiscoRuntimeCacheWrapper/Sources"
         ),
+        // TBD: transitive dependency wrappers for the SR modules added in
+        // smartlook-ios-sdk-private on develop. Pending checksum/URL bump
+        // to the next Session Replay staticlib release.
+        .target(
+            name: "CiscoVideoEncoderWrapper",
+            dependencies: [
+                "CiscoVideoEncoder",
+                resolveDependency("common"),
+                resolveDependency("diskStorage"),
+                resolveDependency("logger")
+            ],
+            path: "TargetWrappers/CiscoVideoEncoderWrapper/Sources"
+        ),
+        .target(
+            name: "CiscoScreenshotWrapper",
+            dependencies: [
+                "CiscoScreenshot",
+                resolveDependency("common"),
+                resolveDependency("logger")
+            ],
+            path: "TargetWrappers/CiscoScreenshotWrapper/Sources"
+        ),
+        .target(
+            name: "CiscoWireframeWrapper",
+            dependencies: [
+                "CiscoWireframe",
+                resolveDependency("common"),
+                resolveDependency("logger"),
+                resolveDependency("runtimeCache"),
+                resolveDependency("screenshot")
+            ],
+            path: "TargetWrappers/CiscoWireframeWrapper/Sources"
+        ),
+        .target(
+            name: "CiscoDataExporterWrapper",
+            dependencies: [
+                "CiscoDataExporter",
+                resolveDependency("common"),
+                resolveDependency("interactions"),
+                resolveDependency("wireframe")
+            ],
+            path: "TargetWrappers/CiscoDataExporterWrapper/Sources"
+        ),
+        .target(
+            name: "CiscoSnapshotManagerWrapper",
+            dependencies: [
+                "CiscoSnapshotManager",
+                resolveDependency("common"),
+                resolveDependency("logger"),
+                resolveDependency("screenshot"),
+                resolveDependency("wireframe")
+            ],
+            path: "TargetWrappers/CiscoSnapshotManagerWrapper/Sources"
+        ),
         .target(
             name: "CiscoSessionReplayWrapper",
             dependencies: [
                 "CiscoSessionReplay",
+                resolveDependency("common"),
                 resolveDependency("instanceManager"),
                 resolveDependency("diskStorage"),
                 resolveDependency("runtimeCache"),
                 resolveDependency("interactions"),
                 resolveDependency("logger"),
-                resolveDependency("swizzling")
+                resolveDependency("swizzling"),
+                resolveDependency("videoEncoder"),
+                resolveDependency("screenshot"),
+                resolveDependency("wireframe"),
+                resolveDependency("dataExporter"),
+                resolveDependency("snapshotManager")
             ],
             path: "TargetWrappers/CiscoSessionReplayWrapper/Sources"
         )
@@ -707,6 +767,43 @@ struct SessionReplayBinaryRegistry {
             checksum: "4c31e2c817364363f167d28bfe0cc2b94f8adc7e03e9afa9d8cb7e0009392520",
             productName: "CiscoRuntimeCache",
             wrapperName: "CiscoRuntimeCacheWrapper"
+        ),
+        // TBD: URL/checksum will be filled in once the next Session Replay
+        // release publishes staticlib artifacts for the following modules.
+        "videoEncoder": BinaryTargetInfo(
+            name: "CiscoVideoEncoder",
+            url: "https://sdk.smartlook.com/cisco-session-replay/ios/1.1.2/staticlib/cisco-video-encoder-1.1.2.265.zip",
+            checksum: "XXX",
+            productName: "CiscoVideoEncoder",
+            wrapperName: "CiscoVideoEncoderWrapper"
+        ),
+        "screenshot": BinaryTargetInfo(
+            name: "CiscoScreenshot",
+            url: "https://sdk.smartlook.com/cisco-session-replay/ios/1.1.2/staticlib/cisco-screenshot-1.1.2.265.zip",
+            checksum: "XXX",
+            productName: "CiscoScreenshot",
+            wrapperName: "CiscoScreenshotWrapper"
+        ),
+        "wireframe": BinaryTargetInfo(
+            name: "CiscoWireframe",
+            url: "https://sdk.smartlook.com/cisco-session-replay/ios/1.1.2/staticlib/cisco-wireframe-1.1.2.265.zip",
+            checksum: "XXX",
+            productName: "CiscoWireframe",
+            wrapperName: "CiscoWireframeWrapper"
+        ),
+        "dataExporter": BinaryTargetInfo(
+            name: "CiscoDataExporter",
+            url: "https://sdk.smartlook.com/cisco-session-replay/ios/1.1.2/staticlib/cisco-data-exporter-1.1.2.265.zip",
+            checksum: "XXX",
+            productName: "CiscoDataExporter",
+            wrapperName: "CiscoDataExporterWrapper"
+        ),
+        "snapshotManager": BinaryTargetInfo(
+            name: "CiscoSnapshotManager",
+            url: "https://sdk.smartlook.com/cisco-session-replay/ios/1.1.2/staticlib/cisco-snapshot-manager-1.1.2.265.zip",
+            checksum: "XXX",
+            productName: "CiscoSnapshotManager",
+            wrapperName: "CiscoSnapshotManagerWrapper"
         )
     ]
 }
