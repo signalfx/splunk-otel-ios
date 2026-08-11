@@ -101,7 +101,7 @@ Start with:
 | Deferred endpoint, endpoint update/disable, runtime state, sampling, duplicate install | [`install/endpoint-and-runtime-state.md`](skill-references/install/endpoint-and-runtime-state.md) |
 | `SplunkOtel`, `SplunkRumBuilder`, deprecated static APIs, old crash setup | [`install/migration-from-splunkotel.md`](skill-references/install/migration-from-splunkotel.md) |
 | Default SDK modules, app start/state, crash runtime behavior, slow/frozen frames, interactions | [`instrumentation/default-modules.md`](skill-references/instrumentation/default-modules.md) |
-| Custom events, handled errors, workflows, user/session/global attributes | [`instrumentation/custom-tracking-and-attributes.md`](skill-references/instrumentation/custom-tracking-and-attributes.md) |
+| Custom events, handled errors, workflows, global attributes | [`instrumentation/custom-tracking-and-attributes.md`](skill-references/instrumentation/custom-tracking-and-attributes.md) |
 | SwiftUI/UIKit screen tracking, tabs, navigation stacks, storyboards, custom containers | [`instrumentation/navigation.md`](skill-references/instrumentation/navigation.md) |
 | `URLSession`, URL exclusions, trace headers, captured headers | [`instrumentation/network.md`](skill-references/instrumentation/network.md) |
 | Session Replay enablement, sampling, endpoints, recording control, or state | [`instrumentation/session-replay.md`](skill-references/instrumentation/session-replay.md) |

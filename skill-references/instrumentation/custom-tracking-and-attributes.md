@@ -7,7 +7,32 @@ useful verification. Use custom events for business milestones, handled errors
 for expected error paths, and workflows for timed operations with clear
 start/end points.
 
-Source-backed Swift APIs:
+### Global attributes
+
+Use global attributes for stable, non-sensitive context that belongs on every
+signal. Configure initial values before installing the agent:
+
+```swift
+let configuration = AgentConfiguration(
+    endpoint: endpointConfiguration,
+    appName: appName,
+    deploymentEnvironment: deploymentEnvironment
+).globalAttributes(MutableAttributes(dictionary: [
+    "app.release_channel": .string("beta")
+]))
+```
+
+After installation, mutate the retained agent's public collection. Assign
+`nil` to remove an attribute:
+
+```swift
+agent.globalAttributes[string: "app.release_channel"] = "production"
+agent.globalAttributes[string: "app.release_channel"] = nil
+```
+
+Keep context that applies to only one event in that event's attributes.
+
+### Custom tracking
 
 ```swift
 let attributes = MutableAttributes(dictionary: [
@@ -26,6 +51,10 @@ Keep attributes low-cardinality and non-sensitive. Never add raw names, emails,
 addresses, account numbers, auth identifiers, or other PII. Use the Host App's
 existing privacy-approved redaction or tokenization before values reach
 telemetry.
+
+For ObjC global attributes, use `SPLKAgentConfiguration.globalAttributes`
+before installation and `SPLKAgent.shared.globalAttributes` afterward. Assigning
+the runtime property replaces the complete dictionary.
 
 For ObjC, verify bridged API availability before suggesting selectors. Current
 ObjC bridge supports custom events, error messages, `NSError`, and `NSException`;
