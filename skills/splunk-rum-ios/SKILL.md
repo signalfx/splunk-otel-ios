@@ -1,11 +1,17 @@
+---
+name: splunk-rum-ios
+description: Plan, review, apply, or verify Splunk Real User Monitoring instrumentation in customer iOS and iPadOS apps using the Splunk RUM iOS SDK. Use when integrating or migrating the SDK in Swift, Objective-C, UIKit, SwiftUI, or mixed apps; configuring supported instrumentation; diagnosing integration problems; or validating the resulting setup.
+license: Apache-2.0
+---
+
 # Splunk RUM iOS SDK Agent Skill
 
 Use this skill when a coding agent must plan, review, apply, or verify Splunk
 Real User Monitoring instrumentation in a customer iOS app using this SDK.
 
-The Skill Bundle is public-release safe. Keep `SKILLS.md` as the canonical
+The Skill Bundle is public-release safe. Keep `SKILL.md` as the canonical
 router for modes, depth, hard gates, source selection, and reference loading.
-Load only the `skill-references/` files needed for the Host App and requested
+Load only the `references/` files needed for the Host App and requested
 mode.
 
 ## Modes
@@ -89,27 +95,27 @@ Start with:
 
 ## Always Load
 
-- [`skill-references/workflow.md`](skill-references/workflow.md)
+- [`references/workflow.md`](references/workflow.md)
 
 ## Load Rules
 
 | Task or evidence | Load these files |
 | --- | --- |
-| React Native, Flutter, `package.json`, `pubspec.yaml`, generated `ios/` wrapper | [`install/hybrid-apps.md`](skill-references/install/hybrid-apps.md) |
-| Fresh install, product choice, lifecycle entry point, SwiftUI/UIKit/AppDelegate/no-AppDelegate cases | [`install/fresh-install.md`](skill-references/install/fresh-install.md) and [`install/endpoint-and-runtime-state.md`](skill-references/install/endpoint-and-runtime-state.md) |
-| Build/link/package failures, product mismatch, stale package metadata | [`install/build-and-link-errors.md`](skill-references/install/build-and-link-errors.md) |
-| Deferred endpoint, endpoint update/disable, runtime state, sampling, duplicate install | [`install/endpoint-and-runtime-state.md`](skill-references/install/endpoint-and-runtime-state.md) |
-| `SplunkOtel`, `SplunkRumBuilder`, deprecated static APIs, old crash setup | [`install/migration-from-splunkotel.md`](skill-references/install/migration-from-splunkotel.md) |
-| Default SDK modules, app start/state, crash runtime behavior, slow/frozen frames, interactions | [`instrumentation/default-modules.md`](skill-references/instrumentation/default-modules.md) |
-| Custom events, handled errors, workflows, global attributes | [`instrumentation/custom-tracking-and-attributes.md`](skill-references/instrumentation/custom-tracking-and-attributes.md) |
-| SwiftUI/UIKit screen tracking, tabs, navigation stacks, storyboards, custom containers | [`instrumentation/navigation.md`](skill-references/instrumentation/navigation.md) |
-| `URLSession`, URL exclusions, trace headers, captured headers | [`instrumentation/network.md`](skill-references/instrumentation/network.md) |
-| Session Replay enablement, sampling, endpoints, recording control, or state | [`instrumentation/session-replay.md`](skill-references/instrumentation/session-replay.md) |
-| Session Replay masking, sensitivity, custom IDs, rendering mode, or recording masks | [`instrumentation/session-replay.md`](skill-references/instrumentation/session-replay.md) and [`instrumentation/session-replay-privacy.md`](skill-references/instrumentation/session-replay-privacy.md) |
-| Objective-C Session Replay | [`instrumentation/session-replay.md`](skill-references/instrumentation/session-replay.md) and [`objc/session-replay.md`](skill-references/objc/session-replay.md); also load [`instrumentation/session-replay-privacy.md`](skill-references/instrumentation/session-replay-privacy.md) for sensitivity, custom IDs, rendering, or recording masks |
-| `WKWebView`, Browser RUM bridge, native session bridge exposure | [`instrumentation/webview.md`](skill-references/instrumentation/webview.md) |
-| Objective-C or mixed app product/lifecycle decisions | [`objc/product-and-lifecycle.md`](skill-references/objc/product-and-lifecycle.md) |
-| Objective-C UIKit/storyboard/navigation details | [`objc/uikit-storyboards-navigation.md`](skill-references/objc/uikit-storyboards-navigation.md) |
-| Objective-C module configuration examples | [`objc/module-configuration.md`](skill-references/objc/module-configuration.md) |
-| dSYM upload, crash symbolication, archive/release/CI changes | [`release/crash-and-dsym.md`](skill-references/release/crash-and-dsym.md) |
-| Build/launch verification, signal exercise, backend telemetry, ObjC validation, troubleshooting | [`verification.md`](skill-references/verification.md) |
+| React Native, Flutter, `package.json`, `pubspec.yaml`, generated `ios/` wrapper | [`install/hybrid-apps.md`](references/install/hybrid-apps.md) |
+| Fresh install, product choice, lifecycle entry point, SwiftUI/UIKit/AppDelegate/no-AppDelegate cases | [`install/fresh-install.md`](references/install/fresh-install.md) and [`install/endpoint-and-runtime-state.md`](references/install/endpoint-and-runtime-state.md) |
+| Build/link/package failures, product mismatch, stale package metadata | [`install/build-and-link-errors.md`](references/install/build-and-link-errors.md) |
+| Deferred endpoint, endpoint update/disable, runtime state, sampling, duplicate install | [`install/endpoint-and-runtime-state.md`](references/install/endpoint-and-runtime-state.md) |
+| `SplunkOtel`, `SplunkRumBuilder`, deprecated static APIs, old crash setup | [`install/migration-from-splunkotel.md`](references/install/migration-from-splunkotel.md) |
+| Default SDK modules, app start/state, crash runtime behavior, slow/frozen frames, interactions | [`instrumentation/default-modules.md`](references/instrumentation/default-modules.md) |
+| Custom events, handled errors, workflows, global attributes | [`instrumentation/custom-tracking-and-attributes.md`](references/instrumentation/custom-tracking-and-attributes.md) |
+| SwiftUI/UIKit screen tracking, tabs, navigation stacks, storyboards, custom containers | [`instrumentation/navigation.md`](references/instrumentation/navigation.md) |
+| `URLSession`, URL exclusions, trace headers, captured headers | [`instrumentation/network.md`](references/instrumentation/network.md) |
+| Session Replay enablement, sampling, endpoints, recording control, or state | [`instrumentation/session-replay.md`](references/instrumentation/session-replay.md) |
+| Session Replay masking, sensitivity, custom IDs, rendering mode, or recording masks | [`instrumentation/session-replay.md`](references/instrumentation/session-replay.md) and [`instrumentation/session-replay-privacy.md`](references/instrumentation/session-replay-privacy.md) |
+| Objective-C Session Replay | [`instrumentation/session-replay.md`](references/instrumentation/session-replay.md) and [`objc/session-replay.md`](references/objc/session-replay.md); also load [`instrumentation/session-replay-privacy.md`](references/instrumentation/session-replay-privacy.md) for sensitivity, custom IDs, rendering, or recording masks |
+| `WKWebView`, Browser RUM bridge, native session bridge exposure | [`instrumentation/webview.md`](references/instrumentation/webview.md) |
+| Objective-C or mixed app product/lifecycle decisions | [`objc/product-and-lifecycle.md`](references/objc/product-and-lifecycle.md) |
+| Objective-C UIKit/storyboard/navigation details | [`objc/uikit-storyboards-navigation.md`](references/objc/uikit-storyboards-navigation.md) |
+| Objective-C module configuration examples | [`objc/module-configuration.md`](references/objc/module-configuration.md) |
+| dSYM upload, crash symbolication, archive/release/CI changes | [`release/crash-and-dsym.md`](references/release/crash-and-dsym.md) |
+| Build/launch verification, signal exercise, backend telemetry, ObjC validation, troubleshooting | [`verification.md`](references/verification.md) |

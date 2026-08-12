@@ -71,4 +71,4 @@ Once initialized, the agent will automatically begin collecting data. To explore
 
 ## Assisted Integration
 
-A coding agent skill bundle is included in this repository (`SKILLS.md` and `skill-references/`). You can point a coding agent at `SKILLS.md` to get guided help with installation, configuration, and verification.
+A coding agent skill bundle is included in this repository at `skills/splunk-rum-ios/`. You can point a coding agent at `skills/splunk-rum-ios/SKILL.md` to get guided help with installation, configuration, and verification.

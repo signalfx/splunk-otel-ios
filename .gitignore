@@ -9,8 +9,8 @@ DerivedData/
 
 # Release
 release/
-!skill-references/release/
-!skill-references/release/**
+!skills/splunk-rum-ios/references/release/
+!skills/splunk-rum-ios/references/release/**
 
 ## Various settings
 *.pbxuser

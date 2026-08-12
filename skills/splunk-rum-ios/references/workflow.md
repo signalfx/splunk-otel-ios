@@ -2,7 +2,7 @@
 
 ## Procedure
 
-1. Use the mode and instrumentation depth selected under `SKILLS.md`.
+1. Use the mode and instrumentation depth selected under `SKILL.md`.
 2. Inspect before deciding. Do not assume app lifecycle, language, platform, or
    dependency manager.
 3. Load only the topic references needed by Host App evidence.
@@ -15,7 +15,7 @@
 
 ## Current-source rule
 
-Follow the source-of-truth order in `SKILLS.md`. If docs disagree with public
+Follow the source-of-truth order in `SKILL.md`. If docs disagree with public
 API source, prefer source and report the mismatch.
 
 ## Inspection checklist
@@ -58,7 +58,7 @@ URLSession WKWebView trackScreen reportError reportEvent setScreenName
 
 ## Gates
 
-Apply the hard gates in `SKILLS.md` before recommending or changing
+Apply the hard gates in `SKILL.md` before recommending or changing
 instrumentation. Topic references may add stricter constraints.
 
 ## Required output

@@ -10,7 +10,7 @@ changing sensitivity, custom IDs, rendering, or recording masks, load
 
 Before enabling, inspect sensitive screens, WebViews and custom-rendered
 content, existing masking, sampling, and storage implications. Keep start/stop
-snippets out of top-level `SKILLS.md`, fresh-install defaults, and default local
+snippets out of `SKILL.md`, fresh-install defaults, and default local
 signal generation.
 
 ## Public API boundary
