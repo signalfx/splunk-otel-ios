@@ -9,10 +9,13 @@ default.
 Network instrumentation can capture URL-derived attributes, including path,
 query, and the full URL. Before changing network behavior, report sensitive
 route risk. Use `ignoreURLs` when dropping the matching span is acceptable.
-The Network module has no URL-rewrite setting. When the span must be retained,
-use the public `AgentConfiguration.spanInterceptor` only with explicit approval,
-scope the transform to matching network spans, and inspect current source for
-every URL-bearing attribute that must be removed or replaced.
+The Network module has no URL-rewrite setting. In Swift, when the span must be
+retained, use the public `AgentConfiguration.spanInterceptor` only with explicit
+approval, scope the transform to matching network spans, and inspect current
+source for every URL-bearing attribute that must be removed or replaced. The
+Objective-C API has no span interceptor; use
+`SPLKNetworkInstrumentationConfiguration.ignoreURLs` to drop matching spans or
+report that retaining them with URL redaction is unsupported.
 
 Swift module configuration types live in `SplunkNetwork`; import it when using
 `NetworkInstrumentationConfiguration` or `IgnoreURLs`:

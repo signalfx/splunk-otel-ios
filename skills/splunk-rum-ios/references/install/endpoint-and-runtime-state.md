@@ -2,8 +2,10 @@
 
 ## Guidance
 
-Endpoint is optional in current public API. Use deferred endpoint setup when the
-user has not supplied a safe token/config mechanism.
+Endpoint is optional in current public API. In Swift, use deferred endpoint
+setup when the user has not supplied a safe token/config mechanism. In
+Objective-C, identify that mechanism before installation because the current
+public API has no safe deferred update path.
 
 Runtime state is available through `agent.state.status`. Source-backed status
 cases are `.running`, `.notRunning(.notInstalled)`,
@@ -26,10 +28,13 @@ Avoid `agent.preferences.endpointConfiguration = endpoint` for Swift updates:
 the setter catches failures internally and logs the raw error, which may include
 the endpoint URL or token — contradicting the redaction rule below.
 
-ObjC endpoint update uses `agent.preferences.endpointConfiguration`; assigning
-`nil` disables the endpoint. The ObjC path does not have a separate throwing
-variant; treat it as informational only and do not use it to validate
-arbitrary user-entered endpoint values.
+Objective-C has no public throwing runtime endpoint-update API. Assigning a
+non-`nil` value to `agent.preferences.endpointConfiguration` can log a
+validation error containing endpoint or token data. Do not generate that
+update. Either provide the endpoint through the throwing `SPLKAgent` install
+path and report only a generic failure, or report that deferred Objective-C
+endpoint setup is not safely supported by the current public API. Assigning
+`nil` to disable an endpoint is safe.
 
 Do not print:
 
@@ -54,19 +59,20 @@ no credentials for this check. After the build passes, deliver this handoff and
 **stop — wait for the user to confirm before proceeding to telemetry or backend
 verification steps.**
 
-Tell the user the agent is installed and will start, but telemetry remains
-queued until an endpoint is configured. Ask which existing Host App runtime
-configuration mechanism supplies both realm and token. Do not invent a generic
-source, add literals, or ask for either value in conversation.
+For Swift deferred setup, tell the user the agent is installed and will start,
+but telemetry remains queued until an endpoint is configured. Ask which
+existing Host App runtime configuration mechanism supplies both realm and
+token, then wire its values into `EndpointConfiguration` and call the throwing
+`updateEndpoint(_:)` path above. Surface only a generic failure signal.
 
-Once the mechanism is identified, wire its values into
-`EndpointConfiguration`. For Swift, call the throwing `updateEndpoint(_:)` path
-above and surface only a generic failure signal. For Objective-C, use
-`agent.preferences.endpointConfiguration` with `SPLKEndpointConfiguration` and
-only values supplied by the inspected runtime configuration mechanism; do not
-use the setter as a validation probe.
+For Objective-C, identify the existing configuration mechanism before
+installation and pass its values through `SPLKEndpointConfiguration` to the
+throwing install path. If the app requires a deferred endpoint, report the
+public-API gap and stop rather than using the non-throwing preferences setter.
+Do not invent a generic source, add literals, or ask for either value in
+conversation.
 
-After the user confirms local configuration, inspect only that the
-`EndpointConfiguration` wiring and endpoint update call are present and that no
-realm or token literal was committed. Do not read or validate either value.
-Then continue to launch, signal, and backend verification as allowed.
+After the user confirms local configuration, inspect only that the endpoint
+wiring and applicable Swift update or Objective-C install call are present and
+that no realm or token literal was committed. Do not read or validate either
+value. Then continue to launch, signal, and backend verification as allowed.

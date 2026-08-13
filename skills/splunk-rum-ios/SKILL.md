@@ -66,8 +66,8 @@ If no version control is present, recommend creating a checkpoint before edits.
   substitute for choosing the right file — use target-specific insertion
   instead. If non-iOS Apple targets are relevant, give a light note that RUM
   telemetry is expected only from iOS/iPadOS instrumentation.
-- Do not add endpoint URLs by default. Prefer deferred endpoint setup or the
-  Host App's existing configuration mechanism.
+- Do not add endpoint URLs by default. Use the Host App's existing configuration
+  mechanism; defer setup only when the public API provides a safe update path.
 - Gate Session Replay, WebView bridging, network header capture, endpoint
   updates, dSYM upload, CI edits, and Xcode build-phase/build-setting changes
   behind explicit user approval.

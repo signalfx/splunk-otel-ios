@@ -57,5 +57,7 @@ before installation and `SPLKAgent.shared.globalAttributes` afterward. Assigning
 the runtime property replaces the complete dictionary.
 
 For ObjC, verify bridged API availability before suggesting selectors. Current
-ObjC bridge supports custom events, error messages, `NSError`, and `NSException`;
-do not claim ObjC workflow support unless current source adds it.
+ObjC bridge supports custom events, error messages, `NSError`, `NSException`,
+and explicit stacks through `trackErrorWithType:message:stacktrace:` and
+`trackErrorWithType:message:stacktrace:attributes:`. Do not claim ObjC workflow
+support unless current source adds it.
