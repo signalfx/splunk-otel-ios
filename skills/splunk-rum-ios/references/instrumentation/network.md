@@ -24,9 +24,9 @@ import SplunkNetwork
 let networkConfig: NetworkInstrumentationConfiguration
 
 do {
-    let ignored = try IgnoreURLs(patterns: [
+    let ignored = try IgnoreURLs(patterns: Set([
         #"^https://api\.example\.com/private/"#
-    ])
+    ]))
 
     networkConfig = NetworkInstrumentationConfiguration(
         ignoreURLs: ignored

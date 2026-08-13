@@ -10,6 +10,7 @@ Source-backed Swift APIs:
 
 ```swift
 paymentField.srSensitive = true
+checkoutWebView.srSensitive = true
 agent.sessionReplay.sensitivity[UITextField.self] = true
 agent.sessionReplay.sensitivity[CustomBadgeView.self] = false
 
@@ -17,9 +18,11 @@ SecureCheckoutView()
     .sessionReplaySensitive()
 ```
 
-`UITextView`, `UITextField`, and `WKWebView` are sensitive by default in current
-source. Verify custom controls. When SwiftUI wraps a UIKit element, set UIKit
-sensitivity first and then apply `.sessionReplaySensitive()` when needed.
+The Splunk RUM agent masks `UITextView` and `UITextField` by default, but it does
+not mask `WKWebView` by default. Assess each approved web view and mask it
+explicitly when it can display sensitive content. Verify custom controls. When
+SwiftUI wraps a UIKit element, set UIKit sensitivity first and then apply
+`.sessionReplaySensitive()` when needed.
 
 Use `false` deliberately: it can unmask data hidden by default or class rules.
 

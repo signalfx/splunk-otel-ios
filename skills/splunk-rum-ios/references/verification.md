@@ -31,11 +31,15 @@ Run only for an operational agent with an approved non-production endpoint.
 Report `.notRunning(.unsupportedPlatform)` or `.notRunning(.sampledOut)`
 instead.
 
+Network instrumentation can add trace-context headers. Exercise a network
+signal only against an approved, app-owned non-production URL; otherwise skip
+that signal.
+
 Exercise only:
 
 - app start and launch
 - one screen/navigation event
-- one benign `URLSession` request
+- one `URLSession` request to that approved URL, if available
 - one custom event or handled error
 
 Do not print telemetry payloads, request descriptors, headers, endpoint values,
