@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2025 Splunk Inc.
+Copyright 2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,15 +16,12 @@ limitations under the License.
 */
 
 import Foundation
-import SplunkCommon
 import XCTest
 
 #if os(iOS) || os(tvOS) || os(visionOS)
     import UIKit
 
     @testable import SplunkSlowFrameDetector
-
-    // MARK: - Mock Ticker
 
     final class MockTicker: SlowFrameTicker {
         @MainActor
@@ -33,11 +30,19 @@ import XCTest
         var stopped = false
         @MainActor
         var startCallCount = 0
+        @MainActor
+        var pauseCallCount = 0
+        @MainActor
+        var resumeCallCount = 0
 
         @MainActor
         var onStart: (() -> Void)?
         @MainActor
         var onStop: (() -> Void)?
+        @MainActor
+        var onPause: (() -> Void)?
+        @MainActor
+        var onResume: (() -> Void)?
 
         let onFrameStream: AsyncStream<(TimeInterval, TimeInterval)>
         private let continuation: AsyncStream<(TimeInterval, TimeInterval)>.Continuation
@@ -69,44 +74,20 @@ import XCTest
         }
 
         @MainActor
-        func pause() {}
+        func pause() {
+            pauseCallCount += 1
+            onPause?()
+        }
 
         @MainActor
-        func resume() {}
+        func resume() {
+            resumeCallCount += 1
+            onResume?()
+        }
 
         @MainActor
-        func simulateFrame(timestamp: TimeInterval, duration: TimeInterval) {
-            continuation.yield((timestamp, duration))
-        }
-    }
-
-
-    // MARK: - Mock Destination
-
-    final class MockDestination: SlowFrameDetectorDestination {
-        // This dictionary will store the accumulated counts.
-        private var reportedCountsStorage: [String: Int] = [:]
-        private var onSend: ((String, Int) -> Void)?
-        private let lock = NSLock()
-
-        var reportedCounts: [String: Int] {
-            lock.lock()
-            defer { lock.unlock() }
-            return reportedCountsStorage
-        }
-
-        func send(type: String, count: Int, sharedState _: AgentSharedState?) {
-            lock.lock()
-            reportedCountsStorage[type, default: 0] += count
-            let handler = onSend
-            lock.unlock()
-            handler?(type, count)
-        }
-
-        func setOnSend(_ handler: ((String, Int) -> Void)?) {
-            lock.lock()
-            onSend = handler
-            lock.unlock()
+        func simulateFrame(timestamp: TimeInterval, targetTimestamp: TimeInterval) {
+            continuation.yield((timestamp, targetTimestamp))
         }
     }
 #endif

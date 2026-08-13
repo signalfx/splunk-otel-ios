@@ -16,11 +16,12 @@ limitations under the License.
 */
 
 internal import CiscoSessionReplay
+import Combine
 import Foundation
 internal import SplunkAppStart
 internal import SplunkAppState
 internal import SplunkCustomTracking
-internal import SplunkInteractions
+@_spi(SplunkInternal) internal import SplunkInteractions
 @_spi(SplunkInternal) internal import SplunkNavigation
 internal import SplunkNetwork
 internal import SplunkNetworkMonitor
@@ -289,8 +290,66 @@ extension SplunkRum {
             return
         }
 
+        wireUserActivityCollector(interactionsModule: interactionsModule)
+
         // Initialize proxy API for this module
         interactions = Interactions(for: interactionsModule)
+    }
+
+    /// Wire the `UserActivityCollector` to the Session Replay lifecycle and the
+    /// Interactions module's `onActivity` callback.
+    ///
+    /// The wiring is intentionally independent of `InteractionsConfiguration.isEnabled`.
+    /// The `onActivity` hook is installed on the module regardless of whether the
+    /// detector is currently running, because the module implementation may enable
+    /// the detector later (e.g. via remote configuration) and Session Replay
+    /// activity timestamps should not silently disappear when Interactions is
+    /// disabled at install time.
+    ///
+    /// The collector's recording state is driven by the Cisco Session Replay
+    /// module's `isRecording` publisher. That covers explicit start/stop calls,
+    /// redundant start calls (no reset when already recording), and autonomous
+    /// transitions such as `.diskCacheCapacityOverreached` or internal errors
+    /// that stop the module without going through our proxy.
+    ///
+    /// Reset semantics: the collector is reset on a stopped→recording edge (so
+    /// residual state from a previous recording — including outstanding
+    /// failure-callback restores — cannot bleed into the new session), but not
+    /// on a recording→stopped edge (so the buffered activity for the final
+    /// segment survives long enough for `publishSessionReplay` to flush it
+    /// after `module.stop()` closes the last record).
+    private func wireUserActivityCollector(interactionsModule: SplunkInteractions.Interactions) {
+        guard
+            let collector = (eventManager as? DefaultEventManager)?.userActivityCollector,
+            let srProxy = sessionReplayProxy as? SessionReplay
+        else {
+            return
+        }
+
+        interactionsModule.onActivity = { [weak collector] date in
+            collector?.record(at: date)
+        }
+
+        // `$isRecording` is Combine-@Published; the first sink call fires
+        // synchronously with the current value, so this both seeds the
+        // collector and observes future transitions.
+        srProxy
+            .module
+            .state
+            .$isRecording
+            .removeDuplicates()
+            .sink { [weak collector] isRecording in
+                guard let collector else {
+                    return
+                }
+
+                if isRecording {
+                    collector.reset()
+                }
+
+                collector.setRecording(isRecording)
+            }
+            .store(in: &srProxy.cancellables)
     }
 
     /// Configure WebView Instrumentation module with shared state.

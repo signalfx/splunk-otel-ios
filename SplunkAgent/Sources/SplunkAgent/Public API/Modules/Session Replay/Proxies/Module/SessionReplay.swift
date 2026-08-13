@@ -17,6 +17,7 @@ limitations under the License.
 
 internal import CiscoLogger
 internal import CiscoSessionReplay
+import Combine
 import Foundation
 internal import SplunkCommon
 
@@ -26,6 +27,10 @@ final class SessionReplay: SessionReplayModule {
     // MARK: - Internal
 
     unowned let module: CiscoSessionReplay.SessionReplay
+
+    /// Storage for Combine subscriptions owned by the proxy (e.g. the
+    /// `$isRecording` observation that drives `UserActivityCollector`).
+    var cancellables: Set<AnyCancellable> = []
 
 
     // MARK: - Private

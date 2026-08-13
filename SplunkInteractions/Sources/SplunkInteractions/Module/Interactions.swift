@@ -30,6 +30,25 @@ public final class Interactions: SplunkInteractionsModule {
     private let destination: SplunkInteractionsDestination
     private var interactionsTask: Task<Void, Never>?
 
+    private var storedOnActivity: ((Date) -> Void)?
+    private let onActivityLock = NSLock()
+
+
+    // MARK: - Internal properties
+
+    /// Synchronous callback invoked on every interaction event, regardless of type.
+    ///
+    /// Called directly inside `handleEvent` before type-specific processing.
+    /// The property is guarded by an `NSLock` so that assignment from the host
+    /// app's install path and reads from the detector task cannot race.
+    @_spi(SplunkInternal)
+    public var onActivity: ((Date) -> Void)? {
+        get { onActivityLock.withLock { storedOnActivity } }
+        set { onActivityLock.withLock { storedOnActivity = newValue } }
+    }
+
+    var interactionsDetector: InteractionsDetector<DefaultSwizzling>?
+
     private let internalLogger = DefaultLogAgent(
         poolName: PackageIdentifier.instance(),
         category: "SplunkInteractions"
@@ -40,11 +59,6 @@ public final class Interactions: SplunkInteractionsModule {
         poolName: PackageIdentifier.instance(),
         garbageCollectionCount: 1_000
     )
-
-
-    // MARK: - Internal properties
-
-    var interactionsDetector: InteractionsDetector<DefaultSwizzling>?
 
 
     // MARK: - Initialization
@@ -98,6 +112,8 @@ public final class Interactions: SplunkInteractionsModule {
     }
 
     func handleEvent(_ event: InteractionEvent) async {
+        onActivity?(event.time)
+
         await handleEventType(
             event.type,
             viewHierarchy: event.viewHierarchy,

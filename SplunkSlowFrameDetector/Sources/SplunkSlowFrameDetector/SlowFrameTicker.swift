@@ -29,7 +29,7 @@ import QuartzCore
 /// This protocol provides a consistent interface for receiving frame updates, abstracting
 /// the underlying mechanism (like `CADisplayLink`) for easier testing and dependency injection.
 protocol SlowFrameTicker {
-    /// An async stream that yields the timestamp and duration for each frame update.
+    /// An async stream that yields the timestamp and target presentation timestamp for each frame update.
     nonisolated var onFrameStream: AsyncStream<(TimeInterval, TimeInterval)> { get }
 
     /// Starts the ticker on the main thread.
@@ -60,7 +60,7 @@ protocol SlowFrameTicker {
 
         // MARK: - Public Properties
 
-        /// An async stream that yields the timestamp and duration for each frame update.
+        /// An async stream that yields the timestamp and target presentation timestamp for each frame update.
         let onFrameStream: AsyncStream<(TimeInterval, TimeInterval)>
 
 
@@ -120,7 +120,7 @@ protocol SlowFrameTicker {
 
         @objc
         private func displayLinkCallback(_ link: CADisplayLink) {
-            continuation.yield((link.timestamp, link.duration))
+            continuation.yield((link.timestamp, link.targetTimestamp))
         }
     }
 #endif // os(iOS) || os(tvOS) || os(visionOS)

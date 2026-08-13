@@ -21,6 +21,20 @@ import Foundation
 
 public struct Stacktrace {
     let frames: [String]
+
+    /// Indicates the stack is a caller-supplied verbatim string (for example a
+    /// bridged JavaScript/Dart stack) rather than native `Thread.callStackSymbols`
+    /// frames.
+    ///
+    /// Verbatim stacks are emitted only as `exception.stacktrace` and are never
+    /// parsed into native `exception.threads` diagnostics or scanned for binary
+    /// images, since those parsers only understand native frame lines.
+    let isVerbatim: Bool
+
+    init(frames: [String]) {
+        self.frames = frames
+        isVerbatim = false
+    }
 }
 
 typealias StackFrameImageNameResolver = (_ instructionPointer: UInt64, _ parsedImageName: String?) -> String?
@@ -120,6 +134,26 @@ struct StacktraceImageReferences {
 }
 
 
+// MARK: - Stacktrace initialization
+
+extension Stacktrace {
+
+    /// Creates a stacktrace from a single, already-formatted verbatim string.
+    ///
+    /// Use this for explicitly-supplied stacks (for example cross-platform
+    /// JavaScript/Dart stacks bridged from React Native or Flutter) that must be
+    /// emitted exactly as provided, without re-deriving or reformatting frames.
+    /// ``formatted`` then returns the original string unchanged, preserving it as
+    /// the raw symbolication input.
+    ///
+    /// - Parameter raw: The verbatim stacktrace string to emit unmodified.
+    init(raw: String) {
+        frames = [raw]
+        isVerbatim = true
+    }
+}
+
+
 // MARK: - Stacktrace formatting
 
 extension Stacktrace {
@@ -128,6 +162,12 @@ extension Stacktrace {
     }
 
     var parsedFrames: [StackFrame] {
+        // A verbatim stack is not native `Thread.callStackSymbols` output, so
+        // parsing it would fabricate a single bogus frame. Skip it entirely.
+        guard !isVerbatim else {
+            return []
+        }
+
         var output: [StackFrame] = []
 
         for (index, frame) in frames.enumerated() {
@@ -146,7 +186,14 @@ extension Stacktrace {
     }
 
     func threadList(resolvingImageNamesWith imageNameResolver: StackFrameImageNameResolver? = nil) -> String? {
-        threadList(from: parsedFrames, resolvingImageNamesWith: imageNameResolver)
+        // Verbatim stacks (e.g. bridged JS/Dart) carry no native thread info.
+        // Returning nil here keeps the explicit-stack path truly verbatim and
+        // avoids the parsing/JSON work of building a synthetic thread list.
+        guard !isVerbatim else {
+            return nil
+        }
+
+        return threadList(from: parsedFrames, resolvingImageNamesWith: imageNameResolver)
     }
 
     func threadList(

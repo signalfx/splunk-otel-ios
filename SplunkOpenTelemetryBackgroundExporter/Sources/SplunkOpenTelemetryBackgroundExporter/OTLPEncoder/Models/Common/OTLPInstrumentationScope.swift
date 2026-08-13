@@ -101,8 +101,8 @@ struct OTLPInstrumentationScope: Encodable {
         }
 
         // Only encode droppedAttributesCount if it's non-zero
-        if let count = droppedAttributesCount, count > 0 {
-            try container.encode(count, forKey: .droppedAttributesCount)
+        if let droppedAttributesCount, droppedAttributesCount > 0 {
+            try container.encode(droppedAttributesCount, forKey: .droppedAttributesCount)
         }
     }
 }
