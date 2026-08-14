@@ -31,12 +31,13 @@ only be expected from iOS/iPadOS.
 If the Host App has no iOS/iPadOS app target at all, report that adding the SDK
 will not produce RUM instrumentation for that app.
 
-In shared iOS/macOS or watch-host projects, inspect target membership before
-editing. Choose a startup file owned exclusively by the iOS/iPadOS target as
-the insertion point. Do not add Splunk imports or calls to files compiled by
-macOS, watchOS, tvOS, or visionOS targets — the SDK maps those platforms to
-`.unsupported` or `.compileOnly`, and Session Replay APIs import UIKit, making
-them invalid on those targets regardless of runtime scope.
+In shared multi-platform projects, inspect target membership before editing.
+Choose a startup file owned exclusively by the iOS/iPadOS target as the
+insertion point. Do not add Splunk imports or calls to files owned only by
+macOS, watchOS, tvOS, visionOS, or Mac Catalyst targets: current source maps
+them to `.unsupported` or `.compileOnly`, so they do not produce RUM telemetry.
+Session Replay UI APIs also require UIKit and cannot be placed in files for
+targets without UIKit.
 
 ## Dependency and product
 

@@ -35,7 +35,8 @@ machine.
 
 Confirm `DEBUG_INFORMATION_FORMAT = dwarf-with-dsym` for release/archive
 builds. If the setting is `dwarf` only, there may be no `.dSYM` bundles to
-upload.
+upload. Also confirm `DEBUG_INFORMATION_VERSION = dwarf4`; Splunk RUM does not
+currently support DWARF 5 dSYMs.
 
 Upload app and framework dSYMs that are available:
 
@@ -47,6 +48,12 @@ Upload app and framework dSYMs that are available:
 - Apple system framework frames are not currently symbolicated by Splunk RUM;
   do not present unsymbolicated system frames as a customer setup failure.
 
+Before either upload path, tell the user that dSYMs can contain source paths and
+other build metadata, and that Splunk RUM stores uploads permanently and cannot
+currently delete them. Reconfirm the realm and exact release/archive dSYM
+input, then obtain explicit approval immediately before uploading. Use a dry
+run when the selected input is uncertain.
+
 ### Upload with `splunk-rum`
 
 Prefer `splunk-rum` as the customer-facing upload tool when it is available.
@@ -55,6 +62,10 @@ or CI setup instructions when the current public installation path is unclear.
 
 Use environment variables or CI secrets, not literal tokens in tracked files or
 shared logs:
+
+`SPLUNK_ACCESS_TOKEN` must contain an organization access token with `API token`
+authorization scope and the `power` role, not the RUM access token used by the
+app at runtime.
 
 ```text
 SPLUNK_REALM
@@ -94,6 +105,9 @@ This token-name difference is intentional in the current tools:
 
 - `splunk-rum`: `SPLUNK_ACCESS_TOKEN`
 - `upload-dsyms.sh`: `SPLUNK_API_ACCESS_TOKEN`
+
+Both variables require the organization API access token described above;
+neither accepts the app's RUM access token.
 
 Do not put literal API tokens in tracked snippets. Treat direct `--token`
 examples in docs as illustrative, not safe defaults.

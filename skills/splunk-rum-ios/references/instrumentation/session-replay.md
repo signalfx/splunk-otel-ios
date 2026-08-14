@@ -50,15 +50,16 @@ let agent = try SplunkRum.install(
 ```
 
 Sampling is decided once per agent lifecycle and is not re-evaluated on session
-rotation. `nil` means equivalent to `1.0`; values outside `<0, 1>` are clamped.
-If `enabled` is `false`, `start()` does nothing. If the launch is sampled out,
-state should report `.notRecording(.disabledBySampling)`.
+rotation. `nil` is equivalent to `1.0`; values below `0` or above `1` are
+clamped. If `enabled` is `false`, `start()` does nothing. If the launch is
+sampled out, state should report `.notRecording(.disabledBySampling)`.
 
-Deferred endpoint setup can still leave Session Replay operational at install.
-When endpoint configuration is added later with `updateEndpoint(_:)`, cached
-replay chunks can flush. Do not tell users Session Replay cannot be enabled
-without immediate endpoint values; do report that backend confirmation requires
-an endpoint and public access.
+Swift deferred endpoint setup can still leave Session Replay operational at
+install. When endpoint configuration is added later with `updateEndpoint(_:)`,
+cached replay chunks can flush. Do not tell Swift users Session Replay cannot be
+enabled without immediate endpoint values; do report that backend confirmation
+requires an endpoint and public access. Objective-C integrations must provide
+the endpoint at install; see `../install/endpoint-and-runtime-state.md`.
 
 If a custom endpoint is approved and Session Replay is enabled, a custom trace
 endpoint alone is not enough for Session Replay upload. `EndpointConfiguration`

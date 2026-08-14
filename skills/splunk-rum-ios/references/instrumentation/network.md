@@ -57,5 +57,8 @@ Authorization Cookie Set-Cookie X-SF-Token X-API-Key API-Key Session-Token
 add non-sensitive names such as `Content-Type` or a request correlation header
 after approval.
 
-Trace-header injection can affect downstream systems. Treat changes as
-configuration work and call out compatibility risks.
+In Swift, `NetworkInstrumentationConfiguration.injectTraceHeaders` controls
+trace-header injection. Changes can affect downstream systems, so treat them as
+configuration work and call out compatibility risks. The Objective-C bridge
+does not expose an equivalent setting; report that gap instead of inventing a
+selector.

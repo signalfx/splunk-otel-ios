@@ -60,12 +60,12 @@ If no version control is present, recommend creating a checkpoint before edits.
   narrow native iOS subtopics.
 - Choose an iOS/iPadOS-owned target and startup file as the insertion point.
   Do not add Splunk imports or instrumentation calls to files compiled by
-  macOS, watchOS, tvOS, or visionOS targets unless inspection confirms the
-  public API and imports are valid for that target and the user explicitly
-  requested that scope. Do not add broad `#if os(iOS)` platform fences as a
-  substitute for choosing the right file — use target-specific insertion
-  instead. If non-iOS Apple targets are relevant, give a light note that RUM
-  telemetry is expected only from iOS/iPadOS instrumentation.
+  macOS, watchOS, tvOS, visionOS, or Mac Catalyst targets unless inspection
+  confirms the public API and imports are valid for that target and the user
+  explicitly requested that scope. Do not add broad `#if os(iOS)` platform
+  fences as a substitute for choosing the right file — use target-specific
+  insertion instead. If non-iOS Apple targets are relevant, give a light note
+  that RUM telemetry is expected only from iOS/iPadOS instrumentation.
 - Do not add endpoint URLs by default. Use the Host App's existing configuration
   mechanism; defer setup only when the public API provides a safe update path.
 - Gate Session Replay, WebView bridging, network header capture, endpoint

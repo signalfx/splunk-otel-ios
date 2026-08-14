@@ -12,9 +12,11 @@ static checks when useful.
 5. Safe local signal exercise
 6. Backend — only with user-provided public Splunk access
 
-Deferred setup needs no credentials to build. A launch still persists telemetry;
-use an approved non-production endpoint or delete the disposable simulator
-installation before configuring a real endpoint.
+Swift deferred setup needs no credentials to build. A Swift launch without an
+endpoint still persists telemetry; use an approved non-production endpoint or
+delete the disposable simulator installation before configuring a real
+endpoint. Objective-C integrations must provide the endpoint at install; see
+`install/endpoint-and-runtime-state.md`.
 
 ## Build and launch
 
