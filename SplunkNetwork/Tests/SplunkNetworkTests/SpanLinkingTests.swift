@@ -100,14 +100,26 @@ final class SpanLinkingTests: XCTestCase {
 
     // MARK: - Tests
 
-    func testAddLinkToSpan_ValidTraceParent() {
+    func testAddLinkToSpan_ValidTraceParent_AllLevelTwoFlags() {
+        for traceFlags in ["00", "01", "02", "03"] {
+            let mockSpan = MockSpan()
+            let valStr = "traceparent;desc='00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-\(traceFlags)'"
+
+            addLinkToSpan(span: mockSpan, valStr: valStr)
+
+            XCTAssertEqual(mockSpan.attributes[NetworkSpanAttributeKeys.linkTraceId]?.description, "0af7651916cd43dd8448eb211c80319c")
+            XCTAssertEqual(mockSpan.attributes[NetworkSpanAttributeKeys.linkSpanId]?.description, "b7ad6b7169203331")
+        }
+    }
+
+    func testAddLinkToSpan_InvalidTraceFlags() {
         let mockSpan = MockSpan()
-        let valStr = "traceparent;desc='00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01'"
+        let valStr = "traceparent;desc='00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-0g'"
 
         addLinkToSpan(span: mockSpan, valStr: valStr)
 
-        XCTAssertEqual(mockSpan.attributes[NetworkSpanAttributeKeys.linkTraceId]?.description, "0af7651916cd43dd8448eb211c80319c")
-        XCTAssertEqual(mockSpan.attributes[NetworkSpanAttributeKeys.linkSpanId]?.description, "b7ad6b7169203331")
+        XCTAssertNil(mockSpan.attributes[NetworkSpanAttributeKeys.linkTraceId])
+        XCTAssertNil(mockSpan.attributes[NetworkSpanAttributeKeys.linkSpanId])
     }
 
     func testAddLinkToSpan_ValidTraceParent_DoubleQuotes() {
