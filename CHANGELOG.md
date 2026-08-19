@@ -15,6 +15,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+* Added `skills/splunk-rum-ios/` — a skill bundle for coding agents instrumenting customer iOS apps with Splunk RUM. Covers install, endpoint setup, navigation, network, Session Replay, Objective-C, dSYM, and verification workflows.
 * Session Replay segment metadata now includes a `userActivity` field containing Unix-millisecond timestamps of user interactions that occurred during the segment window, enabling timeline visualization in the backend. Timestamps are only collected while Session Replay is recording; disabling `InteractionsConfiguration` does not affect Session Replay segment recording but does prevent user-activity timestamps from being collected because they originate from the Interactions detector. #646
 * Added `customTracking.trackError(typeName:message:stacktrace:attributes:)` for reporting an error with an explicitly supplied stacktrace. Unlike the existing `trackError` overloads, the supplied stack is emitted verbatim as `exception.stacktrace` (no native stack is derived) and the resulting `component=error` span is named after `typeName` (falling back to `"error"`). This is the native emission path for caught JavaScript/Dart errors bridged from the React Native and Flutter agents. A matching Objective-C selector (`trackErrorWithType:message:stacktrace:attributes:`) is also available.
 
