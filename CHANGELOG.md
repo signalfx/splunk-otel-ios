@@ -12,6 +12,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 * Deployment environment resources now use the OpenTelemetry `deployment.environment.name` attribute instead of `deployment.environment`
+* Replaced the external PLCrashReporter package dependency with the SDK-owned, symbol-prefixed `SplunkCrashReporter` implementation.
 
 ### Added
 

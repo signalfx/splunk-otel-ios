@@ -55,7 +55,7 @@ ALL_PLATFORMS=(
 )
 
 # Platforms excluding visionOS (5 destinations)
-# Used for SplunkCrashReports (PLCrashReporter does not support visionOS)
+# Used for SplunkCrashReporter and SplunkCrashReports (crash reporting does not support visionOS)
 NO_VISIONOS_PLATFORMS=(
     "ios|generic/platform=iOS"
     "ios-simulator|generic/platform=iOS Simulator"
@@ -86,13 +86,14 @@ IOS_PLATFORMS=(
 #   7. SplunkAgentObjC (depends on SplunkAgent)
 
 # Build order (dependencies first) and platform matrix.
-# SplunkCrashReports uses NO_VISIONOS; all others use ALL.
+# SplunkCrashReporter and SplunkCrashReports use NO_VISIONOS; all others use ALL.
 BUILD_ORDER=(
     SplunkCommon
     SplunkNavigation
     SplunkNetwork
     SplunkNetworkMonitor
     SplunkSlowFrameDetector
+    SplunkCrashReporter
     SplunkCrashReports
     SplunkOpenTelemetryBackgroundExporter
     SplunkOpenTelemetry
@@ -108,7 +109,7 @@ BUILD_ORDER=(
 
 # Modules that use restricted platforms (no visionOS).
 # All modules NOT listed here use ALL_PLATFORMS.
-NO_VISIONOS_MODULES="SplunkCrashReports"
+NO_VISIONOS_MODULES="SplunkCrashReporter SplunkCrashReports"
 
 
 # ---------------------------------------------------------------------------

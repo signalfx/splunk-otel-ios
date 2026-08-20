@@ -51,7 +51,7 @@ REQUIRED_FRAMEWORKS=(
     "SplunkCommon"
     "OpenTelemetryApi"
     "OpenTelemetrySdk"
-    "CrashReporter"
+    "SplunkCrashReporter"
     "CiscoLogger"
     "CiscoSessionReplay"
 )
