@@ -22,6 +22,43 @@ import XCTest
 
 final class SessionReplayAPI10TypeConversionsTests: XCTestCase {
 
+    // MARK: - Interaction capture
+
+    func testInteractionCaptureToModuleConversion() {
+        let proxyPreferences = SessionReplayPreferences()
+        proxyPreferences.interactionCapture.isKeyboardEnabled = false
+        proxyPreferences.interactionCapture.isTouchEnabled = true
+        proxyPreferences.interactionCapture.isGestureEnabled = false
+        proxyPreferences.interactionCapture.isFocusEnabled = true
+        proxyPreferences.interactionCapture.isRageTapEnabled = false
+
+        let modulePreferences = SplunkSessionReplayPreferences(preferences: proxyPreferences)
+
+        XCTAssertFalse(modulePreferences.interactionCapture.isKeyboardEnabled)
+        XCTAssertTrue(modulePreferences.interactionCapture.isTouchEnabled)
+        XCTAssertFalse(modulePreferences.interactionCapture.isGestureEnabled)
+        XCTAssertTrue(modulePreferences.interactionCapture.isFocusEnabled)
+        XCTAssertFalse(modulePreferences.interactionCapture.isRageTapEnabled)
+    }
+
+    func testInteractionCaptureToProxyConversion() {
+        let modulePreferences = SplunkSessionReplayPreferences(renderingMode: .default)
+        modulePreferences.interactionCapture.isKeyboardEnabled = true
+        modulePreferences.interactionCapture.isTouchEnabled = false
+        modulePreferences.interactionCapture.isGestureEnabled = true
+        modulePreferences.interactionCapture.isFocusEnabled = false
+        modulePreferences.interactionCapture.isRageTapEnabled = true
+
+        let proxyPreferences = SessionReplayPreferences(srPreferences: modulePreferences)
+
+        XCTAssertTrue(proxyPreferences.interactionCapture.isKeyboardEnabled)
+        XCTAssertFalse(proxyPreferences.interactionCapture.isTouchEnabled)
+        XCTAssertTrue(proxyPreferences.interactionCapture.isGestureEnabled)
+        XCTAssertFalse(proxyPreferences.interactionCapture.isFocusEnabled)
+        XCTAssertTrue(proxyPreferences.interactionCapture.isRageTapEnabled)
+    }
+
+
     // MARK: - Rendering mode
 
     func testRenderingModesToProxyConversion() {

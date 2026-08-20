@@ -25,7 +25,9 @@ extension SessionReplayNonOperational {
         get {
             logAccess(toApi: #function)
 
-            return SessionReplayPreferences()
+            return SessionReplayPreferences(
+                interactionCapture: SessionReplayNonOperationalCapture(logger: logger)
+            )
         }
 
         // swiftlint:disable unused_setter_value
