@@ -87,6 +87,8 @@ func startHttpSpan(request: URLRequest?) -> Span? {
 /// - Parameters:
 ///   - span: The span to end.
 ///   - task: The completed URL session task.
+///   - fallbackResponse: A response supplied by the completion handler when the task has no response.
+///   - fallbackError: An error supplied by the completion handler when the task has no error.
 func endHttpSpan(
     span: Span,
     task: URLSessionTask,

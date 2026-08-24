@@ -35,15 +35,16 @@ final class NetworkSpanFinalizationCoordinatorTests: XCTestCase {
         let group = DispatchGroup()
         for index in 0 ..< 100 {
             group.enter()
-            DispatchQueue.global().async {
-                if index.isMultiple(of: 2) {
-                    coordinator.finalize(task: task)
+            DispatchQueue.global()
+                .async {
+                    if index.isMultiple(of: 2) {
+                        coordinator.finalize(task: task)
+                    }
+                    else {
+                        coordinator.finalize(response: task.response, error: task.error)
+                    }
+                    group.leave()
                 }
-                else {
-                    coordinator.finalize(response: task.response, error: task.error)
-                }
-                group.leave()
-            }
         }
 
         XCTAssertEqual(group.wait(timeout: .now() + 5), .success)
