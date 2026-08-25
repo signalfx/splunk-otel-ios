@@ -7,6 +7,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+* Increased the periodic in-memory trace batch drain interval from 0.5 seconds to 5 seconds, allowing more spans to be persisted together while retaining the 100-span immediate drain threshold and lifecycle drains.
+
 ### Fixed
 
 * Fixed Server-Timing `traceparent` parsing to support bitmask trace flags, including the W3C random trace ID flag.

@@ -42,7 +42,7 @@ struct OTLPBatchSpanProcessor: SpanProcessor {
         static let maxExportBatchSize = 100
 
         /// Interval between periodic flushes of the in-memory batch.
-        static let scheduleDelay: TimeInterval = 0.5
+        static let scheduleDelay: TimeInterval = 5
 
         /// Maximum number of spans held in memory; spans arriving while the queue is full are dropped.
         static let maxQueueSize = 2_048
