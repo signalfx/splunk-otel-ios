@@ -52,7 +52,12 @@ agent.sessionReplay.preferences.renderingMode = SPLKRenderingMode.wireframeOnly;
 Only after explicit approval and all applicable privacy controls are in place:
 
 ```objc
-[agent.sessionReplay start];
+dispatch_async(dispatch_get_main_queue(), ^{
+    [agent.sessionReplay start];
+});
 ```
+
+Run Session Replay recording controls on the main queue. Apply the same rule to
+`stop` when pausing recording.
 
 Do not add a Swift wrapper only to configure Session Replay.

@@ -74,15 +74,19 @@ setup has a separate optional `sessionReplay` URL.
 
 ## Recording control and state
 
-After approval, start and stop through the retained agent:
+After approval, start and stop through the retained agent. Run both calls on the
+main actor because Session Replay control uses UIKit-backed recording. If
+approval or runtime configuration arrives off-main, hop to the main actor
+before invoking the selected control:
 
 ```swift
-agent.sessionReplay.start()
-agent.sessionReplay.stop()
+Task { @MainActor in
+    agent.sessionReplay.start()
+}
 ```
 
-`stop()` is mainly for pausing recording; app exit does not require an explicit
-stop call.
+Apply the same main-actor requirement to `stop()`. It is mainly for pausing
+recording; app exit does not require an explicit stop call.
 
 State API:
 

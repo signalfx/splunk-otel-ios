@@ -60,9 +60,11 @@ no credentials for this check. After the build passes, deliver this handoff and
 verification steps.**
 
 For Swift deferred setup, tell the user the agent is installed and will start,
-but telemetry remains queued until an endpoint is configured. Ask which
-existing Host App runtime configuration mechanism supplies both realm and
-token, then wire its values into `EndpointConfiguration` and call the throwing
+but telemetry is buffered only on a bounded, best-effort basis until an
+endpoint is configured. Configure the endpoint promptly because in-memory or
+disk limits and process termination can cause data loss. Ask which existing
+Host App runtime configuration mechanism supplies both realm and token, then
+wire its values into `EndpointConfiguration` and call the throwing
 `updateEndpoint(_:)` path above. Surface only a generic failure signal.
 
 For Objective-C, identify the existing configuration mechanism before
