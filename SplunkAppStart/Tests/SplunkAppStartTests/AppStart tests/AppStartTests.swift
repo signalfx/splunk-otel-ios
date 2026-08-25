@@ -164,7 +164,7 @@ final class AppStartTests: XCTestCase {
         appStart.install(with: nil, remoteConfiguration: nil)
 
         // Process started long ago; didFinishLaunching was never observed (nil)
-        appStart.processStartTimestamp = Date().addingTimeInterval(-3600.0)
+        appStart.processStartTimestamp = Date().addingTimeInterval(-3_600.0)
 
         // Only willEnterForeground and didBecomeActive arrive (didFinishLaunching was missed)
         simulateWarmStartNotifications()
@@ -183,13 +183,16 @@ final class AppStartTests: XCTestCase {
         appStart.install(with: nil, remoteConfiguration: nil)
 
         // Process started hours ago
-        appStart.processStartTimestamp = Date().addingTimeInterval(-3600.0)
+        appStart.processStartTimestamp = Date().addingTimeInterval(-3_600.0)
         // didFinishLaunching occurred only 1 second ago (would not have triggered the old check)
         appStart.didFinishLaunchingTimestamp = Date().addingTimeInterval(-1.0)
 
         simulateWarmStartNotifications()
 
-        XCTAssertTrue(appStart.backgroundLaunchDetected == true, "backgroundLaunchDetected should be true based on processStartTimestamp even when didFinishLaunching is recent")
+        XCTAssertTrue(
+            appStart.backgroundLaunchDetected == true,
+            "backgroundLaunchDetected should be true based on processStartTimestamp even when didFinishLaunching is recent"
+        )
         try checkDeterminedType(.warm, in: destination)
     }
 
