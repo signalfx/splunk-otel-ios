@@ -13,6 +13,12 @@ content, existing masking, sampling, and storage implications. Keep start/stop
 snippets out of `SKILL.md`, fresh-install defaults, and default local
 signal generation.
 
+Apply every approved privacy control needed for content that can be visible
+when recording begins before calling `start()`. Configure class-level
+sensitivity, rendering mode, and recording masks first. Set instance
+sensitivity before the view can appear in a recording; if that cannot be
+guaranteed, delay `start()` until it is configured.
+
 ## Public API boundary
 
 Use Splunk RUM public APIs, not underlying implementation-only APIs, in

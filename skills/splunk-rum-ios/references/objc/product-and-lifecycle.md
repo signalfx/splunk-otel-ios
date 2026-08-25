@@ -13,7 +13,7 @@ Before `apply`, get the endpoint, app name, and deployment environment from the
 Host App's existing configuration mechanism or the user; never write
 placeholders. If no endpoint is available, report that the current public ObjC
 API has no safe deferred update path and stop. Redact `NSError`; see
-`endpoint-and-runtime-state.md`.
+[endpoint and runtime state](../install/endpoint-and-runtime-state.md).
 
 ```objc
 @import SplunkAgentObjC;
