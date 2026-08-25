@@ -10,6 +10,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Fixed
 
 * Fixed Server-Timing `traceparent` parsing to support bitmask trace flags, including the W3C random trace ID flag.
+* Fixed background launch detection using an inconsistent reference timestamp, which could cause multi-hour cold-start spans when a process was prewarmed or background-launched before the SDK registered its lifecycle listeners.
 
 ## [2.4.1] - 2026-08-13
 
