@@ -14,6 +14,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Fixed
 
 * Fixed Server-Timing `traceparent` parsing to support bitmask trace flags, including the W3C random trace ID flag.
+* Fixed URLSession network span finalization races that could drop Server-Timing links and response attributes, duplicate attribute processing, or end spans on nonterminal task states.
 
 ## [2.4.1] - 2026-08-13
 
