@@ -133,6 +133,8 @@ final class AppStartTests: XCTestCase {
     /// The backgroundLaunchDetected flag should be automatically set to true
     /// because more than 10 seconds have passed since didFinishLaunching,
     /// resulting in a warm start instead of a cold start with hours-long duration.
+    /// Tests timing-based background launch detection using processStartTimestamp as the reference.
+    /// Simulates an app whose process was created more than 10 seconds before the user opened it.
     func testBackgroundLaunchDetectedByTiming() throws {
         let destination = DebugDestination()
 
@@ -140,21 +142,55 @@ final class AppStartTests: XCTestCase {
         appStart.destination = destination
         appStart.install(with: nil, remoteConfiguration: nil)
 
-        // Simulate didFinishLaunching happened more than 10 seconds ago
-        // (app was launched in background and stayed there)
-        appStart.didFinishLaunchingTimestamp = Date().addingTimeInterval(-15.0)
+        // Process was created more than 10 seconds ago (prewarmed or background-launched)
+        appStart.processStartTimestamp = Date().addingTimeInterval(-15.0)
 
-        // Now simulate user bringing app to foreground
-        // The willEnterForeground handler should detect this as a background launch
-        // because more than 10 seconds have passed since didFinishLaunching
         simulateWarmStartNotifications()
 
-        // Verify backgroundLaunchDetected was set to true by the timing check
         XCTAssertTrue(appStart.backgroundLaunchDetected == true, "backgroundLaunchDetected should be true due to timing check")
 
         // Should be warm start, NOT cold start
         try checkDeterminedType(.warm, in: destination)
         try checkDates(in: destination)
+    }
+
+    /// Tests Scenario 1: didFinishLaunching was missed (SDK registered too late), but processStartTimestamp
+    /// is old enough to trigger the background launch safeguard.
+    func testBackgroundLaunchDetectedWhenDidFinishLaunchingMissed() throws {
+        let destination = DebugDestination()
+
+        let appStart = AppStart()
+        appStart.destination = destination
+        appStart.install(with: nil, remoteConfiguration: nil)
+
+        // Process started long ago; didFinishLaunching was never observed (nil)
+        appStart.processStartTimestamp = Date().addingTimeInterval(-3600.0)
+
+        // Only willEnterForeground and didBecomeActive arrive (didFinishLaunching was missed)
+        simulateWarmStartNotifications()
+
+        XCTAssertTrue(appStart.backgroundLaunchDetected == true, "backgroundLaunchDetected should be true even when didFinishLaunching was missed")
+        try checkDeterminedType(.warm, in: destination)
+    }
+
+    /// Tests Scenario 2: didFinishLaunching is present but occurred only moments before
+    /// willEnterForeground, while processStartTimestamp is hours earlier.
+    func testBackgroundLaunchDetectedWhenDidFinishLaunchingLateButProcessStartOld() throws {
+        let destination = DebugDestination()
+
+        let appStart = AppStart()
+        appStart.destination = destination
+        appStart.install(with: nil, remoteConfiguration: nil)
+
+        // Process started hours ago
+        appStart.processStartTimestamp = Date().addingTimeInterval(-3600.0)
+        // didFinishLaunching occurred only 1 second ago (would not have triggered the old check)
+        appStart.didFinishLaunchingTimestamp = Date().addingTimeInterval(-1.0)
+
+        simulateWarmStartNotifications()
+
+        XCTAssertTrue(appStart.backgroundLaunchDetected == true, "backgroundLaunchDetected should be true based on processStartTimestamp even when didFinishLaunching is recent")
+        try checkDeterminedType(.warm, in: destination)
     }
 
     func testHotStart() throws {

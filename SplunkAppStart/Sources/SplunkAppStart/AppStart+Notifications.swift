@@ -54,11 +54,12 @@ extension AppStart {
                 let currentState = UIApplication.shared.applicationState
                 let isCurrentlyInBackground = currentState == .background
 
-                // If more than `backgroundLaunchThreshold` seconds have passed since didFinishLaunching,
+                // If more than `backgroundLaunchThreshold` seconds have passed since process creation,
                 // the app was likely running in background before coming to foreground
                 var significantDelayFromLaunch = false
-                if let launchTime = self.didFinishLaunchingTimestamp {
-                    significantDelayFromLaunch = Date().timeIntervalSince(launchTime) > self.backgroundLaunchThreshold
+                let referenceTime = self.processStartTimestamp ?? self.didFinishLaunchingTimestamp
+                if let referenceTime {
+                    significantDelayFromLaunch = Date().timeIntervalSince(referenceTime) > self.backgroundLaunchThreshold
                 }
 
                 if isCurrentlyInBackground || significantDelayFromLaunch {
