@@ -11,9 +11,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 * Increased the periodic in-memory trace batch drain interval from 0.5 seconds to 5 seconds, allowing more spans to be persisted together while retaining the 100-span immediate drain threshold and lifecycle drains.
 
+### Added
+
+* Added `skills/splunk-rum-ios/` — a skill bundle for coding agents instrumenting customer iOS apps with Splunk RUM. Covers install, endpoint setup, navigation, network, Session Replay, Objective-C, dSYM, and verification workflows.
+
 ### Fixed
 
 * Fixed Server-Timing `traceparent` parsing to support bitmask trace flags, including the W3C random trace ID flag.
+* Fixed URLSession network span finalization races that could drop Server-Timing links and response attributes, duplicate attribute processing, or end spans on nonterminal task states.
 
 ## [2.4.1] - 2026-08-13
 
