@@ -55,6 +55,43 @@ final class SessionReplayAPI10NoOpProxyTests: XCTestCase {
     }
 
 
+    // MARK: - Interaction capture
+
+    func testInteractionCapture() {
+        let capture = moduleProxy.preferences.interactionCapture
+
+        capture.disableAll()
+
+        XCTAssertFalse(capture.isKeyboardEnabled)
+        XCTAssertFalse(capture.isTouchEnabled)
+        XCTAssertFalse(capture.isGestureEnabled)
+        XCTAssertFalse(capture.isFocusEnabled)
+        XCTAssertFalse(capture.isRageTapEnabled)
+
+        capture.enableAll()
+
+        XCTAssertFalse(capture.isKeyboardEnabled)
+        XCTAssertFalse(capture.isTouchEnabled)
+        XCTAssertFalse(capture.isGestureEnabled)
+        XCTAssertFalse(capture.isFocusEnabled)
+        XCTAssertFalse(capture.isRageTapEnabled)
+    }
+
+    func testInteractionCaptureOutlivesModule() {
+        weak var moduleReference: SessionReplayNonOperational?
+        let capture: any SessionReplayModuleInteractionCapture
+
+        do {
+            let module = SessionReplayTestBuilder.buildNonOperational()
+            moduleReference = module
+            capture = module.preferences.interactionCapture
+        }
+
+        XCTAssertNil(moduleReference)
+        XCTAssertFalse(capture.isKeyboardEnabled)
+    }
+
+
     // MARK: - State
 
     func testState() {

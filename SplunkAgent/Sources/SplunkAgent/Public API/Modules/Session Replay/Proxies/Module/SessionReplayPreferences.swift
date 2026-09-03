@@ -28,30 +28,24 @@ import Foundation
 ///
 /// - Note: If you want to set up a parameter, you can change the appropriate property
 ///         or use the proper method. Both approaches are comparable and give the same result.
-public final class SessionReplayPreferences: SessionReplayModulePreferences, Codable {
+public final class SessionReplayPreferences: SessionReplayModulePreferences {
 
     // MARK: - Internal
 
-    unowned var module: CiscoSessionReplay.SessionReplay?
-
-
-    // MARK: - Initialization
-
-    required init() {
-        module = nil
+    unowned var module: CiscoSessionReplay.SessionReplay? {
+        didSet {
+            (interactionCapture as? SessionReplayInteractionCapture)?.module = module
+        }
     }
 
-    init(for module: CiscoSessionReplay.SessionReplay?) {
-        self.module = module
-        renderingMode = RenderingMode(with: module?.preferences.renderingMode)
-    }
+    // MARK: - Interaction capture
 
-
-    // MARK: - Codable
-
-    private enum CodingKeys: String, CodingKey {
-        case renderingMode
-    }
+    /// Configuration that controls which detected interaction categories are captured.
+    ///
+    /// All categories are enabled by default. Updating this object affects only
+    /// interactions received after the change.
+    public private(set) lazy var interactionCapture: any SessionReplayModuleInteractionCapture =
+        SessionReplayInteractionCapture(for: module)
 
 
     // MARK: - Rendering
@@ -79,6 +73,81 @@ public final class SessionReplayPreferences: SessionReplayModulePreferences, Cod
 
         return self
     }
+
+
+    // MARK: - Initialization
+
+    init(
+        for module: CiscoSessionReplay.SessionReplay? = nil,
+        interactionCapture: (any SessionReplayModuleInteractionCapture)? = nil
+    ) {
+        self.module = module
+        renderingMode = module?.preferences.renderingMode.map(RenderingMode.init(with:))
+
+        if let interactionCapture {
+            self.interactionCapture = interactionCapture
+        }
+    }
+}
+
+
+extension SessionReplayPreferences: Codable {
+
+    // MARK: - Codable
+
+    private enum CodingKeys: String, CodingKey {
+        case renderingMode
+        case interactionCapture
+    }
+
+    private struct InteractionCaptureState: Codable {
+        let isKeyboardEnabled: Bool
+        let isTouchEnabled: Bool
+        let isGestureEnabled: Bool
+        let isFocusEnabled: Bool
+        let isRageTapEnabled: Bool
+
+        init(_ capture: any SessionReplayModuleInteractionCapture) {
+            isKeyboardEnabled = capture.isKeyboardEnabled
+            isTouchEnabled = capture.isTouchEnabled
+            isGestureEnabled = capture.isGestureEnabled
+            isFocusEnabled = capture.isFocusEnabled
+            isRageTapEnabled = capture.isRageTapEnabled
+        }
+
+        init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+
+            isKeyboardEnabled = try container.decodeIfPresent(Bool.self, forKey: .isKeyboardEnabled) ?? true
+            isTouchEnabled = try container.decodeIfPresent(Bool.self, forKey: .isTouchEnabled) ?? true
+            isGestureEnabled = try container.decodeIfPresent(Bool.self, forKey: .isGestureEnabled) ?? true
+            isFocusEnabled = try container.decodeIfPresent(Bool.self, forKey: .isFocusEnabled) ?? true
+            isRageTapEnabled = try container.decodeIfPresent(Bool.self, forKey: .isRageTapEnabled) ?? true
+        }
+    }
+
+    public convenience init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        self.init()
+
+        renderingMode = try container.decodeIfPresent(RenderingMode.self, forKey: .renderingMode)
+
+        if let state = try container.decodeIfPresent(InteractionCaptureState.self, forKey: .interactionCapture) {
+            interactionCapture.isKeyboardEnabled = state.isKeyboardEnabled
+            interactionCapture.isTouchEnabled = state.isTouchEnabled
+            interactionCapture.isGestureEnabled = state.isGestureEnabled
+            interactionCapture.isFocusEnabled = state.isFocusEnabled
+            interactionCapture.isRageTapEnabled = state.isRageTapEnabled
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        try container.encodeIfPresent(renderingMode, forKey: .renderingMode)
+        try container.encode(InteractionCaptureState(interactionCapture), forKey: .interactionCapture)
+    }
 }
 
 
@@ -90,7 +159,7 @@ extension SessionReplayPreferences {
     ///
     /// - Parameter renderingMode: The ``RenderingMode`` to use for the session replay.
     public convenience init(renderingMode: RenderingMode) {
-        self.init(for: nil)
+        self.init()
 
         self.renderingMode = renderingMode
     }
