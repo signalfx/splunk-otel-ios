@@ -78,9 +78,9 @@ public class CrashReports {
 
     public func configureCrashReporter() {
         #if os(tvOS)
-            let signalHandlerType = PLCrashReporterSignalHandlerType.BSD
+            let signalHandlerType = SPLKPLCrashReporterSignalHandlerType.BSD
         #else
-            let signalHandlerType = PLCrashReporterSignalHandlerType.mach
+            let signalHandlerType = SPLKPLCrashReporterSignalHandlerType.mach
         #endif
 
         // Use an SDK-owned path so another crash reporter in the host app cannot read or
