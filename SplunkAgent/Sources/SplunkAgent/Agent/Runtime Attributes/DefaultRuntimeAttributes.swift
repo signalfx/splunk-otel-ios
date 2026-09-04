@@ -105,17 +105,7 @@ final class DefaultRuntimeAttributes: AgentRuntimeAttributes {
         accessQueue = DispatchQueue(label: queueName, qos: .userInitiated)
 
         let storage = UserDefaultsStorage()
-        let storageKeyForAppInstallationId = "app.installation.id"
-
-        // Retrieve or generate a persistent app installation ID
-        if let existingAppInstallationId: String = try? storage.read(forKey: storageKeyForAppInstallationId), !existingAppInstallationId.isEmpty {
-            appInstallationId = existingAppInstallationId
-        }
-        else {
-            let newId = String.uniqueHexIdentifier(ofLength: 32)
-            try? storage.update(newId, forKey: storageKeyForAppInstallationId)
-            appInstallationId = newId
-        }
+        appInstallationId = AppInstallationStorage.identifier(using: storage)
     }
 
 
