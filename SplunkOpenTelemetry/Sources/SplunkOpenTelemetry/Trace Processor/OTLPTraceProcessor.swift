@@ -153,7 +153,7 @@ public class OTLPTraceProcessor: TraceProcessor {
         resource.merge(with: configuration.resources)
 
         // Initialize processor
-        // Pools ended spans in memory and flushes a batch to the exporter every 5s or when
+        // Pools ended spans in memory and flushes a batch to the exporter every 1s or when
         // 100 spans accumulate, whichever is first (plus best-effort asynchronous drains on app
         // background/termination and a drain on shutdown).
         let spanProcessor = OTLPBatchSpanProcessor(spanExporter: spanInterceptorExporter)

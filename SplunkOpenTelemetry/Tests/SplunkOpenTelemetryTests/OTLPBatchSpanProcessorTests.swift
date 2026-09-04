@@ -49,10 +49,10 @@ struct OTLPBatchSpanProcessorTests {
     // MARK: - Interval trigger
 
     @Test
-    func defaultScheduleDelayIsFiveSeconds() {
+    func defaultScheduleDelayIsOneSecond() {
         let processor = OTLPBatchSpanProcessor(spanExporter: BatchProcessorTestExporter())
 
-        #expect(processor.core.scheduleDelay == 5)
+        #expect(processor.core.scheduleDelay == 1)
     }
 
     @Test
