@@ -18,44 +18,18 @@ limitations under the License.
 import Foundation
 internal import SplunkCommon
 
-struct DefaultResources: AgentResources {
+enum AppInstallationStorage {
 
-    // MARK: - App info
+    static let installationIdKey = "app.installation.id"
 
-    var appName: String
+    static func identifier(using storage: KeyValueStorage) -> String {
+        if let existingInstallationId: String = try? storage.read(forKey: installationIdKey),
+           !existingInstallationId.isEmpty {
+            return existingInstallationId
+        }
 
-    var appVersion: String
-
-    var appPreviousVersion: String?
-
-    var appBuild: String
-
-    var appDeploymentEnvironment: String
-
-
-    // MARK: - Agent info
-
-    var agentHybridType: String?
-
-    var agentVersion: String
-
-
-    // MARK: - Device info
-
-    var deviceID: String
-
-    var deviceModelIdentifier: String
-
-    var deviceManufacturer: String
-
-
-    // MARK: - OS info
-
-    var osName: String
-
-    var osVersion: String
-
-    var osDescription: String
-
-    var osType: String
+        let newInstallationId = String.uniqueHexIdentifier(ofLength: 32)
+        try? storage.update(newInstallationId, forKey: installationIdKey)
+        return newInstallationId
+    }
 }
