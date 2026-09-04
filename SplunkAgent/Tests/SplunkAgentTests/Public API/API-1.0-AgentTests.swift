@@ -16,8 +16,10 @@ limitations under the License.
 */
 
 import XCTest
+import OpenTelemetryApi
 
 @testable import SplunkAgent
+@testable import SplunkOpenTelemetry
 
 final class API10AgentTests: XCTestCase {
 
@@ -92,9 +94,35 @@ final class API10AgentTests: XCTestCase {
         XCTAssertTrue(agent === anotherAgentInstance)
     }
 
+    func testInstall_recordsVersionBeforeSampling() throws {
+        let storage = UserDefaultsStorage()
+        try? storage.delete(forKey: AppInstallationStorage.installationIdKey)
+        try? storage.delete(forKey: AppVersionTracker.storageKey)
+        defer {
+            try? storage.delete(forKey: AppInstallationStorage.installationIdKey)
+            try? storage.delete(forKey: AppVersionTracker.storageKey)
+        }
+
+        var sampledOutConfiguration = try ConfigurationTestBuilder.buildDefaultSampledOut()
+        sampledOutConfiguration.appVersion = "5.2.0"
+        _ = try SplunkRum.install(with: sampledOutConfiguration)
+
+        SplunkRum.resetSharedInstance()
+
+        var sampledInConfiguration = try ConfigurationTestBuilder.buildDefault()
+        sampledInConfiguration.appVersion = "5.3.0"
+        let installedAgent = try SplunkRum.install(with: sampledInConfiguration)
+        let eventManager = try XCTUnwrap(installedAgent.eventManager as? DefaultEventManager)
+        let logEventProcessor = try XCTUnwrap(eventManager.logEventProcessor as? OTLPLogToSpanEventProcessor)
+        let resource = try XCTUnwrap(logEventProcessor.resource)
+
+        XCTAssertEqual(resource.attributes["app.version"], .string("5.3.0"))
+        XCTAssertEqual(resource.attributes["app.previous_version"], .string("5.2.0"))
+    }
+
     // MARK: - Private methods
 
-    private func expectedAgentStatus() -> Status {
+    private func expectedAgentStatus() -> SplunkAgent.Status {
         let isSupportedPlatform = PlatformSupport.current.scope == .full
 
         return isSupportedPlatform ? .running : .notRunning(.unsupportedPlatform)

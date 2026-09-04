@@ -176,6 +176,10 @@ public class SplunkRum: ObservableObject {
             return shared
         }
 
+        // Record the installed version before session sampling so sampled-out launches still
+        // participate in version transition tracking.
+        AppVersionTracker.record(currentVersion: configuration.appVersion)
+
         // Re-configure and call the Session Sampler
         shared.sessionSampler.configure(with: configuration)
         let samplingDecision = shared.sessionSampler.sample()

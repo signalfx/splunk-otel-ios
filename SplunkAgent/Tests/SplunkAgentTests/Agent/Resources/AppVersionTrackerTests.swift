@@ -112,7 +112,8 @@ final class AppVersionTrackerTests: XCTestCase {
     // MARK: - Private methods
 
     private func tracker(for version: String) throws -> AppVersionTracker {
-        AppVersionTracker(currentVersion: version, storage: try XCTUnwrap(storage))
+        AppVersionTracker.record(currentVersion: version, storage: try XCTUnwrap(storage))
+        return AppVersionTracker(currentVersion: version, storage: try XCTUnwrap(storage))
     }
 
     private func clearStorage() {

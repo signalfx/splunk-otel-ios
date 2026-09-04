@@ -10,7 +10,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 * Set the periodic in-memory trace batch drain interval to 1 second, retaining the 100-span immediate drain threshold and lifecycle drains.
-* Added the optional `app.previous_version` resource attribute, which identifies the app version installed immediately before the current version for the same app installation.
+* Added the optional `app.previous_version` resource attribute, which identifies the app version installed immediately before the current version for the same app installation, including launches sampled out of telemetry.
 
 ### Added
 

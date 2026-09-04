@@ -155,6 +155,7 @@ final class ResourcesTests: XCTestCase {
 
         var firstConfiguration = try ConfigurationTestBuilder.buildDefault()
         firstConfiguration.appVersion = "5.1.3"
+        AppVersionTracker.record(currentVersion: firstConfiguration.appVersion)
         let firstAgent = try AgentTestBuilder.build(with: firstConfiguration)
         firstAgent.eventManager = try DefaultEventManager(with: firstConfiguration, agent: firstAgent)
 
@@ -166,6 +167,7 @@ final class ResourcesTests: XCTestCase {
 
         var upgradedConfiguration = firstConfiguration
         upgradedConfiguration.appVersion = "5.2.0"
+        AppVersionTracker.record(currentVersion: upgradedConfiguration.appVersion)
         let upgradedAgent = try AgentTestBuilder.build(with: upgradedConfiguration)
         upgradedAgent.eventManager = try DefaultEventManager(with: upgradedConfiguration, agent: upgradedAgent)
 

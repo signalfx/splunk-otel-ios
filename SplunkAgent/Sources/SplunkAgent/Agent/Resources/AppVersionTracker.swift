@@ -48,13 +48,32 @@ final class AppVersionTracker {
 
         if let storedState,
            storedState.installationId == installationId,
+           storedState.currentVersion == currentVersion {
+            previousVersion = Self.nonEmpty(storedState.previousVersion)
+        }
+        else {
+            previousVersion = nil
+        }
+    }
+
+    static func record(currentVersion: String, storage: KeyValueStorage = UserDefaultsStorage()) {
+        guard !currentVersion.isEmpty else {
+            return
+        }
+
+        let installationId = AppInstallationStorage.identifier(using: storage)
+        let storedState: StoredState? = try? storage.read(forKey: Self.storageKey)
+        let previousVersion: String?
+
+        if let storedState,
+           storedState.installationId == installationId,
            !storedState.currentVersion.isEmpty {
             if storedState.currentVersion == currentVersion {
                 previousVersion = Self.nonEmpty(storedState.previousVersion)
-                return
             }
-
-            previousVersion = storedState.currentVersion
+            else {
+                previousVersion = storedState.currentVersion
+            }
         }
         else {
             previousVersion = nil
