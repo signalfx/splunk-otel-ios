@@ -80,10 +80,10 @@ public protocol AgentResources {
     var osType: String { get }
 }
 
-public extension AgentResources {
+extension AgentResources {
 
     /// The default is absent when a previous application version is not available.
-    var appPreviousVersion: String? {
+    public var appPreviousVersion: String? {
         nil
     }
 }

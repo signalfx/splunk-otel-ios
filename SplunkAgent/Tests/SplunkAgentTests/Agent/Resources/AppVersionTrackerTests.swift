@@ -21,7 +21,7 @@ import XCTest
 
 final class AppVersionTrackerTests: XCTestCase {
 
-    private var storage: KeyValueStorage!
+    private var storage: KeyValueStorage?
 
 
     // MARK: - XCTestCase
@@ -85,15 +85,16 @@ final class AppVersionTrackerTests: XCTestCase {
 
     func testCleanReinstallHasNoPreviousVersion() throws {
         _ = try tracker(for: "5.2.0")
+        let testStorage = try XCTUnwrap(storage)
         let installationIdBeforeReinstall = try XCTUnwrap(
-            AppInstallationStorage.identifier(using: storage)
+            AppInstallationStorage.identifier(using: testStorage)
         )
 
         clearStorage()
 
         let reinstalled = try tracker(for: "5.3.0")
         let installationIdAfterReinstall = try XCTUnwrap(
-            AppInstallationStorage.identifier(using: storage)
+            AppInstallationStorage.identifier(using: testStorage)
         )
 
         XCTAssertNil(reinstalled.previousVersion)
@@ -112,12 +113,17 @@ final class AppVersionTrackerTests: XCTestCase {
     // MARK: - Private methods
 
     private func tracker(for version: String) throws -> AppVersionTracker {
-        AppVersionTracker.record(currentVersion: version, storage: try XCTUnwrap(storage))
-        return AppVersionTracker(currentVersion: version, storage: try XCTUnwrap(storage))
+        let storage = try XCTUnwrap(storage)
+        AppVersionTracker.record(currentVersion: version, storage: storage)
+        return AppVersionTracker(currentVersion: version, storage: storage)
     }
 
     private func clearStorage() {
-        try? storage?.delete(forKey: AppInstallationStorage.installationIdKey)
-        try? storage?.delete(forKey: AppVersionTracker.storageKey)
+        guard let storage else {
+            return
+        }
+
+        try? storage.delete(forKey: AppInstallationStorage.installationIdKey)
+        try? storage.delete(forKey: AppVersionTracker.storageKey)
     }
 }

@@ -23,8 +23,8 @@ enum AppInstallationStorage {
     static let installationIdKey = "app.installation.id"
 
     static func identifier(using storage: KeyValueStorage) -> String {
-        if let existingInstallationId: String = try? storage.read(forKey: installationIdKey),
-           !existingInstallationId.isEmpty {
+        let existingInstallationId: String? = try? storage.read(forKey: installationIdKey)
+        if let existingInstallationId, !existingInstallationId.isEmpty {
             return existingInstallationId
         }
 
