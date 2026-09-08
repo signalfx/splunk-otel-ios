@@ -16,6 +16,7 @@ limitations under the License.
 */
 
 import Foundation
+@_spi(SplunkInternal) internal import SplunkAppStart
 
 extension AppStartNonOperational {
 
@@ -29,6 +30,13 @@ extension AppStartNonOperational {
         _ = didFinishLaunching
         _ = willEnterForeground
 
+        return self
+    }
+
+    @discardableResult
+    func track(initialLifecycle snapshot: AppStartLifecycleSnapshot) -> any AppStartModule {
+        logAccess(toApi: #function)
+        _ = snapshot
         return self
     }
 }

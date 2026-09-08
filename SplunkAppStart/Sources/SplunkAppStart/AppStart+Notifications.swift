@@ -31,14 +31,18 @@ extension AppStart {
 
         // didFinishLaunching notification - store the notification timestamp
         listen(to: UIApplication.didFinishLaunchingNotification, in: &tokens) {
-            self.didFinishLaunchingTimestamp = Date()
+            if self.didFinishLaunchingTimestamp == nil {
+                self.didFinishLaunchingTimestamp = Date()
+            }
 
             self.logger.log(level: .debug) { "UIApplication.didFinishLaunchingNotification triggered" }
         }
 
         // willEnterForeground notification - store the notification timestamp and detect background launch
         listen(to: UIApplication.willEnterForegroundNotification, in: &tokens) {
-            self.willEnterForegroundTimestamp = Date()
+            if self.willEnterForegroundTimestamp == nil {
+                self.willEnterForegroundTimestamp = Date()
+            }
 
             // Detect background launch.
             // For a background launch, the app was in .background state before this notification,
@@ -71,7 +75,9 @@ extension AppStart {
 
         // didBecomeActive notification - store the timestamp, determine app start type and send results
         listen(to: UIApplication.didBecomeActiveNotification, in: &tokens) {
-            self.didBecomeActiveTimestamp = Date()
+            if self.didBecomeActiveTimestamp == nil {
+                self.didBecomeActiveTimestamp = Date()
+            }
 
             if self.backgroundLaunchDetected == nil {
                 self.backgroundLaunchDetected = false
@@ -79,7 +85,12 @@ extension AppStart {
 
             self.logger.log(level: .debug) { "UIApplication.didBecomeActiveNotification triggered" }
 
-            self.determineAndSend()
+            // Give a hybrid integration one main-loop turn to hand off its lifecycle
+            // snapshot after SDK installation. This prevents a native callback that races
+            // installation from resolving the initial AppStart before the handoff arrives.
+            DispatchQueue.main.async { [weak self] in
+                self?.determineAndSend()
+            }
         }
 
         // willResignActive notification - store the timestamp
@@ -109,7 +120,7 @@ extension AppStart {
     }
 
     private func listen(to name: Notification.Name, in tokens: inout [NSObjectProtocol], handler: @escaping () -> Void) {
-        let token = NotificationCenter.default.addObserver(forName: name, object: nil, queue: nil) { _ in
+        let token = NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { _ in
             handler()
         }
 

@@ -16,6 +16,7 @@ limitations under the License.
 */
 
 import Foundation
+@_spi(SplunkInternal) internal import SplunkAppStart
 
 extension AppStart {
 
@@ -29,6 +30,12 @@ extension AppStart {
             willEnterForeground: willEnterForeground
         )
 
+        return self
+    }
+
+    @discardableResult
+    func track(initialLifecycle snapshot: AppStartLifecycleSnapshot) -> any AppStartModule {
+        module.track(initialLifecycle: snapshot)
         return self
     }
 }

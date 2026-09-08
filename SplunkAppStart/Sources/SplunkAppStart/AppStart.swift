@@ -72,6 +72,12 @@ public final class AppStart {
     /// A flag to prevent the manual track api to be used when an initial app start event has been already sent.
     var initialAppStartSent = false
 
+    /// Marks the first activation as handled, including an intentionally suppressed measurement.
+    var initialAppStartResolved = false
+
+    /// Launch provenance captured by a hybrid integration before the SDK was installed.
+    var capturedLaunchOrigin: AppStartLaunchOrigin?
+
     /// Background launch threshold in seconds.
     ///
     /// If an application launch duration exceeds this threshold, we consider this launch as being launched in background first.
@@ -152,19 +158,64 @@ public final class AppStart {
     ///   Does not determine AppStart type, but is sent as a metadata.
     ///   - willEnterForeground: An optional timestamp of the `UIApplication.willEnterForeground` notification.
     ///   Does not determine AppStart type, but is sent as a metadata.
+    ///
+    /// Use this API when an integration supplies the lifecycle evidence. Timestamps already
+    /// captured by native listeners take precedence. Use `track(initialLifecycle:)` when the
+    /// handoff may be partial and native listeners may complete it later.
     public func track(didBecomeActive: Date, didFinishLaunching: Date?, willEnterForeground: Date?) {
-        guard !initialAppStartSent else {
-            logger.log(level: .debug) {
-                "Initial app start event has been already sent. Ignoring manual track."
+        executeOnMain { [self] in
+            guard !initialAppStartSent, !initialAppStartResolved else {
+                logger.log(level: .debug) {
+                    "Initial app start event has been already sent. Ignoring manual track."
+                }
+                return
             }
-            return
+
+            didBecomeActiveTimestamp = didBecomeActiveTimestamp ?? didBecomeActive
+            didFinishLaunchingTimestamp = didFinishLaunchingTimestamp ?? didFinishLaunching
+            willEnterForegroundTimestamp = willEnterForegroundTimestamp ?? willEnterForeground
+
+            determineAndSend()
         }
+    }
 
-        didBecomeActiveTimestamp = didBecomeActive
-        didFinishLaunchingTimestamp = didFinishLaunching
-        willEnterForegroundTimestamp = willEnterForeground
+    /// Tracks an initial app start using lifecycle evidence captured before SDK installation.
+    ///
+    /// A snapshot may be partial when installation happens before the application becomes active.
+    /// In that case the native listener completes the snapshot when it observes the real event.
+    /// This API and `track(didBecomeActive:didFinishLaunching:willEnterForeground:)` are
+    /// alternative handoff paths and must not be mixed for the same initial activation.
+    @_spi(SplunkInternal)
+    public func track(initialLifecycle snapshot: AppStartLifecycleSnapshot) {
+        executeOnMain { [self] in
+            guard !initialAppStartSent, !initialAppStartResolved else {
+                logger.log(level: .debug) {
+                    "Initial app start event has been already sent. Ignoring lifecycle snapshot."
+                }
+                return
+            }
 
-        determineAndSend()
+            didFinishLaunchingTimestamp = didFinishLaunchingTimestamp ?? snapshot.didFinishLaunching
+            willEnterForegroundTimestamp = willEnterForegroundTimestamp ?? snapshot.willEnterForeground
+            didBecomeActiveTimestamp = didBecomeActiveTimestamp ?? snapshot.didBecomeActive
+            capturedLaunchOrigin = capturedLaunchOrigin ?? snapshot.launchOrigin
+
+            if didBecomeActiveTimestamp != nil {
+                determineAndSend()
+            }
+        }
+    }
+
+    private func executeOnMain(_ work: @escaping () -> Void) {
+        if Thread.isMainThread {
+            work()
+        }
+        else {
+            // Lifecycle instrumentation must never block a host thread waiting for the main
+            // thread. Both bridge integrations already marshal their handoff to main, while
+            // this fallback keeps direct off-main callers safe and serializes their update.
+            DispatchQueue.main.async(execute: work)
+        }
     }
 
 
@@ -176,15 +227,22 @@ public final class AppStart {
         // Reset state for further app start detection
         defer {
             // Clear timestamps
+            didFinishLaunchingTimestamp = nil
             willEnterForegroundTimestamp = nil
             willResignActiveTimestamp = nil
             didBecomeActiveTimestamp = nil
+            capturedLaunchOrigin = nil
 
             // Clear initialization data as initialization span is sent only once with the cold start
             agentInitializeSpanData = nil
         }
 
-        let endTime = Date()
+        guard let endTime = didBecomeActiveTimestamp else {
+            logger.log(level: .debug) {
+                "Cannot determine app start without a didBecomeActive timestamp."
+            }
+            return
+        }
 
         // Send app start if the type was determined
         if let (determinedType, startTime) = determinedAppStartType() {
@@ -201,12 +259,28 @@ public final class AppStart {
                 "Could not determine app start type."
             }
         }
+
+        initialAppStartResolved = true
     }
 
     /// Determines app start type from available notifications timestamps.
     private func determinedAppStartType() -> (AppStartType, Date)? {
-        guard didBecomeActiveTimestamp != nil else {
+        guard let didBecomeActiveTimestamp else {
             return nil
+        }
+
+        // Prewarm means that process start is not a valid user-visible cold-start anchor.
+        // Check it before hybrid launch origin because UIApplication may report .active or
+        // .inactive for a prewarmed process when the early hybrid observer runs.
+        if prewarmDetected,
+            let startTime = willEnterForegroundTimestamp,
+            startTime <= didBecomeActiveTimestamp
+        {
+            return (.warm, startTime)
+        }
+
+        if let capturedLaunchOrigin {
+            return determinedSnapshotAppStartType(launchOrigin: capturedLaunchOrigin)
         }
 
         let launchedInBackground: Bool = backgroundLaunchDetected ?? false
@@ -215,17 +289,67 @@ public final class AppStart {
             return (.hot, startTime)
         }
 
-        if launchedInBackground || prewarmDetected, let startTime = willEnterForegroundTimestamp {
+        if !initialAppStartResolved,
+            launchedInBackground || prewarmDetected,
+            let startTime = willEnterForegroundTimestamp
+        {
             return (.warm, startTime)
         }
 
-        if !coldStartSent, let startTime = processStartTimestamp {
+        if !initialAppStartResolved, !coldStartSent, let startTime = processStartTimestamp {
             return (.cold, startTime)
         }
 
         return nil
     }
 
+    /// Determines an initial AppStart from explicit hybrid lifecycle evidence.
+    private func determinedSnapshotAppStartType(launchOrigin: AppStartLaunchOrigin) -> (AppStartType, Date)? {
+        guard let didBecomeActiveTimestamp else {
+            return nil
+        }
+
+        switch launchOrigin {
+        case .foreground:
+            guard let processStartTimestamp,
+                processStartTimestamp <= didBecomeActiveTimestamp,
+                validSnapshotEventTimes(end: didBecomeActiveTimestamp)
+            else {
+                return nil
+            }
+
+            return (.cold, processStartTimestamp)
+
+        case .background:
+            guard let willEnterForegroundTimestamp,
+                willEnterForegroundTimestamp <= didBecomeActiveTimestamp
+            else {
+                return nil
+            }
+
+            return (.warm, willEnterForegroundTimestamp)
+
+        case .unknown:
+            guard let processStartTimestamp,
+                let willEnterForegroundTimestamp,
+                processStartTimestamp <= didBecomeActiveTimestamp,
+                willEnterForegroundTimestamp <= didBecomeActiveTimestamp,
+                validSnapshotEventTimes(end: didBecomeActiveTimestamp)
+            else {
+                // Without a foreground boundary, an unknown hybrid launch must not fall through
+                // to a cold span measured from process start.
+                return nil
+            }
+
+            if let didFinishLaunchingTimestamp,
+                willEnterForegroundTimestamp.timeIntervalSince(didFinishLaunchingTimestamp) > backgroundLaunchThreshold
+            {
+                return (.warm, willEnterForegroundTimestamp)
+            }
+
+            return (.cold, processStartTimestamp)
+        }
+    }
 
     // MARK: - Sending
 

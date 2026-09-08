@@ -19,28 +19,37 @@ import XCTest
 
 @testable import SplunkAppStart
 
+func drainMainQueue() {
+    RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.01))
+}
+
 func simulateColdStartNotifications() {
     NotificationCenter.default.post(name: UIApplication.didFinishLaunchingNotification, object: nil)
     NotificationCenter.default.post(name: UIApplication.willEnterForegroundNotification, object: nil)
     NotificationCenter.default.post(name: UIApplication.didBecomeActiveNotification, object: nil)
+    drainMainQueue()
 }
 
 func simulateWarmStartNotifications() {
     NotificationCenter.default.post(name: UIApplication.willEnterForegroundNotification, object: nil)
     NotificationCenter.default.post(name: UIApplication.didBecomeActiveNotification, object: nil)
+    drainMainQueue()
 }
 
 func simulateHotStartNotifications() {
     NotificationCenter.default.post(name: UIApplication.didFinishLaunchingNotification, object: nil)
     NotificationCenter.default.post(name: UIApplication.willEnterForegroundNotification, object: nil)
     NotificationCenter.default.post(name: UIApplication.didBecomeActiveNotification, object: nil)
+    drainMainQueue()
     NotificationCenter.default.post(name: UIApplication.willResignActiveNotification, object: nil)
     NotificationCenter.default.post(name: UIApplication.didEnterBackgroundNotification, object: nil)
     NotificationCenter.default.post(name: UIApplication.willEnterForegroundNotification, object: nil)
     NotificationCenter.default.post(name: UIApplication.didBecomeActiveNotification, object: nil)
+    drainMainQueue()
 }
 
 func simulateStartNotificationsWithNoDidFinishLaunching() {
     NotificationCenter.default.post(name: UIApplication.willEnterForegroundNotification, object: nil)
     NotificationCenter.default.post(name: UIApplication.didBecomeActiveNotification, object: nil)
+    drainMainQueue()
 }

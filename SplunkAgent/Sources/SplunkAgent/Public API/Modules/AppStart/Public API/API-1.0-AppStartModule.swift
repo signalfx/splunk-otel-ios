@@ -16,6 +16,15 @@ limitations under the License.
 */
 
 import Foundation
+@_spi(SplunkInternal) public import SplunkAppStart
+
+/// Lifecycle evidence passed from Splunk-maintained hybrid integrations.
+@_spi(SplunkInternal)
+public typealias AppStartLifecycleSnapshot = SplunkAppStart.AppStartLifecycleSnapshot
+
+/// Launch-origin type used by hybrid AppStart integrations.
+@_spi(SplunkInternal)
+public typealias AppStartLaunchOrigin = SplunkAppStart.AppStartLaunchOrigin
 
 /// Defines a public API for the AppStart module.
 ///
@@ -46,6 +55,10 @@ public protocol AppStartModule {
     /// - Warning: Internal use only.
     @_spi(SplunkInternal)
     func track(didBecomeActive: Date, didFinishLaunching: Date?, willEnterForeground: Date?) -> any AppStartModule
+
+    /// Tracks initial lifecycle evidence captured before native SDK installation.
+    @_spi(SplunkInternal)
+    func track(initialLifecycle snapshot: AppStartLifecycleSnapshot) -> any AppStartModule
 }
 
 /// Default implementation required for BUILD_LIBRARY_FOR_DISTRIBUTION
@@ -60,6 +73,12 @@ extension AppStartModule {
         _ = didFinishLaunching
         _ = willEnterForeground
 
+        return self
+    }
+
+    @_spi(SplunkInternal)
+    public func track(initialLifecycle snapshot: AppStartLifecycleSnapshot) -> any AppStartModule {
+        _ = snapshot
         return self
     }
 }
