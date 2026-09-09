@@ -52,7 +52,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // The install(with:) method returns the agent instance
             self.agent = try SplunkRum.install(with: agentConfig)
         } catch {
-            print("Unable to start the Splunk agent, error: \(error)")
+            // Do not log the raw error — it may contain your access token.
+            print("Splunk RUM agent did not start. Check configuration values.")
         }
 
         // Example: Enable automated navigation tracking
@@ -67,3 +68,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 ```
 
 Once initialized, the agent will automatically begin collecting data. To explore what you can do next, see our <doc:Modules-Overview>.
+
+## Assisted Integration
+
+A coding agent skill bundle is included in this repository at `skills/splunk-rum-ios/`. You can point a coding agent at `skills/splunk-rum-ios/SKILL.md` to get guided help with installation, configuration, and verification.

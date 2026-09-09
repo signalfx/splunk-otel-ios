@@ -31,6 +31,12 @@ public protocol AgentResources {
     /// Application version.
     var appVersion: String { get }
 
+    /// Application version installed immediately before the current version for this installation.
+    ///
+    /// This value remains unchanged across launches until the application version changes. It is
+    /// `nil` when no previous version exists.
+    var appPreviousVersion: String? { get }
+
     /// Application build number.
     var appBuild: String { get }
 
@@ -72,4 +78,12 @@ public protocol AgentResources {
 
     /// Operating system type, e.g. `darwin`.
     var osType: String { get }
+}
+
+extension AgentResources {
+
+    /// The default is absent when a previous application version is not available.
+    public var appPreviousVersion: String? {
+        nil
+    }
 }

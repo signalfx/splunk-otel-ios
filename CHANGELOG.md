@@ -7,6 +7,24 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.4.2] - 2026-09-09
+
+### Changed
+
+* Set the periodic in-memory trace batch drain interval to 1 second.
+* Added the optional `app.previous_version` resource attribute, which identifies the app version installed immediately before the current version.
+* Updated Cisco Session Replay binaries to 1.1.3.266
+
+### Added
+
+* Added `skills/splunk-rum-ios/` — a skill bundle for coding agents instrumenting customer iOS apps with Splunk RUM. Covers install, endpoint setup, navigation, network, Session Replay, Objective-C, dSYM, and verification workflows.
+
+### Fixed
+
+* Fixed Server-Timing `traceparent` parsing to support bitmask trace flags, including the W3C random trace ID flag.
+* Fixed URLSession network span finalization races that could drop Server-Timing links and response attributes, duplicate attribute processing, or end spans on nonterminal task states.
+* Fixed a crash during `NavigationSplitView` multiwindow resizing on iPad when automated navigation tracking is enabled. Fixes issue #711.
+
 ## [2.4.1] - 2026-08-13
 
 ### Changed
