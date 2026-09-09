@@ -7,6 +7,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.4.2] - 2026-09-09
+
 ### Changed
 
 * Set the periodic in-memory trace batch drain interval to 1 second, retaining the 100-span immediate drain threshold and lifecycle drains.
