@@ -19,6 +19,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Fixed
 
 * Fixed Server-Timing `traceparent` parsing to support bitmask trace flags, including the W3C random trace ID flag.
+* Fixed Server-Timing `traceparent` parsing to reject all-zero trace IDs and span IDs, which are invalid according to the OpenTelemetry trace context requirements.
 * Fixed URLSession network span finalization races that could drop Server-Timing links and response attributes, duplicate attribute processing, or end spans on nonterminal task states.
 * Fixed a crash during `NavigationSplitView` multiwindow resizing on iPad when automated navigation tracking is enabled. Fixes issue #711.
 

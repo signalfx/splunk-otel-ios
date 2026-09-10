@@ -122,6 +122,26 @@ final class SpanLinkingTests: XCTestCase {
         XCTAssertNil(mockSpan.attributes[NetworkSpanAttributeKeys.linkSpanId])
     }
 
+    func testAddLinkToSpan_InvalidZeroTraceId() {
+        let mockSpan = MockSpan()
+        let valStr = "traceparent;desc='00-00000000000000000000000000000000-b7ad6b7169203331-01'"
+
+        addLinkToSpan(span: mockSpan, valStr: valStr)
+
+        XCTAssertNil(mockSpan.attributes[NetworkSpanAttributeKeys.linkTraceId])
+        XCTAssertNil(mockSpan.attributes[NetworkSpanAttributeKeys.linkSpanId])
+    }
+
+    func testAddLinkToSpan_InvalidZeroSpanId() {
+        let mockSpan = MockSpan()
+        let valStr = "traceparent;desc='00-0af7651916cd43dd8448eb211c80319c-0000000000000000-01'"
+
+        addLinkToSpan(span: mockSpan, valStr: valStr)
+
+        XCTAssertNil(mockSpan.attributes[NetworkSpanAttributeKeys.linkTraceId])
+        XCTAssertNil(mockSpan.attributes[NetworkSpanAttributeKeys.linkSpanId])
+    }
+
     func testAddLinkToSpan_ValidTraceParent_DoubleQuotes() {
         let mockSpan = MockSpan()
         let valStr = #"traceparent;desc="00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01""#
