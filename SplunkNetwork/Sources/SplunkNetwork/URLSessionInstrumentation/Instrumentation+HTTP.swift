@@ -78,7 +78,7 @@ func getIPAddressFromResponse(_ response: HTTPURLResponse) -> String? {
 func addLinkToSpan(span: Span, valStr: String) {
 
     // Trace flags are a bitmask. Linking only needs the identifiers, so accept the complete flag byte.
-    let serverTimingPattern = #"traceparent;desc=['"]00-([0-9a-f]{32})-([0-9a-f]{16})-[0-9a-f]{2}['"]"#
+    let serverTimingPattern = #"traceparent;desc=['"]00-((?!0{32})[0-9a-f]{32})-((?!0{16})[0-9a-f]{16})-[0-9a-f]{2}['"]"#
     guard let regex = try? NSRegularExpression(pattern: serverTimingPattern) else {
         NetworkInstrumentationManager.shared.logger.log(level: .fault) {
             "Regex failed to compile"
