@@ -88,6 +88,10 @@
 /* Public C typedefs and enumeration constants */
 #define PLCrashReporterPostCrashSignalCallback PLNS(PLCrashReporterPostCrashSignalCallback)
 #define PLCrashReporterCallbacks             PLNS(PLCrashReporterCallbacks)
+#define PLCrashHostInfoVersion               PLNS(PLCrashHostInfoVersion)
+#define PLCrashMachExceptionHandlerCallback  PLNS(PLCrashMachExceptionHandlerCallback)
+#define PLCrashSignalHandlerCallback         PLNS(PLCrashSignalHandlerCallback)
+#define PLCrashSignalHandlerCallbackFunc     PLNS(PLCrashSignalHandlerCallbackFunc)
 #define PLCrashReporterError                 PLNS(PLCrashReporterError)
 #define PLCrashReporterErrorUnknown          PLNS(PLCrashReporterErrorUnknown)
 #define PLCrashReporterErrorOperatingSystem  PLNS(PLCrashReporterErrorOperatingSystem)
