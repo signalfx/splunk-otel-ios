@@ -24,6 +24,7 @@ import OpenTelemetryApi
 var associatedKeySpan: UInt8 = 0
 var associatedKeyInstrumented: UInt8 = 1
 var associatedKeySkipped: UInt8 = 2
+var associatedKeyFinalizationCoordinator: UInt8 = 3
 
 // MARK: - Original IMP Storage
 
@@ -224,6 +225,24 @@ func createTaskWithInstrumentation<T: URLSessionTask>(
     createOriginalTask: () -> T,
     createInstrumentedTask: (_ instrumentedRequest: URLRequest, _ span: Span) -> T
 ) -> T {
+    createTaskWithInstrumentation(
+        request: request,
+        createOriginalTask: createOriginalTask,
+        createInstrumentedTask: { instrumentedRequest, span, _ in
+            createInstrumentedTask(instrumentedRequest, span)
+        }
+    )
+}
+
+func createTaskWithInstrumentation<T: URLSessionTask>(
+    request: URLRequest,
+    createOriginalTask: () -> T,
+    createInstrumentedTask: (
+        _ instrumentedRequest: URLRequest,
+        _ span: Span,
+        _ finalizationCoordinator: NetworkSpanFinalizationCoordinator
+    ) -> T
+) -> T {
     switch instrumentationDecision(for: request) {
     case .skipInstrumentation:
         return markSkippedForInstrumentation(createOriginalTask())
@@ -236,10 +255,12 @@ func createTaskWithInstrumentation<T: URLSessionTask>(
             return markSkippedForInstrumentation(createOriginalTask())
         }
 
+        let finalizationCoordinator = NetworkSpanFinalizationCoordinator(span: span)
         let instrumentedRequest = injectTraceContextIfEnabled(into: request, span: span)
         return markInstrumentedAtCreation(
-            createInstrumentedTask(instrumentedRequest, span),
-            span: span
+            createInstrumentedTask(instrumentedRequest, span, finalizationCoordinator),
+            span: span,
+            finalizationCoordinator: finalizationCoordinator
         )
     }
 }
@@ -273,30 +294,22 @@ func injectTraceContextIfEnabled(into request: URLRequest, span: Span) -> URLReq
     return TraceContextInjector.injectTraceContext(into: request, spanContext: span.context)
 }
 
-/// Wraps an optional completion handler to end the span when the request completes.
+/// Wraps an optional completion handler to finalize the span when the request completes.
 ///
-/// For tasks instrumented at creation time, two span-ending paths exist:
-/// 1. `splunkSwizzledSetState` (in `Instrumentation+Swizzling.swift`) calls `endHttpSpan`,
-///    which sets rich attributes (status code, server-timing link, response body size,
-///    peer address, protocol version, error details, request body size).
-/// 2. This wrapped completion handler calls `endHttpSpanFromCompletion`, which sets
-///    status code, configured captured response headers, and error attributes.
-///
-/// On Apple platforms, `setState:` fires before the completion handler, so `endHttpSpan`
-/// runs first and the span receives the full attribute set. The subsequent `end()` call
-/// from the completion handler is a no-op (OpenTelemetry ignores writes to ended spans).
+/// The completion handler and task-state callback share one coordinator. Whichever observes
+/// completion first performs task-aware enrichment and ends the span exactly once.
 func wrapCompletionHandler(
     _ completion: ((Data?, URLResponse?, Error?) -> Void)?,
-    span: Span
+    finalizationCoordinator: NetworkSpanFinalizationCoordinator
 ) -> (Data?, URLResponse?, Error?) -> Void {
     guard let originalCompletion = completion else {
         return { _, response, error in
-            endHttpSpanFromCompletion(span: span, response: response, error: error)
+            finalizationCoordinator.finalize(response: response, error: error)
         }
     }
 
     return { data, response, error in
-        endHttpSpanFromCompletion(span: span, response: response, error: error)
+        finalizationCoordinator.finalize(response: response, error: error)
         originalCompletion(data, response, error)
     }
 }
@@ -308,36 +321,18 @@ func wrapCompletionHandler(
 /// to ``wrapCompletionHandler``.
 func wrapDownloadCompletionHandler(
     _ completion: ((URL?, URLResponse?, Error?) -> Void)?,
-    span: Span
+    finalizationCoordinator: NetworkSpanFinalizationCoordinator
 ) -> (URL?, URLResponse?, Error?) -> Void {
     guard let originalCompletion = completion else {
         return { _, response, error in
-            endHttpSpanFromCompletion(span: span, response: response, error: error)
+            finalizationCoordinator.finalize(response: response, error: error)
         }
     }
 
     return { url, response, error in
-        endHttpSpanFromCompletion(span: span, response: response, error: error)
+        finalizationCoordinator.finalize(response: response, error: error)
         originalCompletion(url, response, error)
     }
-}
-
-/// Ends a span from a completion handler with fallback attributes.
-///
-/// This is a safety net for tasks whose span was not already ended by `splunkSwizzledSetState`.
-/// See ``wrapCompletionHandler`` for details on the dual-path span lifecycle.
-func endHttpSpanFromCompletion(span: Span, response: URLResponse?, error: Error?) {
-    if let httpResponse = response as? HTTPURLResponse {
-        span.clearAndSetAttribute(key: SemanticConventions.Http.responseStatusCode, value: httpResponse.statusCode)
-        addCapturedResponseHeaders(from: httpResponse, to: span)
-    }
-
-    if let error {
-        span.clearAndSetAttribute(key: NetworkSpanAttributeKeys.error, value: true)
-        span.clearAndSetAttribute(key: SemanticConventions.Error.message, value: error.localizedDescription)
-    }
-
-    span.end()
 }
 
 // MARK: - Check if Task was Instrumented at Creation
@@ -360,8 +355,15 @@ func markSkippedForInstrumentation<T: URLSessionTask>(_ task: T) -> T {
     return task
 }
 
-func markInstrumentedAtCreation<T: URLSessionTask>(_ task: T, span: Span) -> T {
+func markInstrumentedAtCreation<T: URLSessionTask>(
+    _ task: T,
+    span: Span,
+    finalizationCoordinator: NetworkSpanFinalizationCoordinator? = nil
+) -> T {
+    let coordinator = finalizationCoordinator ?? NetworkSpanFinalizationCoordinator(span: span)
+    coordinator.attach(to: task)
     objc_setAssociatedObject(task, &associatedKeySpan, span, .OBJC_ASSOCIATION_RETAIN)
+    objc_setAssociatedObject(task, &associatedKeyFinalizationCoordinator, coordinator, .OBJC_ASSOCIATION_RETAIN)
     objc_setAssociatedObject(task, &associatedKeyInstrumented, true, .OBJC_ASSOCIATION_RETAIN)
     return task
 }
@@ -369,4 +371,18 @@ func markInstrumentedAtCreation<T: URLSessionTask>(_ task: T, span: Span) -> T {
 /// Gets the span associated with a task during creation.
 func getCreationSpan(for task: URLSessionTask) -> Span? {
     objc_getAssociatedObject(task, &associatedKeySpan) as? Span
+}
+
+/// Gets the exactly-once span finalizer associated with an instrumented task.
+func getSpanFinalizationCoordinator(for task: URLSessionTask) -> NetworkSpanFinalizationCoordinator? {
+    objc_getAssociatedObject(task, &associatedKeyFinalizationCoordinator) as? NetworkSpanFinalizationCoordinator
+}
+
+/// Associates an exactly-once span finalizer with a task instrumented during `resume()`.
+func setSpanFinalizationCoordinator(
+    _ coordinator: NetworkSpanFinalizationCoordinator,
+    for task: URLSessionTask
+) {
+    coordinator.attach(to: task)
+    objc_setAssociatedObject(task, &associatedKeyFinalizationCoordinator, coordinator, .OBJC_ASSOCIATION_RETAIN)
 }

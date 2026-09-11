@@ -87,8 +87,15 @@ func startHttpSpan(request: URLRequest?) -> Span? {
 /// - Parameters:
 ///   - span: The span to end.
 ///   - task: The completed URL session task.
-func endHttpSpan(span: Span, task: URLSessionTask) {
-    let httpResponse: HTTPURLResponse? = task.response as? HTTPURLResponse
+///   - fallbackResponse: A response supplied by the completion handler when the task has no response.
+///   - fallbackError: An error supplied by the completion handler when the task has no error.
+func endHttpSpan(
+    span: Span,
+    task: URLSessionTask,
+    fallbackResponse: URLResponse? = nil,
+    fallbackError: Error? = nil
+) {
+    let httpResponse = task.response as? HTTPURLResponse ?? fallbackResponse as? HTTPURLResponse
     if let httpResponse {
         span.clearAndSetAttribute(key: SemanticConventions.Http.responseStatusCode, value: httpResponse.statusCode)
         for (key, val) in httpResponse.allHeaderFields {
@@ -117,7 +124,7 @@ func endHttpSpan(span: Span, task: URLSessionTask) {
         addCapturedResponseHeaders(from: httpResponse, to: span)
     }
 
-    if let error = task.error {
+    if let error = task.error ?? fallbackError {
         span.clearAndSetAttribute(key: NetworkSpanAttributeKeys.error, value: true)
         span.clearAndSetAttribute(key: SemanticConventions.Error.message, value: error.localizedDescription)
         span.clearAndSetAttribute(key: SemanticConventions.Error.type, value: String(describing: type(of: error)))
