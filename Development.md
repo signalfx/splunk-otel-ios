@@ -6,7 +6,7 @@ This project is a Swift Package and manages most of its dependencies via the `Pa
 
 Some dependencies, such as Session Replay, are included as pre-compiled binaries. A reference list of major dependencies can also be found in `dependencies.txt`.
 
-Crash reporting uses the vendored, symbol-prefixed `SplunkCrashReporter` target rather than a remote PLCrashReporter package dependency. Keep its source target synchronized with the xcframework manifest when updating it.
+Crash reporting uses the vendored, symbol-prefixed `SplunkCrashReporter` target rather than a remote PLCrashReporter package dependency. Keep its source target synchronized with the xcframework manifest when updating it. See the [SplunkCrashReporter maintenance guide](./SplunkCrashReporter/README.md) for the upstream baseline, local patches, ownership, security process, and validation record.
 
 ### Session Replay Dependency Mode
 

@@ -596,6 +596,7 @@ static PLCrashReporter *sharedReporter = nil;
 
     /* Set up the signal handler context */
     signal_handler_context.path = strdup([[self crashReportPath] UTF8String]); // NOTE: would leak if this were not a singleton struct
+    signal_handler_context.max_report_size = _config.maxReportBytes;
     assert(_applicationIdentifier != nil);
     assert(_applicationVersion != nil);
     plcrash_log_writer_init(&signal_handler_context.writer, _applicationIdentifier, _applicationVersion, _applicationMarketingVersion, [self mapToAsyncSymbolicationStrategy: _config.symbolicationStrategy], false);
