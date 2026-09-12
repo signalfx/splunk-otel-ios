@@ -16,10 +16,10 @@ limitations under the License.
 */
 
 internal import CiscoLogger
-import CrashReporter
 import Foundation
 import OpenTelemetryApi
 @_spi(SplunkInternal) import SplunkCommon
+internal import SplunkCrashReporter
 
 package typealias CrashReportSpanEmitter = () -> SpanId
 package typealias CrashReportPersistenceHandler = (
@@ -49,7 +49,7 @@ public class CrashReports {
 
     // MARK: - Private
 
-    var crashReporter: PLCrashReporter?
+    var crashReporter: SPLKPLCrashReporter?
 
     let persistenceLock = NSLock()
     var isAwaitingPersistence = false
@@ -78,25 +78,24 @@ public class CrashReports {
 
     public func configureCrashReporter() {
         #if os(tvOS)
-            let signalHandlerType = PLCrashReporterSignalHandlerType.BSD
+            let signalHandlerType = SPLKPLCrashReporterSignalHandlerType.BSD
         #else
-            let signalHandlerType = PLCrashReporterSignalHandlerType.mach
+            let signalHandlerType = SPLKPLCrashReporterSignalHandlerType.mach
         #endif
 
-        // Setup private path for crash reports to avoid conflict with other
-        // instances of PLCrashReporter present in the client app
+        // Use an SDK-owned path so another crash reporter in the host app cannot read or
+        // overwrite Splunk's pending report. Symbol namespacing alone does not isolate files.
         let fileManager = FileManager.default
         let crashDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("SplunkCrashReports", isDirectory: true)
         try? fileManager.createDirectory(at: crashDirectory, withIntermediateDirectories: true)
 
-        let signalConfig = PLCrashReporterConfig(
+        let signalConfig = SPLKPLCrashReporterConfig(
             signalHandlerType: signalHandlerType,
             symbolicationStrategy: [],
             basePath: crashDirectory.path
         )
-
-        guard let crashReporterInstance = PLCrashReporter(configuration: signalConfig) else {
+        guard let crashReporterInstance = SPLKPLCrashReporter(configuration: signalConfig) else {
             logger.log(level: .error) {
                 "PLCrashReporter failed to initialize."
             }
@@ -134,7 +133,7 @@ public class CrashReports {
             let data = try crashReporter?.loadPendingCrashReportDataAndReturnError()
 
             // Retrieving crash reporter data.
-            let report = try PLCrashReport(data: data)
+            let report = try SPLKPLCrashReport(data: data)
 
             // Process the report
             let reportPayload = formatCrashReport(report: report)
@@ -176,6 +175,13 @@ public class CrashReports {
         guard crashReporter != nil else {
             logger.log(level: .warn) {
                 "Could not enable crash reporter: Not Installed"
+            }
+            return false
+        }
+
+        guard NSGetUncaughtExceptionHandler() == nil else {
+            logger.log(level: .warn) {
+                "Could not enable crash reporter: An uncaught exception handler is already installed."
             }
             return false
         }
@@ -296,7 +302,7 @@ public class CrashReports {
     }
 
     /// AppState handler.
-    func appStateHandler(report: PLCrashReport) -> String {
+    func appStateHandler(report: SPLKPLCrashReport) -> String {
         var appState = CrashReportConstants.unknownValue
         if let sharedState {
             let timebasedAppState =

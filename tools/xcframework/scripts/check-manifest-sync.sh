@@ -14,19 +14,16 @@ REPO_ROOT="$(cd "${TOOLS_ROOT}/../.." && pwd)"
 PACKAGE_SWIFT="${REPO_ROOT}/Package.swift"
 AGENT_PROJECT="${TOOLS_ROOT}/Project.swift"
 OTEL_PROJECT="${TOOLS_ROOT}/otel/Project.swift"
-PLCRASH_PROJECT="${TOOLS_ROOT}/plcrash/Project.swift"
 SMOKE_PROJECT="${TOOLS_ROOT}/smoke-test/Project.swift"
 DEPENDENCY_MANIFEST_SCRIPT="${TOOLS_ROOT}/scripts/generate-dependency-manifest.sh"
 AGENT_BUILD_SCRIPT="${TOOLS_ROOT}/scripts/build-xcframeworks.sh"
 OTEL_BUILD_SCRIPT="${TOOLS_ROOT}/scripts/build-otel-xcframeworks.sh"
-PLCRASH_BUILD_SCRIPT="${TOOLS_ROOT}/scripts/build-plcrash-xcframeworks.sh"
 
 ERRORS=0
 
 EXPECTED_EXTERNAL_XCFRAMEWORKS=(
     "OpenTelemetryApi"
     "OpenTelemetrySdk"
-    "CrashReporter"
     "CiscoCommon"
     "CiscoLogger"
     "CiscoEncryption"
@@ -41,7 +38,7 @@ EXPECTED_EXTERNAL_XCFRAMEWORKS=(
 EXPECTED_DISTRIBUTION_FRAMEWORKS=(
     "OpenTelemetryApi"
     "OpenTelemetrySdk"
-    "CrashReporter"
+    "SplunkCrashReporter"
     "CiscoCommon"
     "CiscoLogger"
     "CiscoEncryption"
@@ -123,7 +120,7 @@ check_deployment_targets() {
     require_grep '\.visionOS\(\.v1\)' "${PACKAGE_SWIFT}" "Package.swift visionOS 1"
     require_grep '\.macCatalyst\(\.v15\)' "${PACKAGE_SWIFT}" "Package.swift macCatalyst 15"
 
-    for project in "${AGENT_PROJECT}" "${OTEL_PROJECT}" "${PLCRASH_PROJECT}"; do
+    for project in "${AGENT_PROJECT}" "${OTEL_PROJECT}"; do
         local label
         label="${project#${TOOLS_ROOT}/}"
 
@@ -135,7 +132,7 @@ check_deployment_targets() {
     require_grep '"XROS_DEPLOYMENT_TARGET":[[:space:]]*"1\.0"' "${AGENT_PROJECT}" "Project.swift visionOS 1.0"
     require_grep '"XROS_DEPLOYMENT_TARGET":[[:space:]]*"1\.0"' "${OTEL_PROJECT}" "otel/Project.swift visionOS 1.0"
 
-    for script in "${AGENT_BUILD_SCRIPT}" "${OTEL_BUILD_SCRIPT}" "${PLCRASH_BUILD_SCRIPT}"; do
+    for script in "${AGENT_BUILD_SCRIPT}" "${OTEL_BUILD_SCRIPT}"; do
         local label
         label="${script#${TOOLS_ROOT}/}"
 
