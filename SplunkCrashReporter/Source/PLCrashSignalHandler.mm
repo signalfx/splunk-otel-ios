@@ -99,7 +99,7 @@ struct shared_handler_context {
     async_list<plcrash_signal_handler_action> previous_actions;
 };
 
-shared_handler_context& shared_handler_context() {
+static shared_handler_context& shared_handler_context() {
     static struct shared_handler_context instance;
     return instance;
 }
