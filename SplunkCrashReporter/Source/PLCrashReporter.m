@@ -39,6 +39,7 @@
 #import "PLCrashHostInfo.h"
 #import "PLCrashSignalHandler.h"
 #import "PLCrashMachExceptionServer.h"
+#import "PLCrashMachExceptionPortSet.h"
 #import "PLCrashFeatureConfig.h"
 #import "PLCrashAsync.h"
 #import "PLCrashLogWriter.h"
@@ -80,6 +81,66 @@ static int monitored_signals[] = {
 /** @internal
  * number of signals in the fatal signals list */
 static int monitored_signals_count = (sizeof(monitored_signals) / sizeof(monitored_signals[0]));
+
+/**
+ * Return whether another component already owns one of the fatal POSIX signal
+ * handlers used by PLCrashReporter.
+ *
+ * A crash reporter may be configured not to install an uncaught Objective-C
+ * exception handler, so NSGetUncaughtExceptionHandler() is not sufficient to
+ * determine whether the process already has a crash reporter.
+ */
+static BOOL has_existing_signal_handler(void) {
+    for (int i = 0; i < monitored_signals_count; i++) {
+        struct sigaction action;
+        if (sigaction(monitored_signals[i], NULL, &action) != 0)
+            return YES;
+
+        if (action.sa_handler != SIG_DFL && action.sa_handler != SIG_IGN)
+            return YES;
+    }
+
+    return NO;
+}
+
+#if PLCRASH_FEATURE_MACH_EXCEPTIONS
+/**
+ * Return whether another component already owns a task-level Mach exception
+ * port for an exception PLCrashReporter handles.
+ */
+static BOOL has_existing_mach_exception_handler(void) {
+    exception_mask_t exception_mask = EXC_MASK_BAD_ACCESS |
+                                      EXC_MASK_BAD_INSTRUCTION |
+                                      EXC_MASK_ARITHMETIC |
+                                      EXC_MASK_SOFTWARE |
+                                      EXC_MASK_BREAKPOINT;
+
+#ifdef EXC_MASK_GUARD
+    exception_mask |= EXC_MASK_GUARD;
+#endif
+
+    NSError *error = nil;
+    PLCrashMachExceptionPortSet *ports = [PLCrashMachExceptionPort exceptionPortsForTask: mach_task_self()
+                                                                                       mask: exception_mask
+                                                                                      error: &error];
+    if (ports == nil)
+        return YES;
+
+    return ports.set.count > 0;
+}
+#endif /* PLCRASH_FEATURE_MACH_EXCEPTIONS */
+
+static BOOL has_existing_crash_handlers(void) {
+    if (has_existing_signal_handler())
+        return YES;
+
+#if PLCRASH_FEATURE_MACH_EXCEPTIONS
+    if (has_existing_mach_exception_handler())
+        return YES;
+#endif
+
+    return NO;
+}
 
 /**
  * @internal
@@ -589,6 +650,15 @@ static PLCrashReporter *sharedReporter = nil;
     /* Check for programmer error */
     if (_enabled)
         [NSException raise: PLCrashReporterException format: @"The crash reporter has already been enabled"];
+
+    /* A reporter configured without an uncaught exception handler still owns
+     * process-wide signal or Mach exception handlers. Refuse to install a
+     * second reporter rather than silently forwarding crashes to the existing
+     * reporter and producing no report of our own. */
+    if (has_existing_crash_handlers()) {
+        plcrash_populate_error(outError, PLCrashReporterErrorResourceBusy, @"A crash reporter or fatal signal handler has already been installed", nil);
+        return NO;
+    }
 
     /* Create the directory tree */
     if (![self populateCrashReportDirectoryAndReturnError: outError])
