@@ -110,9 +110,11 @@ let crashReporterSettings: SettingsDictionary = [
     "PUBLIC_HEADERS_FOLDER_PATH": "$(CONTENTS_FOLDER_PATH)/Headers"
 ]
 
-/// Public headers exposed by the namespaced crash reporter framework.
+/// Expose only the cleaned facade. The vendored implementation headers remain
+/// private so clients cannot import a header that leaves namespace macros in
+/// their translation unit.
 let crashReporterPublicHeaders: FileList = [
-    "\(repoRoot)/SplunkCrashReporter/include/*.h"
+    "\(repoRoot)/SplunkCrashReporter/include/SplunkCrashReporter.h"
 ]
 
 
