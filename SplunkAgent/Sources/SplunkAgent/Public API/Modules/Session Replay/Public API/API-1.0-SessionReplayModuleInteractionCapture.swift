@@ -26,10 +26,19 @@ public protocol SessionReplayModuleInteractionCapture: AnyObject {
     /// Indicates whether soft keyboard interactions are captured.
     var isKeyboardEnabled: Bool { get set }
 
-    /// Indicates whether pointer and touch interactions are captured.
+    /// Indicates whether pointer events from touch and hover sequences are captured.
+    ///
+    /// Pointer events contain the sampled positions used for pointer-based interaction
+    /// visualization in Session Replay. When this setting is disabled, pointer events
+    /// referenced by enabled gestures are still retained as gesture dependencies while
+    /// standalone pointer sequences are discarded.
     var isTouchEnabled: Bool { get set }
 
     /// Indicates whether recognized gesture interactions are captured.
+    ///
+    /// Gesture events describe the recognized gesture and its participating pointer
+    /// identifiers. Required pointer positions are retained with each enabled gesture,
+    /// even when standalone touch capture is disabled.
     ///
     /// Rage tap interactions are controlled separately by ``isRageTapEnabled``.
     var isGestureEnabled: Bool { get set }
