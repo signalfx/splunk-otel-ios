@@ -16,8 +16,74 @@ limitations under the License.
 */
 
 import Foundation
+@_spi(SplunkInternal) internal import SplunkCommon
 
 extension AppStart {
+
+    /// Replaces the module's temporary notification listeners with the agent-core recorder.
+    @_spi(SplunkInternal)
+    public func resetLifecycleObservationState() {
+        stopDetection()
+        didFinishLaunchingTimestamp = nil
+        willEnterForegroundTimestamp = nil
+        willResignActiveTimestamp = nil
+        didBecomeActiveTimestamp = nil
+        backgroundLaunchDetected = nil
+        capturedLaunchOrigin = nil
+    }
+
+    /// Consumes the snapshot recorded by the agent core.
+    ///
+    /// A complete, trusted snapshot can resolve immediately. Unknown or partial
+    /// provenance remains pending for the bounded hybrid handoff timeout so a
+    /// maintained integration can provide more precise evidence asynchronously.
+    @_spi(SplunkInternal)
+    public func consume(coreLifecycle snapshot: AppStartLifecycleSnapshot) {
+        consume(coreLifecycle: nil, snapshot: snapshot)
+    }
+
+    /// Consumes a core lifecycle event and its current initial snapshot.
+    @_spi(SplunkInternal)
+    public func consume(
+        coreLifecycle event: AppLifecycleRecorder.Event?,
+        snapshot: AppStartLifecycleSnapshot
+    ) {
+        executeOnMain { [self] in
+            switch initialAppStartState {
+            case .suppressed:
+                return
+
+            case .emitted:
+                if let event {
+                    processCoreLifecycleEvent(event)
+                }
+
+            case .pending:
+                merge(initialLifecycle: snapshot, acceptUnknownOrigin: false)
+
+                let hasActivation = didBecomeActiveTimestamp != nil
+                let hasRequiredBoundary: Bool
+
+                switch snapshot.launchOrigin {
+                case .foreground:
+                    hasRequiredBoundary = processStartTimestamp != nil
+
+                case .background:
+                    hasRequiredBoundary = willEnterForegroundTimestamp != nil
+
+                case .unknown:
+                    hasRequiredBoundary = false
+                }
+
+                if hasActivation, hasRequiredBoundary {
+                    determineAndSend()
+                }
+                else {
+                    scheduleInitialHandoffTimeout()
+                }
+            }
+        }
+    }
 
     /// Validates optional lifecycle events supplied by a hybrid integration.
     func validSnapshotEventTimes(end: Date) -> Bool {

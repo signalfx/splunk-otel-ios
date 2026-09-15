@@ -16,6 +16,7 @@ limitations under the License.
 */
 
 import Foundation
+@_spi(SplunkInternal) internal import SplunkCommon
 
 #if os(iOS) || os(tvOS) || os(visionOS)
     import UIKit
@@ -52,6 +53,15 @@ extension AppStateModule {
     }
 
     func removeNotifications() {
+        if let lifecycleObserverIdentifier,
+            let lifecycleRecorder
+        {
+            lifecycleRecorder.removeObserver(lifecycleObserverIdentifier)
+        }
+
+        lifecycleObserverIdentifier = nil
+        lifecycleRecorder = nil
+
         #if os(iOS) || os(tvOS) || os(visionOS)
             let tokens = notificationObservers
             notificationObservers.removeAll()

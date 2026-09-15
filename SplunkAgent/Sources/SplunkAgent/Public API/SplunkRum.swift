@@ -19,7 +19,7 @@ internal import CiscoLogger
 import Combine
 import Foundation
 import OpenTelemetryApi
-internal import SplunkCommon
+@_spi(SplunkInternal) internal import SplunkCommon
 
 /// The class implementing Splunk Agent public API.
 public class SplunkRum: ObservableObject {
@@ -39,6 +39,7 @@ public class SplunkRum: ObservableObject {
     var modulesManager: AgentModulesManager?
     var eventManager: AgentEventManager?
     var appStateManager: AgentAppStateManager
+    let lifecycleRecorder: AppLifecycleRecorder
     lazy var sharedState: AgentSharedState = DefaultSharedState(for: self)
 
     lazy var runtimeAttributes: AgentRuntimeAttributes = DefaultRuntimeAttributes(for: self)
@@ -80,6 +81,7 @@ public class SplunkRum: ObservableObject {
         user: NoOpUser(),
         session: NoOpSession(),
         appStateManager: NoOpAppStateManager(),
+        lifecycleRecorder: AppLifecycleRecorder(enabled: false),
         logPoolName: PackageIdentifier.nonOperationalInstance(),
         sessionSampler: DefaultAgentSessionSampler()
     )
@@ -210,6 +212,7 @@ public class SplunkRum: ObservableObject {
         user: AgentUser,
         session: AgentSession,
         appStateManager: AgentAppStateManager,
+        lifecycleRecorder: AppLifecycleRecorder? = nil,
         logPoolName: String? = nil,
         sessionSampler: AgentSessionSampler
     ) {
@@ -240,6 +243,7 @@ public class SplunkRum: ObservableObject {
 
         // Assign AppState manager
         self.appStateManager = appStateManager
+        self.lifecycleRecorder = lifecycleRecorder ?? AppLifecycleRecorder(enabled: false)
 
         // Assign and configure the session sampler
         self.sessionSampler = sessionSampler
@@ -257,13 +261,15 @@ public class SplunkRum: ObservableObject {
 
         // Prepare handler for stored configuration and download remote configuration
         let configurationHandler = Self.createConfigurationHandler(for: configuration)
+        let lifecycleRecorder = AppLifecycleRecorder()
 
         // Initialize the agent
         self.init(
             configurationHandler: configurationHandler,
             user: DefaultUser(),
             session: DefaultSession(),
-            appStateManager: AppStateManager(),
+            appStateManager: AppStateManager(lifecycleRecorder: lifecycleRecorder),
+            lifecycleRecorder: lifecycleRecorder,
             sessionSampler: DefaultAgentSessionSampler()
         )
 

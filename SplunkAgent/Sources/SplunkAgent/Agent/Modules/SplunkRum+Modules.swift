@@ -18,8 +18,9 @@ limitations under the License.
 internal import CiscoSessionReplay
 import Combine
 import Foundation
-internal import SplunkAppStart
-internal import SplunkAppState
+@_spi(SplunkInternal) internal import SplunkAppStart
+@_spi(SplunkInternal) internal import SplunkAppState
+@_spi(SplunkInternal) internal import SplunkCommon
 internal import SplunkCustomTracking
 @_spi(SplunkInternal) internal import SplunkInteractions
 @_spi(SplunkInternal) internal import SplunkNavigation
@@ -263,6 +264,17 @@ extension SplunkRum {
         if let appStartModule = modulesManager?.module(ofType: SplunkAppStart.AppStart.self) {
             appStartModule.sharedState = sharedState
 
+            // The core recorder owns lifecycle observation. The module's temporary
+            // listeners are removed after installation so all consumers use the same
+            // first-event-wins snapshot and future updates.
+            appStartModule.resetLifecycleObservationState()
+            lifecycleRecorder.addObserver { [weak appStartModule] update in
+                appStartModule?.consume(
+                    coreLifecycle: update.event,
+                    snapshot: Self.appStartLifecycleSnapshot(from: update.snapshot)
+                )
+            }
+
             // Initialize proxy API for this module
             appStartProxy = AppStart(for: appStartModule)
         }
@@ -273,6 +285,31 @@ extension SplunkRum {
         let appStateModule = modulesManager?.module(ofType: SplunkAppState.AppStateModule.self)
 
         appStateModule?.sharedState = sharedState
+        appStateModule?.use(lifecycleRecorder: lifecycleRecorder)
+    }
+
+    private static func appStartLifecycleSnapshot(
+        from snapshot: AppLifecycleRecorder.Snapshot
+    ) -> SplunkAppStart.AppStartLifecycleSnapshot {
+        let launchOrigin: SplunkAppStart.AppStartLifecycleSnapshot.LaunchOrigin
+
+        switch snapshot.launchOrigin {
+        case .foreground:
+            launchOrigin = .foreground
+
+        case .background:
+            launchOrigin = .background
+
+        case .unknown:
+            launchOrigin = .unknown
+        }
+
+        return SplunkAppStart.AppStartLifecycleSnapshot(
+            launchOrigin: launchOrigin,
+            didFinishLaunching: snapshot.didFinishLaunching,
+            willEnterForeground: snapshot.willEnterForeground,
+            didBecomeActive: snapshot.didBecomeActive
+        )
     }
 
     /// Configure NetworkMonitor module.

@@ -50,7 +50,10 @@ class AppStateModel {
     // MARK: - Public functions
 
     func saveEvent(_ state: AppState) {
-        let now = Date()
+        saveEvent(state, at: Date())
+    }
+
+    func saveEvent(_ state: AppState, at now: Date) {
         var events: [AppStateEvent] = (try? storage.read(forKey: Self.storageKey)) ?? []
 
         // Remove events which are old

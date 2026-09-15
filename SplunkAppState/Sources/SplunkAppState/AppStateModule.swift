@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-import SplunkCommon
+@_spi(SplunkInternal) internal import SplunkCommon
 
 public final class AppStateModule {
 
@@ -28,6 +28,8 @@ public final class AppStateModule {
     // MARK: - Internal properties
 
     var notificationObservers: [NSObjectProtocol] = []
+    var lifecycleObserverIdentifier: UUID?
+    var lifecycleRecorder: AppLifecycleRecorder?
     var destination: AppStateDestination = OtelDestination()
 
 
@@ -50,10 +52,47 @@ public final class AppStateModule {
         removeNotifications()
     }
 
+    /// Uses the agent-core lifecycle recorder as the single source of lifecycle events.
+    @_spi(SplunkInternal)
+    public func use(lifecycleRecorder: AppLifecycleRecorder) {
+        removeNotifications()
+        self.lifecycleRecorder = lifecycleRecorder
+
+        lifecycleObserverIdentifier = lifecycleRecorder.addObserver { [weak self] update in
+            guard let event = update.event else {
+                return
+            }
+
+            switch event {
+            case let .didBecomeActive(timestamp):
+                self?.processEvent(.active, at: timestamp)
+
+            case let .didEnterBackground(timestamp):
+                self?.processEvent(.background, at: timestamp)
+
+            case let .willEnterForeground(timestamp):
+                self?.processEvent(.foreground, at: timestamp)
+
+            case let .willResignActive(timestamp):
+                self?.processEvent(.inactive, at: timestamp)
+
+            case let .willTerminate(timestamp):
+                self?.processEvent(.terminate, at: timestamp)
+
+            case .didFinishLaunching:
+                break
+            }
+        }
+    }
+
 
     // MARK: - Process events
 
     func processEvent(_ event: AppStateType) {
-        destination.send(appState: event, time: Date(), sharedState: sharedState)
+        processEvent(event, at: Date())
+    }
+
+    func processEvent(_ event: AppStateType, at time: Date) {
+        destination.send(appState: event, time: time, sharedState: sharedState)
     }
 }

@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-internal import SplunkCommon
+@_spi(SplunkInternal) internal import SplunkCommon
 
 #if os(iOS) || os(tvOS) || os(visionOS)
     import UIKit
@@ -31,15 +31,59 @@ class AppStateManager: AgentAppStateManager {
     /// Serializes external access to stored data.
     private let accessQueue: DispatchQueue
 
+    private let lifecycleRecorder: AppLifecycleRecorder?
+    private var lifecycleObserverIdentifier: UUID?
+
     // MARK: - Initialization
 
-    init(appStateModel: AppStateModel = AppStateModel()) {
+    init(
+        appStateModel: AppStateModel = AppStateModel(),
+        lifecycleRecorder: AppLifecycleRecorder? = nil
+    ) {
         self.appStateModel = appStateModel
+        self.lifecycleRecorder = lifecycleRecorder
 
         let queueName = PackageIdentifier.default(named: "appStateAccess")
         accessQueue = DispatchQueue(label: queueName)
 
-        hookToAppLifecycle()
+        if let lifecycleRecorder {
+            lifecycleObserverIdentifier = lifecycleRecorder.addObserver { [weak self] update in
+                guard let event = update.event else {
+                    return
+                }
+
+                switch event {
+                case let .didBecomeActive(timestamp):
+                    self?.appStateModel.saveEvent(.active, at: timestamp)
+
+                case let .didEnterBackground(timestamp):
+                    self?.appStateModel.saveEvent(.background, at: timestamp)
+
+                case let .willEnterForeground(timestamp):
+                    self?.appStateModel.saveEvent(.foreground, at: timestamp)
+
+                case let .willResignActive(timestamp):
+                    self?.appStateModel.saveEvent(.inactive, at: timestamp)
+
+                case let .willTerminate(timestamp):
+                    self?.appStateModel.saveEvent(.terminate, at: timestamp)
+
+                case .didFinishLaunching:
+                    break
+                }
+            }
+        }
+        else {
+            hookToAppLifecycle()
+        }
+    }
+
+    deinit {
+        if let lifecycleObserverIdentifier,
+            let lifecycleRecorder
+        {
+            lifecycleRecorder.removeObserver(lifecycleObserverIdentifier)
+        }
     }
 
 

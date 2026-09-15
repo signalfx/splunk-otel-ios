@@ -79,10 +79,6 @@ extension AppStart {
                 self.didBecomeActiveTimestamp = Date()
             }
 
-            if self.backgroundLaunchDetected == nil {
-                self.backgroundLaunchDetected = false
-            }
-
             self.logger.log(level: .debug) { "UIApplication.didBecomeActiveNotification triggered" }
 
             // Give a hybrid integration one main-loop turn to hand off its lifecycle

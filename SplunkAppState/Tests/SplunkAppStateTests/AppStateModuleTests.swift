@@ -18,6 +18,7 @@ limitations under the License.
 import XCTest
 
 @testable import SplunkAppState
+@_spi(SplunkInternal) @testable import SplunkCommon
 
 final class AppStateModuleTests: XCTestCase {
 
@@ -88,6 +89,21 @@ final class AppStateModuleTests: XCTestCase {
 
 
     #if os(iOS) || os(tvOS) || os(visionOS)
+
+        func testLifecycleRecorderProvidesSharedEvents() {
+            let mock = MockDestination()
+            let module = AppStateModule()
+            module.destination = mock
+            let notificationCenter = NotificationCenter()
+            let recorder = AppLifecycleRecorder(notificationCenter: notificationCenter)
+
+            module.use(lifecycleRecorder: recorder)
+            notificationCenter.post(name: UIApplication.didBecomeActiveNotification, object: nil)
+
+            expectEventCount(mock, count: 1)
+            XCTAssertEqual(mock.events.last?.state, .active)
+            module.removeNotifications()
+        }
 
         func testDidBecomeActiveSendsActive() {
             let mock = MockDestination()

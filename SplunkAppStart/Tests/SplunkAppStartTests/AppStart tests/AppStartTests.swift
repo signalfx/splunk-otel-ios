@@ -44,6 +44,7 @@ final class AppStartTests: XCTestCase {
         // Check type and dates
         try checkDeterminedType(.cold, in: destination)
         try checkDates(in: destination)
+        XCTAssertEqual(appStart.initialAppStartState, .emitted)
     }
 
     func testStop() throws {
@@ -180,7 +181,8 @@ final class AppStartTests: XCTestCase {
 
         simulateStartNotificationsWithNoDidFinishLaunching()
 
-        try checkDeterminedType(.cold, in: destination)
+        try checkNotDeterminedType(in: destination)
+        XCTAssertEqual(appStart.initialAppStartState, .suppressed(.unknownLaunchOrigin))
     }
 
     func testManualTrackWithFullParameters() throws {
@@ -216,9 +218,8 @@ final class AppStartTests: XCTestCase {
 
         appStart.track(didBecomeActive: didBecomeActive, didFinishLaunching: nil, willEnterForeground: nil)
 
-        // Check type and dates
-        try checkDeterminedType(.cold, in: destination)
-        try checkDates(in: destination)
+        try checkNotDeterminedType(in: destination)
+        XCTAssertEqual(appStart.initialAppStartState, .suppressed(.unknownLaunchOrigin))
     }
 
     func testManualTrackUsesSuppliedActivationTimestampAsEnd() {
@@ -233,7 +234,7 @@ final class AppStartTests: XCTestCase {
         appStart.track(
             didBecomeActive: didBecomeActive,
             didFinishLaunching: now.addingTimeInterval(-1.9),
-            willEnterForeground: nil
+            willEnterForeground: now.addingTimeInterval(-1.8)
         )
 
         XCTAssertEqual(destination.storedAppStart?.end, didBecomeActive)
@@ -251,7 +252,7 @@ final class AppStartTests: XCTestCase {
             appStart.track(
                 didBecomeActive: now,
                 didFinishLaunching: now.addingTimeInterval(-1.0),
-                willEnterForeground: nil
+                willEnterForeground: now.addingTimeInterval(-0.5)
             )
             DispatchQueue.main.async {
                 handoffCompleted.fulfill()
@@ -331,14 +332,14 @@ final class AppStartTests: XCTestCase {
         appStart.destination = destination
         appStart.startDetection()
         defer { appStart.stopDetection() }
-        appStart.processStartTimestamp = now.addingTimeInterval(-121.0)
+        appStart.processStartTimestamp = now.addingTimeInterval(-4.0)
 
         appStart.track(
             initialLifecycle: AppStartLifecycleSnapshot(
                 launchOrigin: .foreground,
-                didFinishLaunching: now.addingTimeInterval(-120.0),
-                willEnterForeground: now.addingTimeInterval(-119.0),
-                didBecomeActive: now.addingTimeInterval(-118.0)
+                didFinishLaunching: now.addingTimeInterval(-3.0),
+                willEnterForeground: now.addingTimeInterval(-2.0),
+                didBecomeActive: now.addingTimeInterval(-1.0)
             )
         )
 
@@ -346,7 +347,7 @@ final class AppStartTests: XCTestCase {
         NotificationCenter.default.post(name: UIApplication.didEnterBackgroundNotification, object: nil)
         NotificationCenter.default.post(name: UIApplication.willEnterForegroundNotification, object: nil)
 
-        XCTAssertFalse(appStart.backgroundLaunchDetected ?? false)
+        XCTAssertNil(appStart.backgroundLaunchDetected)
 
         NotificationCenter.default.post(name: UIApplication.didBecomeActiveNotification, object: nil)
         drainMainQueue()
@@ -516,7 +517,7 @@ final class AppStartTests: XCTestCase {
         try checkNotDeterminedType(in: destination)
     }
 
-    func testForegroundSnapshotLongerThanThresholdRemainsCold() throws {
+    func testForegroundSnapshotOverMaximumDurationIsSuppressed() throws {
         let destination = DebugDestination()
         let now = Date()
         let processStart = now.addingTimeInterval(-30)
@@ -535,12 +536,124 @@ final class AppStartTests: XCTestCase {
             )
         )
 
-        try checkDeterminedType(.cold, in: destination)
-        XCTAssertEqual(destination.storedAppStart?.start, processStart)
-        XCTAssertEqual(destination.storedAppStart?.end, didBecomeActive)
+        try checkNotDeterminedType(in: destination)
+        XCTAssertEqual(appStart.initialAppStartState, .suppressed(.maxDurationExceeded))
     }
 
-    func testUnknownSnapshotWithLongBackgroundGapIsWarm() throws {
+    func testInvalidTimestampOrderIsSuppressed() throws {
+        let destination = DebugDestination()
+        let now = Date()
+
+        let appStart = AppStart()
+        appStart.processStartTimestamp = now.addingTimeInterval(1.0)
+        appStart.destination = destination
+
+        appStart.track(
+            initialLifecycle: AppStartLifecycleSnapshot(
+                launchOrigin: .foreground,
+                didFinishLaunching: now.addingTimeInterval(-1.0),
+                willEnterForeground: now.addingTimeInterval(-0.5),
+                didBecomeActive: now
+            )
+        )
+
+        try checkNotDeterminedType(in: destination)
+        XCTAssertEqual(appStart.initialAppStartState, .suppressed(.invalidTimestampOrder))
+    }
+
+    func testUnknownSnapshotWithoutForegroundBoundaryIsSuppressed() throws {
+        let destination = DebugDestination()
+        let now = Date()
+
+        let appStart = AppStart()
+        appStart.processStartTimestamp = now.addingTimeInterval(-2.0)
+        appStart.destination = destination
+
+        appStart.track(
+            initialLifecycle: AppStartLifecycleSnapshot(
+                launchOrigin: .unknown,
+                didFinishLaunching: now.addingTimeInterval(-2.0),
+                willEnterForeground: nil,
+                didBecomeActive: now
+            )
+        )
+
+        try checkNotDeterminedType(in: destination)
+        XCTAssertEqual(appStart.initialAppStartState, .suppressed(.unknownLaunchOrigin))
+    }
+
+    func testPartialSnapshotTimeoutIsSuppressedAndCannotBeRetried() throws {
+        let destination = DebugDestination()
+        let now = Date()
+
+        let appStart = AppStart()
+        appStart.processStartTimestamp = now.addingTimeInterval(-2.0)
+        appStart.destination = destination
+        appStart.initialHandoffTimeout = 0.01
+
+        appStart.track(
+            initialLifecycle: AppStartLifecycleSnapshot(
+                launchOrigin: .unknown,
+                didFinishLaunching: now.addingTimeInterval(-2.0),
+                willEnterForeground: now.addingTimeInterval(-1.0),
+                didBecomeActive: nil
+            )
+        )
+
+        let timeoutCompleted = expectation(description: "initial handoff timeout completed")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+            timeoutCompleted.fulfill()
+        }
+        wait(for: [timeoutCompleted], timeout: 1.0)
+
+        XCTAssertEqual(appStart.initialAppStartState, .suppressed(.missingDidBecomeActive))
+        try checkNotDeterminedType(in: destination)
+
+        appStart.track(
+            initialLifecycle: AppStartLifecycleSnapshot(
+                launchOrigin: .foreground,
+                didFinishLaunching: now.addingTimeInterval(-1.0),
+                willEnterForeground: now.addingTimeInterval(-0.5),
+                didBecomeActive: now
+            )
+        )
+
+        XCTAssertEqual(appStart.initialAppStartState, .suppressed(.missingDidBecomeActive))
+        try checkNotDeterminedType(in: destination)
+    }
+
+    func testTrustedHybridOriginCanCompleteUnknownCoreSnapshot() throws {
+        let destination = DebugDestination()
+        let now = Date()
+
+        let appStart = AppStart()
+        appStart.processStartTimestamp = now.addingTimeInterval(-2.0)
+        appStart.destination = destination
+
+        appStart.consume(
+            coreLifecycle: nil,
+            snapshot: AppStartLifecycleSnapshot(
+                launchOrigin: .unknown,
+                didFinishLaunching: now.addingTimeInterval(-1.5),
+                willEnterForeground: nil,
+                didBecomeActive: nil
+            )
+        )
+
+        appStart.track(
+            initialLifecycle: AppStartLifecycleSnapshot(
+                launchOrigin: .foreground,
+                didFinishLaunching: nil,
+                willEnterForeground: nil,
+                didBecomeActive: now
+            )
+        )
+
+        try checkDeterminedType(.cold, in: destination)
+        XCTAssertEqual(appStart.initialAppStartState, .emitted)
+    }
+
+    func testUnknownSnapshotWithLongBackgroundGapIsSuppressed() throws {
         let destination = DebugDestination()
         let now = Date()
 
@@ -557,12 +670,11 @@ final class AppStartTests: XCTestCase {
             )
         )
 
-        try checkDeterminedType(.warm, in: destination)
-        XCTAssertEqual(destination.storedAppStart?.start, now.addingTimeInterval(-5))
-        XCTAssertEqual(destination.storedAppStart?.end, now)
+        try checkNotDeterminedType(in: destination)
+        XCTAssertEqual(appStart.initialAppStartState, .suppressed(.unknownLaunchOrigin))
     }
 
-    func testUnknownSnapshotWithinThresholdIsCold() throws {
+    func testUnknownSnapshotWithinThresholdIsSuppressed() throws {
         let destination = DebugDestination()
         let now = Date()
         let processStart = now.addingTimeInterval(-5.0)
@@ -580,8 +692,60 @@ final class AppStartTests: XCTestCase {
             )
         )
 
-        try checkDeterminedType(.cold, in: destination)
-        XCTAssertEqual(destination.storedAppStart?.start, processStart)
+        try checkNotDeterminedType(in: destination)
+        XCTAssertEqual(appStart.initialAppStartState, .suppressed(.unknownLaunchOrigin))
+    }
+
+    func testCoreLifecycleEventsContinueAfterInitialEmission() throws {
+        let destination = DebugDestination()
+        let now = Date()
+
+        let appStart = AppStart()
+        appStart.processStartTimestamp = now.addingTimeInterval(-2.0)
+        appStart.destination = destination
+
+        appStart.consume(
+            coreLifecycle: nil,
+            snapshot: AppStartLifecycleSnapshot(
+                launchOrigin: .foreground,
+                didFinishLaunching: now.addingTimeInterval(-1.5),
+                willEnterForeground: nil,
+                didBecomeActive: now.addingTimeInterval(-1.0)
+            )
+        )
+
+        XCTAssertEqual(appStart.initialAppStartState, .emitted)
+
+        appStart.consume(
+            coreLifecycle: .willResignActive(now.addingTimeInterval(-0.5)),
+            snapshot: AppStartLifecycleSnapshot(
+                launchOrigin: .foreground,
+                didFinishLaunching: nil,
+                willEnterForeground: nil,
+                didBecomeActive: nil
+            )
+        )
+        appStart.consume(
+            coreLifecycle: .willEnterForeground(now.addingTimeInterval(-0.25)),
+            snapshot: AppStartLifecycleSnapshot(
+                launchOrigin: .foreground,
+                didFinishLaunching: nil,
+                willEnterForeground: nil,
+                didBecomeActive: nil
+            )
+        )
+        appStart.consume(
+            coreLifecycle: .didBecomeActive(now),
+            snapshot: AppStartLifecycleSnapshot(
+                launchOrigin: .foreground,
+                didFinishLaunching: nil,
+                willEnterForeground: nil,
+                didBecomeActive: nil
+            )
+        )
+
+        try checkDeterminedType(.hot, in: destination)
+        XCTAssertEqual(destination.storedAppStart?.start, now.addingTimeInterval(-0.25))
         XCTAssertEqual(destination.storedAppStart?.end, now)
     }
 }
