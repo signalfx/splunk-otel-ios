@@ -22,9 +22,11 @@ import OpenTelemetryApi
 @_spi(SplunkInternal)
 extension Span {
 
-    /// Clears the existing value for a key and sets a new value atomically.
+    /// Clears the existing value for a key and then sets a new value.
     ///
-    /// This is useful for ensuring clean attribute updates without leftover values.
+    /// This is useful for ensuring clean attribute updates without leftover values. The two
+    /// underlying `Span.setAttribute` calls are not an atomic transaction; callers must serialize
+    /// this operation with span finalization when they can run concurrently.
     ///
     /// - Parameters:
     ///   - key: The attribute key to clear and set
@@ -37,7 +39,7 @@ extension Span {
         setAttribute(key: key, value: value)
     }
 
-    /// Clears the existing value for a key and sets a new value atomically.
+    /// Clears the existing value for a key and then sets a new value.
     ///
     /// This is a convenience method that accepts Any and converts it to AttributeValue.
     ///
@@ -50,7 +52,7 @@ extension Span {
 
     // MARK: - SemanticConventions Convenience Methods
 
-    /// Clears the existing value for a semantic attribute key and sets a new value atomically.
+    /// Clears the existing value for a semantic attribute key and then sets a new value.
     ///
     /// This is useful for ensuring clean attribute updates without leftover values.
     /// Works with any `SemanticConventions` nested enum (e.g., `SemanticConventions.Http`, `SemanticConventions.Url`).
@@ -62,7 +64,7 @@ extension Span {
         clearAndSetAttribute(key: key.rawValue, value: value)
     }
 
-    /// Clears the existing value for a semantic attribute key and sets a new value atomically.
+    /// Clears the existing value for a semantic attribute key and then sets a new value.
     ///
     /// This is a convenience method that accepts Any and converts it to AttributeValue.
     /// Works with any `SemanticConventions` nested enum (e.g., `SemanticConventions.Http`, `SemanticConventions.Url`).

@@ -49,6 +49,13 @@ struct OTLPBatchSpanProcessorTests {
     // MARK: - Interval trigger
 
     @Test
+    func defaultScheduleDelayIsOneSecond() {
+        let processor = OTLPBatchSpanProcessor(spanExporter: BatchProcessorTestExporter())
+
+        #expect(processor.core.scheduleDelay == 1)
+    }
+
+    @Test
     func timerFlushesPartialBatch() {
         let exporter = BatchProcessorTestExporter()
         let processor = OTLPBatchSpanProcessor(
