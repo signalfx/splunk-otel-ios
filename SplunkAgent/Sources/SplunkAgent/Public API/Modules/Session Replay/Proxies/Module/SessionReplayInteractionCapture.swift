@@ -16,18 +16,50 @@ limitations under the License.
 */
 
 internal import CiscoSessionReplay
+import Foundation
 
 /// The interaction capture object implements public API for interaction category controls.
 final class SessionReplayInteractionCapture: SessionReplayModuleInteractionCapture {
 
+    // MARK: - Internal
+
+    var module: CiscoSessionReplay.SessionReplay? {
+        get {
+            lock.withLock {
+                linkedModule
+            }
+        }
+        set {
+            lock.withLock {
+                let sourceCapture = currentCapture
+                linkedModule = newValue
+
+                let targetCapture = currentCapture
+
+                guard sourceCapture !== targetCapture else {
+                    return
+                }
+
+                // Module preferences are converted before relinking, so preserve any newer capture changes.
+                targetCapture.isKeyboardEnabled = sourceCapture.isKeyboardEnabled
+                targetCapture.isTouchEnabled = sourceCapture.isTouchEnabled
+                targetCapture.isGestureEnabled = sourceCapture.isGestureEnabled
+                targetCapture.isFocusEnabled = sourceCapture.isFocusEnabled
+                targetCapture.isRageTapEnabled = sourceCapture.isRageTapEnabled
+            }
+        }
+    }
+
+
     // MARK: - Private
 
-    unowned var module: CiscoSessionReplay.SessionReplay?
+    private weak var linkedModule: CiscoSessionReplay.SessionReplay?
 
     private let detachedCapture = CiscoSessionReplay.InteractionCapture()
+    private let lock = NSLock()
 
-    private var capture: CiscoSessionReplay.InteractionCapture {
-        module?.preferences.interactionCapture ?? detachedCapture
+    private var currentCapture: CiscoSessionReplay.InteractionCapture {
+        linkedModule?.preferences.interactionCapture ?? detachedCapture
     }
 
 
@@ -35,46 +67,66 @@ final class SessionReplayInteractionCapture: SessionReplayModuleInteractionCaptu
 
     var isKeyboardEnabled: Bool {
         get {
-            capture.isKeyboardEnabled
+            lock.withLock {
+                currentCapture.isKeyboardEnabled
+            }
         }
         set {
-            capture.isKeyboardEnabled = newValue
+            lock.withLock {
+                currentCapture.isKeyboardEnabled = newValue
+            }
         }
     }
 
     var isTouchEnabled: Bool {
         get {
-            capture.isTouchEnabled
+            lock.withLock {
+                currentCapture.isTouchEnabled
+            }
         }
         set {
-            capture.isTouchEnabled = newValue
+            lock.withLock {
+                currentCapture.isTouchEnabled = newValue
+            }
         }
     }
 
     var isGestureEnabled: Bool {
         get {
-            capture.isGestureEnabled
+            lock.withLock {
+                currentCapture.isGestureEnabled
+            }
         }
         set {
-            capture.isGestureEnabled = newValue
+            lock.withLock {
+                currentCapture.isGestureEnabled = newValue
+            }
         }
     }
 
     var isFocusEnabled: Bool {
         get {
-            capture.isFocusEnabled
+            lock.withLock {
+                currentCapture.isFocusEnabled
+            }
         }
         set {
-            capture.isFocusEnabled = newValue
+            lock.withLock {
+                currentCapture.isFocusEnabled = newValue
+            }
         }
     }
 
     var isRageTapEnabled: Bool {
         get {
-            capture.isRageTapEnabled
+            lock.withLock {
+                currentCapture.isRageTapEnabled
+            }
         }
         set {
-            capture.isRageTapEnabled = newValue
+            lock.withLock {
+                currentCapture.isRageTapEnabled = newValue
+            }
         }
     }
 
@@ -82,17 +134,21 @@ final class SessionReplayInteractionCapture: SessionReplayModuleInteractionCaptu
     // MARK: - Initialization
 
     init(for module: CiscoSessionReplay.SessionReplay? = nil) {
-        self.module = module
+        linkedModule = module
     }
 
 
     // MARK: - Bulk updates
 
     func enableAll() {
-        capture.enableAll()
+        lock.withLock {
+            currentCapture.enableAll()
+        }
     }
 
     func disableAll() {
-        capture.disableAll()
+        lock.withLock {
+            currentCapture.disableAll()
+        }
     }
 }
