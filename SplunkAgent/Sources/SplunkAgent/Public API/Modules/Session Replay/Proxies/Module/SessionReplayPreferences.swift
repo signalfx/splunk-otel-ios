@@ -44,8 +44,7 @@ public final class SessionReplayPreferences: SessionReplayModulePreferences {
     ///
     /// All categories are enabled by default. Updating this object affects only
     /// interactions received after the change.
-    public private(set) lazy var interactionCapture: any SessionReplayModuleInteractionCapture =
-        SessionReplayInteractionCapture(for: module)
+    public let interactionCapture: any SessionReplayModuleInteractionCapture
 
 
     // MARK: - Rendering
@@ -82,11 +81,8 @@ public final class SessionReplayPreferences: SessionReplayModulePreferences {
         interactionCapture: (any SessionReplayModuleInteractionCapture)? = nil
     ) {
         self.module = module
+        self.interactionCapture = interactionCapture ?? SessionReplayInteractionCapture(for: module)
         renderingMode = module?.preferences.renderingMode.map(RenderingMode.init(with:))
-
-        if let interactionCapture {
-            self.interactionCapture = interactionCapture
-        }
     }
 }
 
