@@ -259,7 +259,7 @@ public class OTLPBackgroundHTTPBaseExporter {
                 continue
             }
 
-            if let existingTaskDescription = allTaskDescriptions.first(where: { $0.id == requestId }) {
+            if allTaskDescriptions.contains(where: { $0.id == requestId }) {
                 if cancelledTaskIds.contains(requestId) {
                     let taskDescription = RequestDescriptor(
                         id: requestId,

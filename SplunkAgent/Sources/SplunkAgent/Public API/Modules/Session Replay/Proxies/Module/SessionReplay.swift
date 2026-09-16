@@ -62,11 +62,11 @@ final class SessionReplay: SessionReplayModule {
 
     lazy var preferences: any SessionReplayModulePreferences = SessionReplayPreferences(for: module) {
         didSet {
-            // Link preferences with module instance
-            (preferences as? SessionReplayPreferences)?.module = module
-
-            // Pass changes into the module
+            // Convert detached preferences before linking them with the module
             module.preferences = SplunkSessionReplayPreferences(preferences: preferences)
+
+            // Link preferences with the newly configured module instance
+            (preferences as? SessionReplayPreferences)?.module = module
         }
     }
 

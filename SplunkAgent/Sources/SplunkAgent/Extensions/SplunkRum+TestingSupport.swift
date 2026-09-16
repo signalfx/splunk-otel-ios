@@ -15,6 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+internal import CiscoSessionReplay
 import Foundation
 internal import SplunkCommon
 
@@ -27,13 +28,18 @@ extension SplunkRum {
     ///
     /// - Parameters:
     ///   - configuration: A configuration for the initial SDK setup.
+    ///   - sessionReplay: An optional Session Replay module to link with the agent.
     ///   - named: A `String` with the name of the test being performed.
     ///
     /// - Returns: An agent instance suitable for performing unit tests.
     ///
     /// - Warning: This method is not meant for client applications and may produce
     ///            unexpected results, which are not supported by the product.
-    public static func buildTestInstance(with configuration: AgentConfiguration, testNamed named: String? = nil) -> SplunkRum {
+    public static func buildTestInstance(
+        with configuration: AgentConfiguration,
+        sessionReplay: (any SessionReplayModule)? = nil,
+        testNamed named: String? = nil
+    ) -> SplunkRum {
         let testName = named ?? "agent"
 
         // Custom key-value storage instance with different keys for testing
@@ -69,7 +75,16 @@ extension SplunkRum {
         // Links the current session with the agent
         (agent.currentSession as? DefaultSession)?.owner = agent
 
+        if let sessionReplay {
+            agent.sessionReplayProxy = sessionReplay
+        }
+
         return agent
+    }
+
+    /// Creates an operational Session Replay proxy for cross-module API tests.
+    public static func buildTestSessionReplay() -> any SessionReplayModule {
+        SessionReplay(for: CiscoSessionReplay.SessionReplay.instance)
     }
 
 

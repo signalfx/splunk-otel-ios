@@ -7,6 +7,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+* Added Swift and Objective-C runtime controls under `sessionReplay.preferences.interactionCapture` for enabling or disabling keyboard, touch, gesture, focus, and rage tap interactions in Session Replay.
+
 ## [2.4.2] - 2026-09-09
 
 ### Changed

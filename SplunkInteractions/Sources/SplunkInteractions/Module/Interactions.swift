@@ -112,6 +112,10 @@ public final class Interactions: SplunkInteractionsModule {
     }
 
     func handleEvent(_ event: InteractionEvent) async {
+        guard shouldHandleEvent(ofType: event.type) else {
+            return
+        }
+
         onActivity?(event.time)
 
         await handleEventType(
@@ -120,6 +124,10 @@ public final class Interactions: SplunkInteractionsModule {
             targetElement: targetElement(from: event),
             time: event.time
         )
+    }
+
+    func shouldHandleEvent(ofType type: InteractionType) -> Bool {
+        type != .sequenceCompleted
     }
 
     func handleEventType(
