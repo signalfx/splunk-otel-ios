@@ -15,6 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import Foundation
 import XCTest
 
 @testable import SplunkAgent
@@ -89,6 +90,23 @@ final class SessionReplayAPI10NoOpProxyTests: XCTestCase {
 
         XCTAssertNil(moduleReference)
         XCTAssertFalse(capture.isKeyboardEnabled)
+    }
+
+    func testInteractionCaptureIsNotEncoded() throws {
+        let preferences = try XCTUnwrap(moduleProxy.preferences as? SessionReplayPreferences)
+        let data = try JSONEncoder().encode(preferences)
+        let json = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+
+        XCTAssertNil(json["interactionCapture"])
+
+        let decodedPreferences = try JSONDecoder().decode(SessionReplayPreferences.self, from: data)
+        let decodedCapture = decodedPreferences.interactionCapture
+
+        XCTAssertTrue(decodedCapture.isKeyboardEnabled)
+        XCTAssertTrue(decodedCapture.isTouchEnabled)
+        XCTAssertTrue(decodedCapture.isGestureEnabled)
+        XCTAssertTrue(decodedCapture.isFocusEnabled)
+        XCTAssertTrue(decodedCapture.isRageTapEnabled)
     }
 
 

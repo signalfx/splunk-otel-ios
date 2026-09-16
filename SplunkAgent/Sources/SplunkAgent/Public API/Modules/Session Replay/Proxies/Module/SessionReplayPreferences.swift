@@ -146,6 +146,12 @@ extension SessionReplayPreferences: Codable {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
         try container.encodeIfPresent(renderingMode, forKey: .renderingMode)
+
+        // Non-operational values are sentinels and must not become future operational preferences.
+        guard !(interactionCapture is SessionReplayNonOperationalCapture) else {
+            return
+        }
+
         try container.encode(InteractionCaptureState(interactionCapture), forKey: .interactionCapture)
     }
 }
