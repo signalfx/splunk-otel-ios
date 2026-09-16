@@ -26,6 +26,12 @@ final class SessionReplayInteractionCaptureTests: XCTestCase {
         assertAllCategoriesEnabled(makeCapture())
     }
 
+    func testLegacyPreferencesConformerUsesDefaults() {
+        let preferences = LegacyModulePreferences(renderingMode: .native)
+
+        assertAllCategoriesEnabled(preferences.interactionCapture)
+    }
+
 
     // MARK: - Category properties
 
@@ -119,6 +125,23 @@ final class SessionReplayInteractionCaptureTests: XCTestCase {
 
     private struct LegacyPreferences: Encodable {
         let renderingMode: RenderingMode?
+    }
+
+    private final class LegacyModulePreferences: SessionReplayModulePreferences {
+        var renderingMode: RenderingMode?
+
+        required init(renderingMode: RenderingMode) {
+            self.renderingMode = renderingMode
+        }
+
+        @discardableResult
+        func renderingMode(
+            _ renderingMode: RenderingMode?
+        ) -> any SessionReplayModulePreferences {
+            self.renderingMode = renderingMode
+
+            return self
+        }
     }
 
 

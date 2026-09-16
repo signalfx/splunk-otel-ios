@@ -48,3 +48,12 @@ public protocol SessionReplayModulePreferences {
     /// - Parameter renderingMode: The required ``RenderingMode``.
     init(renderingMode: RenderingMode)
 }
+
+extension SessionReplayModulePreferences {
+
+    /// Default interaction capture configuration used by conforming types
+    /// that do not provide one.
+    public var interactionCapture: any SessionReplayModuleInteractionCapture {
+        SessionReplayInteractionCapture()
+    }
+}
