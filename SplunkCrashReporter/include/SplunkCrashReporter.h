@@ -15,7 +15,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#import "CrashReporter.h"
+#if __has_include(<SplunkCrashReporter/CrashReporter.h>)
+#import <SplunkCrashReporter/CrashReporter.h>
+#else
+#import "../Source/CrashReporter.h"
+#endif
 
 /*
  * The namespace header is needed while the umbrella header is parsed, but its

@@ -57,7 +57,8 @@ let package = Package(
                 .define("NDEBUG", .when(configuration: .release)),
                 .define("PLCRASHREPORTER_PREFIX", to: "SPLK"),
                 .define("SWIFT_PACKAGE"), // Should be defined by default, Xcode 11.1 workaround.
-                .headerSearchPath("Dependencies/protobuf-c")
+                .headerSearchPath("Dependencies/protobuf-c"),
+                .headerSearchPath("Source")
             ],
             linkerSettings: [
                 .linkedFramework("Foundation")

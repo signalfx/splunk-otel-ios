@@ -110,12 +110,34 @@ let crashReporterSettings: SettingsDictionary = [
     "PUBLIC_HEADERS_FOLDER_PATH": "$(CONTENTS_FOLDER_PATH)/Headers"
 ]
 
-/// Expose only the cleaned facade.
+/// Publish the cleaned facade and the headers it transitively imports.
 ///
-/// The vendored implementation headers remain private so clients cannot import
-/// a header that leaves namespace macros in their translation unit.
+/// The facade is the supported client entry point and restores namespace macros
+/// after importing the vendored API.
 let crashReporterPublicHeaders: FileList = [
-    "\(repoRoot)/SplunkCrashReporter/include/SplunkCrashReporter.h"
+    "\(repoRoot)/SplunkCrashReporter/include/SplunkCrashReporter.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/CrashReporter.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/PLCrashFeatureConfig.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/PLCrashMacros.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/PLCrashNamespace.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/PLCrashReport.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/PLCrashReportApplicationInfo.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/PLCrashReportBinaryImageInfo.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/PLCrashReportExceptionInfo.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/PLCrashReportFormatter.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/PLCrashReportMachExceptionInfo.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/PLCrashReportMachineInfo.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/PLCrashReportProcessInfo.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/PLCrashReportProcessorInfo.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/PLCrashReportRegisterInfo.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/PLCrashReportSignalInfo.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/PLCrashReportStackFrameInfo.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/PLCrashReportSymbolInfo.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/PLCrashReportSystemInfo.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/PLCrashReportTextFormatter.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/PLCrashReportThreadInfo.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/PLCrashReporter.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/PLCrashReporterConfig.h"
 ]
 
 
