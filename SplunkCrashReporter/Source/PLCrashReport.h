@@ -30,8 +30,8 @@
 
 #import <Foundation/Foundation.h>
 
-#ifndef PLCRASH_REPORT_H
-#define PLCRASH_REPORT_H
+#ifndef SPLK_PLCRASH_REPORT_H
+#define SPLK_PLCRASH_REPORT_H
 
 #if __has_include(<SplunkCrashReporter/PLCrashReportApplicationInfo.h>)
 #import <SplunkCrashReporter/PLCrashReportApplicationInfo.h>

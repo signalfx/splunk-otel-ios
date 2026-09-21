@@ -31,8 +31,8 @@
 #import <Foundation/Foundation.h>
 #import <mach/mach.h>
 
-#ifndef PLCRASH_REPORTER_H
-#define PLCRASH_REPORTER_H
+#ifndef SPLK_PLCRASH_REPORTER_H
+#define SPLK_PLCRASH_REPORTER_H
 
 #if __has_include(<SplunkCrashReporter/PLCrashReporterConfig.h>)
 #import <SplunkCrashReporter/PLCrashReporterConfig.h>

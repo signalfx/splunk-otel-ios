@@ -100,6 +100,7 @@
 #define PLCrashReporterSignalHandlerType      PLNS(PLCrashReporterSignalHandlerType)
 #define PLCrashReporterSignalHandlerTypeBSD   PLNS(PLCrashReporterSignalHandlerTypeBSD)
 #define PLCrashReporterSignalHandlerTypeMach  PLNS(PLCrashReporterSignalHandlerTypeMach)
+#define PLCrashReportFileHeader              PLNS(PLCrashReportFileHeader)
 #define PLCrashReporterSymbolicationStrategy  PLNS(PLCrashReporterSymbolicationStrategy)
 #define PLCrashReporterSymbolicationStrategyNone PLNS(PLCrashReporterSymbolicationStrategyNone)
 #define PLCrashReporterSymbolicationStrategySymbolTable PLNS(PLCrashReporterSymbolicationStrategySymbolTable)

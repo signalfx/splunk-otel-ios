@@ -86,6 +86,7 @@ limitations under the License.
 #undef PLCrashReporterSignalHandlerType
 #undef PLCrashReporterSignalHandlerTypeBSD
 #undef PLCrashReporterSignalHandlerTypeMach
+#undef PLCrashReportFileHeader
 #undef PLCrashReporterSymbolicationStrategy
 #undef PLCrashReporterSymbolicationStrategyAll
 #undef PLCrashReporterSymbolicationStrategyNone

@@ -27,7 +27,7 @@ final class CrashReporterEncodingTests: XCTestCase {
         let reporter = try XCTUnwrap(SPLKPLCrashReporter(configuration: configuration))
         let report = try XCTUnwrap(reporter.generateLiveReport())
 
-        let protobuf = report.dropFirst(MemoryLayout<PLCrashReportFileHeader>.size)
+        let protobuf = report.dropFirst(MemoryLayout<SPLKPLCrashReportFileHeader>.size)
         let processInfo = try XCTUnwrap(lengthDelimitedField(7, in: Data(protobuf)))
         let processPath = try XCTUnwrap(lengthDelimitedField(3, in: processInfo))
 
