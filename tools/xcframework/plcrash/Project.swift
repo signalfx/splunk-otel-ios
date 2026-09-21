@@ -56,7 +56,7 @@ let sharedSettings: SettingsDictionary = [
     ],
 
     // Minimum deployment targets.
-    "IPHONEOS_DEPLOYMENT_TARGET": "13.0",
+    "IPHONEOS_DEPLOYMENT_TARGET": "15.0",
     "TVOS_DEPLOYMENT_TARGET": "15.0",
     "MACOSX_DEPLOYMENT_TARGET": "12.0",
 
