@@ -28,8 +28,8 @@
 
 #import "PLCrashNamespace.h"
 
-#ifndef PLCRASH_CONSTANTS_H
-#define PLCRASH_CONSTANTS_H
+#ifndef SPLK_PLCRASH_CONSTANTS_H
+#define SPLK_PLCRASH_CONSTANTS_H
 
 #include <assert.h>
 #include <TargetConditionals.h>
@@ -142,4 +142,4 @@
 #  endif
 #endif /* PLCR_PRIVATE */
 
-#endif /* PLCRASH_CONSTANTS_H */
+#endif /* SPLK_PLCRASH_CONSTANTS_H */

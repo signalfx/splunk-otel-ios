@@ -28,8 +28,8 @@
 
 #import "PLCrashNamespace.h"
 
-#ifndef PLCRASH_FEATURE_CONFIG_H
-#define PLCRASH_FEATURE_CONFIG_H
+#ifndef SPLK_PLCRASH_FEATURE_CONFIG_H
+#define SPLK_PLCRASH_FEATURE_CONFIG_H
 
 #include <TargetConditionals.h>
 
@@ -107,4 +107,4 @@
  * @}
  */
 
-#endif /* PLCRASH_FEATURE_CONFIG_H */
+#endif /* SPLK_PLCRASH_FEATURE_CONFIG_H */
