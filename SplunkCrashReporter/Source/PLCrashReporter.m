@@ -82,27 +82,6 @@ static int monitored_signals[] = {
  * number of signals in the fatal signals list */
 static int monitored_signals_count = (sizeof(monitored_signals) / sizeof(monitored_signals[0]));
 
-/**
- * Return whether another component already owns one of the fatal POSIX signal
- * handlers used by PLCrashReporter.
- *
- * A crash reporter may be configured not to install an uncaught Objective-C
- * exception handler, so NSGetUncaughtExceptionHandler() is not sufficient to
- * determine whether the process already has a crash reporter.
- */
-static BOOL has_existing_signal_handler(void) {
-    for (int i = 0; i < monitored_signals_count; i++) {
-        struct sigaction action;
-        if (sigaction(monitored_signals[i], NULL, &action) != 0)
-            return YES;
-
-        if (action.sa_handler != SIG_DFL && action.sa_handler != SIG_IGN)
-            return YES;
-    }
-
-    return NO;
-}
-
 #if PLCRASH_FEATURE_MACH_EXCEPTIONS
 /**
  * Return whether another component already owns a task-level Mach exception
@@ -136,10 +115,12 @@ static BOOL has_existing_mach_exception_handler(void) {
 #endif /* PLCRASH_FEATURE_MACH_EXCEPTIONS */
 
 static BOOL has_existing_crash_handlers(void) {
-    if (has_existing_signal_handler())
-        return YES;
-
 #if PLCRASH_FEATURE_MACH_EXCEPTIONS
+    /* POSIX signal handlers are chainable through PLCrashSignalHandler. A
+     * pre-existing signal handler is captured during registration and does
+     * not by itself prevent this reporter from being installed. Mach
+     * exception ports are not chainable in the same way, so those remain a
+     * resource conflict. */
     if (has_existing_mach_exception_handler())
         return YES;
 #endif
