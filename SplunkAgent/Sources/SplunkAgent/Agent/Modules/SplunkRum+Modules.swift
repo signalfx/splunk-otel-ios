@@ -308,7 +308,10 @@ extension SplunkRum {
             launchOrigin: launchOrigin,
             didFinishLaunching: snapshot.didFinishLaunching,
             willEnterForeground: snapshot.willEnterForeground,
-            didBecomeActive: snapshot.didBecomeActive
+            didBecomeActive: snapshot.didBecomeActive,
+            recorderStartedAt: snapshot.recorderStartedAt,
+            prewarmDetected: snapshot.prewarmDetected,
+            events: snapshot.events
         )
     }
 

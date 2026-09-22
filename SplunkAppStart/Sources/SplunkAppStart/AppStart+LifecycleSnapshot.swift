@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-@_spi(SplunkInternal) internal import SplunkCommon
+@_spi(SplunkInternal) import SplunkCommon
 
 extension AppStart {
 
@@ -30,13 +30,15 @@ extension AppStart {
         didBecomeActiveTimestamp = nil
         backgroundLaunchDetected = nil
         capturedLaunchOrigin = nil
+        suppressionCounts.removeAll()
     }
 
     /// Consumes the snapshot recorded by the agent core.
     ///
     /// A complete, trusted snapshot can resolve immediately. Unknown or partial
-    /// provenance remains pending for the bounded hybrid handoff timeout so a
-    /// maintained integration can provide more precise evidence asynchronously.
+    /// foreground provenance remains pending for the bounded hybrid handoff timeout.
+    /// A known background launch without a foreground boundary remains pending until
+    /// the boundary arrives or process termination provides a terminal outcome.
     @_spi(SplunkInternal)
     public func consume(coreLifecycle snapshot: AppStartLifecycleSnapshot) {
         consume(coreLifecycle: nil, snapshot: snapshot)
@@ -61,6 +63,13 @@ extension AppStart {
             case .pending:
                 merge(initialLifecycle: snapshot, acceptUnknownOrigin: false)
 
+                // A recorder update already contains the event in its snapshot
+                // history. The event parameter is retained for compatibility with
+                // callers that provide only a scalar update.
+                if snapshot.events.isEmpty, let event {
+                    processCoreLifecycleEvent(event, resolve: false)
+                }
+
                 let hasActivation = didBecomeActiveTimestamp != nil
                 let hasRequiredBoundary: Bool
 
@@ -78,6 +87,28 @@ extension AppStart {
                 if hasActivation, hasRequiredBoundary {
                     determineAndSend()
                 }
+
+                let terminationEvent: AppLifecycleRecorder.Event?
+                if let termination = snapshot.events.last(where: { $0.kind == .willTerminate }) {
+                    terminationEvent = termination.event
+                }
+                else if let event,
+                    case .willTerminate = event
+                {
+                    terminationEvent = event
+                }
+                else {
+                    terminationEvent = nil
+                }
+
+                if !initialAppStartState.isTerminal, let terminationEvent {
+                    processCoreLifecycleEvent(terminationEvent)
+                    return
+                }
+
+                if isWaitingForBackgroundForegroundBoundary {
+                    cancelInitialHandoffTimeout()
+                }
                 else {
                     scheduleInitialHandoffTimeout()
                 }
@@ -87,6 +118,18 @@ extension AppStart {
 
     /// Validates optional lifecycle events supplied by a hybrid integration.
     func validSnapshotEventTimes(end: Date) -> Bool {
+        let timestamps = [
+            processStartTimestamp,
+            didFinishLaunchingTimestamp,
+            willEnterForegroundTimestamp,
+            didBecomeActiveTimestamp,
+            end
+        ].compactMap { $0 }
+
+        guard timestamps.allSatisfy(\.timeIntervalSinceReferenceDate.isFinite) else {
+            return false
+        }
+
         if let processStartTimestamp,
             let didFinishLaunchingTimestamp,
             processStartTimestamp > didFinishLaunchingTimestamp
@@ -109,6 +152,12 @@ extension AppStart {
 
         if let willEnterForegroundTimestamp,
             willEnterForegroundTimestamp > end
+        {
+            return false
+        }
+
+        if let processStartTimestamp,
+            processStartTimestamp > end
         {
             return false
         }

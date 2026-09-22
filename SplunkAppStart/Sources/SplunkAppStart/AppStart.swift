@@ -16,16 +16,17 @@ limitations under the License.
 */
 
 internal import CiscoLogger
-@_spi(SplunkInternal) internal import SplunkCommon
+@_spi(SplunkInternal) import SplunkCommon
 import UIKit
 
-enum AppStartSuppressionReason: String, Equatable {
+enum AppStartSuppressionReason: String, Equatable, Hashable {
     case unknownLaunchOrigin
     case maxDurationExceeded
     case missingDidBecomeActive
     case invalidTimestampOrder
     case missingForegroundBoundary
     case missingProcessStart
+    case backgroundWithoutForeground
 }
 
 enum AppStartResolutionState: Equatable {
@@ -111,7 +112,15 @@ public final class AppStart {
     let backgroundLaunchThreshold = 10.0
 
     /// Maximum valid AppStart duration. This is a validity guard, not the launch classifier.
-    var maxAppStartDuration: TimeInterval = 5.0
+    ///
+    /// The guard is intentionally high and only applies when launch provenance is
+    /// untrusted. Trusted foreground and background launches must remain observable
+    /// even when the host application's splash/startup work is slow.
+    var maxAppStartDuration: TimeInterval = 60.0
+
+    /// Counts suppressed initial measurements by reason for rollout diagnostics.
+    /// This stays local to the module and is not emitted as customer telemetry.
+    var suppressionCounts: [AppStartSuppressionReason: Int] = [:]
 
     /// Maximum time to wait for an asynchronous hybrid lifecycle handoff.
     var initialHandoffTimeout: TimeInterval = 5.0
@@ -230,9 +239,12 @@ public final class AppStart {
 
             merge(initialLifecycle: snapshot)
 
-            if didBecomeActiveTimestamp != nil {
+            if didBecomeActiveTimestamp != nil, !isWaitingForBackgroundForegroundBoundary {
                 cancelInitialHandoffTimeout()
                 determineAndSend()
+            }
+            else if isWaitingForBackgroundForegroundBoundary {
+                cancelInitialHandoffTimeout()
             }
             else {
                 scheduleInitialHandoffTimeout()
@@ -265,6 +277,10 @@ public final class AppStart {
             return
         }
 
+        guard !isWaitingForBackgroundForegroundBoundary else {
+            return
+        }
+
         // Reset state for further app start detection
         defer {
             // Clear timestamps
@@ -287,12 +303,22 @@ public final class AppStart {
 
         // Send app start if the type was determined
         if let (determinedType, startTime) = determinedAppStartType() {
-            guard startTime <= endTime else {
+            guard startTime.timeIntervalSinceReferenceDate.isFinite,
+                endTime.timeIntervalSinceReferenceDate.isFinite,
+                startTime <= endTime
+            else {
                 suppressInitialAppStart(reason: .invalidTimestampOrder)
                 return
             }
 
-            guard endTime.timeIntervalSince(startTime) <= maxAppStartDuration else {
+            let duration = endTime.timeIntervalSince(startTime)
+            let provenanceIsTrusted = capturedLaunchOrigin == .foreground
+                || capturedLaunchOrigin == .background
+                || backgroundLaunchDetected == true
+
+            guard duration.isFinite,
+                !provenanceIsTrusted && duration <= maxAppStartDuration || provenanceIsTrusted
+            else {
                 suppressInitialAppStart(reason: .maxDurationExceeded)
                 return
             }
@@ -432,13 +458,41 @@ public final class AppStart {
         didFinishLaunchingTimestamp = didFinishLaunchingTimestamp ?? snapshot.didFinishLaunching
         willEnterForegroundTimestamp = willEnterForegroundTimestamp ?? snapshot.willEnterForeground
         didBecomeActiveTimestamp = didBecomeActiveTimestamp ?? snapshot.didBecomeActive
+        prewarmDetected = prewarmDetected || snapshot.prewarmDetected
+
+        // Replay the same ordered evidence used by AppState. The scalar fields
+        // above preserve compatibility with integrations that only provide three
+        // timestamps, while the history fills in transitions such as
+        // willResignActive and willTerminate that are otherwise lost on handoff.
+        for record in snapshot.events {
+            mergeCoreLifecycleEvent(record.event)
+        }
 
         if acceptUnknownOrigin || snapshot.launchOrigin != .unknown {
             capturedLaunchOrigin = capturedLaunchOrigin ?? snapshot.launchOrigin
         }
     }
 
-    func processCoreLifecycleEvent(_ event: AppLifecycleRecorder.Event) {
+    func processCoreLifecycleEvent(_ event: AppLifecycleRecorder.Event, resolve: Bool = true) {
+        mergeCoreLifecycleEvent(event)
+
+        if resolve {
+            switch event {
+            case .didBecomeActive:
+                determineAndSend()
+
+            case .willTerminate:
+                if !initialAppStartState.isTerminal {
+                    suppressInitialAppStart(reason: suppressionReason())
+                }
+
+            default:
+                break
+            }
+        }
+    }
+
+    private func mergeCoreLifecycleEvent(_ event: AppLifecycleRecorder.Event) {
         switch event {
         case let .didFinishLaunching(timestamp):
             didFinishLaunchingTimestamp = didFinishLaunchingTimestamp ?? timestamp
@@ -448,7 +502,6 @@ public final class AppStart {
 
         case let .didBecomeActive(timestamp):
             didBecomeActiveTimestamp = didBecomeActiveTimestamp ?? timestamp
-            determineAndSend()
 
         case let .willResignActive(timestamp):
             willResignActiveTimestamp = willResignActiveTimestamp ?? timestamp
@@ -460,7 +513,10 @@ public final class AppStart {
     }
 
     func scheduleInitialHandoffTimeout() {
-        guard initialHandoffTimeoutWorkItem == nil, !initialAppStartState.isTerminal else {
+        guard initialHandoffTimeoutWorkItem == nil,
+            !initialAppStartState.isTerminal,
+            !isWaitingForBackgroundForegroundBoundary
+        else {
             return
         }
 
@@ -470,6 +526,10 @@ public final class AppStart {
             }
 
             initialHandoffTimeoutWorkItem = nil
+
+            if isWaitingForBackgroundForegroundBoundary {
+                return
+            }
 
             if didBecomeActiveTimestamp == nil {
                 suppressInitialAppStart(reason: .missingDidBecomeActive)
@@ -486,7 +546,7 @@ public final class AppStart {
         )
     }
 
-    private func cancelInitialHandoffTimeout() {
+    func cancelInitialHandoffTimeout() {
         initialHandoffTimeoutWorkItem?.cancel()
         initialHandoffTimeoutWorkItem = nil
     }
@@ -501,9 +561,12 @@ public final class AppStart {
     }
 
     private func suppressInitialAppStart(reason: AppStartSuppressionReason) {
-        if !initialAppStartState.isTerminal {
-            resolveInitialAppStart(as: .suppressed(reason))
+        guard !initialAppStartState.isTerminal else {
+            return
         }
+
+        resolveInitialAppStart(as: .suppressed(reason))
+        suppressionCounts[reason, default: 0] += 1
 
         logger.log(level: .warn) {
             "AppStart measurement suppressed. reason=\(reason.rawValue)"
@@ -511,6 +574,10 @@ public final class AppStart {
     }
 
     private func suppressionReason() -> AppStartSuppressionReason {
+        if isWaitingForBackgroundForegroundBoundary {
+            return .backgroundWithoutForeground
+        }
+
         guard didBecomeActiveTimestamp != nil else {
             return .missingDidBecomeActive
         }
@@ -539,6 +606,10 @@ public final class AppStart {
         }
 
         return .unknownLaunchOrigin
+    }
+
+    var isWaitingForBackgroundForegroundBoundary: Bool {
+        capturedLaunchOrigin == .background && willEnterForegroundTimestamp == nil
     }
 
 

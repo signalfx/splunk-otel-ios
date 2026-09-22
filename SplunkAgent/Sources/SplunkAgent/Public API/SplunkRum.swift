@@ -81,10 +81,21 @@ public class SplunkRum: ObservableObject {
         user: NoOpUser(),
         session: NoOpSession(),
         appStateManager: NoOpAppStateManager(),
-        lifecycleRecorder: AppLifecycleRecorder(enabled: false),
+        lifecycleRecorder: AppLifecycleRecorder.bootstrap(),
         logPoolName: PackageIdentifier.nonOperationalInstance(),
         sessionSampler: DefaultAgentSessionSampler()
     )
+
+    /// Starts the shared lifecycle recorder before SDK installation.
+    ///
+    /// Hybrid integrations should call this from their earliest native entry
+    /// point, before React Native, Flutter, or application startup work can
+    /// delay SDK installation. The recorder is reused by the eventual agent
+    /// instance and keeps a bounded ordered event history.
+    @_spi(SplunkInternal)
+    public static func bootstrapLifecycleRecording() {
+        _ = AppLifecycleRecorder.bootstrap()
+    }
 
 
     // MARK: - Public API
@@ -261,7 +272,7 @@ public class SplunkRum: ObservableObject {
 
         // Prepare handler for stored configuration and download remote configuration
         let configurationHandler = Self.createConfigurationHandler(for: configuration)
-        let lifecycleRecorder = AppLifecycleRecorder()
+        let lifecycleRecorder = AppLifecycleRecorder.bootstrap()
 
         // Initialize the agent
         self.init(

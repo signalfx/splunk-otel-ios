@@ -18,6 +18,7 @@ limitations under the License.
 import XCTest
 
 @_spi(SplunkInternal) @testable import SplunkAppStart
+@_spi(SplunkInternal) @testable import SplunkCommon
 
 final class AppStartTests: XCTestCase {
 
@@ -442,12 +443,13 @@ final class AppStartTests: XCTestCase {
         XCTAssertEqual(destination.storedAppStart?.end, didBecomeActive)
     }
 
-    func testLifecycleSnapshotBackgroundLaunchWithoutForegroundIsSuppressed() throws {
+    func testLifecycleSnapshotBackgroundLaunchWithoutForegroundRemainsPending() throws {
         let destination = DebugDestination()
         let now = Date()
 
         let appStart = AppStart()
         appStart.processStartTimestamp = now.addingTimeInterval(-120)
+        appStart.initialHandoffTimeout = 0.01
         appStart.destination = destination
 
         appStart.track(
@@ -459,39 +461,79 @@ final class AppStartTests: XCTestCase {
             )
         )
 
+        let timeoutCompleted = expectation(description: "background launch remains pending")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+            timeoutCompleted.fulfill()
+        }
+        wait(for: [timeoutCompleted], timeout: 1.0)
+
+        XCTAssertEqual(appStart.initialAppStartState, .pending)
         try checkNotDeterminedType(in: destination)
-    }
-
-    func testSuppressedInitialSnapshotIsNotRetriedByAnotherSnapshot() throws {
-        let destination = DebugDestination()
-        let now = Date()
-
-        let appStart = AppStart()
-        appStart.processStartTimestamp = now.addingTimeInterval(-120)
-        appStart.destination = destination
 
         appStart.track(
             initialLifecycle: AppStartLifecycleSnapshot(
                 launchOrigin: .background,
-                didFinishLaunching: now.addingTimeInterval(-120),
-                willEnterForeground: nil,
-                didBecomeActive: now
-            )
-        )
-
-        appStart.track(
-            initialLifecycle: AppStartLifecycleSnapshot(
-                launchOrigin: .foreground,
                 didFinishLaunching: now.addingTimeInterval(-120),
                 willEnterForeground: now.addingTimeInterval(-1),
                 didBecomeActive: now
             )
         )
 
+        try checkDeterminedType(.warm, in: destination)
+    }
+
+    func testBackgroundLaunchWithoutForegroundIsSuppressedOnTermination() throws {
+        let destination = DebugDestination()
+        let now = Date()
+
+        let appStart = AppStart()
+        appStart.processStartTimestamp = now.addingTimeInterval(-120)
+        appStart.destination = destination
+
+        appStart.track(
+            initialLifecycle: AppStartLifecycleSnapshot(
+                launchOrigin: .background,
+                didFinishLaunching: now.addingTimeInterval(-120),
+                willEnterForeground: nil,
+                didBecomeActive: now
+            )
+        )
+
+        appStart.processCoreLifecycleEvent(.willTerminate(now.addingTimeInterval(0.1)))
+
+        try checkNotDeterminedType(in: destination)
+        XCTAssertEqual(appStart.initialAppStartState, .suppressed(.backgroundWithoutForeground))
+    }
+
+    func testRecordedBackgroundTerminationSuppressesPendingSnapshot() throws {
+        let destination = DebugDestination()
+        let notificationCenter = NotificationCenter()
+        let recorder = AppLifecycleRecorder(notificationCenter: notificationCenter)
+
+        notificationCenter.post(name: UIApplication.didFinishLaunchingNotification, object: nil)
+        notificationCenter.post(name: UIApplication.willTerminateNotification, object: nil)
+
+        let snapshot = recorder.snapshot()
+        let appStart = AppStart()
+        appStart.destination = destination
+        appStart.processStartTimestamp = Date(timeIntervalSinceNow: -2)
+
+        appStart.consume(
+            coreLifecycle: nil,
+            snapshot: AppStartLifecycleSnapshot(
+                launchOrigin: .background,
+                didFinishLaunching: snapshot.didFinishLaunching,
+                willEnterForeground: nil,
+                didBecomeActive: nil,
+                events: snapshot.events
+            )
+        )
+
+        XCTAssertEqual(appStart.initialAppStartState, .suppressed(.backgroundWithoutForeground))
         try checkNotDeterminedType(in: destination)
     }
 
-    func testSuppressedInitialSnapshotIsNotRetriedByLegacyTrack() throws {
+    func testBackgroundPendingSnapshotCanBeCompletedByLegacyTrack() throws {
         let destination = DebugDestination()
         let now = Date()
 
@@ -514,10 +556,10 @@ final class AppStartTests: XCTestCase {
             willEnterForeground: now.addingTimeInterval(-1.0)
         )
 
-        try checkNotDeterminedType(in: destination)
+        try checkDeterminedType(.warm, in: destination)
     }
 
-    func testForegroundSnapshotOverMaximumDurationIsSuppressed() throws {
+    func testTrustedForegroundSnapshotOverFormerMaximumDurationIsEmitted() throws {
         let destination = DebugDestination()
         let now = Date()
         let processStart = now.addingTimeInterval(-30)
@@ -534,6 +576,25 @@ final class AppStartTests: XCTestCase {
                 willEnterForeground: now.addingTimeInterval(-2),
                 didBecomeActive: didBecomeActive
             )
+        )
+
+        try checkDeterminedType(.cold, in: destination)
+        XCTAssertEqual(appStart.initialAppStartState, .emitted)
+    }
+
+    func testUntrustedLegacyStartOverConfiguredGuardIsSuppressed() throws {
+        let destination = DebugDestination()
+        let now = Date()
+
+        let appStart = AppStart()
+        appStart.processStartTimestamp = now.addingTimeInterval(-30)
+        appStart.maxAppStartDuration = 5
+        appStart.destination = destination
+
+        appStart.track(
+            didBecomeActive: now,
+            didFinishLaunching: now.addingTimeInterval(-5),
+            willEnterForeground: now.addingTimeInterval(-1)
         )
 
         try checkNotDeterminedType(in: destination)

@@ -81,4 +81,44 @@ final class AppLifecycleRecorderTests: XCTestCase {
 
         wait(for: [eventReceived], timeout: 1.0)
     }
+
+    func testSnapshotRetainsBoundedOrderedLifecycleHistory() {
+        let notificationCenter = NotificationCenter()
+        let recorder = AppLifecycleRecorder(notificationCenter: notificationCenter)
+
+        notificationCenter.post(name: UIApplication.didFinishLaunchingNotification, object: nil)
+        notificationCenter.post(name: UIApplication.willResignActiveNotification, object: nil)
+        notificationCenter.post(name: UIApplication.didEnterBackgroundNotification, object: nil)
+
+        let events = recorder.snapshot().events
+
+        XCTAssertEqual(
+            events.map(\.kind),
+            [.didFinishLaunching, .willResignActive, .didEnterBackground]
+        )
+        XCTAssertEqual(events.map(\.sequence), [1, 2, 3])
+        XCTAssertEqual(events.map(\.source), [.notification, .notification, .notification])
+    }
+
+    func testLateObserverReceivesPreviouslyRecordedHistory() {
+        let notificationCenter = NotificationCenter()
+        let recorder = AppLifecycleRecorder(notificationCenter: notificationCenter)
+        notificationCenter.post(name: UIApplication.willEnterForegroundNotification, object: nil)
+        notificationCenter.post(name: UIApplication.didBecomeActiveNotification, object: nil)
+
+        let observerReceived = expectation(description: "history replay received")
+        recorder.addObserver { update in
+            guard update.event == nil else {
+                return
+            }
+
+            XCTAssertEqual(
+                update.snapshot.events.map(\.kind),
+                [.willEnterForeground, .didBecomeActive]
+            )
+            observerReceived.fulfill()
+        }
+
+        wait(for: [observerReceived], timeout: 1.0)
+    }
 }

@@ -21,11 +21,11 @@ import Foundation
     import UIKit
 #endif
 
-/// Records the process' initial application lifecycle evidence for the agent core.
+/// Records process lifecycle evidence for the agent core.
 ///
 /// The recorder is shared by AppStart, AppState, and hybrid integrations. Initial
-/// lifecycle fields use first-event-wins semantics; subsequent lifecycle events are
-/// still delivered to subscribers so AppState can persist every transition.
+/// lifecycle fields use first-event-wins semantics, while a bounded ordered event
+/// history preserves evidence for SDKs installed after the process lifecycle began.
 @_spi(SplunkInternal)
 public final class AppLifecycleRecorder {
 
@@ -42,6 +42,32 @@ public final class AppLifecycleRecorder {
 
         /// The launch origin could not be determined reliably.
         case unknown
+    }
+
+    /// The lifecycle event kind stored in the ordered history.
+    @_spi(SplunkInternal)
+    public enum EventKind: Equatable {
+        case didFinishLaunching
+        case willEnterForeground
+        case didBecomeActive
+        case willResignActive
+        case didEnterBackground
+        case willTerminate
+    }
+
+    /// The application state observed when a lifecycle event was recorded.
+    @_spi(SplunkInternal)
+    public enum ApplicationState: Equatable {
+        case active
+        case inactive
+        case background
+        case unknown
+    }
+
+    /// The source that produced a lifecycle record.
+    @_spi(SplunkInternal)
+    public enum EventSource: Equatable {
+        case notification
     }
 
     /// A lifecycle event delivered to subscribers.
@@ -66,24 +92,83 @@ public final class AppLifecycleRecorder {
         case willTerminate(Date)
     }
 
+    /// A timestamped, ordered lifecycle record.
+    @_spi(SplunkInternal)
+    public struct EventRecord: Equatable {
+        public let kind: EventKind
+        public let timestamp: Date
+        public let applicationState: ApplicationState
+        public let sequence: UInt64
+        public let source: EventSource
+
+        fileprivate init(
+            kind: EventKind,
+            timestamp: Date,
+            applicationState: ApplicationState,
+            sequence: UInt64,
+            source: EventSource
+        ) {
+            self.kind = kind
+            self.timestamp = timestamp
+            self.applicationState = applicationState
+            self.sequence = sequence
+            self.source = source
+        }
+
+        /// The legacy event representation used by lifecycle consumers.
+        public var event: Event {
+            switch kind {
+            case .didFinishLaunching:
+                return .didFinishLaunching(timestamp)
+
+            case .willEnterForeground:
+                return .willEnterForeground(timestamp)
+
+            case .didBecomeActive:
+                return .didBecomeActive(timestamp)
+
+            case .willResignActive:
+                return .willResignActive(timestamp)
+
+            case .didEnterBackground:
+                return .didEnterBackground(timestamp)
+
+            case .willTerminate:
+                return .willTerminate(timestamp)
+            }
+        }
+    }
+
     /// The first-launch evidence currently known by the recorder.
     @_spi(SplunkInternal)
     public struct Snapshot {
+        /// The time at which this recorder started observing lifecycle events.
+        public let recorderStartedAt: Date
+        /// Whether the process exposed Apple's prewarm marker to the recorder.
+        public let prewarmDetected: Bool
         public let launchOrigin: LaunchOrigin
         public let didFinishLaunching: Date?
         public let willEnterForeground: Date?
         public let didBecomeActive: Date?
+        /// Bounded lifecycle history in notification order.
+        public let events: [EventRecord]
 
         fileprivate init(
+            recorderStartedAt: Date,
+            prewarmDetected: Bool,
             launchOrigin: LaunchOrigin,
             didFinishLaunching: Date?,
             willEnterForeground: Date?,
-            didBecomeActive: Date?
+            didBecomeActive: Date?,
+            events: [EventRecord]
         ) {
+            self.recorderStartedAt = recorderStartedAt
+            self.prewarmDetected = prewarmDetected
             self.launchOrigin = launchOrigin
             self.didFinishLaunching = didFinishLaunching
             self.willEnterForeground = willEnterForeground
             self.didBecomeActive = didBecomeActive
+            self.events = events
         }
     }
 
@@ -91,10 +176,12 @@ public final class AppLifecycleRecorder {
     @_spi(SplunkInternal)
     public struct Update {
         public let event: Event?
+        public let eventRecord: EventRecord?
         public let snapshot: Snapshot
 
-        fileprivate init(event: Event?, snapshot: Snapshot) {
+        fileprivate init(event: Event?, eventRecord: EventRecord?, snapshot: Snapshot) {
             self.event = event
+            self.eventRecord = eventRecord
             self.snapshot = snapshot
         }
     }
@@ -104,6 +191,9 @@ public final class AppLifecycleRecorder {
     private let notificationCenter: NotificationCenter
     private let lock = NSLock()
     private let backgroundLaunchThreshold: TimeInterval = 10.0
+    private let maxHistoryCount = 128
+    private let recorderStartedAt: Date
+    private let prewarmDetected: Bool
 
     private var notificationTokens: [NSObjectProtocol] = []
     private var observers: [UUID: (Update) -> Void] = [:]
@@ -112,13 +202,49 @@ public final class AppLifecycleRecorder {
     private var didFinishLaunchingTimestamp: Date?
     private var willEnterForegroundTimestamp: Date?
     private var didBecomeActiveTimestamp: Date?
+    private var eventHistory: [EventRecord] = []
+    private var nextSequence: UInt64 = 0
 
     // MARK: - Initialization
 
     /// Creates and starts a lifecycle recorder.
     @_spi(SplunkInternal)
-    public init(notificationCenter: NotificationCenter = .default, enabled: Bool = true) {
+    public convenience init(notificationCenter: NotificationCenter = .default, enabled: Bool = true) {
+        self.init(
+            notificationCenter: notificationCenter,
+            enabled: enabled,
+            captureInitialApplicationState: false
+        )
+    }
+
+    /// Returns the process-wide recorder intended for early adapter bootstrap.
+    ///
+    /// Integrations that can load before `UIApplication` lifecycle notifications
+    /// should call this from their earliest native entry point. Later SDK install
+    /// reuses the same recorder and receives the already captured history.
+    @_spi(SplunkInternal)
+    public static func bootstrap() -> AppLifecycleRecorder {
+        bootstrappedRecorder
+    }
+
+    private static let bootstrappedRecorder = AppLifecycleRecorder(
+        notificationCenter: .default,
+        enabled: true,
+        captureInitialApplicationState: true
+    )
+
+    private init(
+        notificationCenter: NotificationCenter,
+        enabled: Bool,
+        captureInitialApplicationState: Bool
+    ) {
         self.notificationCenter = notificationCenter
+        recorderStartedAt = Date()
+        prewarmDetected = ProcessInfo.processInfo.environment["ActivePrewarm"] == "1"
+
+        if captureInitialApplicationState {
+            captureInitialApplicationStateIfAvailable()
+        }
 
         if enabled {
             start()
@@ -139,7 +265,7 @@ public final class AppLifecycleRecorder {
         }
     }
 
-    /// Subscribes to lifecycle updates and asynchronously receives the current snapshot first.
+    /// Subscribes to lifecycle updates and receives the current snapshot first.
     @_spi(SplunkInternal)
     @discardableResult
     public func addObserver(_ observer: @escaping (Update) -> Void) -> UUID {
@@ -149,12 +275,22 @@ public final class AppLifecycleRecorder {
             return makeSnapshot()
         }
 
-        DispatchQueue.main.async { [weak self] in
+        let deliverSnapshot = { [weak self] in
             guard let observer = self?.observer(for: identifier) else {
                 return
             }
 
-            observer(Update(event: nil, snapshot: snapshot))
+            observer(Update(event: nil, eventRecord: nil, snapshot: snapshot))
+        }
+
+        // Lifecycle consumers are attached on the main thread. Delivering the
+        // registration snapshot synchronously there preserves event order when a
+        // notification is posted immediately after installation.
+        if Thread.isMainThread {
+            deliverSnapshot()
+        }
+        else {
+            DispatchQueue.main.async(execute: deliverSnapshot)
         }
 
         return identifier
@@ -211,33 +347,53 @@ public final class AppLifecycleRecorder {
         #if canImport(UIKit)
         let timestamp = Date()
         let event: Event
+        let kind: EventKind
 
         switch name {
         case UIApplication.didFinishLaunchingNotification:
             event = .didFinishLaunching(timestamp)
+            kind = .didFinishLaunching
 
         case UIApplication.willEnterForegroundNotification:
             event = .willEnterForeground(timestamp)
+            kind = .willEnterForeground
 
         case UIApplication.didBecomeActiveNotification:
             event = .didBecomeActive(timestamp)
+            kind = .didBecomeActive
 
         case UIApplication.willResignActiveNotification:
             event = .willResignActive(timestamp)
+            kind = .willResignActive
 
         case UIApplication.didEnterBackgroundNotification:
             event = .didEnterBackground(timestamp)
+            kind = .didEnterBackground
 
         case UIApplication.willTerminateNotification:
             event = .willTerminate(timestamp)
+            kind = .willTerminate
 
         default:
             return
         }
 
         let update = withLock { () -> Update in
+            nextSequence += 1
+            let record = EventRecord(
+                kind: kind,
+                timestamp: timestamp,
+                applicationState: currentApplicationState(),
+                sequence: nextSequence,
+                source: .notification
+            )
+            eventHistory.append(record)
+            if eventHistory.count > maxHistoryCount {
+                eventHistory.removeFirst(eventHistory.count - maxHistoryCount)
+            }
+
             updateSnapshot(for: event)
-            return Update(event: event, snapshot: makeSnapshot())
+            return Update(event: event, eventRecord: record, snapshot: makeSnapshot())
         }
 
         let currentObservers = withLock { Array(observers.values) }
@@ -327,11 +483,56 @@ public final class AppLifecycleRecorder {
 
     private func makeSnapshot() -> Snapshot {
         Snapshot(
+            recorderStartedAt: recorderStartedAt,
+            prewarmDetected: prewarmDetected,
             launchOrigin: launchOrigin,
             didFinishLaunching: didFinishLaunchingTimestamp,
             willEnterForeground: willEnterForegroundTimestamp,
-            didBecomeActive: didBecomeActiveTimestamp
+            didBecomeActive: didBecomeActiveTimestamp,
+            events: eventHistory
         )
+    }
+
+    private func captureInitialApplicationStateIfAvailable() {
+        #if canImport(UIKit)
+            guard Thread.isMainThread else {
+                return
+            }
+
+            switch UIApplication.shared.applicationState {
+            case .active:
+                launchOrigin = .foreground
+
+            case .background:
+                launchOrigin = .background
+
+            case .inactive:
+                launchOrigin = .unknown
+
+            @unknown default:
+                launchOrigin = .unknown
+            }
+        #endif
+    }
+
+    private func currentApplicationState() -> ApplicationState {
+        #if canImport(UIKit)
+            switch UIApplication.shared.applicationState {
+            case .active:
+                return .active
+
+            case .inactive:
+                return .inactive
+
+            case .background:
+                return .background
+
+            @unknown default:
+                return .unknown
+            }
+        #else
+            return .unknown
+        #endif
     }
 
     private func observer(for identifier: UUID) -> ((Update) -> Void)? {

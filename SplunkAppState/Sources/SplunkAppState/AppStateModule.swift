@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-@_spi(SplunkInternal) internal import SplunkCommon
+@_spi(SplunkInternal) import SplunkCommon
 
 public final class AppStateModule {
 
@@ -59,30 +59,45 @@ public final class AppStateModule {
         self.lifecycleRecorder = lifecycleRecorder
 
         lifecycleObserverIdentifier = lifecycleRecorder.addObserver { [weak self] update in
+            guard let self else {
+                return
+            }
+
+            if update.event == nil {
+                for record in update.snapshot.events {
+                    processCoreLifecycleEvent(record.event)
+                }
+                return
+            }
+
             guard let event = update.event else {
                 return
             }
 
+            processCoreLifecycleEvent(event)
+        }
+    }
+
+    private func processCoreLifecycleEvent(_ event: AppLifecycleRecorder.Event) {
             switch event {
             case let .didBecomeActive(timestamp):
-                self?.processEvent(.active, at: timestamp)
+                processEvent(.active, at: timestamp)
 
             case let .didEnterBackground(timestamp):
-                self?.processEvent(.background, at: timestamp)
+                processEvent(.background, at: timestamp)
 
             case let .willEnterForeground(timestamp):
-                self?.processEvent(.foreground, at: timestamp)
+                processEvent(.foreground, at: timestamp)
 
             case let .willResignActive(timestamp):
-                self?.processEvent(.inactive, at: timestamp)
+                processEvent(.inactive, at: timestamp)
 
             case let .willTerminate(timestamp):
-                self?.processEvent(.terminate, at: timestamp)
+                processEvent(.terminate, at: timestamp)
 
             case .didFinishLaunching:
                 break
             }
-        }
     }
 
 

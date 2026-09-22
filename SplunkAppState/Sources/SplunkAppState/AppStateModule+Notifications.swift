@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-@_spi(SplunkInternal) internal import SplunkCommon
+@_spi(SplunkInternal) import SplunkCommon
 
 #if os(iOS) || os(tvOS) || os(visionOS)
     import UIKit

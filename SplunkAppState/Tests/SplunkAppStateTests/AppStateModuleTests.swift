@@ -105,6 +105,24 @@ final class AppStateModuleTests: XCTestCase {
             module.removeNotifications()
         }
 
+        func testLateLifecycleRecorderConsumerReplaysOrderedHistory() {
+            let mock = MockDestination()
+            let module = AppStateModule()
+            module.destination = mock
+            let notificationCenter = NotificationCenter()
+            let recorder = AppLifecycleRecorder(notificationCenter: notificationCenter)
+
+            notificationCenter.post(name: UIApplication.willResignActiveNotification, object: nil)
+            notificationCenter.post(name: UIApplication.didEnterBackgroundNotification, object: nil)
+            notificationCenter.post(name: UIApplication.willEnterForegroundNotification, object: nil)
+
+            module.use(lifecycleRecorder: recorder)
+
+            expectEventCount(mock, count: 3)
+            XCTAssertEqual(mock.events.map(\.state), [.inactive, .background, .foreground])
+            module.removeNotifications()
+        }
+
         func testDidBecomeActiveSendsActive() {
             let mock = MockDestination()
             let module = makeModule(with: mock)

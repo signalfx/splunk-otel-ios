@@ -15,6 +15,7 @@ limitations under the License.
 */
 
 import Foundation
+@_spi(SplunkInternal) import SplunkCommon
 
 /// Lifecycle evidence captured by a hybrid integration before the iOS SDK is installed.
 @_spi(SplunkInternal)
@@ -44,17 +45,32 @@ public struct AppStartLifecycleSnapshot {
     /// The captured `UIApplication.didBecomeActiveNotification` timestamp.
     public let didBecomeActive: Date?
 
+    /// The time at which the core recorder started observing lifecycle events.
+    public let recorderStartedAt: Date?
+
+    /// Whether the process exposed Apple's prewarm marker to the recorder.
+    public let prewarmDetected: Bool
+
+    /// The bounded ordered lifecycle history captured before SDK installation.
+    public let events: [AppLifecycleRecorder.EventRecord]
+
     /// Creates lifecycle evidence for initial AppStart classification.
     public init(
         launchOrigin: LaunchOrigin,
         didFinishLaunching: Date?,
         willEnterForeground: Date?,
-        didBecomeActive: Date?
+        didBecomeActive: Date?,
+        recorderStartedAt: Date? = nil,
+        prewarmDetected: Bool = false,
+        events: [AppLifecycleRecorder.EventRecord] = []
     ) {
         self.launchOrigin = launchOrigin
         self.didFinishLaunching = didFinishLaunching
         self.willEnterForeground = willEnterForeground
         self.didBecomeActive = didBecomeActive
+        self.recorderStartedAt = recorderStartedAt
+        self.prewarmDetected = prewarmDetected
+        self.events = events
     }
 }
 

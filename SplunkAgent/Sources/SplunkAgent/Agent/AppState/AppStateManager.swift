@@ -48,34 +48,49 @@ class AppStateManager: AgentAppStateManager {
 
         if let lifecycleRecorder {
             lifecycleObserverIdentifier = lifecycleRecorder.addObserver { [weak self] update in
+                guard let self else {
+                    return
+                }
+
+                if update.event == nil {
+                    for record in update.snapshot.events {
+                        processLifecycleEvent(record.event)
+                    }
+                    return
+                }
+
                 guard let event = update.event else {
                     return
                 }
 
-                switch event {
-                case let .didBecomeActive(timestamp):
-                    self?.appStateModel.saveEvent(.active, at: timestamp)
-
-                case let .didEnterBackground(timestamp):
-                    self?.appStateModel.saveEvent(.background, at: timestamp)
-
-                case let .willEnterForeground(timestamp):
-                    self?.appStateModel.saveEvent(.foreground, at: timestamp)
-
-                case let .willResignActive(timestamp):
-                    self?.appStateModel.saveEvent(.inactive, at: timestamp)
-
-                case let .willTerminate(timestamp):
-                    self?.appStateModel.saveEvent(.terminate, at: timestamp)
-
-                case .didFinishLaunching:
-                    break
-                }
+                processLifecycleEvent(event)
             }
         }
         else {
             hookToAppLifecycle()
         }
+    }
+
+    private func processLifecycleEvent(_ event: AppLifecycleRecorder.Event) {
+                switch event {
+                case let .didBecomeActive(timestamp):
+                    appStateModel.saveEvent(.active, at: timestamp)
+
+                case let .didEnterBackground(timestamp):
+                    appStateModel.saveEvent(.background, at: timestamp)
+
+                case let .willEnterForeground(timestamp):
+                    appStateModel.saveEvent(.foreground, at: timestamp)
+
+                case let .willResignActive(timestamp):
+                    appStateModel.saveEvent(.inactive, at: timestamp)
+
+                case let .willTerminate(timestamp):
+                    appStateModel.saveEvent(.terminate, at: timestamp)
+
+                case .didFinishLaunching:
+                    break
+                }
     }
 
     deinit {
