@@ -126,7 +126,12 @@ static BOOL has_existing_mach_exception_handler(void) {
     if (ports == nil)
         return YES;
 
-    return ports.set.count > 0;
+    for (PLCrashMachExceptionPort *port in ports.set) {
+        if (MACH_PORT_VALID(port.server_port))
+            return YES;
+    }
+
+    return NO;
 }
 #endif /* PLCRASH_FEATURE_MACH_EXCEPTIONS */
 
