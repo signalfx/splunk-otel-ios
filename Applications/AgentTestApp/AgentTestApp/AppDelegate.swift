@@ -52,7 +52,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         )
         let agentConfig = AgentConfiguration(
             endpoint: endpointConfig,
-            appName: "App Name",
+            appName: "AgentTestApp",
             deploymentEnvironment: "dev"
         )
         .enableDebugLogging(true)

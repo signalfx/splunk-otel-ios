@@ -9,22 +9,18 @@
 #   - OpenTelemetryApi/Sdk: Built by build-otel-xcframeworks.sh → output/xcframeworks/
 #   - Cisco modules: Built locally as dynamic xcframeworks by build-cisco-xcframeworks.sh
 #                    (or linked from a legacy local path via --cisco-path)
-#   - CrashReporter: Downloaded from PLCrashReporter GitHub releases
 #
 # Usage:
 #   ./scripts/populate-dependencies.sh [options]
 #
 # Options:
 #   --cisco-path PATH     Legacy path to directory containing dynamic Cisco xcframeworks
-#   --plcrash-version VER PLCrashReporter version (default: 1.12.2)
 #   --skip-otel           Skip OTel (assumes already built in output/xcframeworks/)
 #   --skip-cisco          Skip Cisco staging
-#   --skip-plcrash        Skip PLCrashReporter download
 #   --download-cisco      Legacy mode: download Cisco from Package.swift registry
 #
 # Environment variables:
 #   CISCO_XCFRAMEWORKS_PATH  Same as --cisco-path (legacy)
-#   PLCRASH_VERSION          Same as --plcrash-version
 
 set -euo pipefail
 
@@ -41,16 +37,12 @@ DEPS_DIR="${TOOLS_ROOT}/dependencies"
 # Where OTel xcframeworks are built
 OTEL_OUTPUT_DIR="${TOOLS_ROOT}/output/xcframeworks"
 
-# PLCrashReporter settings (built from source by build-plcrash-xcframeworks.sh)
-PLCRASH_VERSION="${PLCRASH_VERSION:-1.12.2}"
-
 # Cisco xcframeworks path (can be overridden)
 CISCO_XCFRAMEWORKS_PATH="${CISCO_XCFRAMEWORKS_PATH:-}"
 
 # Control flags
 SKIP_OTEL=false
 SKIP_CISCO=false
-SKIP_PLCRASH=false
 DOWNLOAD_CISCO=false
 
 # Expected xcframeworks
@@ -68,13 +60,8 @@ while [[ $# -gt 0 ]]; do
             CISCO_XCFRAMEWORKS_PATH="$2"
             shift 2
             ;;
-        --plcrash-version)
-            PLCRASH_VERSION="$2"
-            shift 2
-            ;;
         --skip-otel) SKIP_OTEL=true; shift ;;
         --skip-cisco) SKIP_CISCO=true; shift ;;
-        --skip-plcrash) SKIP_PLCRASH=true; shift ;;
         --download-cisco) DOWNLOAD_CISCO=true; shift ;;
         *)
             echo "Unknown argument: $1"
@@ -171,32 +158,10 @@ fi
 
 
 # ---------------------------------------------------------------------------
-# Step 4: Link PLCrashReporter xcframework (built from source)
-# ---------------------------------------------------------------------------
-
-if [[ "${SKIP_PLCRASH}" == "false" ]]; then
-    log "Linking CrashReporter xcframework from build output"
-
-    PLCRASH_SRC="${OTEL_OUTPUT_DIR}/CrashReporter.xcframework"
-    PLCRASH_DST="${DEPS_DIR}/CrashReporter.xcframework"
-
-    if [[ ! -d "${PLCRASH_SRC}" ]]; then
-        echo "ERROR: CrashReporter.xcframework not found at ${PLCRASH_SRC}"
-        echo "  Run build-plcrash-xcframeworks.sh first."
-        exit 1
-    fi
-
-    rm -rf "${PLCRASH_DST}"
-    ln -s "${PLCRASH_SRC}" "${PLCRASH_DST}"
-    echo "  ✓ CrashReporter.xcframework (symlinked from build output)"
-fi
-
-
-# ---------------------------------------------------------------------------
-# Step 5: Copy Cisco xcframeworks into the output directory
+# Step 4: Copy Cisco xcframeworks into the output directory
 # ---------------------------------------------------------------------------
 # The output/ directory is the single distribution artifact. It already
-# contains built-from-source frameworks (OTel, PLCrash, Agent modules).
+# contains built-from-source frameworks (OTel and Agent modules).
 # Cisco SR frameworks are pre-built externals that also need to be in
 # the output so customers get everything from one folder.
 
@@ -224,7 +189,7 @@ fi
 
 
 # ---------------------------------------------------------------------------
-# Step 6: Verify
+# Step 5: Verify
 # ---------------------------------------------------------------------------
 
 log "Dependencies directory contents:"

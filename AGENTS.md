@@ -81,7 +81,7 @@ This repo is not migrated to Swift 6 strict concurrency. New code should reduce 
 
 - `Package.swift` and `tools/xcframework/Project.swift` must stay synchronized for products, targets, platforms, dependencies, resources, and module links.
 - Run or request `tools/xcframework/scripts/check-manifest-sync.sh` when either manifest changes.
-- Dependency bumps for `opentelemetry-swift-core` or `PLCrashReporter` must stay exact-pinned and compatible with the xcframework build pipeline.
+- Dependency bumps for `opentelemetry-swift-core` must stay exact-pinned and compatible with the xcframework build pipeline. Updates to the vendored `SplunkCrashReporter` sources require license, binary-size, symbol-prefix, and xcframework compatibility review.
 - New SPM products are customer-visible distribution changes.
 - Use `TargetWrappers/` for Cisco binary target wrappers; it is the directory referenced by `Package.swift`.
 - Resource changes must be reflected in both SPM and xcframework distribution and reviewed for `PrivacyInfo.xcprivacy` impact.
