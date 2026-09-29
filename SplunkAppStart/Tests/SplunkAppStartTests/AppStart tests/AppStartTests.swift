@@ -70,6 +70,7 @@ final class AppStartTests: XCTestCase {
         appStart.processStartTimestamp = Date()
         appStart.destination = destination
         appStart.install(with: nil, remoteConfiguration: nil)
+        appStart.resumeInitialLifecycleResolution()
 
         simulateColdStartNotifications()
 
@@ -95,6 +96,7 @@ final class AppStartTests: XCTestCase {
         let appStart = AppStart()
         appStart.destination = destination
         appStart.install(with: nil, remoteConfiguration: nil)
+        appStart.resumeInitialLifecycleResolution()
         appStart.prewarmDetected = true
 
         simulateWarmStartNotifications()
@@ -118,6 +120,7 @@ final class AppStartTests: XCTestCase {
         appStart.backgroundLaunchDetected = true
         appStart.destination = destination
         appStart.install(with: nil, remoteConfiguration: nil)
+        appStart.resumeInitialLifecycleResolution()
 
         simulateWarmStartNotifications()
 
@@ -141,6 +144,7 @@ final class AppStartTests: XCTestCase {
         let appStart = AppStart()
         appStart.destination = destination
         appStart.install(with: nil, remoteConfiguration: nil)
+        appStart.resumeInitialLifecycleResolution()
 
         // Simulate a long delay that is ambiguous between a background launch and
         // a slow foreground splash screen.
@@ -163,6 +167,7 @@ final class AppStartTests: XCTestCase {
         let appStart = AppStart()
         appStart.destination = destination
         appStart.install(with: nil, remoteConfiguration: nil)
+        appStart.resumeInitialLifecycleResolution()
 
         simulateHotStartNotifications()
 
@@ -177,6 +182,7 @@ final class AppStartTests: XCTestCase {
         let appStart = AppStart()
         appStart.destination = destination
         appStart.install(with: nil, remoteConfiguration: nil)
+        appStart.resumeInitialLifecycleResolution()
 
         simulateStartNotificationsWithNoDidFinishLaunching()
 

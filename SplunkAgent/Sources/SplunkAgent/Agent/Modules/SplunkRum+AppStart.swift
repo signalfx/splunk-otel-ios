@@ -102,8 +102,20 @@ extension SplunkRum {
     func customizeAppState() {
         let appStateModule = modulesManager?.module(ofType: SplunkAppState.AppStateModule.self)
 
-        appStateModule?.sharedState = sharedState
-        appStateModule?.use(lifecycleRecorder: lifecycleRecorder)
+        let customize = { [self, appStateModule] in
+            // Local observers are removed before the recorder observer is
+            // registered. Keep that transition on main so no UIKit lifecycle
+            // callback can fall into the handoff gap.
+            appStateModule?.sharedState = sharedState
+            appStateModule?.use(lifecycleRecorder: lifecycleRecorder)
+        }
+
+        if Thread.isMainThread {
+            customize()
+        }
+        else {
+            DispatchQueue.main.sync(execute: customize)
+        }
     }
 
     private static func appStartLifecycleSnapshot(

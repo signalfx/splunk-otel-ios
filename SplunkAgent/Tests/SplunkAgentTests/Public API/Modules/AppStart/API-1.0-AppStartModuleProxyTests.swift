@@ -15,10 +15,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import SplunkAppStart
+@_spi(SplunkInternal) import SplunkCommon
 import XCTest
 
 @testable import SplunkAgent
+@_spi(SplunkInternal) @testable import SplunkAppStart
 
 final class AppStartAPI10ModuleProxyTests: XCTestCase {
 
@@ -55,5 +56,26 @@ final class AppStartAPI10ModuleProxyTests: XCTestCase {
 
         XCTAssertNotNil(moduleProxy.track(didBecomeActive: Date(), didFinishLaunching: Date(), willEnterForeground: Date()))
         XCTAssertNotNil(moduleProxy.track(didBecomeActive: Date(), didFinishLaunching: nil, willEnterForeground: nil))
+    }
+
+    func testInitialLifecycleTrackingForwardsToModule() throws {
+        let module = try XCTUnwrap(module)
+        let moduleProxy = try XCTUnwrap(moduleProxy)
+        let now = Date()
+        let destination = DebugDestination()
+        module.destination = destination
+        module.processStartTimestamp = now.addingTimeInterval(-2.0)
+
+        _ = moduleProxy.track(
+            initialLifecycle: AppStartLifecycleSnapshot(
+                launchOrigin: .foreground,
+                launchOriginConfidence: .observed,
+                didFinishLaunching: now.addingTimeInterval(-1.5),
+                willEnterForeground: now.addingTimeInterval(-1.0),
+                didBecomeActive: now
+            )
+        )
+
+        XCTAssertEqual(destination.storedAppStart?.type, .cold)
     }
 }

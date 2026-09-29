@@ -15,6 +15,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+@_spi(SplunkInternal) import SplunkAppStart
+@_spi(SplunkInternal) import SplunkCommon
 import XCTest
 
 @testable import SplunkAgent
@@ -31,5 +33,18 @@ final class AppStartAPI10NoOpProxyTests: XCTestCase {
     func testManualTracking() {
         XCTAssertNotNil(moduleProxy.track(didBecomeActive: Date(), didFinishLaunching: Date(), willEnterForeground: Date()))
         XCTAssertNotNil(moduleProxy.track(didBecomeActive: Date(), didFinishLaunching: nil, willEnterForeground: nil))
+    }
+
+    func testInitialLifecycleTrackingIsNoOp() {
+        let now = Date()
+        let snapshot = AppStartLifecycleSnapshot(
+            launchOrigin: .foreground,
+            launchOriginConfidence: .observed,
+            didFinishLaunching: now.addingTimeInterval(-1.5),
+            willEnterForeground: now.addingTimeInterval(-1.0),
+            didBecomeActive: now
+        )
+
+        XCTAssertNotNil(moduleProxy.track(initialLifecycle: snapshot))
     }
 }

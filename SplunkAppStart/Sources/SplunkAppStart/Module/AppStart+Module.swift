@@ -38,7 +38,21 @@ extension AppStart: Module {
     // MARK: - Module methods
 
     public func install(with _: (any ModuleConfiguration)?, remoteConfiguration _: (any RemoteModuleConfiguration)?) {
-        startDetection()
+        let install = { [self] in
+            // Agent installation completes the recorder handoff later in the
+            // same main-thread lifecycle sequence. Defer resolution before
+            // registering listeners so an early native callback cannot win
+            // the race with the hybrid snapshot.
+            deferInitialLifecycleResolution()
+            startDetection()
+        }
+
+        if Thread.isMainThread {
+            install()
+        }
+        else {
+            DispatchQueue.main.sync(execute: install)
+        }
     }
 
 
