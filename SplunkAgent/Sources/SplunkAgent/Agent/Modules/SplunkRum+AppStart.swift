@@ -89,12 +89,13 @@ extension SplunkRum {
 
         // AppStart lifecycle state and notification callbacks are main-thread state.
         // Keep reset, deferral, and recorder subscription as one ordered transition
-        // when the agent is installed from a hybrid/background thread.
+        // when the agent is installed from a hybrid/background thread. Do not wait
+        // for main: the host may be synchronously waiting for agent installation.
         if Thread.isMainThread {
             customize()
         }
         else {
-            DispatchQueue.main.sync(execute: customize)
+            DispatchQueue.main.async(execute: customize)
         }
     }
 
@@ -114,7 +115,9 @@ extension SplunkRum {
             customize()
         }
         else {
-            DispatchQueue.main.sync(execute: customize)
+            // AppState also owns main-thread lifecycle observation. Enqueue the
+            // handoff without blocking a hybrid thread during agent installation.
+            DispatchQueue.main.async(execute: customize)
         }
     }
 

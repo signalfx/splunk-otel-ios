@@ -36,6 +36,7 @@ extension AppStartTests {
                 installCompleted.fulfill()
             }
         wait(for: [installCompleted], timeout: 1.0)
+        drainMainQueue()
 
         NotificationCenter.default.post(name: UIApplication.didFinishLaunchingNotification, object: nil)
         NotificationCenter.default.post(name: UIApplication.willEnterForegroundNotification, object: nil)

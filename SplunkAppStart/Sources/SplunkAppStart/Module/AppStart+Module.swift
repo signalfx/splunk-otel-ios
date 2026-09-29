@@ -51,7 +51,10 @@ extension AppStart: Module {
             install()
         }
         else {
-            DispatchQueue.main.sync(execute: install)
+            // Module installation is called synchronously from the agent initializer.
+            // Never wait for main here: a hybrid host may synchronously wait for that
+            // initializer from the main thread.
+            DispatchQueue.main.async(execute: install)
         }
     }
 
