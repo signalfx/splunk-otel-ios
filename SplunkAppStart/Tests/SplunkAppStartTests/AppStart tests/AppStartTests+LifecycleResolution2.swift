@@ -108,6 +108,42 @@ extension AppStartTests {
         try checkNotDeterminedType(in: destination)
     }
 
+    func testLateSnapshotSeparatesInitialAndSubsequentActivationCycles() throws {
+        let destination = DebugDestination()
+        let notificationCenter = NotificationCenter()
+        let recorder = AppLifecycleRecorder(notificationCenter: notificationCenter)
+
+        notificationCenter.post(name: UIApplication.didFinishLaunchingNotification, object: nil)
+        notificationCenter.post(name: UIApplication.didBecomeActiveNotification, object: nil)
+        notificationCenter.post(name: UIApplication.willResignActiveNotification, object: nil)
+        notificationCenter.post(name: UIApplication.willEnterForegroundNotification, object: nil)
+        notificationCenter.post(name: UIApplication.didBecomeActiveNotification, object: nil)
+
+        let snapshot = recorder.snapshot()
+        let appStart = AppStart()
+        appStart.destination = destination
+        appStart.processStartTimestamp = try XCTUnwrap(snapshot.didFinishLaunching).addingTimeInterval(-1.0)
+
+        appStart.consume(
+            coreLifecycle: nil,
+            snapshot: AppStartLifecycleSnapshot(
+                launchOrigin: .foreground,
+                launchOriginConfidence: .observed,
+                didFinishLaunching: snapshot.didFinishLaunching,
+                willEnterForeground: snapshot.willEnterForeground,
+                didBecomeActive: snapshot.didBecomeActive,
+                events: snapshot.events
+            )
+        )
+
+        XCTAssertTrue(appStart.coldStartSent)
+        try checkDeterminedType(.hot, in: destination)
+        XCTAssertEqual(
+            destination.storedAppStart?.start,
+            snapshot.events.first { $0.kind == .willEnterForeground }?.timestamp
+        )
+    }
+
     func testInferredCoreBackgroundSnapshotWaitsForObservedHybridHandoff() throws {
         let destination = DebugDestination()
         let now = Date()

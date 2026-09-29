@@ -28,6 +28,7 @@ public final class AppStateModule {
     // MARK: - Internal properties
 
     var notificationObservers: [NSObjectProtocol] = []
+    var localObservationStartedAt: Date?
     var lifecycleObserverIdentifier: UUID?
     var lifecycleRecorder: AppLifecycleRecorder?
     var destination: AppStateDestination = OtelDestination()
@@ -55,6 +56,11 @@ public final class AppStateModule {
     /// Uses the agent-core lifecycle recorder as the single source of lifecycle events.
     @_spi(SplunkInternal)
     public func use(lifecycleRecorder: AppLifecycleRecorder) {
+        guard self.lifecycleRecorder !== lifecycleRecorder else {
+            return
+        }
+
+        let localObservationStartedAt = localObservationStartedAt
         removeNotifications()
         self.lifecycleRecorder = lifecycleRecorder
 
@@ -64,7 +70,15 @@ public final class AppStateModule {
             }
 
             if update.event == nil {
-                for record in update.snapshot.events {
+                let records = update.snapshot.events.filter { record in
+                    guard let localObservationStartedAt else {
+                        return true
+                    }
+
+                    return record.timestamp < localObservationStartedAt
+                }
+
+                for record in records {
                     processCoreLifecycleEvent(record.event)
                 }
                 return

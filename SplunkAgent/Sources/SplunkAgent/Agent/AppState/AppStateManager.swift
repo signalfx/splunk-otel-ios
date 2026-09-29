@@ -53,9 +53,7 @@ class AppStateManager: AgentAppStateManager {
                 }
 
                 if update.event == nil {
-                    for record in update.snapshot.events {
-                        processLifecycleEvent(record.event)
-                    }
+                    processLifecycleEvents(update.snapshot.events.map(\.event))
                     return
                 }
 
@@ -63,7 +61,7 @@ class AppStateManager: AgentAppStateManager {
                     return
                 }
 
-                processLifecycleEvent(event)
+                processLifecycleEvents([event])
             }
         }
         else {
@@ -71,27 +69,31 @@ class AppStateManager: AgentAppStateManager {
         }
     }
 
-    private func processLifecycleEvent(_ event: AppLifecycleRecorder.Event) {
+    private func processLifecycleEvents(_ lifecycleEvents: [AppLifecycleRecorder.Event]) {
         accessQueue.sync {
-            switch event {
-            case let .didBecomeActive(timestamp):
-                appStateModel.saveEvent(.active, at: timestamp)
+            let events = lifecycleEvents.compactMap { event -> (state: AppState, timestamp: Date)? in
+                switch event {
+                case let .didBecomeActive(timestamp):
+                    return (.active, timestamp)
 
-            case let .didEnterBackground(timestamp):
-                appStateModel.saveEvent(.background, at: timestamp)
+                case let .didEnterBackground(timestamp):
+                    return (.background, timestamp)
 
-            case let .willEnterForeground(timestamp):
-                appStateModel.saveEvent(.foreground, at: timestamp)
+                case let .willEnterForeground(timestamp):
+                    return (.foreground, timestamp)
 
-            case let .willResignActive(timestamp):
-                appStateModel.saveEvent(.inactive, at: timestamp)
+                case let .willResignActive(timestamp):
+                    return (.inactive, timestamp)
 
-            case let .willTerminate(timestamp):
-                appStateModel.saveEvent(.terminate, at: timestamp)
+                case let .willTerminate(timestamp):
+                    return (.terminate, timestamp)
 
-            case .didFinishLaunching:
-                break
+                case .didFinishLaunching:
+                    return nil
+                }
             }
+
+            appStateModel.saveEvents(events)
         }
     }
 
@@ -115,7 +117,7 @@ class AppStateManager: AgentAppStateManager {
                 queue: nil
             ) { [weak self] _ in
 
-                self?.processLifecycleEvent(.didBecomeActive(Date()))
+                self?.processLifecycleEvents([.didBecomeActive(Date())])
             }
 
             _ = NotificationCenter.default.addObserver(
@@ -124,7 +126,7 @@ class AppStateManager: AgentAppStateManager {
                 queue: nil
             ) { [weak self] _ in
 
-                self?.processLifecycleEvent(.didEnterBackground(Date()))
+                self?.processLifecycleEvents([.didEnterBackground(Date())])
             }
 
             _ = NotificationCenter.default.addObserver(
@@ -133,7 +135,7 @@ class AppStateManager: AgentAppStateManager {
                 queue: nil
             ) { [weak self] _ in
 
-                self?.processLifecycleEvent(.willEnterForeground(Date()))
+                self?.processLifecycleEvents([.willEnterForeground(Date())])
             }
 
             _ = NotificationCenter.default.addObserver(
@@ -142,7 +144,7 @@ class AppStateManager: AgentAppStateManager {
                 queue: nil
             ) { [weak self] _ in
 
-                self?.processLifecycleEvent(.willResignActive(Date()))
+                self?.processLifecycleEvents([.willResignActive(Date())])
             }
 
             _ = NotificationCenter.default.addObserver(
@@ -151,7 +153,7 @@ class AppStateManager: AgentAppStateManager {
                 queue: nil
             ) { [weak self] _ in
 
-                self?.processLifecycleEvent(.willTerminate(Date()))
+                self?.processLifecycleEvents([.willTerminate(Date())])
             }
 
         #endif

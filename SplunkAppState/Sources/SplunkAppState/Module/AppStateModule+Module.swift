@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-import SplunkCommon
+@_spi(SplunkInternal) import SplunkCommon
 
 public struct AppStateData: ModuleEventData {}
 
@@ -38,7 +38,7 @@ extension AppStateModule: Module {
     // MARK: - Module methods
 
     public func install(with _: (any ModuleConfiguration)?, remoteConfiguration _: (any RemoteModuleConfiguration)?) {
-        startDetection()
+        use(lifecycleRecorder: AppLifecycleRecorder.bootstrap())
     }
 
 

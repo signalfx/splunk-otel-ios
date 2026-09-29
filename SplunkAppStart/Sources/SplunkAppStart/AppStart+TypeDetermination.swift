@@ -24,7 +24,7 @@ extension AppStart {
     // MARK: - Type determination
 
     /// Determines an app start type and sends valid results.
-    func determineAndSend() {
+    func determineAndSend(allowLegacyManualTrackingFallback: Bool = false) {
         guard !shouldIgnoreLifecycleResolution,
             !awaitingObservedBackgroundHandoff,
             !isWaitingForBackgroundForegroundBoundary
@@ -43,7 +43,9 @@ extension AppStart {
             return
         }
 
-        if let (determinedType, startTime) = determinedAppStartType() {
+        if let (determinedType, startTime) = determinedAppStartType(
+            allowLegacyManualTrackingFallback: allowLegacyManualTrackingFallback
+        ) {
             sendIfValid(start: startTime, end: endTime, type: determinedType)
         }
         else {
@@ -102,30 +104,27 @@ extension AppStart {
     }
 
     /// Determines app start type from available notifications timestamps.
-    func determinedAppStartType() -> (AppStartType, Date)? {
+    func determinedAppStartType(
+        allowLegacyManualTrackingFallback: Bool = false
+    ) -> (AppStartType, Date)? {
         guard let didBecomeActiveTimestamp else {
             return nil
         }
 
-        if let willResignActiveTimestamp,
-            let willEnterForegroundTimestamp,
-            willResignActiveTimestamp <= willEnterForegroundTimestamp
-        {
-            return (.hot, willEnterForegroundTimestamp)
+        if let hotStart = determinedHotStart() {
+            return hotStart
         }
 
-        // Prewarm means that process start is not a valid user-visible cold-start anchor.
-        // Check it before hybrid launch origin because UIApplication may report .active or
-        // .inactive for a prewarmed process when the early hybrid observer runs.
-        if prewarmDetected,
-            let startTime = willEnterForegroundTimestamp,
-            startTime <= didBecomeActiveTimestamp
-        {
-            return (.warm, startTime)
+        if let prewarmStart = determinedPrewarmStart(didBecomeActiveTimestamp: didBecomeActiveTimestamp) {
+            return prewarmStart
         }
 
         if let capturedLaunchOrigin {
             return determinedSnapshotAppStartType(launchOrigin: capturedLaunchOrigin)
+        }
+
+        if let legacyStart = determinedLegacyStart(allowed: allowLegacyManualTrackingFallback) {
+            return legacyStart
         }
 
         let launchedInBackground = backgroundLaunchDetected
@@ -139,34 +138,83 @@ extension AppStart {
             return nil
         }
 
-        if !initialAppStartState.isTerminal,
+        if let warmStart = determinedWarmStart(launchedInBackground: launchedInBackground) {
+            return warmStart
+        }
+
+        return determinedColdStart(launchedInBackground: launchedInBackground)
+    }
+
+    private func determinedHotStart() -> (AppStartType, Date)? {
+        guard let willResignActiveTimestamp,
+            let willEnterForegroundTimestamp,
+            willResignActiveTimestamp <= willEnterForegroundTimestamp
+        else {
+            return nil
+        }
+
+        return (.hot, willEnterForegroundTimestamp)
+    }
+
+    private func determinedPrewarmStart(didBecomeActiveTimestamp: Date) -> (AppStartType, Date)? {
+        // Prewarm means that process start is not a valid user-visible cold-start anchor.
+        // Check it before hybrid launch origin because UIApplication may report .active or
+        // .inactive for a prewarmed process when the early hybrid observer runs.
+        guard prewarmDetected,
+            let startTime = willEnterForegroundTimestamp,
+            startTime <= didBecomeActiveTimestamp
+        else {
+            return nil
+        }
+
+        return (.warm, startTime)
+    }
+
+    private func determinedLegacyStart(allowed: Bool) -> (AppStartType, Date)? {
+        guard allowed,
+            backgroundLaunchDetected == nil,
+            let startTime = processStartTimestamp
+        else {
+            return nil
+        }
+
+        // The legacy public tracking API documents the optional lifecycle timestamps as
+        // metadata. Keep its minimum-parameter behavior when no stronger evidence exists.
+        return (.cold, startTime)
+    }
+
+    private func determinedWarmStart(launchedInBackground: Bool?) -> (AppStartType, Date)? {
+        guard !initialAppStartState.isTerminal,
             launchedInBackground == true || prewarmDetected,
             let startTime = willEnterForegroundTimestamp
-        {
-            return (.warm, startTime)
+        else {
+            return nil
         }
 
-        if !initialAppStartState.isTerminal, !coldStartSent, let startTime = processStartTimestamp {
-            if launchedInBackground == nil {
-                guard let didFinishLaunchingTimestamp,
-                    let willEnterForegroundTimestamp,
-                    willEnterForegroundTimestamp >= didFinishLaunchingTimestamp
-                else {
-                    return nil
-                }
+        return (.warm, startTime)
+    }
 
-                if willEnterForegroundTimestamp.timeIntervalSince(didFinishLaunchingTimestamp) > backgroundLaunchThreshold {
-                    // A delayed foreground boundary without trusted background
-                    // provenance is intentionally suppressed; it must not become
-                    // an artificially long cold start or an inferred warm start.
-                    return nil
-                }
+    private func determinedColdStart(launchedInBackground: Bool?) -> (AppStartType, Date)? {
+        guard !initialAppStartState.isTerminal,
+            !coldStartSent,
+            let startTime = processStartTimestamp
+        else {
+            return nil
+        }
+
+        if launchedInBackground == nil {
+            guard let didFinishLaunchingTimestamp,
+                let willEnterForegroundTimestamp,
+                willEnterForegroundTimestamp >= didFinishLaunchingTimestamp,
+                willEnterForegroundTimestamp.timeIntervalSince(didFinishLaunchingTimestamp) <= backgroundLaunchThreshold
+            else {
+                // A delayed foreground boundary without trusted background provenance is
+                // intentionally suppressed rather than becoming an inferred warm start.
+                return nil
             }
-
-            return (.cold, startTime)
         }
 
-        return nil
+        return (.cold, startTime)
     }
 
     /// Determines an initial AppStart from explicit hybrid lifecycle evidence.

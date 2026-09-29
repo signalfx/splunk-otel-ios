@@ -29,6 +29,7 @@ extension AppStateModule {
     func setupNotifications() {
         #if os(iOS) || os(tvOS) || os(visionOS)
             removeNotifications()
+            localObservationStartedAt = Date()
 
             addObserver(UIApplication.didBecomeActiveNotification) { [weak self] in
                 self?.processEvent(.active)
@@ -61,6 +62,7 @@ extension AppStateModule {
 
         lifecycleObserverIdentifier = nil
         lifecycleRecorder = nil
+        localObservationStartedAt = nil
 
         #if os(iOS) || os(tvOS) || os(visionOS)
             let tokens = notificationObservers

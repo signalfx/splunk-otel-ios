@@ -213,8 +213,7 @@ extension AppLifecycleRecorder {
         guard launchOrigin == .unknown,
             willEnterForegroundTimestamp == nil,
             let didFinishLaunchingTimestamp,
-            timestamp >= didFinishLaunchingTimestamp,
-            timestamp.timeIntervalSince(didFinishLaunchingTimestamp) <= backgroundLaunchThreshold
+            timestamp >= didFinishLaunchingTimestamp
         else {
             return
         }

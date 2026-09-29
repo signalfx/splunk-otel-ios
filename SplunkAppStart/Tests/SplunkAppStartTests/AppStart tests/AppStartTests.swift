@@ -217,7 +217,7 @@ final class AppStartTests: XCTestCase {
 
         appStart.track(didBecomeActive: didBecomeActive, didFinishLaunching: nil, willEnterForeground: nil)
 
-        try checkNotDeterminedType(in: destination)
-        XCTAssertEqual(appStart.initialAppStartState, .suppressed(.unknownLaunchOrigin))
+        try checkDeterminedType(.cold, in: destination)
+        try checkDates(in: destination)
     }
 }

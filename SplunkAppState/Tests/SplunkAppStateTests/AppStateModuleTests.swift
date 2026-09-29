@@ -57,8 +57,10 @@ final class AppStateModuleTests: XCTestCase {
         let module = AppStateModule()
         module.startDetection()
         XCTAssertEqual(module.notificationObservers.count, expectedObserverCount)
+        XCTAssertNil(module.lifecycleObserverIdentifier)
         module.stopDetection()
-        XCTAssertEqual(module.notificationObservers.count, 0)
+        XCTAssertTrue(module.notificationObservers.isEmpty)
+        XCTAssertNil(module.lifecycleObserverIdentifier)
     }
 
     func testPostingNotificationsDoesNotCrash() {
@@ -120,6 +122,23 @@ final class AppStateModuleTests: XCTestCase {
 
             expectEventCount(mock, count: 3)
             XCTAssertEqual(mock.events.map(\.state), [.inactive, .background, .foreground])
+            module.removeNotifications()
+        }
+
+        func testLifecycleRecorderHandoffDoesNotReplayLocallyObservedEvents() {
+            let mock = MockDestination()
+            let module = AppStateModule()
+            module.destination = mock
+            module.setupNotifications()
+
+            let recorder = AppLifecycleRecorder(notificationCenter: .default)
+            NotificationCenter.default.post(name: UIApplication.didBecomeActiveNotification, object: nil)
+
+            XCTAssertEqual(mock.events.map(\.state), [.active])
+
+            module.use(lifecycleRecorder: recorder)
+
+            XCTAssertEqual(mock.events.map(\.state), [.active])
             module.removeNotifications()
         }
 

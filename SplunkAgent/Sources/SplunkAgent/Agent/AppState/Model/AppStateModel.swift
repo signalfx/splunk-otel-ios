@@ -54,21 +54,32 @@ class AppStateModel {
     }
 
     func saveEvent(_ state: AppState, at now: Date) {
+        saveEvents([(state: state, timestamp: now)])
+    }
+
+    func saveEvents(_ newEvents: [(state: AppState, timestamp: Date)]) {
+        guard !newEvents.isEmpty else {
+            return
+        }
+
         var events: [AppStateEvent] = (try? storage.read(forKey: Self.storageKey)) ?? []
+        let latestTimestamp = newEvents.map(\.timestamp).max() ?? Date()
 
         // Remove events which are old
         events = events.filter {
-            now.timeIntervalSince($0.timestamp) <= Self.eventLifetime
+            latestTimestamp.timeIntervalSince($0.timestamp) <= Self.eventLifetime
         }
 
-        // Remove events which exceeds maximal event count
-        if events.count >= Self.maxEvents {
-            events.removeFirst(events.count - Self.maxEvents + 1)
-        }
+        events.append(
+            contentsOf: newEvents.map { event in
+                AppStateEvent(timestamp: event.timestamp, state: event.state)
+            }
+        )
 
-        // Add new event
-        let newState = AppStateEvent(timestamp: now, state: state)
-        events.append(newState)
+        // Remove events which exceed the maximal event count.
+        if events.count > Self.maxEvents {
+            events.removeFirst(events.count - Self.maxEvents)
+        }
 
         // Save events to storage
         do {

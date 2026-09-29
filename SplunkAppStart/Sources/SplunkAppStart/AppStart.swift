@@ -256,7 +256,7 @@ public final class AppStart {
             didFinishLaunchingTimestamp = didFinishLaunchingTimestamp ?? didFinishLaunching
             willEnterForegroundTimestamp = willEnterForegroundTimestamp ?? willEnterForeground
 
-            determineAndSend()
+            determineAndSend(allowLegacyManualTrackingFallback: true)
         }
     }
 
@@ -276,7 +276,8 @@ public final class AppStart {
                 return
             }
 
-            merge(initialLifecycle: snapshot)
+            let lifecycleSegments = initialLifecycleSegments(from: snapshot)
+            merge(initialLifecycle: lifecycleSegments.initial)
 
             if capturedLaunchOriginConfidence == .observed {
                 awaitingObservedBackgroundHandoff = false
@@ -288,6 +289,9 @@ public final class AppStart {
             else if didBecomeActiveTimestamp != nil, !isWaitingForBackgroundForegroundBoundary {
                 cancelInitialHandoffTimeout()
                 determineAndSend()
+                if initialAppStartState.isTerminal {
+                    replaySubsequentLifecycleEvents(lifecycleSegments.subsequent)
+                }
             }
             else if isWaitingForBackgroundForegroundBoundary {
                 cancelInitialHandoffTimeout()

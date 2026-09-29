@@ -18,6 +18,7 @@ limitations under the License.
 import XCTest
 
 @testable import SplunkAgent
+@_spi(SplunkInternal) @testable import SplunkCommon
 
 final class AppStateManagerTests: XCTestCase {
 
@@ -62,6 +63,22 @@ final class AppStateManagerTests: XCTestCase {
         XCTAssertEqual(retrievedState, .foreground)
     }
 
+    func testLifecycleHistoryReplayPersistsAsSingleBatch() {
+        let storage = CountingStorage()
+        let appStateModel = AppStateModel(storage: storage)
+        let notificationCenter = NotificationCenter()
+        let recorder = AppLifecycleRecorder(notificationCenter: notificationCenter)
+
+        notificationCenter.post(name: UIApplication.didBecomeActiveNotification, object: nil)
+        notificationCenter.post(name: UIApplication.didEnterBackgroundNotification, object: nil)
+        notificationCenter.post(name: UIApplication.willEnterForegroundNotification, object: nil)
+
+        _ = AppStateManager(appStateModel: appStateModel, lifecycleRecorder: recorder)
+
+        XCTAssertEqual(storage.updateCount, 1)
+        XCTAssertEqual(storage.events.map(\.state), [.active, .background, .foreground])
+    }
+
     func testNotificationsHandle() async {
         let storage = UserDefaultsStorageTestBuilder.buildCleanStorage(named: "testNotificationsHandle")
         try? storage.delete(forKey: "appStateEvents")
@@ -89,5 +106,27 @@ final class AppStateManagerTests: XCTestCase {
 
         let retrievedState = appStateManager.appState(for: Date())
         XCTAssertEqual(retrievedState, .terminate)
+    }
+}
+
+private final class CountingStorage: KeyValueStorage {
+    var events: [AppStateEvent] = []
+    var updateCount = 0
+
+    func insert(_ value: Codable, forKey _: String) throws {
+        events = (value as? [AppStateEvent]) ?? []
+    }
+
+    func read<T: Codable>(forKey _: String) throws -> T? {
+        events as? T
+    }
+
+    func update(_ value: Codable, forKey _: String) throws {
+        updateCount += 1
+        events = (value as? [AppStateEvent]) ?? []
+    }
+
+    func delete(forKey _: String) throws {
+        events.removeAll()
     }
 }

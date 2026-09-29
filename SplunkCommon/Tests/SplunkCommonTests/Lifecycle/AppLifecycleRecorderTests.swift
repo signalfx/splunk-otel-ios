@@ -65,6 +65,18 @@ final class AppLifecycleRecorderTests: XCTestCase {
         XCTAssertEqual(recorder.snapshot().launchOriginConfidence, .observed)
     }
 
+    func testForegroundLaunchWithoutForegroundBoundaryIgnoresLongSplashDuration() {
+        let notificationCenter = NotificationCenter()
+        let recorder = AppLifecycleRecorder(notificationCenter: notificationCenter)
+        let didFinishLaunching = Date(timeIntervalSinceNow: -120.0)
+
+        recorder.didFinishLaunchingTimestamp = didFinishLaunching
+        notificationCenter.post(name: UIApplication.didBecomeActiveNotification, object: nil)
+
+        XCTAssertEqual(recorder.snapshot().launchOrigin, .foreground)
+        XCTAssertEqual(recorder.snapshot().launchOriginConfidence, .observed)
+    }
+
     func testForegroundLaunchWithForegroundBoundaryIsNotMarkedAsBackground() {
         let notificationCenter = NotificationCenter()
         let recorder = AppLifecycleRecorder(notificationCenter: notificationCenter)

@@ -91,7 +91,10 @@ extension AppStart {
         coreLifecycle event: AppLifecycleRecorder.Event?,
         snapshot: AppStartLifecycleSnapshot
     ) {
-        merge(initialLifecycle: snapshot, acceptUnknownOrigin: false)
+        let lifecycleSegments = initialLifecycleSegments(from: snapshot)
+        let initialSnapshot = lifecycleSegments.initial
+
+        merge(initialLifecycle: initialSnapshot, acceptUnknownOrigin: false)
 
         if capturedLaunchOrigin == .background,
             capturedLaunchOriginConfidence == .inferred
@@ -114,20 +117,80 @@ extension AppStart {
             // observed origin before making the conservative suppression decision.
             scheduleInitialHandoffTimeout()
         }
-        else if didBecomeActiveTimestamp != nil, hasRequiredBoundary(for: snapshot.launchOrigin) {
+        else if didBecomeActiveTimestamp != nil, hasRequiredBoundary(for: initialSnapshot.launchOrigin) {
             determineAndSend()
             if initialAppStartState.isTerminal {
+                replaySubsequentLifecycleEvents(lifecycleSegments.subsequent)
                 return
             }
         }
 
-        if let terminationEvent = terminationEvent(in: snapshot, fallback: event) {
+        if let terminationEvent = terminationEvent(in: initialSnapshot, fallback: event) {
             processCoreLifecycleEvent(terminationEvent)
             return
         }
 
         if isWaitingForBackgroundForegroundBoundary {
             cancelInitialHandoffTimeout()
+        }
+    }
+
+    func initialLifecycleSegments(
+        from snapshot: AppStartLifecycleSnapshot
+    ) -> (initial: AppStartLifecycleSnapshot, subsequent: [AppLifecycleRecorder.EventRecord]) {
+        guard let firstActivationIndex = snapshot.events.firstIndex(where: { $0.kind == .didBecomeActive }),
+            firstActivationIndex < snapshot.events.index(before: snapshot.events.endIndex)
+        else {
+            return (snapshot, [])
+        }
+
+        let initialEvents = Array(snapshot.events[...firstActivationIndex])
+        let subsequentEvents = Array(snapshot.events.dropFirst(firstActivationIndex + 1))
+        let initialSnapshot = AppStartLifecycleSnapshot(
+            launchOrigin: snapshot.launchOrigin,
+            launchOriginConfidence: snapshot.launchOriginConfidence,
+            didFinishLaunching: initialTimestamp(
+                for: .didFinishLaunching,
+                initialEvents: initialEvents,
+                allEvents: snapshot.events,
+                fallback: snapshot.didFinishLaunching
+            ),
+            willEnterForeground: initialTimestamp(
+                for: .willEnterForeground,
+                initialEvents: initialEvents,
+                allEvents: snapshot.events,
+                fallback: snapshot.willEnterForeground
+            ),
+            didBecomeActive: initialTimestamp(
+                for: .didBecomeActive,
+                initialEvents: initialEvents,
+                allEvents: snapshot.events,
+                fallback: snapshot.didBecomeActive
+            ),
+            recorderStartedAt: snapshot.recorderStartedAt,
+            prewarmDetected: snapshot.prewarmDetected,
+            events: initialEvents
+        )
+
+        return (initialSnapshot, subsequentEvents)
+    }
+
+    private func initialTimestamp(
+        for kind: AppLifecycleRecorder.EventKind,
+        initialEvents: [AppLifecycleRecorder.EventRecord],
+        allEvents: [AppLifecycleRecorder.EventRecord],
+        fallback: Date?
+    ) -> Date? {
+        if let timestamp = initialEvents.first(where: { $0.kind == kind })?.timestamp {
+            return timestamp
+        }
+
+        return allEvents.contains(where: { $0.kind == kind }) ? nil : fallback
+    }
+
+    func replaySubsequentLifecycleEvents(_ events: [AppLifecycleRecorder.EventRecord]) {
+        for record in events {
+            processCoreLifecycleEvent(record.event)
         }
     }
 
