@@ -264,8 +264,12 @@ public final class AppStart {
     ///
     /// A snapshot may be partial when installation happens before the application becomes active.
     /// In that case the native listener completes the snapshot when it observes the real event.
-    /// This API and `track(didBecomeActive:didFinishLaunching:willEnterForeground:)` are
-    /// alternative handoff paths and must not be mixed for the same initial activation.
+    /// This is the preferred handoff path when an integration can provide a complete
+    /// or partial snapshot. For compatibility, a legacy
+    /// `track(didBecomeActive:didFinishLaunching:willEnterForeground:)` call may
+    /// complete a snapshot that is still pending, for example when an older hybrid
+    /// adapter supplies the missing foreground boundary. Do not use the two APIs as
+    /// independent handoffs for different initial activations.
     @_spi(SplunkInternal)
     public func track(initialLifecycle snapshot: AppStartLifecycleSnapshot) {
         executeOnMain { [self] in

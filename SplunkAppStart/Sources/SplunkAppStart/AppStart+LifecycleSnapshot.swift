@@ -138,6 +138,14 @@ extension AppStart {
     func initialLifecycleSegments(
         from snapshot: AppStartLifecycleSnapshot
     ) -> (initial: AppStartLifecycleSnapshot, subsequent: [AppLifecycleRecorder.EventRecord]) {
+        guard hasCompleteLifecycleHistory(snapshot.events) else {
+            // The recorder keeps the scalar first-event-wins fields after its
+            // bounded history evicts old records. A truncated history cannot
+            // identify the process' first activation, so never use its retained
+            // records to replace those scalar fields or to replay later cycles.
+            return (snapshotWithoutTruncatedHistory(snapshot), [])
+        }
+
         guard let firstActivationIndex = snapshot.events.firstIndex(where: { $0.kind == .didBecomeActive }),
             firstActivationIndex < snapshot.events.index(before: snapshot.events.endIndex)
         else {
@@ -173,6 +181,40 @@ extension AppStart {
         )
 
         return (initialSnapshot, subsequentEvents)
+    }
+
+    private func hasCompleteLifecycleHistory(_ events: [AppLifecycleRecorder.EventRecord]) -> Bool {
+        guard let firstEvent = events.first else {
+            return true
+        }
+
+        return firstEvent.sequence == 1
+    }
+
+    private func snapshotWithoutTruncatedHistory(
+        _ snapshot: AppStartLifecycleSnapshot
+    ) -> AppStartLifecycleSnapshot {
+        let willEnterForeground = snapshot.willEnterForeground.flatMap { timestamp in
+            guard let didBecomeActive = snapshot.didBecomeActive,
+                timestamp > didBecomeActive
+            else {
+                return timestamp
+            }
+
+            // A foreground boundary after the preserved first activation belongs
+            // to a later cycle and must not complete the initial snapshot.
+            return nil
+        }
+
+        return AppStartLifecycleSnapshot(
+            launchOrigin: snapshot.launchOrigin,
+            launchOriginConfidence: snapshot.launchOriginConfidence,
+            didFinishLaunching: snapshot.didFinishLaunching,
+            willEnterForeground: willEnterForeground,
+            didBecomeActive: snapshot.didBecomeActive,
+            recorderStartedAt: snapshot.recorderStartedAt,
+            prewarmDetected: snapshot.prewarmDetected
+        )
     }
 
     private func initialTimestamp(

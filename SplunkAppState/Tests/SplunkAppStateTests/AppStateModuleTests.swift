@@ -63,6 +63,17 @@ final class AppStateModuleTests: XCTestCase {
         XCTAssertNil(module.lifecycleObserverIdentifier)
     }
 
+    func testInstallKeepsLocalObservationUntilSharedStateHandoff() {
+        let module = AppStateModule()
+        module.install(with: nil, remoteConfiguration: nil)
+
+        XCTAssertEqual(module.notificationObservers.count, expectedObserverCount)
+        XCTAssertNil(module.lifecycleRecorder)
+        XCTAssertNil(module.lifecycleObserverIdentifier)
+
+        module.removeNotifications()
+    }
+
     func testPostingNotificationsDoesNotCrash() {
         let module = AppStateModule()
         module.setupNotifications()

@@ -38,7 +38,10 @@ extension AppStateModule: Module {
     // MARK: - Module methods
 
     public func install(with _: (any ModuleConfiguration)?, remoteConfiguration _: (any RemoteModuleConfiguration)?) {
-        use(lifecycleRecorder: AppLifecycleRecorder.bootstrap())
+        // Keep local observation until customizeAppState assigns sharedState.
+        // The customization then hands off to the shared recorder and replays
+        // only events that were not already observed locally.
+        startDetection()
     }
 
 
