@@ -111,6 +111,10 @@ public final class AppStart {
     var capturedLaunchOrigin: AppStartLaunchOrigin?
     var capturedLaunchOriginConfidence: AppLifecycleRecorder.LaunchOriginConfidence = .unknown
 
+    /// Keeps an inferred core background snapshot pending until a hybrid integration
+    /// can provide the observed launch provenance.
+    var awaitingObservedBackgroundHandoff = false
+
     /// Background launch threshold in seconds.
     ///
     /// Delays beyond this threshold are only an inferred signal. They are not
@@ -274,7 +278,14 @@ public final class AppStart {
 
             merge(initialLifecycle: snapshot)
 
-            if didBecomeActiveTimestamp != nil, !isWaitingForBackgroundForegroundBoundary {
+            if capturedLaunchOriginConfidence == .observed {
+                awaitingObservedBackgroundHandoff = false
+            }
+
+            if awaitingObservedBackgroundHandoff {
+                scheduleInitialHandoffTimeout()
+            }
+            else if didBecomeActiveTimestamp != nil, !isWaitingForBackgroundForegroundBoundary {
                 cancelInitialHandoffTimeout()
                 determineAndSend()
             }

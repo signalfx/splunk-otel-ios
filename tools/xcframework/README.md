@@ -221,6 +221,7 @@ At a minimum, you need these frameworks:
 | Framework | Purpose |
 |-----------|---------|
 | `SplunkAgent.xcframework` | Main SDK and public API |
+| `SplunkAgentBootstrap.xcframework` | SDK bootstrap used by the main agent |
 | `SplunkCommon.xcframework` | Shared types and protocols |
 | `SplunkOpenTelemetry.xcframework` | OpenTelemetry integration |
 | `SplunkOpenTelemetryBackgroundExporter.xcframework` | OTLP export with background support |

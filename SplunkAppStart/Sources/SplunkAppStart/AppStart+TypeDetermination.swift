@@ -26,6 +26,7 @@ extension AppStart {
     /// Determines an app start type and sends valid results.
     func determineAndSend() {
         guard !shouldIgnoreLifecycleResolution,
+            !awaitingObservedBackgroundHandoff,
             !isWaitingForBackgroundForegroundBoundary
         else {
             return

@@ -35,6 +35,7 @@ extension AppStart {
         suppressionCounts.removeAll()
         deferredLifecycleSnapshot = nil
         shouldDeferInitialLifecycleResolution = false
+        awaitingObservedBackgroundHandoff = false
     }
 
     /// Consumes the snapshot recorded by the agent core.
@@ -92,13 +93,28 @@ extension AppStart {
     ) {
         merge(initialLifecycle: snapshot, acceptUnknownOrigin: false)
 
+        if capturedLaunchOrigin == .background,
+            capturedLaunchOriginConfidence == .inferred
+        {
+            awaitingObservedBackgroundHandoff = true
+        }
+        else if capturedLaunchOriginConfidence == .observed {
+            awaitingObservedBackgroundHandoff = false
+        }
+
         // A recorder update already contains the event in its snapshot history.
         // The event parameter is retained for callers that provide only a scalar update.
         if snapshot.events.isEmpty, let event {
             processCoreLifecycleEvent(event, resolve: false)
         }
 
-        if didBecomeActiveTimestamp != nil, hasRequiredBoundary(for: snapshot.launchOrigin) {
+        if awaitingObservedBackgroundHandoff {
+            // A timing-only background inference can also describe a slow foreground
+            // launch. Give a hybrid adapter a bounded window to replace it with its
+            // observed origin before making the conservative suppression decision.
+            scheduleInitialHandoffTimeout()
+        }
+        else if didBecomeActiveTimestamp != nil, hasRequiredBoundary(for: snapshot.launchOrigin) {
             determineAndSend()
             if initialAppStartState.isTerminal {
                 return

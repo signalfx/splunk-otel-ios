@@ -162,6 +162,9 @@ extension AppStart {
             if didBecomeActiveTimestamp == nil {
                 suppressInitialAppStart(reason: .missingDidBecomeActive)
             }
+            else if awaitingObservedBackgroundHandoff {
+                suppressInitialAppStart(reason: .unknownLaunchOrigin)
+            }
             else {
                 determineAndSend()
             }
@@ -185,6 +188,7 @@ extension AppStart {
         }
 
         initialAppStartState = state
+        awaitingObservedBackgroundHandoff = false
         cancelInitialHandoffTimeout()
     }
 

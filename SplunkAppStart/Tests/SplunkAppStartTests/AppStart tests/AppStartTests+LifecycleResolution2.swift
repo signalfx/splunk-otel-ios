@@ -108,6 +108,42 @@ extension AppStartTests {
         try checkNotDeterminedType(in: destination)
     }
 
+    func testInferredCoreBackgroundSnapshotWaitsForObservedHybridHandoff() throws {
+        let destination = DebugDestination()
+        let now = Date()
+
+        let appStart = AppStart()
+        appStart.processStartTimestamp = now.addingTimeInterval(-120.0)
+        appStart.destination = destination
+        appStart.initialHandoffTimeout = 0.1
+
+        appStart.consume(
+            coreLifecycle: nil,
+            snapshot: AppStartLifecycleSnapshot(
+                launchOrigin: .background,
+                launchOriginConfidence: .inferred,
+                didFinishLaunching: now.addingTimeInterval(-120.0),
+                willEnterForeground: now.addingTimeInterval(-1.0),
+                didBecomeActive: now
+            )
+        )
+
+        XCTAssertEqual(appStart.initialAppStartState, .pending)
+        try checkNotDeterminedType(in: destination)
+
+        appStart.track(
+            initialLifecycle: AppStartLifecycleSnapshot(
+                launchOrigin: .background,
+                launchOriginConfidence: .observed,
+                didFinishLaunching: nil,
+                willEnterForeground: now.addingTimeInterval(-1.0),
+                didBecomeActive: now
+            )
+        )
+
+        try checkDeterminedType(.warm, in: destination)
+    }
+
     func testLifecycleResolutionWaitsForInitializationData() throws {
         let destination = DebugDestination()
         let now = Date()
