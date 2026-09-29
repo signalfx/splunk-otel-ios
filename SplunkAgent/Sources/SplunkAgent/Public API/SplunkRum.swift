@@ -21,6 +21,9 @@ import Foundation
 import OpenTelemetryApi
 @_spi(SplunkInternal) internal import SplunkCommon
 
+@_silgen_name("splunk_rum_link_lifecycle_bootstrap")
+private func splunkRumLinkLifecycleBootstrap()
+
 /// The class implementing Splunk Agent public API.
 public class SplunkRum: ObservableObject {
 
@@ -76,15 +79,24 @@ public class SplunkRum: ObservableObject {
     /// A singleton shared instance of the Agent library.
     ///
     /// This shared instance is used to access all SDK functions.
-    public internal(set) static var shared = SplunkRum(
-        configurationHandler: ConfigurationHandlerNonOperational(for: AgentConfiguration.emptyConfiguration),
-        user: NoOpUser(),
-        session: NoOpSession(),
-        appStateManager: NoOpAppStateManager(),
-        lifecycleRecorder: AppLifecycleRecorder.bootstrap(),
-        logPoolName: PackageIdentifier.nonOperationalInstance(),
-        sessionSampler: DefaultAgentSessionSampler()
-    )
+    public internal(set) static var shared = makeSharedInstance()
+
+    private static func makeSharedInstance() -> SplunkRum {
+        // Keep the private bootstrap target linked even for static consumers.
+        // Its constructor runs when the image is loaded; this call is an
+        // idempotent link anchor and does not perform lifecycle work itself.
+        splunkRumLinkLifecycleBootstrap()
+
+        return SplunkRum(
+            configurationHandler: ConfigurationHandlerNonOperational(for: AgentConfiguration.emptyConfiguration),
+            user: NoOpUser(),
+            session: NoOpSession(),
+            appStateManager: NoOpAppStateManager(),
+            lifecycleRecorder: AppLifecycleRecorder.bootstrap(),
+            logPoolName: PackageIdentifier.nonOperationalInstance(),
+            sessionSampler: DefaultAgentSessionSampler()
+        )
+    }
 
     /// Starts the shared lifecycle recorder before SDK installation.
     ///

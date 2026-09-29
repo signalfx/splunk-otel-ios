@@ -20,7 +20,9 @@ import XCTest
 @testable import SplunkAppStart
 
 func drainMainQueue() {
-    RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.01))
+    // Lifecycle handlers deliberately enqueue one main-queue turn. Keep enough
+    // margin for a loaded simulator/CI host without using a production sleep.
+    RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.05))
 }
 
 func simulateColdStartNotifications() {

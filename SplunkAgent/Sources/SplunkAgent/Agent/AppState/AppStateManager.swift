@@ -72,25 +72,27 @@ class AppStateManager: AgentAppStateManager {
     }
 
     private func processLifecycleEvent(_ event: AppLifecycleRecorder.Event) {
-                switch event {
-                case let .didBecomeActive(timestamp):
-                    appStateModel.saveEvent(.active, at: timestamp)
+        accessQueue.sync {
+            switch event {
+            case let .didBecomeActive(timestamp):
+                appStateModel.saveEvent(.active, at: timestamp)
 
-                case let .didEnterBackground(timestamp):
-                    appStateModel.saveEvent(.background, at: timestamp)
+            case let .didEnterBackground(timestamp):
+                appStateModel.saveEvent(.background, at: timestamp)
 
-                case let .willEnterForeground(timestamp):
-                    appStateModel.saveEvent(.foreground, at: timestamp)
+            case let .willEnterForeground(timestamp):
+                appStateModel.saveEvent(.foreground, at: timestamp)
 
-                case let .willResignActive(timestamp):
-                    appStateModel.saveEvent(.inactive, at: timestamp)
+            case let .willResignActive(timestamp):
+                appStateModel.saveEvent(.inactive, at: timestamp)
 
-                case let .willTerminate(timestamp):
-                    appStateModel.saveEvent(.terminate, at: timestamp)
+            case let .willTerminate(timestamp):
+                appStateModel.saveEvent(.terminate, at: timestamp)
 
-                case .didFinishLaunching:
-                    break
-                }
+            case .didFinishLaunching:
+                break
+            }
+        }
     }
 
     deinit {
@@ -113,7 +115,7 @@ class AppStateManager: AgentAppStateManager {
                 queue: nil
             ) { [weak self] _ in
 
-                self?.appStateModel.saveEvent(.active)
+                self?.processLifecycleEvent(.didBecomeActive(Date()))
             }
 
             _ = NotificationCenter.default.addObserver(
@@ -122,7 +124,7 @@ class AppStateManager: AgentAppStateManager {
                 queue: nil
             ) { [weak self] _ in
 
-                self?.appStateModel.saveEvent(.background)
+                self?.processLifecycleEvent(.didEnterBackground(Date()))
             }
 
             _ = NotificationCenter.default.addObserver(
@@ -131,7 +133,7 @@ class AppStateManager: AgentAppStateManager {
                 queue: nil
             ) { [weak self] _ in
 
-                self?.appStateModel.saveEvent(.foreground)
+                self?.processLifecycleEvent(.willEnterForeground(Date()))
             }
 
             _ = NotificationCenter.default.addObserver(
@@ -140,7 +142,7 @@ class AppStateManager: AgentAppStateManager {
                 queue: nil
             ) { [weak self] _ in
 
-                self?.appStateModel.saveEvent(.inactive)
+                self?.processLifecycleEvent(.willResignActive(Date()))
             }
 
             _ = NotificationCenter.default.addObserver(
@@ -149,7 +151,7 @@ class AppStateManager: AgentAppStateManager {
                 queue: nil
             ) { [weak self] _ in
 
-                self?.appStateModel.saveEvent(.terminate)
+                self?.processLifecycleEvent(.willTerminate(Date()))
             }
 
         #endif

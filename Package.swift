@@ -65,11 +65,22 @@ resolveSessionReplayRepositoryDependency()
 func generateMainTargets() -> [Target] {
     [
 
+        // MARK: - Early lifecycle bootstrap
+
+        // This private C target provides the load-time constructor needed to
+        // start the shared Swift recorder before hybrid SDK installation.
+        .target(
+            name: "SplunkAgentBootstrap",
+            dependencies: ["SplunkCommon"],
+            path: "SplunkAgent/Sources/SplunkAgentBootstrap"
+        ),
+
         // MARK: - Splunk Agent
 
         .target(
             name: "SplunkAgent",
             dependencies: [
+                "SplunkAgentBootstrap",
                 "SplunkCommon",
                 "SplunkCrashReports",
                 "SplunkSessionReplayProxy",

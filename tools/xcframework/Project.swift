@@ -446,6 +446,16 @@ let project = Project(
         // `#if canImport(SplunkCrashReports)` guards throughout, so when
         // building for visionOS the crash reporting code is excluded.
         .target(
+            name: "SplunkAgentBootstrap",
+            destinations: allPlatforms,
+            product: .framework,
+            bundleId: "com.splunk.rum.agentbootstrap",
+            sources: "\(repoRoot)/SplunkAgent/Sources/SplunkAgentBootstrap/**",
+            dependencies: [
+                mod("SplunkCommon")
+            ]
+        ),
+        .target(
             name: "SplunkAgent",
             destinations: allPlatforms,
             product: .framework,
@@ -456,6 +466,7 @@ let project = Project(
                 .glob(pattern: "\(repoRoot)/SplunkAgent/Resources/NOTICES")
             ],
             dependencies: [
+                mod("SplunkAgentBootstrap"),
                 mod("SplunkCommon"),
                 mod("SplunkSessionReplayProxy"),
                 mod("SplunkNavigation"),

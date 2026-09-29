@@ -259,62 +259,6 @@ extension SplunkRum {
         #endif
     }
 
-    /// Configure App start module with shared state and a public api proxy.
-    private func customizeAppStart() {
-        if let appStartModule = modulesManager?.module(ofType: SplunkAppStart.AppStart.self) {
-            appStartModule.sharedState = sharedState
-
-            // The core recorder owns lifecycle observation. The module's temporary
-            // listeners are removed after installation so all consumers use the same
-            // first-event-wins snapshot and future updates.
-            appStartModule.resetLifecycleObservationState()
-            lifecycleRecorder.addObserver { [weak appStartModule] update in
-                appStartModule?.consume(
-                    coreLifecycle: update.event,
-                    snapshot: Self.appStartLifecycleSnapshot(from: update.snapshot)
-                )
-            }
-
-            // Initialize proxy API for this module
-            appStartProxy = AppStart(for: appStartModule)
-        }
-    }
-
-    /// Configure App state module with shared state.
-    private func customizeAppState() {
-        let appStateModule = modulesManager?.module(ofType: SplunkAppState.AppStateModule.self)
-
-        appStateModule?.sharedState = sharedState
-        appStateModule?.use(lifecycleRecorder: lifecycleRecorder)
-    }
-
-    private static func appStartLifecycleSnapshot(
-        from snapshot: AppLifecycleRecorder.Snapshot
-    ) -> SplunkAppStart.AppStartLifecycleSnapshot {
-        let launchOrigin: SplunkAppStart.AppStartLifecycleSnapshot.LaunchOrigin
-
-        switch snapshot.launchOrigin {
-        case .foreground:
-            launchOrigin = .foreground
-
-        case .background:
-            launchOrigin = .background
-
-        case .unknown:
-            launchOrigin = .unknown
-        }
-
-        return SplunkAppStart.AppStartLifecycleSnapshot(
-            launchOrigin: launchOrigin,
-            didFinishLaunching: snapshot.didFinishLaunching,
-            willEnterForeground: snapshot.willEnterForeground,
-            didBecomeActive: snapshot.didBecomeActive,
-            recorderStartedAt: snapshot.recorderStartedAt,
-            prewarmDetected: snapshot.prewarmDetected,
-            events: snapshot.events
-        )
-    }
-
     /// Configure NetworkMonitor module.
     private func customizeNetworkMonitor() {
         let networkMonitorModule = modulesManager?.module(ofType: SplunkNetworkMonitor.NetworkMonitor.self)

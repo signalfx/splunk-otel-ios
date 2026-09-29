@@ -29,7 +29,9 @@ extension AppStart {
         willResignActiveTimestamp = nil
         didBecomeActiveTimestamp = nil
         backgroundLaunchDetected = nil
+        backgroundLaunchConfidence = .unknown
         capturedLaunchOrigin = nil
+        capturedLaunchOriginConfidence = .unknown
         suppressionCounts.removeAll()
     }
 
@@ -37,7 +39,7 @@ extension AppStart {
     ///
     /// A complete, trusted snapshot can resolve immediately. Unknown or partial
     /// foreground provenance remains pending for the bounded hybrid handoff timeout.
-    /// A known background launch without a foreground boundary remains pending until
+    /// An observed background launch without a foreground boundary remains pending until
     /// the boundary arrives or process termination provides a terminal outcome.
     @_spi(SplunkInternal)
     public func consume(coreLifecycle snapshot: AppStartLifecycleSnapshot) {
@@ -51,69 +53,86 @@ extension AppStart {
         snapshot: AppStartLifecycleSnapshot
     ) {
         executeOnMain { [self] in
-            switch initialAppStartState {
-            case .suppressed:
+            consumeOnMain(coreLifecycle: event, snapshot: snapshot)
+        }
+    }
+
+    private func consumeOnMain(
+        coreLifecycle event: AppLifecycleRecorder.Event?,
+        snapshot: AppStartLifecycleSnapshot
+    ) {
+        switch initialAppStartState {
+        case .suppressed:
+            return
+
+        case .emitted:
+            if let event {
+                processCoreLifecycleEvent(event)
+            }
+
+        case .pending:
+            consumePending(coreLifecycle: event, snapshot: snapshot)
+        }
+    }
+
+    private func consumePending(
+        coreLifecycle event: AppLifecycleRecorder.Event?,
+        snapshot: AppStartLifecycleSnapshot
+    ) {
+        merge(initialLifecycle: snapshot, acceptUnknownOrigin: false)
+
+        // A recorder update already contains the event in its snapshot history.
+        // The event parameter is retained for callers that provide only a scalar update.
+        if snapshot.events.isEmpty, let event {
+            processCoreLifecycleEvent(event, resolve: false)
+        }
+
+        if didBecomeActiveTimestamp != nil, hasRequiredBoundary(for: snapshot.launchOrigin) {
+            determineAndSend()
+            if initialAppStartState.isTerminal {
                 return
-
-            case .emitted:
-                if let event {
-                    processCoreLifecycleEvent(event)
-                }
-
-            case .pending:
-                merge(initialLifecycle: snapshot, acceptUnknownOrigin: false)
-
-                // A recorder update already contains the event in its snapshot
-                // history. The event parameter is retained for compatibility with
-                // callers that provide only a scalar update.
-                if snapshot.events.isEmpty, let event {
-                    processCoreLifecycleEvent(event, resolve: false)
-                }
-
-                let hasActivation = didBecomeActiveTimestamp != nil
-                let hasRequiredBoundary: Bool
-
-                switch snapshot.launchOrigin {
-                case .foreground:
-                    hasRequiredBoundary = processStartTimestamp != nil
-
-                case .background:
-                    hasRequiredBoundary = willEnterForegroundTimestamp != nil
-
-                case .unknown:
-                    hasRequiredBoundary = false
-                }
-
-                if hasActivation, hasRequiredBoundary {
-                    determineAndSend()
-                }
-
-                let terminationEvent: AppLifecycleRecorder.Event?
-                if let termination = snapshot.events.last(where: { $0.kind == .willTerminate }) {
-                    terminationEvent = termination.event
-                }
-                else if let event,
-                    case .willTerminate = event
-                {
-                    terminationEvent = event
-                }
-                else {
-                    terminationEvent = nil
-                }
-
-                if !initialAppStartState.isTerminal, let terminationEvent {
-                    processCoreLifecycleEvent(terminationEvent)
-                    return
-                }
-
-                if isWaitingForBackgroundForegroundBoundary {
-                    cancelInitialHandoffTimeout()
-                }
-                else {
-                    scheduleInitialHandoffTimeout()
-                }
             }
         }
+
+        if let terminationEvent = terminationEvent(in: snapshot, fallback: event) {
+            processCoreLifecycleEvent(terminationEvent)
+            return
+        }
+
+        if isWaitingForBackgroundForegroundBoundary {
+            cancelInitialHandoffTimeout()
+        }
+        else {
+            scheduleInitialHandoffTimeout()
+        }
+    }
+
+    private func hasRequiredBoundary(for launchOrigin: AppStartLifecycleSnapshot.LaunchOrigin) -> Bool {
+        switch launchOrigin {
+        case .foreground:
+            return processStartTimestamp != nil
+
+        case .background:
+            return willEnterForegroundTimestamp != nil
+
+        case .unknown:
+            return false
+        }
+    }
+
+    private func terminationEvent(
+        in snapshot: AppStartLifecycleSnapshot,
+        fallback event: AppLifecycleRecorder.Event?
+    ) -> AppLifecycleRecorder.Event? {
+        if let termination = snapshot.events.last(where: { $0.kind == .willTerminate }) {
+            return termination.event
+        }
+
+        if let event, case .willTerminate = event {
+            return event
+        }
+
+        return nil
     }
 
     /// Validates optional lifecycle events supplied by a hybrid integration.
@@ -124,7 +143,12 @@ extension AppStart {
             willEnterForegroundTimestamp,
             didBecomeActiveTimestamp,
             end
-        ].compactMap { $0 }
+        ]
+        .reduce(into: [Date]()) { timestamps, timestamp in
+            if let timestamp {
+                timestamps.append(timestamp)
+            }
+        }
 
         guard timestamps.allSatisfy(\.timeIntervalSinceReferenceDate.isFinite) else {
             return false

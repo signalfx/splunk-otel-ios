@@ -18,6 +18,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+* Improved AppStart cold-start classification and lifecycle handoff for native and hybrid applications, including late React Native and Flutter initialization. #6128
 * Improved accuracy of `slowRenders` and `frozenRenders` detection: the detector now derives the expected cadence per frame, counts a continuous freeze once, and makes slow and frozen classifications mutually exclusive. #696
 * Fixed a spurious `frozenRenders` event that could be emitted when the app backgrounded while a frame was in flight. #696
 

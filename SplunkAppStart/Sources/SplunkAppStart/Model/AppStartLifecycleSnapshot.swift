@@ -36,6 +36,9 @@ public struct AppStartLifecycleSnapshot {
     /// The observed launch origin.
     public let launchOrigin: LaunchOrigin
 
+    /// How strongly the launch origin is supported by lifecycle evidence.
+    public let launchOriginConfidence: AppLifecycleRecorder.LaunchOriginConfidence
+
     /// The captured `UIApplication.didFinishLaunchingNotification` timestamp.
     public let didFinishLaunching: Date?
 
@@ -57,6 +60,7 @@ public struct AppStartLifecycleSnapshot {
     /// Creates lifecycle evidence for initial AppStart classification.
     public init(
         launchOrigin: LaunchOrigin,
+        launchOriginConfidence: AppLifecycleRecorder.LaunchOriginConfidence = .unknown,
         didFinishLaunching: Date?,
         willEnterForeground: Date?,
         didBecomeActive: Date?,
@@ -65,6 +69,7 @@ public struct AppStartLifecycleSnapshot {
         events: [AppLifecycleRecorder.EventRecord] = []
     ) {
         self.launchOrigin = launchOrigin
+        self.launchOriginConfidence = launchOriginConfidence
         self.didFinishLaunching = didFinishLaunching
         self.willEnterForeground = willEnterForeground
         self.didBecomeActive = didBecomeActive

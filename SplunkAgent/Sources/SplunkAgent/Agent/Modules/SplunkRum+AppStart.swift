@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2025 Splunk Inc.
+Copyright 2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,7 +16,9 @@ limitations under the License.
 */
 
 import Foundation
-internal import SplunkAppStart
+@_spi(SplunkInternal) internal import SplunkAppStart
+@_spi(SplunkInternal) internal import SplunkAppState
+@_spi(SplunkInternal) internal import SplunkCommon
 
 extension SplunkRum {
 
@@ -56,5 +58,63 @@ extension SplunkRum {
         }
 
         return settings
+    }
+
+    /// Configure App start module with shared state and a public api proxy.
+    func customizeAppStart() {
+        if let appStartModule = modulesManager?.module(ofType: SplunkAppStart.AppStart.self) {
+            appStartModule.sharedState = sharedState
+
+            // The core recorder owns lifecycle observation. The module's temporary
+            // listeners are removed after installation so all consumers use the same
+            // first-event-wins snapshot and future updates.
+            appStartModule.resetLifecycleObservationState()
+            lifecycleRecorder.addObserver { [weak appStartModule] update in
+                appStartModule?
+                    .consume(
+                        coreLifecycle: update.event,
+                        snapshot: Self.appStartLifecycleSnapshot(from: update.snapshot)
+                    )
+            }
+
+            // Initialize proxy API for this module
+            appStartProxy = AppStart(for: appStartModule)
+        }
+    }
+
+    /// Configure App state module with shared state.
+    func customizeAppState() {
+        let appStateModule = modulesManager?.module(ofType: SplunkAppState.AppStateModule.self)
+
+        appStateModule?.sharedState = sharedState
+        appStateModule?.use(lifecycleRecorder: lifecycleRecorder)
+    }
+
+    private static func appStartLifecycleSnapshot(
+        from snapshot: AppLifecycleRecorder.Snapshot
+    ) -> SplunkAppStart.AppStartLifecycleSnapshot {
+        let launchOrigin: SplunkAppStart.AppStartLifecycleSnapshot.LaunchOrigin
+
+        switch snapshot.launchOrigin {
+        case .foreground:
+            launchOrigin = .foreground
+
+        case .background:
+            launchOrigin = .background
+
+        case .unknown:
+            launchOrigin = .unknown
+        }
+
+        return SplunkAppStart.AppStartLifecycleSnapshot(
+            launchOrigin: launchOrigin,
+            launchOriginConfidence: snapshot.launchOriginConfidence,
+            didFinishLaunching: snapshot.didFinishLaunching,
+            willEnterForeground: snapshot.willEnterForeground,
+            didBecomeActive: snapshot.didBecomeActive,
+            recorderStartedAt: snapshot.recorderStartedAt,
+            prewarmDetected: snapshot.prewarmDetected,
+            events: snapshot.events
+        )
     }
 }

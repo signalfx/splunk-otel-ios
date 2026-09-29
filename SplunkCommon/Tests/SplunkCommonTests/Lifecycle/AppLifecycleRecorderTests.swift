@@ -42,6 +42,7 @@ final class AppLifecycleRecorderTests: XCTestCase {
         XCTAssertEqual(secondSnapshot.didFinishLaunching, firstSnapshot.didFinishLaunching)
         XCTAssertEqual(secondSnapshot.willEnterForeground, firstSnapshot.willEnterForeground)
         XCTAssertEqual(secondSnapshot.didBecomeActive, firstSnapshot.didBecomeActive)
+        XCTAssertEqual(secondSnapshot.launchOriginConfidence, .observed)
     }
 
     func testUnknownOriginIsNotConvertedToForeground() {
@@ -61,6 +62,39 @@ final class AppLifecycleRecorderTests: XCTestCase {
         notificationCenter.post(name: UIApplication.didBecomeActiveNotification, object: nil)
 
         XCTAssertEqual(recorder.snapshot().launchOrigin, .foreground)
+        XCTAssertEqual(recorder.snapshot().launchOriginConfidence, .observed)
+    }
+
+    func testForegroundLaunchWithForegroundBoundaryIsNotMarkedAsBackground() {
+        let notificationCenter = NotificationCenter()
+        let recorder = AppLifecycleRecorder(notificationCenter: notificationCenter)
+
+        notificationCenter.post(name: UIApplication.didFinishLaunchingNotification, object: nil)
+        notificationCenter.post(name: UIApplication.willEnterForegroundNotification, object: nil)
+
+        XCTAssertEqual(recorder.snapshot().launchOrigin, .foreground)
+    }
+
+    func testDidFinishLaunchingRetainsLaunchOptionKeys() {
+        let notificationCenter = NotificationCenter()
+        let recorder = AppLifecycleRecorder(notificationCenter: notificationCenter)
+        let urlKey = UIApplication.LaunchOptionsKey(rawValue: "test.url")
+        let metadataKey = UIApplication.LaunchOptionsKey(rawValue: "test.metadata")
+        let launchOptions: [UIApplication.LaunchOptionsKey: Any] = [
+            urlKey: URL(string: "https://example.com") as Any,
+            metadataKey: "test"
+        ]
+
+        notificationCenter.post(
+            name: UIApplication.didFinishLaunchingNotification,
+            object: nil,
+            userInfo: launchOptions
+        )
+
+        XCTAssertEqual(
+            recorder.snapshot().events.first?.launchOptionKeys,
+            [metadataKey.rawValue, urlKey.rawValue].sorted()
+        )
     }
 
     func testSubscribersReceiveLifecycleEventTimestamp() {

@@ -40,7 +40,7 @@ enum AppStartResolutionState: Equatable {
             return false
 
         case .emitted,
-             .suppressed:
+            .suppressed:
             return true
         }
     }
@@ -92,6 +92,7 @@ public final class AppStart {
     /// Background launch detection, optional because we need to detect
     /// background launch only once during the initial application launch.
     var backgroundLaunchDetected: Bool?
+    var backgroundLaunchConfidence: AppLifecycleRecorder.LaunchOriginConfidence = .unknown
 
     /// A flag to prevent duplicate cold starts.
     var coldStartSent = false
@@ -104,21 +105,25 @@ public final class AppStart {
 
     /// Launch provenance captured by a hybrid integration before the SDK was installed.
     var capturedLaunchOrigin: AppStartLaunchOrigin?
+    var capturedLaunchOriginConfidence: AppLifecycleRecorder.LaunchOriginConfidence = .unknown
 
     /// Background launch threshold in seconds.
     ///
-    /// If an application launch duration exceeds this threshold, we consider this launch as being launched in background first.
-    /// This threshold is a temporary fix to long cold starts until we improve the background launch detection mechanism.
+    /// Delays beyond this threshold are only an inferred signal. They are not
+    /// sufficient to emit a warm start because a long foreground splash screen
+    /// can produce the same timing.
     let backgroundLaunchThreshold = 10.0
 
-    /// Maximum valid AppStart duration. This is a validity guard, not the launch classifier.
+    /// Maximum valid AppStart duration.
     ///
-    /// The guard is intentionally high and only applies when launch provenance is
+    /// This is a validity guard, not the launch classifier. The guard is intentionally
+    /// high and only applies when launch provenance is
     /// untrusted. Trusted foreground and background launches must remain observable
     /// even when the host application's splash/startup work is slow.
     var maxAppStartDuration: TimeInterval = 60.0
 
     /// Counts suppressed initial measurements by reason for rollout diagnostics.
+    ///
     /// This stays local to the module and is not emitted as customer telemetry.
     var suppressionCounts: [AppStartSuppressionReason: Int] = [:]
 
@@ -135,6 +140,11 @@ public final class AppStart {
     // MARK: - Initialization
 
     public required init() {}
+
+    func markBackgroundLaunchDetected(explicitlyObserved: Bool) {
+        backgroundLaunchDetected = true
+        backgroundLaunchConfidence = explicitlyObserved ? .observed : .inferred
+    }
 
 
     // MARK: - Instrumentation
@@ -262,391 +272,5 @@ public final class AppStart {
             // this fallback keeps direct off-main callers safe and serializes their update.
             DispatchQueue.main.async(execute: work)
         }
-    }
-
-
-    // MARK: - Type determination
-
-    /// Determines an app start type and sends valid results.
-    func determineAndSend() {
-
-        if case .suppressed = initialAppStartState {
-            logger.log(level: .debug) {
-                "App start resolution has already reached a terminal state. Ignoring lifecycle event."
-            }
-            return
-        }
-
-        guard !isWaitingForBackgroundForegroundBoundary else {
-            return
-        }
-
-        // Reset state for further app start detection
-        defer {
-            // Clear timestamps
-            didFinishLaunchingTimestamp = nil
-            willEnterForegroundTimestamp = nil
-            willResignActiveTimestamp = nil
-            didBecomeActiveTimestamp = nil
-            capturedLaunchOrigin = nil
-
-            // Clear initialization data as initialization span is sent only once with the cold start
-            agentInitializeSpanData = nil
-        }
-
-        guard let endTime = didBecomeActiveTimestamp else {
-            logger.log(level: .debug) {
-                "Cannot determine app start without a didBecomeActive timestamp."
-            }
-            return
-        }
-
-        // Send app start if the type was determined
-        if let (determinedType, startTime) = determinedAppStartType() {
-            guard startTime.timeIntervalSinceReferenceDate.isFinite,
-                endTime.timeIntervalSinceReferenceDate.isFinite,
-                startTime <= endTime
-            else {
-                suppressInitialAppStart(reason: .invalidTimestampOrder)
-                return
-            }
-
-            let duration = endTime.timeIntervalSince(startTime)
-            let provenanceIsTrusted = capturedLaunchOrigin == .foreground
-                || capturedLaunchOrigin == .background
-                || backgroundLaunchDetected == true
-
-            guard duration.isFinite,
-                !provenanceIsTrusted && duration <= maxAppStartDuration || provenanceIsTrusted
-            else {
-                suppressInitialAppStart(reason: .maxDurationExceeded)
-                return
-            }
-
-            send(start: startTime, end: endTime, type: determinedType)
-            resolveInitialAppStart(as: .emitted)
-
-            logger.log(level: .debug) {
-                "App start log: determined app start type: \(determinedType.rawValue), start time: \(startTime), end time: \(endTime)."
-            }
-        }
-        else {
-            suppressInitialAppStart(reason: suppressionReason())
-        }
-    }
-
-    /// Determines app start type from available notifications timestamps.
-    private func determinedAppStartType() -> (AppStartType, Date)? {
-        guard let didBecomeActiveTimestamp else {
-            return nil
-        }
-
-        // Prewarm means that process start is not a valid user-visible cold-start anchor.
-        // Check it before hybrid launch origin because UIApplication may report .active or
-        // .inactive for a prewarmed process when the early hybrid observer runs.
-        if prewarmDetected,
-            let startTime = willEnterForegroundTimestamp,
-            startTime <= didBecomeActiveTimestamp
-        {
-            return (.warm, startTime)
-        }
-
-        if let capturedLaunchOrigin {
-            return determinedSnapshotAppStartType(launchOrigin: capturedLaunchOrigin)
-        }
-
-        let launchedInBackground = backgroundLaunchDetected
-
-        if willResignActiveTimestamp != nil, let startTime = willEnterForegroundTimestamp {
-            return (.hot, startTime)
-        }
-
-        if !initialAppStartState.isTerminal,
-            launchedInBackground == true || prewarmDetected,
-            let startTime = willEnterForegroundTimestamp
-        {
-            return (.warm, startTime)
-        }
-
-        if !initialAppStartState.isTerminal, !coldStartSent, let startTime = processStartTimestamp {
-            if launchedInBackground == nil {
-                guard let didFinishLaunchingTimestamp,
-                    let willEnterForegroundTimestamp,
-                    willEnterForegroundTimestamp >= didFinishLaunchingTimestamp
-                else {
-                    return nil
-                }
-
-                if willEnterForegroundTimestamp.timeIntervalSince(didFinishLaunchingTimestamp) > backgroundLaunchThreshold {
-                    // A delayed foreground boundary without trusted background
-                    // provenance is intentionally suppressed; it must not become
-                    // an artificially long cold start or an inferred warm start.
-                    return nil
-                }
-            }
-
-            return (.cold, startTime)
-        }
-
-        return nil
-    }
-
-    /// Determines an initial AppStart from explicit hybrid lifecycle evidence.
-    private func determinedSnapshotAppStartType(launchOrigin: AppStartLaunchOrigin) -> (AppStartType, Date)? {
-        guard let didBecomeActiveTimestamp else {
-            return nil
-        }
-
-        switch launchOrigin {
-        case .foreground:
-            guard let processStartTimestamp,
-                processStartTimestamp <= didBecomeActiveTimestamp,
-                validSnapshotEventTimes(end: didBecomeActiveTimestamp)
-            else {
-                return nil
-            }
-
-            return (.cold, processStartTimestamp)
-
-        case .background:
-            guard let willEnterForegroundTimestamp,
-                willEnterForegroundTimestamp <= didBecomeActiveTimestamp,
-                validSnapshotEventTimes(end: didBecomeActiveTimestamp)
-            else {
-                return nil
-            }
-
-            return (.warm, willEnterForegroundTimestamp)
-
-        case .unknown:
-            // An unknown origin is not evidence for either cold or warm start. In
-            // particular, do not use a duration threshold to turn untrusted
-            // provenance into a customer-visible measurement.
-            return nil
-        }
-    }
-
-    // MARK: - Sending
-
-    /// Sends results into a destination.
-    private func send(start: Date, end: Date, type: AppStartType) {
-
-        var events: [AppStartEvent]?
-        var initializeData: AgentInitializeSpanData?
-
-        // Send app start events and initialize span in a cold start only
-        if type == .cold {
-            events = coldStartEvents(startTime: start)
-            initializeData = agentInitializeSpanData
-
-            coldStartSent = true
-        }
-
-        let appStartData = AppStartSpanData(
-            type: type,
-            start: start,
-            end: end,
-            events: events
-        )
-
-        destination.send(appStart: appStartData, agentInitialize: initializeData, sharedState: sharedState)
-    }
-
-    // MARK: - Resolution
-
-    func merge(initialLifecycle snapshot: AppStartLifecycleSnapshot, acceptUnknownOrigin: Bool = true) {
-        didFinishLaunchingTimestamp = didFinishLaunchingTimestamp ?? snapshot.didFinishLaunching
-        willEnterForegroundTimestamp = willEnterForegroundTimestamp ?? snapshot.willEnterForeground
-        didBecomeActiveTimestamp = didBecomeActiveTimestamp ?? snapshot.didBecomeActive
-        prewarmDetected = prewarmDetected || snapshot.prewarmDetected
-
-        // Replay the same ordered evidence used by AppState. The scalar fields
-        // above preserve compatibility with integrations that only provide three
-        // timestamps, while the history fills in transitions such as
-        // willResignActive and willTerminate that are otherwise lost on handoff.
-        for record in snapshot.events {
-            mergeCoreLifecycleEvent(record.event)
-        }
-
-        if acceptUnknownOrigin || snapshot.launchOrigin != .unknown {
-            capturedLaunchOrigin = capturedLaunchOrigin ?? snapshot.launchOrigin
-        }
-    }
-
-    func processCoreLifecycleEvent(_ event: AppLifecycleRecorder.Event, resolve: Bool = true) {
-        mergeCoreLifecycleEvent(event)
-
-        if resolve {
-            switch event {
-            case .didBecomeActive:
-                determineAndSend()
-
-            case .willTerminate:
-                if !initialAppStartState.isTerminal {
-                    suppressInitialAppStart(reason: suppressionReason())
-                }
-
-            default:
-                break
-            }
-        }
-    }
-
-    private func mergeCoreLifecycleEvent(_ event: AppLifecycleRecorder.Event) {
-        switch event {
-        case let .didFinishLaunching(timestamp):
-            didFinishLaunchingTimestamp = didFinishLaunchingTimestamp ?? timestamp
-
-        case let .willEnterForeground(timestamp):
-            willEnterForegroundTimestamp = willEnterForegroundTimestamp ?? timestamp
-
-        case let .didBecomeActive(timestamp):
-            didBecomeActiveTimestamp = didBecomeActiveTimestamp ?? timestamp
-
-        case let .willResignActive(timestamp):
-            willResignActiveTimestamp = willResignActiveTimestamp ?? timestamp
-
-        case .didEnterBackground,
-             .willTerminate:
-            break
-        }
-    }
-
-    func scheduleInitialHandoffTimeout() {
-        guard initialHandoffTimeoutWorkItem == nil,
-            !initialAppStartState.isTerminal,
-            !isWaitingForBackgroundForegroundBoundary
-        else {
-            return
-        }
-
-        let workItem = DispatchWorkItem { [weak self] in
-            guard let self, !self.initialAppStartState.isTerminal else {
-                return
-            }
-
-            initialHandoffTimeoutWorkItem = nil
-
-            if isWaitingForBackgroundForegroundBoundary {
-                return
-            }
-
-            if didBecomeActiveTimestamp == nil {
-                suppressInitialAppStart(reason: .missingDidBecomeActive)
-            }
-            else {
-                determineAndSend()
-            }
-        }
-
-        initialHandoffTimeoutWorkItem = workItem
-        DispatchQueue.main.asyncAfter(
-            deadline: .now() + initialHandoffTimeout,
-            execute: workItem
-        )
-    }
-
-    func cancelInitialHandoffTimeout() {
-        initialHandoffTimeoutWorkItem?.cancel()
-        initialHandoffTimeoutWorkItem = nil
-    }
-
-    private func resolveInitialAppStart(as state: AppStartResolutionState) {
-        guard !initialAppStartState.isTerminal else {
-            return
-        }
-
-        initialAppStartState = state
-        cancelInitialHandoffTimeout()
-    }
-
-    private func suppressInitialAppStart(reason: AppStartSuppressionReason) {
-        guard !initialAppStartState.isTerminal else {
-            return
-        }
-
-        resolveInitialAppStart(as: .suppressed(reason))
-        suppressionCounts[reason, default: 0] += 1
-
-        logger.log(level: .warn) {
-            "AppStart measurement suppressed. reason=\(reason.rawValue)"
-        }
-    }
-
-    private func suppressionReason() -> AppStartSuppressionReason {
-        if isWaitingForBackgroundForegroundBoundary {
-            return .backgroundWithoutForeground
-        }
-
-        guard didBecomeActiveTimestamp != nil else {
-            return .missingDidBecomeActive
-        }
-
-        guard let didBecomeActiveTimestamp,
-            validSnapshotEventTimes(end: didBecomeActiveTimestamp)
-        else {
-            return .invalidTimestampOrder
-        }
-
-        if let capturedLaunchOrigin {
-            switch capturedLaunchOrigin {
-            case .background:
-                return willEnterForegroundTimestamp == nil ? .missingForegroundBoundary : .unknownLaunchOrigin
-
-            case .unknown:
-                return .unknownLaunchOrigin
-
-            case .foreground:
-                return processStartTimestamp == nil ? .missingProcessStart : .unknownLaunchOrigin
-            }
-        }
-
-        if backgroundLaunchDetected == nil {
-            return .unknownLaunchOrigin
-        }
-
-        return .unknownLaunchOrigin
-    }
-
-    var isWaitingForBackgroundForegroundBoundary: Bool {
-        capturedLaunchOrigin == .background && willEnterForegroundTimestamp == nil
-    }
-
-
-    // MARK: - Cold start events
-
-    private func coldStartEvents(startTime: Date) -> [AppStartEvent] {
-        var events: [AppStartEvent] = []
-
-        events.append(AppStartEvent(name: "process.start", timestamp: startTime))
-
-        if let didFinishLaunchingTimestamp {
-            events.append(
-                AppStartEvent(
-                    name: UIApplication.didFinishLaunchingNotification.rawValue,
-                    timestamp: didFinishLaunchingTimestamp
-                )
-            )
-        }
-
-        if let willEnterForegroundTimestamp {
-            events.append(
-                AppStartEvent(
-                    name: UIApplication.willEnterForegroundNotification.rawValue,
-                    timestamp: willEnterForegroundTimestamp
-                )
-            )
-        }
-
-        if let didBecomeActiveTimestamp {
-            events.append(
-                AppStartEvent(
-                    name: UIApplication.didBecomeActiveNotification.rawValue,
-                    timestamp: didBecomeActiveTimestamp
-                )
-            )
-        }
-
-        return events
     }
 }

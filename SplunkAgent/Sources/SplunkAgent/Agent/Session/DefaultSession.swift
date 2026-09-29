@@ -19,7 +19,6 @@ internal import CiscoLogger
 import Foundation
 internal import SplunkCommon
 
-
 /// The object implements the management of the current session.
 class DefaultSession: AgentSession {
 

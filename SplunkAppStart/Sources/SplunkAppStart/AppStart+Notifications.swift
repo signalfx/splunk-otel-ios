@@ -66,7 +66,7 @@ extension AppStart {
                 }
 
                 if isCurrentlyInBackground || significantDelayFromLaunch {
-                    self.backgroundLaunchDetected = true
+                    self.markBackgroundLaunchDetected(explicitlyObserved: isCurrentlyInBackground)
                 }
             }
 

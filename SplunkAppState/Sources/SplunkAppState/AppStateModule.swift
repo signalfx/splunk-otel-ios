@@ -79,25 +79,25 @@ public final class AppStateModule {
     }
 
     private func processCoreLifecycleEvent(_ event: AppLifecycleRecorder.Event) {
-            switch event {
-            case let .didBecomeActive(timestamp):
-                processEvent(.active, at: timestamp)
+        switch event {
+        case let .didBecomeActive(timestamp):
+            processEvent(.active, at: timestamp)
 
-            case let .didEnterBackground(timestamp):
-                processEvent(.background, at: timestamp)
+        case let .didEnterBackground(timestamp):
+            processEvent(.background, at: timestamp)
 
-            case let .willEnterForeground(timestamp):
-                processEvent(.foreground, at: timestamp)
+        case let .willEnterForeground(timestamp):
+            processEvent(.foreground, at: timestamp)
 
-            case let .willResignActive(timestamp):
-                processEvent(.inactive, at: timestamp)
+        case let .willResignActive(timestamp):
+            processEvent(.inactive, at: timestamp)
 
-            case let .willTerminate(timestamp):
-                processEvent(.terminate, at: timestamp)
+        case let .willTerminate(timestamp):
+            processEvent(.terminate, at: timestamp)
 
-            case .didFinishLaunching:
-                break
-            }
+        case .didFinishLaunching:
+            break
+        }
     }
 
 
