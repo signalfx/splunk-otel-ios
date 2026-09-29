@@ -119,7 +119,9 @@ extension AppStart {
             // observed origin before making the conservative suppression decision.
             scheduleInitialHandoffTimeout()
         }
-        else if didBecomeActiveTimestamp != nil, hasRequiredBoundary(for: initialSnapshot.launchOrigin) {
+        else if didBecomeActiveTimestamp != nil,
+            hasRequiredBoundary(for: capturedLaunchOrigin ?? initialSnapshot.launchOrigin)
+        {
             determineAndSend()
             if initialAppStartState.isTerminal {
                 replaySubsequentLifecycleEvents(lifecycleSegments.subsequent)
