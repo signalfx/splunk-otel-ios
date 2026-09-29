@@ -77,6 +77,7 @@ cat > "${MANIFEST_PATH}" << JSONEOF
       "frameworks": [
         "SplunkAgent.xcframework",
         "SplunkAgentObjC.xcframework",
+        "SplunkAgentBootstrap.xcframework",
         "SplunkCommon.xcframework",
         "SplunkNavigation.xcframework",
         "SplunkNetwork.xcframework",

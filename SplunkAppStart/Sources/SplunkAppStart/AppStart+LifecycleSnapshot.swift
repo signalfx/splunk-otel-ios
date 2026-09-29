@@ -33,6 +33,8 @@ extension AppStart {
         capturedLaunchOrigin = nil
         capturedLaunchOriginConfidence = .unknown
         suppressionCounts.removeAll()
+        deferredLifecycleSnapshot = nil
+        shouldDeferInitialLifecycleResolution = false
     }
 
     /// Consumes the snapshot recorded by the agent core.
@@ -61,9 +63,18 @@ extension AppStart {
         coreLifecycle event: AppLifecycleRecorder.Event?,
         snapshot: AppStartLifecycleSnapshot
     ) {
+        if shouldDeferInitialLifecycleResolution,
+            initialAppStartState == .pending
+        {
+            deferredLifecycleSnapshot = snapshot
+            return
+        }
+
         switch initialAppStartState {
         case .suppressed:
-            return
+            if let event {
+                processCoreLifecycleEvent(event)
+            }
 
         case .emitted:
             if let event {
@@ -101,9 +112,6 @@ extension AppStart {
 
         if isWaitingForBackgroundForegroundBoundary {
             cancelInitialHandoffTimeout()
-        }
-        else {
-            scheduleInitialHandoffTimeout()
         }
     }
 

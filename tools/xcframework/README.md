@@ -29,7 +29,7 @@ The `make build` target requires `SESSION_REPLAY_LOCAL_PATH` and runs five stage
 | 2 | `make build-plcrash` | Clones `PLCrashReporter`, builds it as a **dynamic** framework from source for iOS/tvOS/macCatalyst |
 | 3 | `make build-cisco` | Builds the 9 Cisco Session Replay frameworks as **dynamic** xcframeworks from the local Session Replay checkout |
 | 4 | `make populate-deps` | Stages OTel, PLCrash, and already-built dynamic Cisco xcframeworks into `dependencies/` |
-| 5 | `make build-agent` | Generates the main Tuist workspace and builds all 16 Splunk module xcframeworks |
+| 5 | `make build-agent` | Generates the main Tuist workspace and builds all 17 Splunk module xcframeworks |
 
 ### Output
 
@@ -49,6 +49,7 @@ output/xcframeworks/
 ├── CiscoSessionReplay.xcframework
 ├── CiscoInstanceManager.xcframework
 ├── CiscoRuntimeCache.xcframework
+├── SplunkAgentBootstrap.xcframework
 ├── SplunkAgent.xcframework
 ├── SplunkAgentObjC.xcframework
 ├── SplunkCommon.xcframework

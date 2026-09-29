@@ -32,6 +32,7 @@ let xcfwDir = "../output/xcframeworks"
 
 /// Agent modules (built by `make build-agent`).
 let agentFrameworks = [
+    "SplunkAgentBootstrap",
     "SplunkAgent",
     "SplunkAgentObjC",
     "SplunkCommon",

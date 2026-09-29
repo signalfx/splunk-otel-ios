@@ -186,7 +186,10 @@ extension AppLifecycleRecorder {
 
         if isBackgroundLaunch(timestamp: timestamp) {
             launchOrigin = .background
-            launchOriginConfidence = isApplicationInBackground ? .observed : .inferred
+            launchOriginConfidence =
+                eventHistory.contains {
+                    $0.kind == .didEnterBackground
+                } ? .observed : .inferred
         }
         else if let didFinishLaunchingTimestamp,
             timestamp >= didFinishLaunchingTimestamp

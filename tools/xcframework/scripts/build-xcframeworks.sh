@@ -82,8 +82,9 @@ IOS_PLATFORMS=(
 #   3. SplunkOpenTelemetryBackgroundExporter (depends on SplunkCommon)
 #   4. SplunkOpenTelemetry (depends on BackgroundExporter)
 #   5. SplunkCustomTracking (depends on SplunkOpenTelemetry)
-#   6. SplunkAgent (depends on everything)
-#   7. SplunkAgentObjC (depends on SplunkAgent)
+#   6. SplunkAgentBootstrap (early lifecycle bootstrap for SplunkAgent)
+#   7. SplunkAgent (depends on everything)
+#   8. SplunkAgentObjC (depends on SplunkAgent)
 
 # Build order (dependencies first) and platform matrix.
 # SplunkCrashReports uses NO_VISIONOS; all others use ALL.
@@ -102,6 +103,7 @@ BUILD_ORDER=(
     SplunkWebView
     SplunkCustomTracking
     SplunkSessionReplayProxy
+    SplunkAgentBootstrap
     SplunkAgent
     SplunkAgentObjC
 )

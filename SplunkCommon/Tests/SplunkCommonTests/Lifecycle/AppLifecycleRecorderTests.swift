@@ -75,6 +75,18 @@ final class AppLifecycleRecorderTests: XCTestCase {
         XCTAssertEqual(recorder.snapshot().launchOrigin, .foreground)
     }
 
+    func testBackgroundHistoryKeepsObservedConfidenceDuringForegroundTransition() {
+        let notificationCenter = NotificationCenter()
+        let recorder = AppLifecycleRecorder(notificationCenter: notificationCenter)
+
+        notificationCenter.post(name: UIApplication.didEnterBackgroundNotification, object: nil)
+        notificationCenter.post(name: UIApplication.willEnterForegroundNotification, object: nil)
+
+        let snapshot = recorder.snapshot()
+        XCTAssertEqual(snapshot.launchOrigin, .background)
+        XCTAssertEqual(snapshot.launchOriginConfidence, .observed)
+    }
+
     func testDidFinishLaunchingRetainsLaunchOptionKeys() {
         let notificationCenter = NotificationCenter()
         let recorder = AppLifecycleRecorder(notificationCenter: notificationCenter)

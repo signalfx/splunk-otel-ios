@@ -47,6 +47,7 @@ log_step() {
 log_step "Step 1: Verify xcframeworks exist"
 
 REQUIRED_FRAMEWORKS=(
+    "SplunkAgentBootstrap"
     "SplunkAgent"
     "SplunkCommon"
     "OpenTelemetryApi"

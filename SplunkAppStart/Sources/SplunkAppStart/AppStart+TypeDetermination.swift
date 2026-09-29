@@ -25,31 +25,14 @@ extension AppStart {
 
     /// Determines an app start type and sends valid results.
     func determineAndSend() {
-
-        if case .suppressed = initialAppStartState {
-            logger.log(level: .debug) {
-                "App start resolution has already reached a terminal state. Ignoring lifecycle event."
-            }
+        guard !shouldIgnoreLifecycleResolution,
+            !isWaitingForBackgroundForegroundBoundary
+        else {
             return
         }
 
-        guard !isWaitingForBackgroundForegroundBoundary else {
-            return
-        }
-
-        // Reset state for further app start detection
         defer {
-            // Clear timestamps
-            didFinishLaunchingTimestamp = nil
-            willEnterForegroundTimestamp = nil
-            willResignActiveTimestamp = nil
-            didBecomeActiveTimestamp = nil
-            capturedLaunchOrigin = nil
-            capturedLaunchOriginConfidence = .unknown
-            backgroundLaunchConfidence = .unknown
-
-            // Clear initialization data as initialization span is sent only once with the cold start
-            agentInitializeSpanData = nil
+            resetAppStartResolutionState()
         }
 
         guard let endTime = didBecomeActiveTimestamp else {
@@ -59,37 +42,61 @@ extension AppStart {
             return
         }
 
-        // Send app start if the type was determined
         if let (determinedType, startTime) = determinedAppStartType() {
-            guard startTime.timeIntervalSinceReferenceDate.isFinite,
-                endTime.timeIntervalSinceReferenceDate.isFinite,
-                startTime <= endTime
-            else {
-                suppressInitialAppStart(reason: .invalidTimestampOrder)
-                return
-            }
-
-            let duration = endTime.timeIntervalSince(startTime)
-            let provenanceIsTrusted = capturedLaunchOriginConfidence == .observed
-
-            guard duration.isFinite,
-                provenanceIsTrusted || duration <= maxAppStartDuration
-            else {
-                suppressInitialAppStart(reason: .maxDurationExceeded)
-                return
-            }
-
-            // Resolve before handing data to the destination so a synchronous
-            // callback cannot re-enter the resolver and emit a duplicate.
-            resolveInitialAppStart(as: .emitted)
-            send(start: startTime, end: endTime, type: determinedType)
-
-            logger.log(level: .debug) {
-                "App start log: determined app start type: \(determinedType.rawValue), start time: \(startTime), end time: \(endTime)."
-            }
+            sendIfValid(start: startTime, end: endTime, type: determinedType)
         }
         else {
             suppressInitialAppStart(reason: suppressionReason())
+        }
+    }
+
+    private var shouldIgnoreLifecycleResolution: Bool {
+        guard case .suppressed = initialAppStartState else {
+            return false
+        }
+
+        return willResignActiveTimestamp == nil || willEnterForegroundTimestamp == nil
+    }
+
+    private func resetAppStartResolutionState() {
+        didFinishLaunchingTimestamp = nil
+        willEnterForegroundTimestamp = nil
+        willResignActiveTimestamp = nil
+        didBecomeActiveTimestamp = nil
+        capturedLaunchOrigin = nil
+        capturedLaunchOriginConfidence = .unknown
+        backgroundLaunchConfidence = .unknown
+
+        // Initialization data is sent only once with the cold start.
+        agentInitializeSpanData = nil
+    }
+
+    private func sendIfValid(start: Date, end: Date, type: AppStartType) {
+        guard start.timeIntervalSinceReferenceDate.isFinite,
+            end.timeIntervalSinceReferenceDate.isFinite,
+            start <= end
+        else {
+            suppressInitialAppStart(reason: .invalidTimestampOrder)
+            return
+        }
+
+        let duration = end.timeIntervalSince(start)
+        let provenanceIsTrusted = capturedLaunchOriginConfidence == .observed
+
+        guard duration.isFinite,
+            provenanceIsTrusted || duration <= maxAppStartDuration
+        else {
+            suppressInitialAppStart(reason: .maxDurationExceeded)
+            return
+        }
+
+        // Resolve before handing data to the destination so a synchronous
+        // callback cannot re-enter the resolver and emit a duplicate.
+        resolveInitialAppStart(as: .emitted)
+        send(start: start, end: end, type: type)
+
+        logger.log(level: .debug) {
+            "App start log: determined app start type: \(type.rawValue), start time: \(start), end time: \(end)."
         }
     }
 
@@ -97,6 +104,13 @@ extension AppStart {
     func determinedAppStartType() -> (AppStartType, Date)? {
         guard let didBecomeActiveTimestamp else {
             return nil
+        }
+
+        if let willResignActiveTimestamp,
+            let willEnterForegroundTimestamp,
+            willResignActiveTimestamp <= willEnterForegroundTimestamp
+        {
+            return (.hot, willEnterForegroundTimestamp)
         }
 
         // Prewarm means that process start is not a valid user-visible cold-start anchor.
@@ -122,10 +136,6 @@ extension AppStart {
             backgroundLaunchConfidence == .inferred
         {
             return nil
-        }
-
-        if willResignActiveTimestamp != nil, let startTime = willEnterForegroundTimestamp {
-            return (.hot, startTime)
         }
 
         if !initialAppStartState.isTerminal,

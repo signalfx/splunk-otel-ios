@@ -58,6 +58,7 @@ EXPECTED_FRAMEWORKS=(
     "SplunkWebView"
     "SplunkCustomTracking"
     "SplunkSessionReplayProxy"
+    "SplunkAgentBootstrap"
     "SplunkAgent"
     "SplunkAgentObjC"
 )

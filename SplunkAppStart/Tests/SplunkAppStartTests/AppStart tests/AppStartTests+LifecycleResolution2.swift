@@ -21,7 +21,7 @@ import XCTest
 @_spi(SplunkInternal) @testable import SplunkCommon
 
 extension AppStartTests {
-    func testPartialSnapshotTimeoutIsSuppressedAndCannotBeRetried() throws {
+    func testSuppressedInitialSnapshotStillAllowsLaterHotStarts() throws {
         let destination = DebugDestination()
         let now = Date()
 
@@ -48,17 +48,131 @@ extension AppStartTests {
         XCTAssertEqual(appStart.initialAppStartState, .suppressed(.missingDidBecomeActive))
         try checkNotDeterminedType(in: destination)
 
-        appStart.track(
-            initialLifecycle: AppStartLifecycleSnapshot(
+        appStart.consume(
+            coreLifecycle: .willResignActive(now.addingTimeInterval(0.1)),
+            snapshot: AppStartLifecycleSnapshot(
+                launchOrigin: .unknown,
+                didFinishLaunching: nil,
+                willEnterForeground: nil,
+                didBecomeActive: nil
+            )
+        )
+        appStart.consume(
+            coreLifecycle: .willEnterForeground(now.addingTimeInterval(0.2)),
+            snapshot: AppStartLifecycleSnapshot(
+                launchOrigin: .unknown,
+                didFinishLaunching: nil,
+                willEnterForeground: nil,
+                didBecomeActive: nil
+            )
+        )
+        appStart.consume(
+            coreLifecycle: .didBecomeActive(now.addingTimeInterval(0.3)),
+            snapshot: AppStartLifecycleSnapshot(
+                launchOrigin: .unknown,
+                didFinishLaunching: nil,
+                willEnterForeground: nil,
+                didBecomeActive: nil
+            )
+        )
+
+        try checkDeterminedType(.hot, in: destination)
+    }
+
+    func testCoreSnapshotDoesNotStartHybridTimeout() throws {
+        let destination = DebugDestination()
+        let now = Date()
+
+        let appStart = AppStart()
+        appStart.destination = destination
+        appStart.initialHandoffTimeout = 0.01
+
+        appStart.consume(
+            coreLifecycle: nil,
+            snapshot: AppStartLifecycleSnapshot(
                 launchOrigin: .foreground,
+                launchOriginConfidence: .observed,
                 didFinishLaunching: now.addingTimeInterval(-1.0),
                 willEnterForeground: now.addingTimeInterval(-0.5),
+                didBecomeActive: nil
+            )
+        )
+
+        let timeoutCompleted = expectation(description: "native lifecycle wait completed")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+            timeoutCompleted.fulfill()
+        }
+        wait(for: [timeoutCompleted], timeout: 1.0)
+
+        XCTAssertEqual(appStart.initialAppStartState, .pending)
+        try checkNotDeterminedType(in: destination)
+    }
+
+    func testLifecycleResolutionWaitsForInitializationData() throws {
+        let destination = DebugDestination()
+        let now = Date()
+
+        let appStart = AppStart()
+        appStart.processStartTimestamp = now.addingTimeInterval(-2.0)
+        appStart.destination = destination
+        appStart.deferInitialLifecycleResolution()
+
+        appStart.consume(
+            coreLifecycle: nil,
+            snapshot: AppStartLifecycleSnapshot(
+                launchOrigin: .foreground,
+                launchOriginConfidence: .observed,
+                didFinishLaunching: now.addingTimeInterval(-1.5),
+                willEnterForeground: now.addingTimeInterval(-1.0),
                 didBecomeActive: now
             )
         )
 
-        XCTAssertEqual(appStart.initialAppStartState, .suppressed(.missingDidBecomeActive))
         try checkNotDeterminedType(in: destination)
+        XCTAssertEqual(appStart.initialAppStartState, .pending)
+
+        appStart.reportAgentInitialize(
+            start: now.addingTimeInterval(-1.5),
+            end: now.addingTimeInterval(-0.1),
+            events: ["modules_connected": now.addingTimeInterval(-0.5)],
+            configurationSettings: [:]
+        )
+        appStart.resumeInitialLifecycleResolution()
+
+        try checkDeterminedType(.cold, in: destination)
+        XCTAssertNotNil(destination.storedInitialize)
+    }
+
+    func testObservedOriginOverridesConflictingInferredOrigin() throws {
+        let destination = DebugDestination()
+        let now = Date()
+
+        let appStart = AppStart()
+        appStart.processStartTimestamp = now.addingTimeInterval(-2.0)
+        appStart.destination = destination
+
+        appStart.consume(
+            coreLifecycle: nil,
+            snapshot: AppStartLifecycleSnapshot(
+                launchOrigin: .background,
+                launchOriginConfidence: .inferred,
+                didFinishLaunching: now.addingTimeInterval(-1.5),
+                willEnterForeground: nil,
+                didBecomeActive: nil
+            )
+        )
+
+        appStart.track(
+            initialLifecycle: AppStartLifecycleSnapshot(
+                launchOrigin: .foreground,
+                launchOriginConfidence: .observed,
+                didFinishLaunching: now.addingTimeInterval(-1.5),
+                willEnterForeground: now.addingTimeInterval(-1.0),
+                didBecomeActive: now
+            )
+        )
+
+        try checkDeterminedType(.cold, in: destination)
     }
 
     func testTrustedHybridOriginCanCompleteUnknownCoreSnapshot() throws {
@@ -141,6 +255,7 @@ extension AppStartTests {
 
         let appStart = AppStart()
         appStart.processStartTimestamp = now.addingTimeInterval(-2.0)
+        appStart.prewarmDetected = true
         appStart.destination = destination
 
         appStart.consume(

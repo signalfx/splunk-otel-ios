@@ -65,6 +65,7 @@ EXPECTED_DISTRIBUTION_FRAMEWORKS=(
     "SplunkWebView"
     "SplunkCustomTracking"
     "SplunkSessionReplayProxy"
+    "SplunkAgentBootstrap"
     "SplunkAgent"
     "SplunkAgentObjC"
 )

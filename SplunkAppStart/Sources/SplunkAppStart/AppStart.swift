@@ -103,6 +103,10 @@ public final class AppStart {
     /// Cancels the bounded wait for a partial hybrid handoff.
     var initialHandoffTimeoutWorkItem: DispatchWorkItem?
 
+    /// Holds the recorder snapshot until the agent initialization child span data exists.
+    var deferredLifecycleSnapshot: AppStartLifecycleSnapshot?
+    var shouldDeferInitialLifecycleResolution = false
+
     /// Launch provenance captured by a hybrid integration before the SDK was installed.
     var capturedLaunchOrigin: AppStartLaunchOrigin?
     var capturedLaunchOriginConfidence: AppLifecycleRecorder.LaunchOriginConfidence = .unknown
@@ -181,6 +185,27 @@ public final class AppStart {
     public func stopDetection() {
         stopNotificationListeners()
         cancelInitialHandoffTimeout()
+    }
+
+    /// Defers the initial lifecycle resolution until agent initialization data is available.
+    @_spi(SplunkInternal)
+    public func deferInitialLifecycleResolution() {
+        shouldDeferInitialLifecycleResolution = true
+        deferredLifecycleSnapshot = nil
+    }
+
+    /// Resumes an initial lifecycle snapshot captured while the agent was being customized.
+    @_spi(SplunkInternal)
+    public func resumeInitialLifecycleResolution() {
+        let snapshot = deferredLifecycleSnapshot
+        deferredLifecycleSnapshot = nil
+        shouldDeferInitialLifecycleResolution = false
+
+        guard let snapshot else {
+            return
+        }
+
+        consume(coreLifecycle: nil, snapshot: snapshot)
     }
 
     /// Report agent initialization metrics, which will be sent in the Initialization span as an AppStart's child span.

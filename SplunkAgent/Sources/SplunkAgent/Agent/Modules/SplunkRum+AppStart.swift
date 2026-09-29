@@ -44,6 +44,7 @@ extension SplunkRum {
                 events: initializeEvents,
                 configurationSettings: configurationSettings
             )
+            appStartModule.resumeInitialLifecycleResolution()
         }
     }
 
@@ -69,6 +70,7 @@ extension SplunkRum {
             // listeners are removed after installation so all consumers use the same
             // first-event-wins snapshot and future updates.
             appStartModule.resetLifecycleObservationState()
+            appStartModule.deferInitialLifecycleResolution()
             lifecycleRecorder.addObserver { [weak appStartModule] update in
                 appStartModule?
                     .consume(

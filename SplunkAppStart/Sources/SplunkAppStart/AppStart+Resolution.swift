@@ -64,14 +64,13 @@ extension AppStart {
         }
 
         if acceptUnknownOrigin || snapshot.launchOrigin != .unknown {
-            if capturedLaunchOrigin == nil || capturedLaunchOrigin == .unknown {
-                capturedLaunchOrigin = snapshot.launchOrigin
-                capturedLaunchOriginConfidence = snapshot.launchOriginConfidence
-            }
-            else if capturedLaunchOrigin == snapshot.launchOrigin,
-                launchOriginConfidenceRank(snapshot.launchOriginConfidence)
-                    > launchOriginConfidenceRank(capturedLaunchOriginConfidence)
+            let incomingConfidenceRank = launchOriginConfidenceRank(snapshot.launchOriginConfidence)
+            let capturedConfidenceRank = launchOriginConfidenceRank(capturedLaunchOriginConfidence)
+
+            if capturedLaunchOrigin == nil || capturedLaunchOrigin == .unknown
+                || incomingConfidenceRank > capturedConfidenceRank
             {
+                capturedLaunchOrigin = snapshot.launchOrigin
                 capturedLaunchOriginConfidence = snapshot.launchOriginConfidence
             }
         }
@@ -93,6 +92,16 @@ extension AppStart {
     }
 
     func processCoreLifecycleEvent(_ event: AppLifecycleRecorder.Event, resolve: Bool = true) {
+        if case .suppressed = initialAppStartState,
+            case .willResignActive = event
+        {
+            // The initial suppression may have retained an earlier foreground
+            // boundary. Start a fresh boundary pair for the next hot start.
+            willEnterForegroundTimestamp = nil
+            willResignActiveTimestamp = nil
+            didBecomeActiveTimestamp = nil
+        }
+
         mergeCoreLifecycleEvent(event)
 
         if resolve {
@@ -140,7 +149,7 @@ extension AppStart {
         }
 
         let workItem = DispatchWorkItem { [weak self] in
-            guard let self, !self.initialAppStartState.isTerminal else {
+            guard let self, !initialAppStartState.isTerminal else {
                 return
             }
 
