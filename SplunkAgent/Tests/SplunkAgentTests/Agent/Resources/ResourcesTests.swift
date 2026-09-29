@@ -92,4 +92,96 @@ final class ResourcesTests: XCTestCase {
         let agentVersion = try XCTUnwrap(otelResource.attributes["rum.sdk.version"])
         XCTAssertFalse(agentVersion.description.isEmpty)
     }
+
+    func testPreviousAppVersionIsIncludedWhenPresent() {
+        var resource = Resource()
+        let resources = DefaultResources(
+            appName: "Tests",
+            appVersion: "5.2.0",
+            appPreviousVersion: "5.1.3",
+            appBuild: "1",
+            appDeploymentEnvironment: "test",
+            agentHybridType: nil,
+            agentVersion: "1.0.0",
+            deviceID: "device",
+            deviceModelIdentifier: "iPhone",
+            deviceManufacturer: "Apple",
+            osName: "iOS",
+            osVersion: "18.0",
+            osDescription: "iOS 18.0",
+            osType: "darwin"
+        )
+
+        resource.merge(with: resources)
+
+        XCTAssertEqual(resource.attributes["app.version"], .string("5.2.0"))
+        XCTAssertEqual(resource.attributes["app.previous_version"], .string("5.1.3"))
+    }
+
+    func testPreviousAppVersionIsOmittedWhenAbsentOrEmpty() {
+        for previousVersion in [nil, ""] as [String?] {
+            var resource = Resource()
+            let resources = DefaultResources(
+                appName: "Tests",
+                appVersion: "5.2.0",
+                appPreviousVersion: previousVersion,
+                appBuild: "1",
+                appDeploymentEnvironment: "test",
+                agentHybridType: nil,
+                agentVersion: "1.0.0",
+                deviceID: "device",
+                deviceModelIdentifier: "iPhone",
+                deviceManufacturer: "Apple",
+                osName: "iOS",
+                osVersion: "18.0",
+                osDescription: "iOS 18.0",
+                osType: "darwin"
+            )
+
+            resource.merge(with: resources)
+
+            XCTAssertNil(resource.attributes["app.previous_version"])
+        }
+    }
+
+    func testPreviousAppVersionReachesErrorResourceAfterUpgrade() throws {
+        let storage = UserDefaultsStorage()
+        try? storage.delete(forKey: AppInstallationStorage.installationIdKey)
+        try? storage.delete(forKey: AppVersionTracker.storageKey)
+        defer {
+            try? storage.delete(forKey: AppInstallationStorage.installationIdKey)
+            try? storage.delete(forKey: AppVersionTracker.storageKey)
+        }
+
+        var firstConfiguration = try ConfigurationTestBuilder.buildDefault()
+        firstConfiguration.appVersion = "5.1.3"
+        AppVersionTracker.record(currentVersion: firstConfiguration.appVersion)
+        let firstAgent = try AgentTestBuilder.build(with: firstConfiguration)
+        firstAgent.eventManager = try DefaultEventManager(with: firstConfiguration, agent: firstAgent)
+
+        let firstEventManager = try XCTUnwrap(firstAgent.eventManager as? DefaultEventManager)
+        let firstLogEventProcessor = try XCTUnwrap(
+            firstEventManager.logEventProcessor as? OTLPLogToSpanEventProcessor
+        )
+        XCTAssertNil(firstLogEventProcessor.resource?.attributes["app.previous_version"])
+
+        var upgradedConfiguration = firstConfiguration
+        upgradedConfiguration.appVersion = "5.2.0"
+        AppVersionTracker.record(currentVersion: upgradedConfiguration.appVersion)
+        let upgradedAgent = try AgentTestBuilder.build(with: upgradedConfiguration)
+        upgradedAgent.eventManager = try DefaultEventManager(with: upgradedConfiguration, agent: upgradedAgent)
+
+        let upgradedEventManager = try XCTUnwrap(upgradedAgent.eventManager as? DefaultEventManager)
+        let upgradedLogEventProcessor = try XCTUnwrap(
+            upgradedEventManager.logEventProcessor as? OTLPLogToSpanEventProcessor
+        )
+        let upgradedResource = try XCTUnwrap(upgradedLogEventProcessor.resource)
+
+        XCTAssertEqual(upgradedResource.attributes["app.version"], .string("5.2.0"))
+        XCTAssertEqual(upgradedResource.attributes["app.previous_version"], .string("5.1.3"))
+        XCTAssertEqual(
+            firstAgent.runtimeAttributes.all["app.installation.id"] as? String,
+            upgradedAgent.runtimeAttributes.all["app.installation.id"] as? String
+        )
+    }
 }

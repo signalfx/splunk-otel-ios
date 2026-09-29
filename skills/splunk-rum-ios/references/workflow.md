@@ -1,0 +1,83 @@
+# Workflow
+
+## Procedure
+
+1. Use the mode and instrumentation depth selected under `SKILL.md`.
+2. Inspect before deciding. Do not assume app lifecycle, language, platform, or
+   dependency manager.
+3. Load only the topic references needed by Host App evidence.
+4. Produce a plan before edits. Update the plan if new evidence changes the
+   safest integration point.
+5. Keep edits scoped to Splunk RUM dependency/linkage, initialization, explicit
+   instrumentation, and approved release/build-phase work.
+6. Verify in layers: static review, dependency resolution, build, launch, safe
+   signal exercise, backend only when user-provided public access is available.
+
+## Current-source rule
+
+Follow the source-of-truth order in `SKILL.md`. If docs disagree with public
+API source, prefer source and report the mismatch.
+
+## Inspection checklist
+
+Inspect the Host App before deciding on any integration path:
+
+- dependency manager and project type
+- hybrid framework evidence: React Native, Flutter, generated `ios/`
+  wrapper, or product-specific Splunk hybrid SDK package
+- primary app target and platform destinations
+- Swift, Objective-C, or mixed language boundaries
+- lifecycle: SwiftUI `App.init`, app delegate adaptor, Swift/ObjC
+  `AppDelegate`, `SceneDelegate`, storyboards, `main.m`, no-AppDelegate cases
+- existing configuration and secret-injection mechanism
+- existing observability SDKs or duplicate instrumentation risk
+- network layer and `URLSession` usage
+- `WKWebView` usage and whether web content is app-controlled
+- navigation: SwiftUI stacks/tabs/sheets, UIKit nav controllers, tab bars,
+  modals, custom containers, storyboards
+- sensitive UI that would need Session Replay masking
+- release/archive/CI paths for dSYM upload
+
+Source files to inspect:
+
+- `.xcodeproj`, `.xcworkspace`, `Package.swift`, `Package.resolved`
+- `Podfile`, `Cartfile`, generated project manifests, CI files
+- `package.json`, `pubspec.yaml`
+- `AppDelegate.*`, `SceneDelegate.*`, Swift `@main App`, `main.m`
+- storyboards, SwiftUI views, UIKit controllers, networking wrappers
+
+Search terms for existing instrumentation:
+
+```text
+SplunkAgent SplunkAgentObjC SplunkOtel SplunkRum SplunkRumBuilder
+SplunkRum.install SPLKAgent installWith EndpointConfiguration AgentConfiguration
+SplunkRumCrashReporting OpenTelemetry Datadog Crashlytics Sentry AppDynamics
+URLSession WKWebView trackScreen reportError reportEvent setScreenName
+@splunk/otel-react-native splunk_otel_flutter react-native flutter
+```
+
+## Gates
+
+Apply the hard gates in `SKILL.md` before recommending or changing
+instrumentation. Topic references may add stricter constraints.
+
+## Required output
+
+For `plan` / pre-`apply`, report:
+
+1. Evidence table with file paths, line numbers or search patterns, and confidence.
+2. Recommended path: fresh install, migration, review fix, manual-only, sample,
+   product-specific hybrid SDK referral, non-operational platform note, or
+   no-iOS-target outcome.
+3. References loaded and why.
+4. Minimal dependency, linkage, lifecycle, and configuration changes.
+5. Required user-provided values or approvals.
+6. Verification plan and measurable baseline metrics.
+7. Risks, blockers, and open questions.
+
+For `apply`, keep diffs scoped to explicit Splunk RUM instrumentation, required
+package/linkage, and approved release/build-phase work.
+
+For `verify`, report build result, launch result, exercised safe signals,
+credential status, backend observations if available, redacted evidence, and
+remaining blockers.

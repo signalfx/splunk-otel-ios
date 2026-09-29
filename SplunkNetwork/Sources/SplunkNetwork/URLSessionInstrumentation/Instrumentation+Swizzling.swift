@@ -30,20 +30,21 @@ extension URLSessionTask {
         if !isSupportedTask(task: self) {
             return
         }
-        if state == Self.State.running {
+        // Only a completed task has stable response, metrics, and error information. Suspended and
+        // canceling are intermediate states and must not finalize the span.
+        guard shouldFinalizeNetworkSpan(for: state) else {
             return
         }
+
         if currentRequest?.url == nil {
             return
         }
 
-        // Check for span from task creation first, then from resume
-        let span = getCreationSpan(for: self) ?? objc_getAssociatedObject(self, &associatedKeySpanResume) as? Span
-        guard let span else {
+        guard let finalizationCoordinator = getSpanFinalizationCoordinator(for: self) else {
             return
         }
 
-        endHttpSpan(span: span, task: self)
+        finalizationCoordinator.finalize(task: self)
     }
 
     @objc
@@ -79,11 +80,19 @@ extension URLSessionTask {
 
         // Fallback: create span at resume time (no header injection possible).
         // Covers tasks created before agent initialization or via un-swizzled APIs.
-        startHttpSpan(request: currentRequest)
-            .map { span in
-                objc_setAssociatedObject(self, &associatedKeySpanResume, span, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
-            }
+        guard let span = startHttpSpan(request: currentRequest) else {
+            return
+        }
+
+        let finalizationCoordinator = NetworkSpanFinalizationCoordinator(span: span)
+        objc_setAssociatedObject(self, &associatedKeySpanResume, span, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
+        setSpanFinalizationCoordinator(finalizationCoordinator, for: self)
     }
+}
+
+/// Returns whether a URL session task state has stable terminal response information.
+func shouldFinalizeNetworkSpan(for state: URLSessionTask.State) -> Bool {
+    state == .completed
 }
 
 /// Swizzles two methods on a given class.

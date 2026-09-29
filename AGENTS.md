@@ -53,7 +53,7 @@ This repo is a modular Swift Package for the Splunk RUM iOS agent. It instrument
 - Direct spans: Navigation, Network, AppStart, AppState, NetworkMonitor, SlowFrameDetector, and CustomTracking workflows use `Tracer.spanBuilder` -> `OTLPBatchSpanProcessor` -> `OTLPBackgroundHTTPTraceExporter`.
 - Log-as-span: CrashReports crash payloads, CustomTracking events/errors, Interactions, internal agent events, and agent events published through `DefaultEventManager` emit log records that `OTLPLogToSpanExporter` converts to spans and sends to the trace endpoint.
 - Binary logs: Session Replay is the exception; it uses `OTLPSessionReplayEventProcessor` -> `OTLPBackgroundHTTPLogExporterBinary`.
-- Direct spans use the custom in-memory `OTLPBatchSpanProcessor`, which pools ended spans and flushes a batch to the disk-backed exporter every 0.5s or when 100 spans accumulate (whichever is first). App background and normal termination notifications trigger asynchronous, best-effort drains without blocking the lifecycle notification thread; shutdown is fire-and-forget on the main thread and uses a bounded wait off-main. Spans still buffered in memory when the process exits are lost by design. This is distinct from the upstream `BatchSpanProcessor`, which is not used. There is no production `BatchLogRecordProcessor`. Durable buffering remains disk-backed in the background exporters.
+- Direct spans use the custom in-memory `OTLPBatchSpanProcessor`, which pools ended spans and flushes a batch to the disk-backed exporter every 1s or when 100 spans accumulate (whichever is first). App background and normal termination notifications trigger asynchronous, best-effort drains without blocking the lifecycle notification thread; shutdown is fire-and-forget on the main thread and uses a bounded wait off-main. Spans still buffered in memory when the process exits are lost by design. This is distinct from the upstream `BatchSpanProcessor`, which is not used. There is no production `BatchLogRecordProcessor`. Durable buffering remains disk-backed in the background exporters.
 - Uploads use `URLSessionConfiguration.background(withIdentifier:)`, not `UIApplication.beginBackgroundTask`.
 - Some hardcoded strings and attribute keys already exist. New hot-path string keys should still be centralized per module instead of copied inline.
 
@@ -81,7 +81,7 @@ This repo is not migrated to Swift 6 strict concurrency. New code should reduce 
 
 - `Package.swift` and `tools/xcframework/Project.swift` must stay synchronized for products, targets, platforms, dependencies, resources, and module links.
 - Run or request `tools/xcframework/scripts/check-manifest-sync.sh` when either manifest changes.
-- Dependency bumps for `opentelemetry-swift-core` or `PLCrashReporter` must stay exact-pinned and compatible with the xcframework build pipeline.
+- Dependency bumps for `opentelemetry-swift-core` must stay exact-pinned and compatible with the xcframework build pipeline. Updates to the vendored `SplunkCrashReporter` sources require license, binary-size, symbol-prefix, and xcframework compatibility review.
 - New SPM products are customer-visible distribution changes.
 - Use `TargetWrappers/` for Cisco binary target wrappers; it is the directory referenced by `Package.swift`.
 - Resource changes must be reflected in both SPM and xcframework distribution and reviewed for `PrivacyInfo.xcprivacy` impact.
@@ -166,3 +166,4 @@ Call these out as design choices when a PR relies on or changes them:
 - `TargetWrappers/` - Cisco binary target wrappers.
 - `dsymUploader/` - dSYM upload helper for clients.
 - `CHANGELOG.md`, `CODESTYLE.md`, `Development.md`, `CONTRIBUTING.md`.
+- `skills/splunk-rum-ios/` - skill bundle for coding agents instrumenting iOS apps with this SDK.

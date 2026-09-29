@@ -110,8 +110,11 @@ func swizzleDownloadTaskWithRequestAndCompletion() {
             createOriginalTask: {
                 castedIMP(session, selector, request, completion)
             },
-            createInstrumentedTask: { instrumentedRequest, span in
-                let wrappedCompletion = wrapDownloadCompletionHandler(completion, span: span)
+            createInstrumentedTask: { instrumentedRequest, _, finalizationCoordinator in
+                let wrappedCompletion = wrapDownloadCompletionHandler(
+                    completion,
+                    finalizationCoordinator: finalizationCoordinator
+                )
                 return castedIMP(session, selector, instrumentedRequest, wrappedCompletion)
             }
         )
@@ -158,8 +161,11 @@ func swizzleDownloadTaskWithURLAndCompletion() {
             createOriginalTask: {
                 castedIMP(session, selector, url, completion)
             },
-            createInstrumentedTask: { instrumentedRequest, span in
-                let wrappedCompletion = wrapDownloadCompletionHandler(completion, span: span)
+            createInstrumentedTask: { instrumentedRequest, _, finalizationCoordinator in
+                let wrappedCompletion = wrapDownloadCompletionHandler(
+                    completion,
+                    finalizationCoordinator: finalizationCoordinator
+                )
                 let castedRequestIMP = unsafeBitCast(
                     originalRequestIMP,
                     to: (@convention(c) (URLSession, Selector, URLRequest, DownloadHandler?) -> URLSessionDownloadTask).self

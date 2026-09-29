@@ -27,7 +27,7 @@ import ProjectDescription
 
 /// Directory containing all xcframeworks for distribution.
 ///
-/// After `make build`, this contains Agent modules, OTel, PLCrash, and Cisco SR.
+/// After `make build`, this contains Agent modules, OTel, and Cisco SR.
 let xcfwDir = "../output/xcframeworks"
 
 /// Agent modules (built by `make build-agent`).
@@ -40,6 +40,7 @@ let agentFrameworks = [
     "SplunkNetwork",
     "SplunkNetworkMonitor",
     "SplunkSlowFrameDetector",
+    "SplunkCrashReporter",
     "SplunkCrashReports",
     "SplunkOpenTelemetry",
     "SplunkOpenTelemetryBackgroundExporter",
@@ -57,11 +58,6 @@ let otelFrameworks = [
     "OpenTelemetrySdk"
 ]
 
-/// PLCrashReporter (built by `make build-plcrash`).
-let crashFrameworks = [
-    "CrashReporter"
-]
-
 /// Cisco Session Replay (downloaded by `make populate-deps`).
 let ciscoFrameworks = [
     "CiscoCommon",
@@ -76,7 +72,7 @@ let ciscoFrameworks = [
 ]
 
 /// All frameworks combined.
-let allFrameworks = agentFrameworks + otelFrameworks + crashFrameworks + ciscoFrameworks
+let allFrameworks = agentFrameworks + otelFrameworks + ciscoFrameworks
 
 
 // ---------------------------------------------------------------------------

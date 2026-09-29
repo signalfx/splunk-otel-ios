@@ -140,10 +140,12 @@ extension DefaultEventManager {
     private static func buildResources(configuration: any AgentConfigurationProtocol) -> DefaultResources {
         // Will be used later by hybrid agents
         let hybridType: String? = nil
+        let appVersionTracker = AppVersionTracker(currentVersion: configuration.appVersion)
 
         return DefaultResources(
             appName: configuration.appName,
             appVersion: configuration.appVersion,
+            appPreviousVersion: appVersionTracker.previousVersion,
             appBuild: AppInfo.buildId ?? "-",
             appDeploymentEnvironment: configuration.deploymentEnvironment,
             agentHybridType: hybridType,

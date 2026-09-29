@@ -107,8 +107,11 @@ func swizzleDataTaskWithRequestAndCompletion() {
             createOriginalTask: {
                 castedIMP(session, selector, request, completion)
             },
-            createInstrumentedTask: { instrumentedRequest, span in
-                let wrappedCompletion = wrapCompletionHandler(completion, span: span)
+            createInstrumentedTask: { instrumentedRequest, _, finalizationCoordinator in
+                let wrappedCompletion = wrapCompletionHandler(
+                    completion,
+                    finalizationCoordinator: finalizationCoordinator
+                )
                 return castedIMP(session, selector, instrumentedRequest, wrappedCompletion)
             }
         )
@@ -155,8 +158,11 @@ func swizzleDataTaskWithURLAndCompletion() {
             createOriginalTask: {
                 castedIMP(session, selector, url, completion)
             },
-            createInstrumentedTask: { instrumentedRequest, span in
-                let wrappedCompletion = wrapCompletionHandler(completion, span: span)
+            createInstrumentedTask: { instrumentedRequest, _, finalizationCoordinator in
+                let wrappedCompletion = wrapCompletionHandler(
+                    completion,
+                    finalizationCoordinator: finalizationCoordinator
+                )
 
                 // Call the ORIGINAL (un-swizzled) request-based method directly.
                 // This bypasses the request-based swizzle, preventing double instrumentation
@@ -271,8 +277,11 @@ func swizzleUploadTaskWithRequestFromDataAndCompletion() {
             createOriginalTask: {
                 castedIMP(session, selector, request, data, completion)
             },
-            createInstrumentedTask: { instrumentedRequest, span in
-                let wrappedCompletion = wrapCompletionHandler(completion, span: span)
+            createInstrumentedTask: { instrumentedRequest, _, finalizationCoordinator in
+                let wrappedCompletion = wrapCompletionHandler(
+                    completion,
+                    finalizationCoordinator: finalizationCoordinator
+                )
                 return castedIMP(session, selector, instrumentedRequest, data, wrappedCompletion)
             }
         )
@@ -309,8 +318,11 @@ func swizzleUploadTaskWithRequestFromFileAndCompletion() {
             createOriginalTask: {
                 castedIMP(session, selector, request, fileURL, completion)
             },
-            createInstrumentedTask: { instrumentedRequest, span in
-                let wrappedCompletion = wrapCompletionHandler(completion, span: span)
+            createInstrumentedTask: { instrumentedRequest, _, finalizationCoordinator in
+                let wrappedCompletion = wrapCompletionHandler(
+                    completion,
+                    finalizationCoordinator: finalizationCoordinator
+                )
                 return castedIMP(session, selector, instrumentedRequest, fileURL, wrappedCompletion)
             }
         )

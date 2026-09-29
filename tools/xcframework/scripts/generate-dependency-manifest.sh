@@ -83,6 +83,7 @@ cat > "${MANIFEST_PATH}" << JSONEOF
         "SplunkNetwork.xcframework",
         "SplunkNetworkMonitor.xcframework",
         "SplunkSlowFrameDetector.xcframework",
+        "SplunkCrashReporter.xcframework",
         "SplunkCrashReports.xcframework",
         "SplunkOpenTelemetry.xcframework",
         "SplunkOpenTelemetryBackgroundExporter.xcframework",
@@ -94,7 +95,6 @@ cat > "${MANIFEST_PATH}" << JSONEOF
         "SplunkSessionReplayProxy.xcframework",
         "OpenTelemetryApi.xcframework",
         "OpenTelemetrySdk.xcframework",
-        "CrashReporter.xcframework",
         "CiscoCommon.xcframework",
         "CiscoLogger.xcframework",
         "CiscoEncryption.xcframework",
@@ -107,7 +107,7 @@ cat > "${MANIFEST_PATH}" << JSONEOF
       ],
       "notes": [
         "All frameworks are required for full SplunkAgent functionality.",
-        "SplunkCrashReports.xcframework and CrashReporter.xcframework do NOT support visionOS.",
+        "SplunkCrashReporter.xcframework and SplunkCrashReports.xcframework do NOT support visionOS.",
         "SplunkAgentObjC.xcframework is only needed for Objective-C API access."
       ]
     },
@@ -120,11 +120,11 @@ cat > "${MANIFEST_PATH}" << JSONEOF
     }
   },
   "platformRestrictions": {
-    "SplunkCrashReports.xcframework": {
+    "SplunkCrashReporter.xcframework": {
       "excludes": ["visionOS"],
       "reason": "PLCrashReporter does not support visionOS"
     },
-    "CrashReporter.xcframework": {
+    "SplunkCrashReports.xcframework": {
       "excludes": ["visionOS"],
       "reason": "PLCrashReporter does not support visionOS"
     }

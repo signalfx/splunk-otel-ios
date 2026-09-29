@@ -40,15 +40,40 @@ final class URLSessionMockProtocol: URLProtocol {
             return
         }
 
-        let data = responseData(for: request)
-        let response = HTTPURLResponse(
-            url: url,
-            statusCode: 200,
-            httpVersion: "HTTP/1.1",
-            headerFields: [
+        let isFinalizationResponse = url.path == "/finalization"
+        let data: Data
+        let statusCode: Int
+        let httpVersion: String
+        let headerFields: [String: String]
+
+        if isFinalizationResponse {
+            data = Data(repeating: 0x41, count: 42)
+            statusCode = 207
+            httpVersion = "HTTP/2"
+            headerFields = [
+                "Content-Length": "\(data.count)",
+                "Content-Type": "application/octet-stream",
+                "Server": "h2",
+                "Server-Timing": "traceparent;desc='00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-03'",
+                "X-Finalization-Test": "preserved",
+                "X-Forwarded-For": "192.0.2.10"
+            ]
+        }
+        else {
+            data = responseData(for: request)
+            statusCode = 200
+            httpVersion = "HTTP/1.1"
+            headerFields = [
                 "Content-Type": "application/json",
                 "Content-Length": "\(data.count)"
             ]
+        }
+
+        let response = HTTPURLResponse(
+            url: url,
+            statusCode: statusCode,
+            httpVersion: httpVersion,
+            headerFields: headerFields
         )
 
         if let response {

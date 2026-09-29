@@ -1,0 +1,95 @@
+# Fresh Install
+
+## Platform
+
+Target normal iOS/iPadOS apps for full RUM telemetry. Do not ask users to add
+platform fences around Splunk RUM configuration, initialization, or public API
+calls; the SDK handles non-iOS Apple runtimes internally.
+
+If non-iOS Apple targets are relevant, verify both compile support and runtime
+behavior:
+
+- `Package.swift` declares package build platforms.
+- `PlatformSupport.current.scope` decides runtime behavior.
+- `.full` means the agent can initialize operational modules.
+- `.compileOnly` means the API can compile and may run, but public calls are
+  non-operational and telemetry should not be expected.
+- `.unsupported` means the target is not supported by current source.
+
+Current source maps normal iOS/iPadOS to `.full`, Mac Catalyst/tvOS/visionOS
+and iOS apps running on Mac or Vision to `.compileOnly`, and macOS/watchOS to
+`.unsupported`. On non-full scopes, `SplunkRum.install` returns the shared
+non-operational instance with `.notRunning(.unsupportedPlatform)` instead of
+starting telemetry.
+
+In straightforward iOS-only integrations, platform support usually needs no
+separate note. If other Apple targets are visible or the user asks, a light
+informational note is enough: they should build and run without special
+app-side handling, but the agent is non-operational there and telemetry should
+only be expected from iOS/iPadOS.
+
+If the Host App has no iOS/iPadOS app target at all, report that adding the SDK
+will not produce RUM instrumentation for that app.
+
+In shared multi-platform projects, inspect target membership before editing.
+Choose a startup file owned exclusively by the iOS/iPadOS target as the
+insertion point. Do not add Splunk imports or calls to files owned only by
+macOS, watchOS, tvOS, visionOS, or Mac Catalyst targets: current source maps
+them to `.unsupported` or `.compileOnly`, so they do not produce RUM telemetry.
+Session Replay UI APIs also require UIKit and cannot be placed in files for
+targets without UIKit.
+
+## Dependency and product
+
+Use SPM package:
+
+```text
+https://github.com/signalfx/splunk-otel-ios
+```
+
+Use `SplunkAgent` for Swift integration files. Use `SplunkAgentObjC` when the
+initialization file is Objective-C. In mixed apps, choose by the file that owns
+initialization; do not add a Swift wrapper just to initialize an Objective-C app.
+
+Do not pin a version from memory. Check current public releases and the Host
+App dependency policy.
+
+## Lifecycle decision tree
+
+- SwiftUI without `AppDelegate`: prefer existing `@main App.init` when that is
+  the smallest hook.
+- SwiftUI with app delegate adaptor: use the existing delegate if present.
+- UIKit code-only or storyboard apps: prefer existing `AppDelegate`.
+- `SceneDelegate`: use for scene-specific/manual instrumentation, not default
+  SDK install, unless the app already centralizes startup there.
+- Objective-C: use existing ObjC app delegate and `SplunkAgentObjC`.
+
+## Safe Swift initialization pattern
+
+Before `apply`, get the app name and deployment environment from Host App
+configuration or the user; never write placeholders. Defer the endpoint and
+redact errors; see
+`endpoint-and-runtime-state.md`.
+
+```swift
+import SplunkAgent
+
+private var splunkRum: SplunkRum?
+
+func startSplunkRum(appName: String, deploymentEnvironment: String) {
+    let config = AgentConfiguration(
+        appName: appName,
+        deploymentEnvironment: deploymentEnvironment
+    )
+
+    do {
+        splunkRum = try SplunkRum.install(with: config)
+    } catch {
+        // Non-fatal. Do not print the raw error; it may contain config values.
+        print("Splunk RUM agent did not start. Check configuration values.")
+    }
+}
+```
+
+This installs and starts the agent. Telemetry is queued locally until the user
+adds an endpoint after apply.
