@@ -23,19 +23,21 @@ extension AppStart {
     /// Replaces the module's temporary notification listeners with the agent-core recorder.
     @_spi(SplunkInternal)
     public func resetLifecycleObservationState() {
-        stopDetection()
-        didFinishLaunchingTimestamp = nil
-        willEnterForegroundTimestamp = nil
-        willResignActiveTimestamp = nil
-        didBecomeActiveTimestamp = nil
-        backgroundLaunchDetected = nil
-        backgroundLaunchConfidence = .unknown
-        capturedLaunchOrigin = nil
-        capturedLaunchOriginConfidence = .unknown
-        suppressionCounts.removeAll()
-        deferredLifecycleSnapshot = nil
-        shouldDeferInitialLifecycleResolution = false
-        awaitingObservedBackgroundHandoff = false
+        executeOnMain { [self] in
+            stopDetection()
+            didFinishLaunchingTimestamp = nil
+            willEnterForegroundTimestamp = nil
+            willResignActiveTimestamp = nil
+            didBecomeActiveTimestamp = nil
+            backgroundLaunchDetected = nil
+            backgroundLaunchConfidence = .unknown
+            capturedLaunchOrigin = nil
+            capturedLaunchOriginConfidence = .unknown
+            suppressionCounts.removeAll()
+            deferredLifecycleSnapshot = nil
+            shouldDeferInitialLifecycleResolution = false
+            awaitingObservedBackgroundHandoff = false
+        }
     }
 
     /// Consumes the snapshot recorded by the agent core.

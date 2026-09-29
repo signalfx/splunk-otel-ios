@@ -194,22 +194,26 @@ public final class AppStart {
     /// Defers the initial lifecycle resolution until agent initialization data is available.
     @_spi(SplunkInternal)
     public func deferInitialLifecycleResolution() {
-        shouldDeferInitialLifecycleResolution = true
-        deferredLifecycleSnapshot = nil
+        executeOnMain { [self] in
+            shouldDeferInitialLifecycleResolution = true
+            deferredLifecycleSnapshot = nil
+        }
     }
 
     /// Resumes an initial lifecycle snapshot captured while the agent was being customized.
     @_spi(SplunkInternal)
     public func resumeInitialLifecycleResolution() {
-        let snapshot = deferredLifecycleSnapshot
-        deferredLifecycleSnapshot = nil
-        shouldDeferInitialLifecycleResolution = false
+        executeOnMain { [self] in
+            let snapshot = deferredLifecycleSnapshot
+            deferredLifecycleSnapshot = nil
+            shouldDeferInitialLifecycleResolution = false
 
-        guard let snapshot else {
-            return
+            guard let snapshot else {
+                return
+            }
+
+            consume(coreLifecycle: nil, snapshot: snapshot)
         }
-
-        consume(coreLifecycle: nil, snapshot: snapshot)
     }
 
     /// Report agent initialization metrics, which will be sent in the Initialization span as an AppStart's child span.

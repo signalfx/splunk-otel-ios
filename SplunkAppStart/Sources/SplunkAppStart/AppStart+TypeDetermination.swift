@@ -85,9 +85,10 @@ extension AppStart {
 
         let duration = end.timeIntervalSince(start)
         let provenanceIsTrusted = capturedLaunchOriginConfidence == .observed
+        let isObservedHotStart = type == .hot
 
         guard duration.isFinite,
-            provenanceIsTrusted || duration <= maxAppStartDuration
+            isObservedHotStart || provenanceIsTrusted || duration <= maxAppStartDuration
         else {
             suppressInitialAppStart(reason: .maxDurationExceeded)
             return

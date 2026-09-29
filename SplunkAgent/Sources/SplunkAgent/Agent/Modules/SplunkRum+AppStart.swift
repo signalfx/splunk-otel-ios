@@ -63,7 +63,11 @@ extension SplunkRum {
 
     /// Configure App start module with shared state and a public api proxy.
     func customizeAppStart() {
-        if let appStartModule = modulesManager?.module(ofType: SplunkAppStart.AppStart.self) {
+        guard let appStartModule = modulesManager?.module(ofType: SplunkAppStart.AppStart.self) else {
+            return
+        }
+
+        let customize = { [self, appStartModule] in
             appStartModule.sharedState = sharedState
 
             // The core recorder owns lifecycle observation. The module's temporary
@@ -81,6 +85,16 @@ extension SplunkRum {
 
             // Initialize proxy API for this module
             appStartProxy = AppStart(for: appStartModule)
+        }
+
+        // AppStart lifecycle state and notification callbacks are main-thread state.
+        // Keep reset, deferral, and recorder subscription as one ordered transition
+        // when the agent is installed from a hybrid/background thread.
+        if Thread.isMainThread {
+            customize()
+        }
+        else {
+            DispatchQueue.main.sync(execute: customize)
         }
     }
 
