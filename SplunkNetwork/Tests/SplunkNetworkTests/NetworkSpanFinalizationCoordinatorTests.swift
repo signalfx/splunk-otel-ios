@@ -100,7 +100,10 @@ final class NetworkSpanFinalizationCoordinatorTests: XCTestCase {
         let coordinator = NetworkSpanFinalizationCoordinator(
             span: span,
             watchdogDelay: 0.01,
-            watchdogQueue: DispatchQueue(label: "NetworkSpanFinalizationCoordinatorTests.watchdog")
+            watchdogScheduler: NetworkSpanWatchdogScheduler(
+                queue: DispatchQueue(label: "NetworkSpanFinalizationCoordinatorTests.watchdog"),
+                tickInterval: 0.01
+            )
         )
         coordinator.attach(to: task)
         coordinator.start(task: task)
@@ -125,16 +128,21 @@ final class NetworkSpanFinalizationCoordinatorTests: XCTestCase {
     func testTerminalCallbackCancelsWatchdogAndFinalizesOnce() {
         let task = unstartedTask()
         let span = ThreadSafeMockSpan()
+        let scheduler = NetworkSpanWatchdogScheduler(
+            queue: DispatchQueue(label: "NetworkSpanFinalizationCoordinatorTests.watchdog"),
+            tickInterval: 0.01
+        )
         let coordinator = NetworkSpanFinalizationCoordinator(
             span: span,
             watchdogDelay: 0.05,
-            watchdogQueue: DispatchQueue(label: "NetworkSpanFinalizationCoordinatorTests.watchdog")
+            watchdogScheduler: scheduler
         )
         coordinator.attach(to: task)
         coordinator.start(task: task)
         coordinator.finalize(response: nil, error: nil)
 
         XCTAssertEqual(span.endCount, 1)
+        XCTAssertEqual(scheduler.pendingCount, 0)
 
         let deadline = Date().addingTimeInterval(0.2)
         while Date() < deadline {

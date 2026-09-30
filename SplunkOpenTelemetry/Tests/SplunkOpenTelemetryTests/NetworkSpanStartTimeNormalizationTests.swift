@@ -53,6 +53,19 @@ final class NetworkSpanStartTimeNormalizationTests: XCTestCase {
         XCTAssertEqual(normalizeNetworkSpanStartTime(span).startTime, creationTime)
     }
 
+    func testCustomHttpSpanIsNotNormalized() {
+        let creationTime = Date(timeIntervalSince1970: 100)
+        let span = makeSpanData(
+            name: "HTTP GET",
+            startTime: creationTime,
+            endTime: Date(timeIntervalSince1970: 102),
+            events: [SpanData.Event(name: "http.request.started", timestamp: Date(timeIntervalSince1970: 101))],
+            instrumentationName: "CustomInstrumentation"
+        )
+
+        XCTAssertEqual(normalizeNetworkSpanStartTime(span).startTime, creationTime)
+    }
+
     func testInvalidRequestStartedTimestampIsIgnored() {
         let creationTime = Date(timeIntervalSince1970: 100)
         let span = makeSpanData(
@@ -69,12 +82,13 @@ final class NetworkSpanStartTimeNormalizationTests: XCTestCase {
         name: String,
         startTime: Date,
         endTime: Date,
-        events: [SpanData.Event]
+        events: [SpanData.Event],
+        instrumentationName: String = "NetworkInstrumentation"
     ) -> SpanData {
         let tracerProvider = TracerProviderBuilder()
             .add(spanProcessor: SimpleSpanProcessor(spanExporter: MockSpanExporter()))
             .build()
-        let tracer = tracerProvider.get(instrumentationName: "NetworkSpanStartTimeNormalizationTests")
+        let tracer = tracerProvider.get(instrumentationName: instrumentationName)
         let span = tracer.spanBuilder(spanName: name)
             .setStartTime(time: startTime)
             .startSpan()

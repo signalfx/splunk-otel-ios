@@ -48,7 +48,7 @@ final class NetworkSpanFinalizationCoordinator: @unchecked Sendable {
     private var pendingFinalization: PendingFinalization?
     private var isFinalized = false
     private var hasStarted = false
-    private var watchdogWorkItem: DispatchWorkItem?
+    private var watchdogToken: NetworkSpanWatchdogScheduler.Token?
 
 
     // MARK: - Properties
@@ -70,15 +70,15 @@ final class NetworkSpanFinalizationCoordinator: @unchecked Sendable {
     init(
         span: Span,
         watchdogDelay: TimeInterval? = nil,
-        watchdogQueue: DispatchQueue? = nil
+        watchdogScheduler: NetworkSpanWatchdogScheduler? = nil
     ) {
         self.span = span
         self.watchdogDelay = watchdogDelay
-        self.watchdogQueue = watchdogQueue ?? NetworkInstrumentationManager.shared.watchdogQueue
+        self.watchdogScheduler = watchdogScheduler ?? NetworkInstrumentationManager.shared.watchdogScheduler
     }
 
     private let watchdogDelay: TimeInterval?
-    private let watchdogQueue: DispatchQueue
+    private let watchdogScheduler: NetworkSpanWatchdogScheduler
 
 
     // MARK: - Coordination
@@ -86,20 +86,26 @@ final class NetworkSpanFinalizationCoordinator: @unchecked Sendable {
     /// Attaches the task after URLSession has returned it from its creation method.
     func attach(to task: URLSessionTask) {
         let pending: PendingFinalization?
+        let watchdogToken: NetworkSpanWatchdogScheduler.Token?
 
         lock.lock()
         self.task = task
         if hasStarted, !isFinalized, let storedFinalization = pendingFinalization {
             isFinalized = true
             pendingFinalization = nil
-            watchdogWorkItem?.cancel()
-            watchdogWorkItem = nil
+            watchdogToken = self.watchdogToken
+            self.watchdogToken = nil
             pending = storedFinalization
         }
         else {
+            watchdogToken = nil
             pending = nil
         }
         lock.unlock()
+
+        if let watchdogToken {
+            watchdogScheduler.cancel(watchdogToken)
+        }
 
         if let pending {
             endHttpSpan(
@@ -118,7 +124,6 @@ final class NetworkSpanFinalizationCoordinator: @unchecked Sendable {
     /// the span start time.
     func start(task: URLSessionTask, at startTime: Date = Date()) {
         let pending: PendingFinalization?
-        let workItem: DispatchWorkItem?
         let delay = watchdogDelay ?? Self.watchdogDelay(for: task)
 
         lock.lock()
@@ -134,19 +139,9 @@ final class NetworkSpanFinalizationCoordinator: @unchecked Sendable {
             isFinalized = true
             pendingFinalization = nil
             pending = storedFinalization
-            workItem = nil
         }
         else {
             pending = nil
-            let newWorkItem = DispatchWorkItem { [weak self, weak task] in
-                guard let self, let task else {
-                    return
-                }
-
-                finalizeTimeout(task: task)
-            }
-            watchdogWorkItem = newWorkItem
-            workItem = newWorkItem
         }
         lock.unlock()
 
@@ -158,13 +153,31 @@ final class NetworkSpanFinalizationCoordinator: @unchecked Sendable {
                 fallbackError: pending.error
             )
         }
-        else if let workItem {
-            watchdogQueue.asyncAfter(deadline: .now() + max(0, delay), execute: workItem)
+        else {
+            let token = watchdogScheduler.schedule(after: max(0, delay)) { [weak self, weak task] in
+                guard let self, let task else {
+                    return
+                }
+
+                finalizeTimeout(task: task)
+            }
+
+            lock.lock()
+            if isFinalized {
+                lock.unlock()
+                watchdogScheduler.cancel(token)
+            }
+            else {
+                watchdogToken = token
+                lock.unlock()
+            }
         }
     }
 
     /// Finalizes from the task-state callback, using the completed task as the canonical data source.
     func finalize(task: URLSessionTask) {
+        let watchdogToken: NetworkSpanWatchdogScheduler.Token?
+
         lock.lock()
         guard !isFinalized else {
             lock.unlock()
@@ -179,9 +192,13 @@ final class NetworkSpanFinalizationCoordinator: @unchecked Sendable {
 
         isFinalized = true
         pendingFinalization = nil
-        watchdogWorkItem?.cancel()
-        watchdogWorkItem = nil
+        watchdogToken = self.watchdogToken
+        self.watchdogToken = nil
         lock.unlock()
+
+        if let watchdogToken {
+            watchdogScheduler.cancel(watchdogToken)
+        }
 
         endHttpSpan(span: span, task: task)
     }
@@ -189,6 +206,7 @@ final class NetworkSpanFinalizationCoordinator: @unchecked Sendable {
     /// Finalizes from a completion handler while retaining task-derived enrichment when available.
     func finalize(response: URLResponse?, error: Error?) {
         let attachedTask: URLSessionTask
+        let watchdogToken: NetworkSpanWatchdogScheduler.Token?
 
         lock.lock()
         guard !isFinalized else {
@@ -214,10 +232,14 @@ final class NetworkSpanFinalizationCoordinator: @unchecked Sendable {
 
         isFinalized = true
         pendingFinalization = nil
-        watchdogWorkItem?.cancel()
-        watchdogWorkItem = nil
+        watchdogToken = self.watchdogToken
+        self.watchdogToken = nil
         attachedTask = task
         lock.unlock()
+
+        if let watchdogToken {
+            watchdogScheduler.cancel(watchdogToken)
+        }
 
         endHttpSpan(
             span: span,
@@ -229,6 +251,8 @@ final class NetworkSpanFinalizationCoordinator: @unchecked Sendable {
 
     /// Finalizes a started span when URLSession fails to deliver any terminal callback.
     func finalizeTimeout(task: URLSessionTask) {
+        let watchdogToken: NetworkSpanWatchdogScheduler.Token?
+
         lock.lock()
         guard hasStarted, !isFinalized else {
             lock.unlock()
@@ -237,8 +261,13 @@ final class NetworkSpanFinalizationCoordinator: @unchecked Sendable {
 
         isFinalized = true
         pendingFinalization = nil
-        watchdogWorkItem = nil
+        watchdogToken = self.watchdogToken
+        self.watchdogToken = nil
         lock.unlock()
+
+        if let watchdogToken {
+            watchdogScheduler.cancel(watchdogToken)
+        }
 
         // Prefer an error already exposed by URLSession. If no error is available, the watchdog
         // is the only authoritative signal available to telemetry and records an instrumentation
