@@ -89,6 +89,8 @@ func startHttpSpan(request: URLRequest?) -> Span? {
 ///   - task: The completed URL session task.
 ///   - fallbackResponse: A response supplied by the completion handler when the task has no response.
 ///   - fallbackError: An error supplied by the completion handler when the task has no error.
+///   - errorTypeOverride: An optional error type to use when the instrumentation detects an error.
+///   - errorMessageOverride: An optional error message to use when the instrumentation detects an error.
 func endHttpSpan(
     span: Span,
     task: URLSessionTask,
