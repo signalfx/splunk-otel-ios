@@ -36,6 +36,11 @@ final class NetworkInstrumentationManager {
     /// while swizzled URLSession callbacks are still executing.
     private weak var module: NetworkInstrumentation?
     private let queue = DispatchQueue(label: "com.splunk.networkModuleQueue")
+    /// Serializes instrumentation watchdog callbacks without using the main queue.
+    let watchdogQueue = DispatchQueue(
+        label: PackageIdentifier.default(named: "NetworkSpanWatchdog"),
+        qos: .utility
+    )
     private var hasSwizzled = false
 
     /// Logger instance for network instrumentation.

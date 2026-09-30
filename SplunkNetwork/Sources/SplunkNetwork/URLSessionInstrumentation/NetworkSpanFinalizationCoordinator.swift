@@ -29,12 +29,26 @@ import OpenTelemetryApi
 /// cannot deadlock or re-enter the coordinator while it is locked.
 final class NetworkSpanFinalizationCoordinator: @unchecked Sendable {
 
+    // MARK: - Constants
+
+    /// The maximum time an ordinary data or upload request may remain open in telemetry.
+    static let defaultWatchdogDelay: TimeInterval = 5 * 60
+
+    /// Downloads can legitimately outlive an ordinary request, so they receive a longer limit.
+    static let downloadWatchdogDelay: TimeInterval = 30 * 60
+
+    static let requestStartedEventName = "http.request.started"
+    static let timeoutErrorType = "instrumentation.timeout"
+    static let timeoutErrorMessage = "Network task did not provide a completion callback before the SDK deadline"
+
     // MARK: - Private properties
 
     private let lock = NSLock()
     private weak var task: URLSessionTask?
-    private var pendingCompletion: (response: URLResponse?, error: Error?)?
+    private var pendingFinalization: PendingFinalization?
     private var isFinalized = false
+    private var hasStarted = false
+    private var watchdogWorkItem: DispatchWorkItem?
 
 
     // MARK: - Properties
@@ -42,25 +56,45 @@ final class NetworkSpanFinalizationCoordinator: @unchecked Sendable {
     let span: Span
 
 
+    // MARK: - Private types
+
+    private struct PendingFinalization {
+        let task: URLSessionTask?
+        let response: URLResponse?
+        let error: Error?
+    }
+
+
     // MARK: - Initialization
 
-    init(span: Span) {
+    init(
+        span: Span,
+        watchdogDelay: TimeInterval? = nil,
+        watchdogQueue: DispatchQueue? = nil
+    ) {
         self.span = span
+        self.watchdogDelay = watchdogDelay
+        self.watchdogQueue = watchdogQueue ?? NetworkInstrumentationManager.shared.watchdogQueue
     }
+
+    private let watchdogDelay: TimeInterval?
+    private let watchdogQueue: DispatchQueue
 
 
     // MARK: - Coordination
 
     /// Attaches the task after URLSession has returned it from its creation method.
     func attach(to task: URLSessionTask) {
-        let pending: (response: URLResponse?, error: Error?)?
+        let pending: PendingFinalization?
 
         lock.lock()
         self.task = task
-        if !isFinalized, let storedCompletion = pendingCompletion {
+        if hasStarted, !isFinalized, let storedFinalization = pendingFinalization {
             isFinalized = true
-            pendingCompletion = nil
-            pending = storedCompletion
+            pendingFinalization = nil
+            watchdogWorkItem?.cancel()
+            watchdogWorkItem = nil
+            pending = storedFinalization
         }
         else {
             pending = nil
@@ -77,6 +111,58 @@ final class NetworkSpanFinalizationCoordinator: @unchecked Sendable {
         }
     }
 
+    /// Records the moment the task was resumed and starts the independent telemetry watchdog.
+    ///
+    /// The span itself is created earlier so its context can be injected into the request. A
+    /// request-started event is recorded here and the exporter later uses that event timestamp as
+    /// the span start time.
+    func start(task: URLSessionTask, at startTime: Date = Date()) {
+        let pending: PendingFinalization?
+        let workItem: DispatchWorkItem?
+        let delay = watchdogDelay ?? Self.watchdogDelay(for: task)
+
+        lock.lock()
+        guard !isFinalized, !hasStarted else {
+            lock.unlock()
+            return
+        }
+
+        hasStarted = true
+        span.addEvent(name: Self.requestStartedEventName, timestamp: startTime)
+
+        if let storedFinalization = pendingFinalization {
+            isFinalized = true
+            pendingFinalization = nil
+            pending = storedFinalization
+            workItem = nil
+        }
+        else {
+            pending = nil
+            let newWorkItem = DispatchWorkItem { [weak self, weak task] in
+                guard let self, let task else {
+                    return
+                }
+
+                finalizeTimeout(task: task)
+            }
+            watchdogWorkItem = newWorkItem
+            workItem = newWorkItem
+        }
+        lock.unlock()
+
+        if let pending {
+            endHttpSpan(
+                span: span,
+                task: pending.task ?? task,
+                fallbackResponse: pending.response,
+                fallbackError: pending.error
+            )
+        }
+        else if let workItem {
+            watchdogQueue.asyncAfter(deadline: .now() + max(0, delay), execute: workItem)
+        }
+    }
+
     /// Finalizes from the task-state callback, using the completed task as the canonical data source.
     func finalize(task: URLSessionTask) {
         lock.lock()
@@ -85,8 +171,16 @@ final class NetworkSpanFinalizationCoordinator: @unchecked Sendable {
             return
         }
 
+        guard hasStarted else {
+            pendingFinalization = PendingFinalization(task: task, response: nil, error: nil)
+            lock.unlock()
+            return
+        }
+
         isFinalized = true
-        pendingCompletion = nil
+        pendingFinalization = nil
+        watchdogWorkItem?.cancel()
+        watchdogWorkItem = nil
         lock.unlock()
 
         endHttpSpan(span: span, task: task)
@@ -102,18 +196,26 @@ final class NetworkSpanFinalizationCoordinator: @unchecked Sendable {
             return
         }
 
+        guard hasStarted else {
+            // A completion callback without a resume() call is not a network request. Keep the
+            // callback only in case resume and completion race while the task is being attached.
+            pendingFinalization = PendingFinalization(task: nil, response: response, error: error)
+            lock.unlock()
+            return
+        }
+
         guard let task else {
-            // A URLSession task normally cannot complete before it has been returned and attached.
-            // Store the completion defensively so attachment can perform canonical finalization.
-            if pendingCompletion == nil {
-                pendingCompletion = (response, error)
-            }
+            // The completion handler can race task attachment. Keep the callback until the task
+            // is attached so response attributes can still be collected before ending the span.
+            pendingFinalization = PendingFinalization(task: nil, response: response, error: error)
             lock.unlock()
             return
         }
 
         isFinalized = true
-        pendingCompletion = nil
+        pendingFinalization = nil
+        watchdogWorkItem?.cancel()
+        watchdogWorkItem = nil
         attachedTask = task
         lock.unlock()
 
@@ -123,5 +225,38 @@ final class NetworkSpanFinalizationCoordinator: @unchecked Sendable {
             fallbackResponse: response,
             fallbackError: error
         )
+    }
+
+    /// Finalizes a started span when URLSession fails to deliver any terminal callback.
+    func finalizeTimeout(task: URLSessionTask) {
+        lock.lock()
+        guard hasStarted, !isFinalized else {
+            lock.unlock()
+            return
+        }
+
+        isFinalized = true
+        pendingFinalization = nil
+        watchdogWorkItem = nil
+        lock.unlock()
+
+        // Prefer an error already exposed by URLSession. If no error is available, the watchdog
+        // is the only authoritative signal available to telemetry and records an instrumentation
+        // error without cancelling or otherwise changing the application task.
+        if task.error != nil {
+            endHttpSpan(span: span, task: task)
+        }
+        else {
+            endHttpSpan(
+                span: span,
+                task: task,
+                errorTypeOverride: Self.timeoutErrorType,
+                errorMessageOverride: Self.timeoutErrorMessage
+            )
+        }
+    }
+
+    private static func watchdogDelay(for task: URLSessionTask) -> TimeInterval {
+        task is URLSessionDownloadTask ? downloadWatchdogDelay : defaultWatchdogDelay
     }
 }

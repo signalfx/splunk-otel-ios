@@ -31,6 +31,7 @@ final class NetworkSpanFinalizationCoordinatorTests: XCTestCase {
         let span = ThreadSafeMockSpan()
         let coordinator = NetworkSpanFinalizationCoordinator(span: span)
         coordinator.attach(to: task)
+        coordinator.start(task: task)
 
         let group = DispatchGroup()
         for index in 0 ..< 100 {
@@ -70,6 +71,7 @@ final class NetworkSpanFinalizationCoordinatorTests: XCTestCase {
         let span = ThreadSafeMockSpan()
         let coordinator = NetworkSpanFinalizationCoordinator(span: span)
 
+        coordinator.start(task: task)
         coordinator.finalize(response: task.response, error: task.error)
         XCTAssertEqual(span.endCount, 0)
 
@@ -79,6 +81,68 @@ final class NetworkSpanFinalizationCoordinatorTests: XCTestCase {
 
         coordinator.finalize(task: task)
         XCTAssertEqual(span.endCount, 1)
+    }
+
+    func testCompletionBeforeResumeDoesNotExportSpan() {
+        let task = unstartedTask()
+        let span = ThreadSafeMockSpan()
+        let coordinator = NetworkSpanFinalizationCoordinator(span: span)
+        coordinator.attach(to: task)
+
+        coordinator.finalize(response: nil, error: nil)
+
+        XCTAssertEqual(span.endCount, 0)
+    }
+
+    func testWatchdogFinalizesWithInstrumentationTimeout() {
+        let task = unstartedTask()
+        let span = ThreadSafeMockSpan()
+        let coordinator = NetworkSpanFinalizationCoordinator(
+            span: span,
+            watchdogDelay: 0.01,
+            watchdogQueue: DispatchQueue(label: "NetworkSpanFinalizationCoordinatorTests.watchdog")
+        )
+        coordinator.attach(to: task)
+        coordinator.start(task: task)
+
+        let deadline = Date().addingTimeInterval(1)
+        while span.endCount == 0, Date() < deadline {
+            RunLoop.current.run(until: Date().addingTimeInterval(0.01))
+        }
+
+        XCTAssertEqual(span.endCount, 1)
+        XCTAssertEqual(
+            span.attributes[SemanticConventions.Error.type.rawValue],
+            .string(NetworkSpanFinalizationCoordinator.timeoutErrorType)
+        )
+        XCTAssertEqual(
+            span.attributes[SemanticConventions.Error.message.rawValue],
+            .string(NetworkSpanFinalizationCoordinator.timeoutErrorMessage)
+        )
+        XCTAssertEqual(span.attributes[NetworkSpanAttributeKeys.error], .bool(true))
+    }
+
+    func testTerminalCallbackCancelsWatchdogAndFinalizesOnce() {
+        let task = unstartedTask()
+        let span = ThreadSafeMockSpan()
+        let coordinator = NetworkSpanFinalizationCoordinator(
+            span: span,
+            watchdogDelay: 0.05,
+            watchdogQueue: DispatchQueue(label: "NetworkSpanFinalizationCoordinatorTests.watchdog")
+        )
+        coordinator.attach(to: task)
+        coordinator.start(task: task)
+        coordinator.finalize(response: nil, error: nil)
+
+        XCTAssertEqual(span.endCount, 1)
+
+        let deadline = Date().addingTimeInterval(0.2)
+        while Date() < deadline {
+            RunLoop.current.run(until: Date().addingTimeInterval(0.01))
+        }
+
+        XCTAssertEqual(span.endCount, 1)
+        XCTAssertNil(span.attributes[SemanticConventions.Error.type.rawValue])
     }
 
     func testOnlyCompletedStateTriggersFinalization() {
@@ -108,6 +172,16 @@ final class NetworkSpanFinalizationCoordinatorTests: XCTestCase {
         wait(for: [completed], timeout: 5)
 
         return task
+    }
+
+    private func unstartedTask() -> URLSessionDataTask {
+        let configuration = URLSessionConfiguration.ephemeral
+        let session = URLSession(configuration: configuration)
+        guard let url = URL(string: "https://finalization.test/resource") else {
+            preconditionFailure("Static finalization test URL is invalid")
+        }
+
+        return session.dataTask(with: url)
     }
 }
 

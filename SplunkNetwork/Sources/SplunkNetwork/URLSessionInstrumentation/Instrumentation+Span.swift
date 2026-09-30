@@ -93,7 +93,9 @@ func endHttpSpan(
     span: Span,
     task: URLSessionTask,
     fallbackResponse: URLResponse? = nil,
-    fallbackError: Error? = nil
+    fallbackError: Error? = nil,
+    errorTypeOverride: String? = nil,
+    errorMessageOverride: String? = nil
 ) {
     let httpResponse = task.response as? HTTPURLResponse ?? fallbackResponse as? HTTPURLResponse
     if let httpResponse {
@@ -126,11 +128,22 @@ func endHttpSpan(
 
     if let error = task.error ?? fallbackError {
         span.clearAndSetAttribute(key: NetworkSpanAttributeKeys.error, value: true)
-        span.clearAndSetAttribute(key: SemanticConventions.Error.message, value: error.localizedDescription)
-        span.clearAndSetAttribute(key: SemanticConventions.Error.type, value: String(describing: type(of: error)))
+        let errorMessage = errorMessageOverride ?? error.localizedDescription
+        let errorType = errorTypeOverride ?? String(describing: type(of: error))
+        span.clearAndSetAttribute(key: SemanticConventions.Error.message, value: errorMessage)
+        span.clearAndSetAttribute(key: SemanticConventions.Error.type, value: errorType)
 
         NetworkInstrumentationManager.shared.logger.log(level: .error) {
-            "Error: \(error.localizedDescription)"
+            "Error: \(errorMessage)"
+        }
+    }
+    else if let errorTypeOverride, let errorMessageOverride {
+        span.clearAndSetAttribute(key: NetworkSpanAttributeKeys.error, value: true)
+        span.clearAndSetAttribute(key: SemanticConventions.Error.message, value: errorMessageOverride)
+        span.clearAndSetAttribute(key: SemanticConventions.Error.type, value: errorTypeOverride)
+
+        NetworkInstrumentationManager.shared.logger.log(level: .error) {
+            "Error: \(errorMessageOverride)"
         }
     }
 
