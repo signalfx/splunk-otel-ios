@@ -9,7 +9,7 @@ name: Build XCFrameworks
 #   tools/xcframework/scripts/sign-and-upload.sh <VERSION>
 #
 # Architecture:
-#   Job 1 (build): Build OTel + PLCrash + Agent modules → upload artifact
+#   Job 1 (build): Build OTel + Agent modules, stage Cisco artifacts → upload artifact
 #   Job 2 (sign-and-release): Optional legacy signing, validation, and packaging
 
 on:
@@ -19,11 +19,6 @@ on:
         description: "OpenTelemetry Swift Core version"
         required: false
         default: "2.3.0"
-        type: string
-      plcrash-version:
-        description: "PLCrashReporter version"
-        required: false
-        default: "1.12.2"
         type: string
       cisco-xcframeworks-run-id:
         description: "GitHub Actions run ID with dynamic Cisco SR xcframeworks artifact (required)"
@@ -45,7 +40,6 @@ permissions:
 
 env:
   OTEL_VERSION: ${{ inputs.otel-version || '2.3.0' }}
-  PLCRASH_VERSION: ${{ inputs.plcrash-version || '1.12.2' }}
 
 jobs:
 
@@ -77,15 +71,7 @@ jobs:
           OTEL_VERSION="${OTEL_VERSION}" scripts/build-otel-xcframeworks.sh
 
       # -----------------------------------------------------------------
-      # Step 2: Build PLCrashReporter xcframework from source
-      # -----------------------------------------------------------------
-      - name: Build PLCrashReporter xcframework
-        working-directory: tools/xcframework
-        run: |
-          PLCRASH_VERSION="${PLCRASH_VERSION}" scripts/build-plcrash-xcframeworks.sh
-
-      # -----------------------------------------------------------------
-      # Step 3: Download dynamic Cisco Session Replay xcframeworks
+      # Step 2: Download dynamic Cisco Session Replay xcframeworks
       # -----------------------------------------------------------------
       # Cisco xcframeworks must be provided explicitly. Package.swift now
       # intentionally points to static Cisco artifacts for SPM, so this
@@ -99,7 +85,7 @@ jobs:
           run-id: ${{ inputs.cisco-xcframeworks-run-id }}
 
       # -----------------------------------------------------------------
-      # Step 4: Populate dependencies and build Agent modules
+      # Step 3: Populate dependencies and build Agent modules
       # -----------------------------------------------------------------
       - name: Populate dependencies
         working-directory: tools/xcframework
@@ -135,14 +121,14 @@ jobs:
         run: scripts/build-xcframeworks.sh
 
       # -----------------------------------------------------------------
-      # Step 5: Validate (pre-signing)
+      # Step 4: Validate (pre-signing)
       # -----------------------------------------------------------------
       - name: Validate xcframeworks (pre-signing)
         working-directory: tools/xcframework
         run: RELEASE=false scripts/validate-xcframeworks.sh
 
       # -----------------------------------------------------------------
-      # Step 5b: Smoke test (consumer linkage)
+      # Step 5: Smoke test (consumer linkage)
       # -----------------------------------------------------------------
       - name: Run smoke test
         working-directory: tools/xcframework

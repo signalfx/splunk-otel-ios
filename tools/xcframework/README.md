@@ -5,7 +5,7 @@ Build tooling for producing signed, multi-platform xcframeworks from the Splunk 
 ## Quick Start
 
 ```bash
-# Full build: OTel + PLCrash + dynamic Cisco + Agent modules
+# Full build: OTel + dynamic Cisco + Agent modules
 export SESSION_REPLAY_LOCAL_PATH=/path/to/session-replay-repo
 make build
 
@@ -21,15 +21,14 @@ make smoke-test
 
 ## Build Pipeline
 
-The `make build` target requires `SESSION_REPLAY_LOCAL_PATH` and runs five stages in order:
+The `make build` target requires `SESSION_REPLAY_LOCAL_PATH` and runs four stages in order:
 
 | Stage | Command | What it does |
 |-------|---------|-------------|
 | 1 | `make build-otel` | Clones `opentelemetry-swift-core`, generates a Tuist project, and archives `OpenTelemetryApi` + `OpenTelemetrySdk` for all 7 platform slices, or 2 slices with `IOS_ONLY=true` |
-| 2 | `make build-plcrash` | Clones `PLCrashReporter`, builds it as a **dynamic** framework from source for iOS/tvOS/macCatalyst |
-| 3 | `make build-cisco` | Builds the 9 Cisco Session Replay frameworks as **dynamic** xcframeworks from the local Session Replay checkout |
-| 4 | `make populate-deps` | Stages OTel, PLCrash, and already-built dynamic Cisco xcframeworks into `dependencies/` |
-| 5 | `make build-agent` | Generates the main Tuist workspace and builds all 16 Splunk module xcframeworks |
+| 2 | `make build-cisco` | Builds the 9 Cisco Session Replay frameworks as **dynamic** xcframeworks from the local Session Replay checkout |
+| 3 | `make populate-deps` | Stages OTel and already-built dynamic Cisco xcframeworks into `dependencies/` |
+| 4 | `make build-agent` | Generates the main Tuist workspace and builds all Splunk module xcframeworks, including the vendored `SplunkCrashReporter` |
 
 ### Output
 
@@ -39,7 +38,7 @@ All built xcframeworks are placed in `output/xcframeworks/`:
 output/xcframeworks/
 ├── OpenTelemetryApi.xcframework
 ├── OpenTelemetrySdk.xcframework
-├── CrashReporter.xcframework
+├── SplunkCrashReporter.xcframework
 ├── CiscoCommon.xcframework
 ├── CiscoLogger.xcframework
 ├── CiscoEncryption.xcframework
@@ -77,7 +76,7 @@ Cisco Session Replay xcframeworks are built locally as dynamic frameworks. The A
 | Cisco modules | arm64 | arm64 | arm64 | arm64+x86_64 |
 | SplunkCrashReports | arm64 | arm64 | -- | arm64 |
 | OpenTelemetryApi/Sdk | arm64 | arm64 | arm64 | arm64+x86_64 |
-| CrashReporter | arm64 | arm64 | -- | arm64+x86_64 |
+| SplunkCrashReporter | arm64 | arm64 | -- | arm64 |
 
 All platforms also include simulator slices (arm64+x86_64).
 
@@ -90,7 +89,6 @@ Key variables in the Makefile:
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `OTEL_VERSION` | `2.3.0` | OpenTelemetry Swift Core tag to build |
-| `PLCRASH_VERSION` | `1.12.2` | PLCrashReporter tag to build |
 | `SESSION_REPLAY_LOCAL_PATH` | *(required)* | Local path to the Session Replay repository |
 | `CISCO_XCFRAMEWORKS_PATH` | *(empty)* | Legacy path to prebuilt dynamic Cisco xcframeworks |
 | `IOS_ONLY` | `false` | Build and validate only `ios-arm64` and `ios-arm64_x86_64-simulator` slices |
@@ -123,7 +121,7 @@ export SESSION_REPLAY_LOCAL_PATH=/path/to/session-replay-repo
 
 The script will:
 - Auto-detect your signing identity from the local keychain
-- Build OTel, PLCrashReporter, dynamic Cisco, and Splunk xcframeworks locally
+- Build OTel, dynamic Cisco, and Splunk xcframeworks locally
 - Record the Session Replay commit, branch, and dirty state in `cisco-release-manifest.txt`
 - Sign non-Cisco xcframeworks while preserving pre-signed Cisco framework signatures
 - Validate signatures for all shipped xcframeworks
@@ -238,7 +236,7 @@ Add these based on which instrumentation you need:
 | `SplunkNavigation.xcframework` | Screen view changes |
 | `SplunkNetwork.xcframework` | HTTP requests via URLSession |
 | `SplunkNetworkMonitor.xcframework` | Network connectivity status |
-| `SplunkCrashReports.xcframework` | Crash reports (+ `CrashReporter.xcframework`) |
+| `SplunkCrashReports.xcframework` | Crash report instrumentation (+ `SplunkCrashReporter.xcframework`) |
 | `SplunkInteractions.xcframework` | UI taps and gestures |
 | `SplunkAppStart.xcframework` | App launch timing |
 | `SplunkAppState.xcframework` | Foreground/background transitions |
@@ -253,7 +251,7 @@ For Objective-C projects, also include `SplunkAgentObjC.xcframework` and use the
 
 ### visionOS Note
 
-`SplunkCrashReports.xcframework` and `CrashReporter.xcframework` do **not** support visionOS. Crash reporting is automatically disabled on that platform. All other modules work on visionOS.
+`SplunkCrashReporter.xcframework` and `SplunkCrashReports.xcframework` do **not** support visionOS. Crash reporting is automatically disabled on that platform. All other modules work on visionOS.
 
 ---
 

@@ -10,6 +10,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 * Raised the minimum supported iOS and iPadOS version from 13 to 15. Applications targeting iOS or iPadOS 13 and 14 are no longer supported.
+* Replaced the external PLCrashReporter package dependency with the SDK-owned, symbol-prefixed `SplunkCrashReporter` implementation.
 
 ## [2.4.2] - 2026-09-09
 
