@@ -102,7 +102,9 @@ final class NetworkSpanWatchdogScheduler: @unchecked Sendable {
         }
         let actions = expiredTokens.compactMap { entries.removeValue(forKey: $0)?.action }
 
-        actions.forEach { $0() }
+        for action in actions {
+            action()
+        }
     }
 
     private func sync<T>(_ action: () -> T) -> T {
