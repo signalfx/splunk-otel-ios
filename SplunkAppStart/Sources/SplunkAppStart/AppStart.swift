@@ -16,8 +16,8 @@ limitations under the License.
 */
 
 internal import CiscoLogger
+import Foundation
 import SplunkCommon
-import UIKit
 
 /// Defines an app start type.
 public enum AppStartType: String {
@@ -25,58 +25,39 @@ public enum AppStartType: String {
     /// Cold start is a complete application launch, with no resources preloaded.
     case cold
 
-    /// Warm start is an application launch when the application was either prewarmed, or launched in the background first.
+    /// Warm start is an application launch when the application was either prewarmed,
+    /// or launched in the background first.
     case warm
 
-    /// Hot start is every application launch after an application was already launched at least once.
-    /// Hot start begins with the `willEnterForeground` notification, ends with the `didBecomeActive` notification.
-    ///
-    /// Note: Opening the application right after closing the application in a quick succession causes the `willEnterForeground` to not trigger.
-    /// We don't handle this case and we do not consider this scenario as an app start in the current implementation.
+    /// Hot start is an activation after the application was already running.
     case hot
 }
 
-/// AppStart determines and measures an application's start type (cold, warm, hot), by listening to Application's lifecycle notifications,
-/// and sends results into a destination (OTel span as a default).
+/// Measures application activation from one lifecycle observer and one state machine.
 public final class AppStart {
+
+    // MARK: - Inline types
+
+    typealias ProcessingOutput = (
+        action: AppStartReducer.Action?,
+        agentInitialize: AgentInitializeSpanData?
+    )
 
     // MARK: - Private
 
-    /// Internal Logger.
-    let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "AppStart")
+    private let lock = NSLock()
+    private var state: AppStartReducer.State
+    private var agentInitializeSpanData: AgentInitializeSpanData?
 
-    // Notifications and process start
+    // Internal only because notification handling lives in a separate file.
+    // Access the generation and tokens exclusively while holding this lock.
+    let notificationLock = NSLock()
+    let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "AppStart")
+    var notificationGeneration: UInt64 = 0
     var notificationTokens: [NSObjectProtocol]?
-    var didFinishLaunchingTimestamp: Date?
-    var willEnterForegroundTimestamp: Date?
-    var willResignActiveTimestamp: Date?
-    var didBecomeActiveTimestamp: Date?
-    var processStartTimestamp: Date?
 
     /// Data destination.
     var destination: AppStartDestination = OTelDestination()
-
-    /// Initialize span data.
-    var agentInitializeSpanData: AgentInitializeSpanData?
-
-    /// Application prewarm detection.
-    var prewarmDetected = false
-
-    /// Background launch detection, optional because we need to detect
-    /// ackground launch only once during the initial application launch.
-    var backgroundLaunchDetected: Bool?
-
-    /// A flag to prevent duplicate cold starts.
-    var coldStartSent = false
-
-    /// A flag to prevent the manual track api to be used when an initial app start event has been already sent.
-    var initialAppStartSent = false
-
-    /// Background launch threshold in seconds.
-    ///
-    /// If an application launch duration exceeds this threshold, we consider this launch as being launched in background first.
-    /// This threshold is a temporary fix to long cold starts until we improve the background launch detection mechanism.
-    let backgroundLaunchThreshold = 10.0
 
 
     // MARK: - Public
@@ -87,207 +68,267 @@ public final class AppStart {
 
     // MARK: - Initialization
 
-    public required init() {}
+    public required init() {
+        let prewarmed: Bool
 
-
-    // MARK: - Instrumentation
-
-    /// Starts app start detection.
-    ///
-    /// Detection should be started before receiving the `UIApplication.didFinishLaunchingNotification` notification
-    /// in order to correctly detect an application prewarm.
-    public func startDetection() {
-
-        // Detect prewarm. ‼️ Prewarm detection must happen before `didFinishLaunching`
         if #available(iOS 15.0, *) {
-            prewarmDetected = ProcessInfo.processInfo.environment["ActivePrewarm"] == "1"
+            prewarmed = ProcessInfo.processInfo.environment["ActivePrewarm"] == "1"
         }
         else {
-            prewarmDetected = false
+            prewarmed = false
         }
 
-        // Obtain process start time, which is used as an app start span's start
+        state = .initial(
+            AppStartReducer.Evidence(
+                processStart: nil,
+                launchOrigin: prewarmed ? .prewarmed : .unknown,
+                didFinishLaunching: nil,
+                foregroundBoundary: nil,
+                didBecomeActive: nil
+            )
+        )
+
         do {
             processStartTimestamp = try processStartTime()
         }
         catch {
             logger.log(level: .warn) {
-                "Was not able to obtain process start date, cold start won't be recorded. Error: \(error)"
+                "Could not obtain process start time. A cold AppStart will be suppressed. Error: \(error)"
             }
         }
+    }
 
-        // Start notification listeners
+    deinit {
+        stopNotificationListeners(invalidateState: false)
+    }
+
+
+    // MARK: - Instrumentation
+
+    /// Starts app start detection.
+    public func startDetection() {
         startNotificationListeners()
     }
 
     /// Stops app start detection.
     public func stopDetection() {
-        stopNotificationListeners()
+        stopNotificationListeners(invalidateState: true)
     }
 
-    /// Report agent initialization metrics, which will be sent in the Initialization span as an AppStart's child span.
-    ///
-    /// - Parameters:
-    ///   - start: Agent's initialization start timestamp.
-    ///   - end: Agent's initialization end timestamp.
-    ///   - events: Report any number of events, which will be reported as Initialize span's events. Event name as a key, timestamp as a value for each event.
-    ///   - configurationSettings: Report agent configuration settings.
-    public func reportAgentInitialize(start: Date, end: Date, events: [String: Date], configurationSettings: [String: String]) {
-        agentInitializeSpanData = AgentInitializeSpanData(
+    /// Reports agent initialization metrics sent as a child of a cold AppStart span.
+    public func reportAgentInitialize(
+        start: Date,
+        end: Date,
+        events: [String: Date],
+        configurationSettings: [String: String]
+    ) {
+        let data = AgentInitializeSpanData(
             start: start,
             end: end,
             events: AppStartEvent.sortedEvents(from: events),
             configurationSettings: configurationSettings
         )
+
+        withLock {
+            guard case .initial = state else {
+                return
+            }
+
+            agentInitializeSpanData = data
+        }
     }
 
-    /// This method allows bridges (React, Flutter etc.) to track app lifecycle notifications timestamps
-    /// to determine and send the app start event manually via an exposed public API.
+    /// Compatibility handoff for existing hybrid integrations.
     ///
-    /// Function call is ignored if an initial app start event has been already sent.
+    /// Legacy timestamps cannot prove launch origin. A completed handoff is safely
+    /// suppressed unless native lifecycle evidence has already established it.
+    public func track(
+        didBecomeActive: Date,
+        didFinishLaunching: Date?,
+        willEnterForeground: Date?
+    ) {
+        track(
+            initialLifecycle: AppStartLifecycleSnapshot(
+                launchOrigin: .unknown,
+                didFinishLaunching: didFinishLaunching,
+                willEnterForeground: willEnterForeground,
+                didBecomeActive: didBecomeActive
+            )
+        )
+    }
+
+    /// Tracks one lifecycle snapshot captured by a hybrid integration before SDK installation.
     ///
-    /// - Parameters:
-    ///   - didBecomeActive: A timestamp of the `UIApplication.didBecomeActive` notification. Needed for type determination and sending.
-    ///   - didFinishLaunching: An optional timestamp of the `UIApplication.didFinishLaunching` notification.
-    ///   Does not determine AppStart type, but is sent as a metadata.
-    ///   - willEnterForeground: An optional timestamp of the `UIApplication.willEnterForeground` notification.
-    ///   Does not determine AppStart type, but is sent as a metadata.
-    public func track(didBecomeActive: Date, didFinishLaunching: Date?, willEnterForeground: Date?) {
-        guard !initialAppStartSent else {
-            logger.log(level: .debug) {
-                "Initial app start event has been already sent. Ignoring manual track."
+    /// Repeated snapshots are treated as conflicting evidence and suppressed.
+    @_spi(SplunkInternal)
+    public func track(initialLifecycle snapshot: AppStartLifecycleSnapshot) {
+        process(event: .hybridSnapshot(snapshot, receivedAt: Date()))
+    }
+
+
+    // MARK: - Testing support
+
+    var processStartTimestamp: Date? {
+        get {
+            withLock {
+                guard case let .initial(evidence) = state else {
+                    return nil
+                }
+
+                return evidence.processStart
             }
+        }
+        set {
+            withLock {
+                guard case var .initial(evidence) = state else {
+                    return
+                }
+
+                evidence.processStart = newValue
+                state = .initial(evidence)
+            }
+        }
+    }
+
+    var prewarmDetected: Bool {
+        get {
+            withLock {
+                guard case let .initial(evidence) = state else {
+                    return false
+                }
+
+                return evidence.launchOrigin == .prewarmed
+            }
+        }
+        set {
+            withLock {
+                guard case var .initial(evidence) = state else {
+                    return
+                }
+
+                if newValue {
+                    evidence.launchOrigin = .prewarmed
+                }
+                else if evidence.launchOrigin == .prewarmed {
+                    evidence.launchOrigin = .unknown
+                }
+
+                state = .initial(evidence)
+            }
+        }
+    }
+
+    var suppressionReason: AppStartSuppressionReason? {
+        withLock {
+            switch state {
+            case let .active(resolution),
+                let .background(resolution),
+                let .foregrounding(resolution, _),
+                let .stopped(resolution):
+                return resolution.suppressionReason
+
+            case .initial:
+                return nil
+            }
+        }
+    }
+
+
+    // MARK: - Event processing
+
+    func process(event: AppStartReducer.Event) {
+        // Direct handoffs use the state lock but do not belong to a notification generation.
+        perform(prepare(event: event))
+    }
+
+    func prepare(event: AppStartReducer.Event) -> ProcessingOutput {
+        withLock { () -> ProcessingOutput in
+            let result = AppStartReducer.reduce(state: state, event: event)
+            state = result.state
+
+            guard let action = result.action else {
+                return (nil, nil)
+            }
+
+            switch action {
+            case let .send(appStart) where appStart.type == .cold:
+                let initialize = agentInitializeSpanData.flatMap {
+                    Self.containedAgentInitialize($0, in: appStart)
+                }
+                agentInitializeSpanData = nil
+                return (action, initialize)
+
+            case let .send(appStart) where appStart.type == .warm:
+                // Agent initialization is attached only to an uninterrupted cold start.
+                agentInitializeSpanData = nil
+                return (action, nil)
+
+            case .suppress:
+                agentInitializeSpanData = nil
+                return (action, nil)
+
+            case .send:
+                return (action, nil)
+            }
+        }
+    }
+
+    func perform(_ output: ProcessingOutput) {
+        perform(action: output.action, agentInitialize: output.agentInitialize)
+    }
+
+    private func perform(
+        action: AppStartReducer.Action?,
+        agentInitialize: AgentInitializeSpanData?
+    ) {
+        guard let action else {
             return
         }
 
-        didBecomeActiveTimestamp = didBecomeActive
-        didFinishLaunchingTimestamp = didFinishLaunching
-        willEnterForegroundTimestamp = willEnterForeground
-
-        determineAndSend()
-    }
-
-
-    // MARK: - Type determination
-
-    /// Determines an app start type and sends valid results.
-    func determineAndSend() {
-
-        // Reset state for further app start detection
-        defer {
-            // Clear timestamps
-            willEnterForegroundTimestamp = nil
-            willResignActiveTimestamp = nil
-            didBecomeActiveTimestamp = nil
-
-            // Clear initialization data as initialization span is sent only once with the cold start
-            agentInitializeSpanData = nil
-        }
-
-        let endTime = Date()
-
-        // Send app start if the type was determined
-        if let (determinedType, startTime) = determinedAppStartType() {
-            send(start: startTime, end: endTime, type: determinedType)
-
-            initialAppStartSent = true
+        switch action {
+        case let .send(appStart):
+            destination.send(
+                appStart: appStart,
+                agentInitialize: agentInitialize,
+                sharedState: sharedState
+            )
 
             logger.log(level: .debug) {
-                "App start log: determined app start type: \(determinedType.rawValue), start time: \(startTime), end time: \(endTime)."
+                "AppStart emitted. type=\(appStart.type.rawValue) start=\(appStart.start) end=\(appStart.end)"
             }
-        }
-        else {
+
+        case let .suppress(reason):
             logger.log(level: .warn) {
-                "Could not determine app start type."
+                "AppStart measurement suppressed. reason=\(reason.rawValue)"
             }
         }
     }
 
-    /// Determines app start type from available notifications timestamps.
-    private func determinedAppStartType() -> (AppStartType, Date)? {
-        guard didBecomeActiveTimestamp != nil else {
+    private func withLock<Result>(_ work: () -> Result) -> Result {
+        lock.lock()
+        defer { lock.unlock() }
+        return work()
+    }
+
+    private static func containedAgentInitialize(
+        _ initialize: AgentInitializeSpanData,
+        in appStart: AppStartSpanData
+    ) -> AgentInitializeSpanData? {
+        guard AppStartReducer.valid(initialize.start),
+            AppStartReducer.valid(initialize.end),
+            appStart.start <= initialize.start,
+            initialize.start <= initialize.end,
+            initialize.end <= appStart.end,
+            (initialize.events ?? [])
+                .allSatisfy({ event in
+                    AppStartReducer.valid(event.timestamp)
+                        && initialize.start <= event.timestamp
+                        && event.timestamp <= initialize.end
+                })
+        else {
             return nil
         }
 
-        let launchedInBackground: Bool = backgroundLaunchDetected ?? false
-
-        if willResignActiveTimestamp != nil, let startTime = willEnterForegroundTimestamp {
-            return (.hot, startTime)
-        }
-
-        if launchedInBackground || prewarmDetected, let startTime = willEnterForegroundTimestamp {
-            return (.warm, startTime)
-        }
-
-        if !coldStartSent, let startTime = processStartTimestamp {
-            return (.cold, startTime)
-        }
-
-        return nil
-    }
-
-
-    // MARK: - Sending
-
-    /// Sends results into a destination.
-    private func send(start: Date, end: Date, type: AppStartType) {
-
-        var events: [AppStartEvent]?
-        var initializeData: AgentInitializeSpanData?
-
-        // Send app start events and initialize span in a cold start only
-        if type == .cold {
-            events = coldStartEvents(startTime: start)
-            initializeData = agentInitializeSpanData
-
-            coldStartSent = true
-        }
-
-        let appStartData = AppStartSpanData(
-            type: type,
-            start: start,
-            end: end,
-            events: events
-        )
-
-        destination.send(appStart: appStartData, agentInitialize: initializeData, sharedState: sharedState)
-    }
-
-
-    // MARK: - Cold start events
-
-    private func coldStartEvents(startTime: Date) -> [AppStartEvent] {
-        var events: [AppStartEvent] = []
-
-        events.append(AppStartEvent(name: "process.start", timestamp: startTime))
-
-        if let didFinishLaunchingTimestamp {
-            events.append(
-                AppStartEvent(
-                    name: UIApplication.didFinishLaunchingNotification.rawValue,
-                    timestamp: didFinishLaunchingTimestamp
-                )
-            )
-        }
-
-        if let willEnterForegroundTimestamp {
-            events.append(
-                AppStartEvent(
-                    name: UIApplication.willEnterForegroundNotification.rawValue,
-                    timestamp: willEnterForegroundTimestamp
-                )
-            )
-        }
-
-        if let didBecomeActiveTimestamp {
-            events.append(
-                AppStartEvent(
-                    name: UIApplication.didBecomeActiveNotification.rawValue,
-                    timestamp: didBecomeActiveTimestamp
-                )
-            )
-        }
-
-        return events
+        return initialize
     }
 }

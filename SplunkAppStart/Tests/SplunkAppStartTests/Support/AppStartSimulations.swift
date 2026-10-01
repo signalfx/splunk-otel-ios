@@ -21,26 +21,5 @@ import XCTest
 
 func simulateColdStartNotifications() {
     NotificationCenter.default.post(name: UIApplication.didFinishLaunchingNotification, object: nil)
-    NotificationCenter.default.post(name: UIApplication.willEnterForegroundNotification, object: nil)
-    NotificationCenter.default.post(name: UIApplication.didBecomeActiveNotification, object: nil)
-}
-
-func simulateWarmStartNotifications() {
-    NotificationCenter.default.post(name: UIApplication.willEnterForegroundNotification, object: nil)
-    NotificationCenter.default.post(name: UIApplication.didBecomeActiveNotification, object: nil)
-}
-
-func simulateHotStartNotifications() {
-    NotificationCenter.default.post(name: UIApplication.didFinishLaunchingNotification, object: nil)
-    NotificationCenter.default.post(name: UIApplication.willEnterForegroundNotification, object: nil)
-    NotificationCenter.default.post(name: UIApplication.didBecomeActiveNotification, object: nil)
-    NotificationCenter.default.post(name: UIApplication.willResignActiveNotification, object: nil)
-    NotificationCenter.default.post(name: UIApplication.didEnterBackgroundNotification, object: nil)
-    NotificationCenter.default.post(name: UIApplication.willEnterForegroundNotification, object: nil)
-    NotificationCenter.default.post(name: UIApplication.didBecomeActiveNotification, object: nil)
-}
-
-func simulateStartNotificationsWithNoDidFinishLaunching() {
-    NotificationCenter.default.post(name: UIApplication.willEnterForegroundNotification, object: nil)
     NotificationCenter.default.post(name: UIApplication.didBecomeActiveNotification, object: nil)
 }
