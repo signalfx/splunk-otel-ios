@@ -33,12 +33,20 @@ final class NetworkSpanWatchdogScheduler: @unchecked Sendable {
         let action: () -> Void
     }
 
+    private struct HeapNode {
+        let token: Token
+        let deadline: UInt64
+    }
+
     // MARK: - Private properties
 
     private let queue: DispatchQueue
+    private let actionQueue: DispatchQueue
     private let queueKey = DispatchSpecificKey<Void>()
     private let timer: DispatchSourceTimer
     private var entries: [Token: Entry] = [:]
+    private var deadlineHeap: [HeapNode] = []
+    private var heapIndices: [Token: Int] = [:]
 
     // MARK: - Initialization
 
@@ -47,9 +55,14 @@ final class NetworkSpanWatchdogScheduler: @unchecked Sendable {
             label: PackageIdentifier.default(named: "NetworkSpanWatchdog"),
             qos: .utility
         ),
+        actionQueue: DispatchQueue = DispatchQueue(
+            label: PackageIdentifier.default(named: "NetworkSpanWatchdogActions"),
+            qos: .utility
+        ),
         tickInterval: TimeInterval = 1
     ) {
         self.queue = queue
+        self.actionQueue = actionQueue
         queue.setSpecific(key: queueKey, value: ())
 
         timer = DispatchSource.makeTimerSource(queue: queue)
@@ -57,7 +70,7 @@ final class NetworkSpanWatchdogScheduler: @unchecked Sendable {
         timer.setEventHandler { [weak self] in
             self?.expireEntries()
         }
-        timer.schedule(deadline: .now() + interval, repeating: interval)
+        timer.schedule(deadline: .now() + interval, repeating: .never)
         timer.resume()
     }
 
@@ -82,6 +95,8 @@ final class NetworkSpanWatchdogScheduler: @unchecked Sendable {
 
         sync {
             entries[token] = Entry(deadline: deadline, action: action)
+            insertHeapNode(HeapNode(token: token, deadline: deadline))
+            armTimer()
         }
 
         return token
@@ -89,7 +104,12 @@ final class NetworkSpanWatchdogScheduler: @unchecked Sendable {
 
     func cancel(_ token: Token) {
         sync {
-            entries.removeValue(forKey: token)
+            guard entries.removeValue(forKey: token) != nil else {
+                return
+            }
+
+            removeHeapNode(for: token)
+            armTimer()
         }
     }
 
@@ -97,13 +117,118 @@ final class NetworkSpanWatchdogScheduler: @unchecked Sendable {
 
     private func expireEntries() {
         let now = DispatchTime.now().uptimeNanoseconds
-        let expiredTokens = entries.compactMap { token, entry in
-            entry.deadline <= now ? token : nil
-        }
-        let actions = expiredTokens.compactMap { entries.removeValue(forKey: $0)?.action }
+        var actions: [() -> Void] = []
 
-        for action in actions {
-            action()
+        while let node = deadlineHeap.first, node.deadline <= now {
+            _ = removeHeapNode(at: 0)
+            if let entry = entries.removeValue(forKey: node.token) {
+                actions.append(entry.action)
+            }
+        }
+
+        armTimer()
+
+        guard !actions.isEmpty else {
+            return
+        }
+
+        actionQueue.async {
+            for action in actions {
+                action()
+            }
+        }
+    }
+
+    private func armTimer() {
+        guard let nextDeadline = deadlineHeap.first?.deadline else {
+            timer.schedule(deadline: .distantFuture, repeating: .never)
+            return
+        }
+
+        timer.schedule(
+            deadline: DispatchTime(uptimeNanoseconds: nextDeadline),
+            repeating: .never
+        )
+    }
+
+    private func insertHeapNode(_ node: HeapNode) {
+        deadlineHeap.append(node)
+        let index = deadlineHeap.count - 1
+        heapIndices[node.token] = index
+        siftUp(from: index)
+    }
+
+    @discardableResult
+    private func removeHeapNode(at index: Int) -> HeapNode {
+        let removedNode = deadlineHeap[index]
+        let lastNode = deadlineHeap.removeLast()
+        heapIndices.removeValue(forKey: removedNode.token)
+
+        guard index < deadlineHeap.count else {
+            return removedNode
+        }
+
+        deadlineHeap[index] = lastNode
+        heapIndices[lastNode.token] = index
+        if index > 0,
+            deadlineHeap[index].deadline < deadlineHeap[(index - 1) / 2].deadline
+        {
+            siftUp(from: index)
+        }
+        else {
+            siftDown(from: index)
+        }
+
+        return removedNode
+    }
+
+    private func removeHeapNode(for token: Token) {
+        guard let index = heapIndices[token] else {
+            return
+        }
+
+        _ = removeHeapNode(at: index)
+    }
+
+    private func siftUp(from index: Int) {
+        var child = index
+        while child > 0 {
+            let parent = (child - 1) / 2
+            guard deadlineHeap[child].deadline < deadlineHeap[parent].deadline else {
+                return
+            }
+
+            deadlineHeap.swapAt(child, parent)
+            heapIndices[deadlineHeap[child].token] = child
+            heapIndices[deadlineHeap[parent].token] = parent
+            child = parent
+        }
+    }
+
+    private func siftDown(from index: Int) {
+        var parent = index
+        while true {
+            let leftChild = parent * 2 + 1
+            guard leftChild < deadlineHeap.count else {
+                return
+            }
+
+            let rightChild = leftChild + 1
+            var smallest = leftChild
+            if rightChild < deadlineHeap.count,
+                deadlineHeap[rightChild].deadline < deadlineHeap[leftChild].deadline
+            {
+                smallest = rightChild
+            }
+
+            guard deadlineHeap[smallest].deadline < deadlineHeap[parent].deadline else {
+                return
+            }
+
+            deadlineHeap.swapAt(parent, smallest)
+            heapIndices[deadlineHeap[parent].token] = parent
+            heapIndices[deadlineHeap[smallest].token] = smallest
+            parent = smallest
         }
     }
 

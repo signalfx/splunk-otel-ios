@@ -130,8 +130,8 @@ func endHttpSpan(
 
     if let error = task.error ?? fallbackError {
         span.clearAndSetAttribute(key: NetworkSpanAttributeKeys.error, value: true)
-        let errorMessage = errorMessageOverride ?? error.localizedDescription
-        let errorType = errorTypeOverride ?? String(describing: type(of: error))
+        let errorMessage = error.localizedDescription
+        let errorType = String(describing: type(of: error))
         span.clearAndSetAttribute(key: SemanticConventions.Error.message, value: errorMessage)
         span.clearAndSetAttribute(key: SemanticConventions.Error.type, value: errorType)
 

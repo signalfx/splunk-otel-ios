@@ -125,6 +125,26 @@ final class NetworkSpanFinalizationCoordinatorTests: XCTestCase {
         XCTAssertEqual(span.attributes[NetworkSpanAttributeKeys.error], .bool(true))
     }
 
+    func testWatchdogPreservesURLSessionErrorOverInstrumentationTimeout() {
+        let task = failedTask()
+        let span = ThreadSafeMockSpan()
+        let coordinator = NetworkSpanFinalizationCoordinator(span: span)
+        coordinator.attach(to: task)
+        coordinator.start(task: task)
+
+        coordinator.finalizeTimeout(task: task)
+
+        XCTAssertEqual(span.endCount, 1)
+        XCTAssertNotEqual(
+            span.attributes[SemanticConventions.Error.type.rawValue],
+            .string(NetworkSpanFinalizationCoordinator.timeoutErrorType)
+        )
+        XCTAssertNotEqual(
+            span.attributes[SemanticConventions.Error.message.rawValue],
+            .string(NetworkSpanFinalizationCoordinator.timeoutErrorMessage)
+        )
+    }
+
     func testTerminalCallbackCancelsWatchdogAndFinalizesOnce() {
         let task = unstartedTask()
         let span = ThreadSafeMockSpan()
@@ -191,6 +211,25 @@ final class NetworkSpanFinalizationCoordinatorTests: XCTestCase {
 
         return session.dataTask(with: url)
     }
+
+    private func failedTask() -> URLSessionDataTask {
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [FailingURLProtocol.self]
+        let session = URLSession(configuration: configuration)
+        let completed = expectation(description: "Task failed")
+        guard let url = URL(string: "https://finalization.test/failure") else {
+            preconditionFailure("Static finalization test URL is invalid")
+        }
+
+        let task = session.dataTask(with: url) { _, _, _ in
+            completed.fulfill()
+        }
+
+        task.resume()
+        wait(for: [completed], timeout: 5)
+
+        return task
+    }
 }
 
 // MARK: - Test URL protocol
@@ -225,6 +264,22 @@ private final class FinalizationURLProtocol: URLProtocol {
         client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
         client?.urlProtocol(self, didLoad: Data(repeating: 0, count: 42))
         client?.urlProtocolDidFinishLoading(self)
+    }
+
+    override func stopLoading() {}
+}
+
+private final class FailingURLProtocol: URLProtocol {
+    override static func canInit(with _: URLRequest) -> Bool {
+        true
+    }
+
+    override static func canonicalRequest(for request: URLRequest) -> URLRequest {
+        request
+    }
+
+    override func startLoading() {
+        client?.urlProtocol(self, didFailWithError: URLError(.timedOut))
     }
 
     override func stopLoading() {}

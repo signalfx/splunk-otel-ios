@@ -269,20 +269,14 @@ final class NetworkSpanFinalizationCoordinator: @unchecked Sendable {
             watchdogScheduler.cancel(watchdogToken)
         }
 
-        // Prefer an error already exposed by URLSession. If no error is available, the watchdog
-        // is the only authoritative signal available to telemetry and records an instrumentation
-        // error without cancelling or otherwise changing the application task.
-        if task.error != nil {
-            endHttpSpan(span: span, task: task)
-        }
-        else {
-            endHttpSpan(
-                span: span,
-                task: task,
-                errorTypeOverride: Self.timeoutErrorType,
-                errorMessageOverride: Self.timeoutErrorMessage
-            )
-        }
+        // The finalizer rechecks task.error immediately before applying the timeout override, so
+        // a URLSession error that arrives during finalization takes precedence.
+        endHttpSpan(
+            span: span,
+            task: task,
+            errorTypeOverride: Self.timeoutErrorType,
+            errorMessageOverride: Self.timeoutErrorMessage
+        )
     }
 
     private static func watchdogDelay(for task: URLSessionTask) -> TimeInterval {
