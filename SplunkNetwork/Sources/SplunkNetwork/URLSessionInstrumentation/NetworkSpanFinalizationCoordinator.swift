@@ -59,7 +59,6 @@ final class NetworkSpanFinalizationCoordinator: @unchecked Sendable {
     // MARK: - Private types
 
     private struct PendingFinalization {
-        let task: URLSessionTask?
         let response: URLResponse?
         let error: Error?
     }
@@ -148,7 +147,7 @@ final class NetworkSpanFinalizationCoordinator: @unchecked Sendable {
         if let pending {
             endHttpSpan(
                 span: span,
-                task: pending.task ?? task,
+                task: task,
                 fallbackResponse: pending.response,
                 fallbackError: pending.error
             )
@@ -185,7 +184,7 @@ final class NetworkSpanFinalizationCoordinator: @unchecked Sendable {
         }
 
         guard hasStarted else {
-            pendingFinalization = PendingFinalization(task: task, response: nil, error: nil)
+            pendingFinalization = PendingFinalization(response: nil, error: nil)
             lock.unlock()
             return
         }
@@ -217,7 +216,7 @@ final class NetworkSpanFinalizationCoordinator: @unchecked Sendable {
         guard hasStarted else {
             // A completion callback without a resume() call is not a network request. Keep the
             // callback only in case resume and completion race while the task is being attached.
-            pendingFinalization = PendingFinalization(task: nil, response: response, error: error)
+            pendingFinalization = PendingFinalization(response: response, error: error)
             lock.unlock()
             return
         }
@@ -225,7 +224,7 @@ final class NetworkSpanFinalizationCoordinator: @unchecked Sendable {
         guard let task else {
             // The completion handler can race task attachment. Keep the callback until the task
             // is attached so response attributes can still be collected before ending the span.
-            pendingFinalization = PendingFinalization(task: nil, response: response, error: error)
+            pendingFinalization = PendingFinalization(response: response, error: error)
             lock.unlock()
             return
         }

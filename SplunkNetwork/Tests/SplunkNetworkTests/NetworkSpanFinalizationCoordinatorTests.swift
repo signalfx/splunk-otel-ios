@@ -94,6 +94,24 @@ final class NetworkSpanFinalizationCoordinatorTests: XCTestCase {
         XCTAssertEqual(span.endCount, 0)
     }
 
+    func testPreResumeFinalizationDoesNotRetainTask() {
+        weak var weakTask: URLSessionDataTask?
+        weak var weakCoordinator: NetworkSpanFinalizationCoordinator?
+
+        autoreleasepool {
+            let task = unstartedTask()
+            let coordinator = NetworkSpanFinalizationCoordinator(span: ThreadSafeMockSpan())
+            weakTask = task
+            weakCoordinator = coordinator
+
+            coordinator.attach(to: task)
+            coordinator.finalize(task: task)
+        }
+
+        XCTAssertNil(weakTask)
+        XCTAssertNil(weakCoordinator)
+    }
+
     func testWatchdogFinalizesWithInstrumentationTimeout() {
         let task = unstartedTask()
         let span = ThreadSafeMockSpan()
