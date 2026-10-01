@@ -22,6 +22,14 @@ import SplunkCommon
 ///
 /// Completed requests are removed from `entries` immediately, so the scheduler retains only
 /// requests that are still waiting for a terminal URLSession signal.
+///
+/// The unchecked sendability is safe because all mutable scheduler state (`entries`, the deadline
+/// heap, and its token indexes) is accessed only on `queue`; `schedule`, `cancel`, and timer
+/// callbacks synchronously serialize access to that queue. Expired actions are then transferred to
+/// `actionQueue`, so scheduled actions must be safe to execute asynchronously on that queue and
+/// must synchronize any captured mutable state. To remove this escape hatch under Swift 6, the
+/// action closure would need to be `@Sendable`, and all captured task/coordinator state would need
+/// checked sendability or an explicit actor/lock-backed wrapper.
 final class NetworkSpanWatchdogScheduler: @unchecked Sendable {
 
     typealias Token = UUID
