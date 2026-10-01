@@ -78,8 +78,8 @@ class SpanInterceptorExporter: SpanExporter {
         // When captured in async closures (e.g., by SimpleSpanProcessor), the
         // dictionary storage is shared. If the original goes out of scope while
         // the closure executes, reference count operations can race, causing crashes.
-        let isolatedSpans = spans
-
+        let isolatedSpans =
+            spans
             .map(normalizeNetworkSpanStartTime)
             .map { $0.isolatedCopy() }
 
