@@ -41,7 +41,21 @@ extension AppStartReducer {
             return resolve(evidence.recordingActivation(timestamp))
 
         case .willResignActive:
-            return suppressInitial(evidence, nextState: State.background)
+            switch evidence.launchOrigin {
+            case .background,
+                .foreground,
+                .foregroundResumed,
+                .prewarmed:
+                // Resigning active is not proof that the app entered the background.
+                // Preserve known launch evidence until didEnterBackground confirms
+                // that the initial activation was interrupted.
+                return (.initial(evidence), nil)
+
+            case .ambiguous,
+                .conflicting,
+                .unknown:
+                return suppressInitial(evidence, nextState: State.background)
+            }
 
         case .didEnterBackground:
             return reduceInitialBackground(evidence)

@@ -68,6 +68,15 @@ final class AppStartReducerTests: XCTestCase {
         )
         state = launchResult.state
 
+        let resignResult = AppStartReducer.reduce(
+            state: state,
+            event: .willResignActive
+        )
+        state = resignResult.state
+
+        XCTAssertNil(resignResult.action)
+        XCTAssertEqual(resignResult.state, launchResult.state)
+
         let backgroundResult = AppStartReducer.reduce(
             state: state,
             event: .didEnterBackground
@@ -138,6 +147,7 @@ final class AppStartReducerTests: XCTestCase {
 
         for event in [
             AppStartReducer.Event.willEnterForeground(interruptedForeground),
+            .willResignActive,
             .didEnterBackground,
             .willEnterForeground(nextForeground)
         ] {
