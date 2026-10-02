@@ -31,6 +31,7 @@ final class NetworkSpanFinalizationErrorTests: XCTestCase {
         guard let url = URL(string: "https://finalization.test/failure") else {
             preconditionFailure("Static finalization test URL is invalid")
         }
+
         let task = session.dataTask(with: url) { _, _, _ in
             completion.fulfill()
         }
