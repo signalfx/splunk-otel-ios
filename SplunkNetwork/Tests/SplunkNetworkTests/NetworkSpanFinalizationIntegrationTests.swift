@@ -187,11 +187,11 @@ final class NetworkSpanFinalizationIntegrationTests: XCTestCase {
 }
 
 private final class HangingURLProtocol: URLProtocol {
-    override class func canInit(with request: URLRequest) -> Bool {
+    override static func canInit(with request: URLRequest) -> Bool {
         request.url?.host == URLSessionMockProtocol.host
     }
 
-    override class func canonicalRequest(for request: URLRequest) -> URLRequest {
+    override static func canonicalRequest(for request: URLRequest) -> URLRequest {
         request
     }
 

@@ -309,7 +309,6 @@ final class NetworkSpanFinalizationCoordinatorTests: XCTestCase {
 
         return session.dataTask(with: url)
     }
-
 }
 
 // MARK: - Test URL protocol
