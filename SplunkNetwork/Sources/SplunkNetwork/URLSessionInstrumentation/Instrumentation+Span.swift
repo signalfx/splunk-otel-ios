@@ -68,11 +68,11 @@ func startHttpSpan(request: URLRequest?) -> Span? {
     let tracer = OpenTelemetry.instance
         .tracerProvider
         .get(
-            instrumentationName: "NetworkInstrumentation",
+            instrumentationName: NetworkInstrumentationConstants.instrumentationName,
             instrumentationVersion: manager.getModule()?.sharedState?.agentVersion
         )
 
-    let span = tracer.spanBuilder(spanName: "HTTP " + method)
+    let span = tracer.spanBuilder(spanName: NetworkInstrumentationConstants.httpSpanNamePrefix + method)
         .setStartTime(time: Date())
         .startSpan()
 
@@ -82,20 +82,27 @@ func startHttpSpan(request: URLRequest?) -> Span? {
     return span
 }
 
-/// Ends an HTTP span for a completed URL session task.
+/// Ends an HTTP span for a completed URL session task or an instrumentation timeout.
 ///
 /// - Parameters:
 ///   - span: The span to end.
-///   - task: The completed URL session task.
+///   - task: The completed URL session task. Omit this for timeout finalization because the task
+///     may still be active and unsafe to read concurrently.
 ///   - fallbackResponse: A response supplied by the completion handler when the task has no response.
 ///   - fallbackError: An error supplied by the completion handler when the task has no error.
+///   - errorTypeOverride: An optional error type to use when the instrumentation detects an error.
+///   - errorMessageOverride: An optional error message to use when the instrumentation detects an error.
+///   - endTime: An explicit end time, used by instrumentation timeout finalization.
 func endHttpSpan(
     span: Span,
-    task: URLSessionTask,
+    task: URLSessionTask? = nil,
     fallbackResponse: URLResponse? = nil,
-    fallbackError: Error? = nil
+    fallbackError: Error? = nil,
+    errorTypeOverride: String? = nil,
+    errorMessageOverride: String? = nil,
+    endTime: Date? = nil
 ) {
-    let httpResponse = task.response as? HTTPURLResponse ?? fallbackResponse as? HTTPURLResponse
+    let httpResponse = task?.response as? HTTPURLResponse ?? fallbackResponse as? HTTPURLResponse
     if let httpResponse {
         span.clearAndSetAttribute(key: SemanticConventions.Http.responseStatusCode, value: httpResponse.statusCode)
         for (key, val) in httpResponse.allHeaderFields {
@@ -124,20 +131,36 @@ func endHttpSpan(
         addCapturedResponseHeaders(from: httpResponse, to: span)
     }
 
-    if let error = task.error ?? fallbackError {
+    if let error = fallbackError ?? task?.error {
         span.clearAndSetAttribute(key: NetworkSpanAttributeKeys.error, value: true)
-        span.clearAndSetAttribute(key: SemanticConventions.Error.message, value: error.localizedDescription)
-        span.clearAndSetAttribute(key: SemanticConventions.Error.type, value: String(describing: type(of: error)))
+        let errorMessage = error.localizedDescription
+        let errorType = String(describing: type(of: error))
+        span.clearAndSetAttribute(key: SemanticConventions.Error.message, value: errorMessage)
+        span.clearAndSetAttribute(key: SemanticConventions.Error.type, value: errorType)
 
         NetworkInstrumentationManager.shared.logger.log(level: .error) {
-            "Error: \(error.localizedDescription)"
+            "Error: \(errorMessage)"
+        }
+    }
+    else if let errorTypeOverride, let errorMessageOverride {
+        span.clearAndSetAttribute(key: NetworkSpanAttributeKeys.error, value: true)
+        span.clearAndSetAttribute(key: SemanticConventions.Error.message, value: errorMessageOverride)
+        span.clearAndSetAttribute(key: SemanticConventions.Error.type, value: errorTypeOverride)
+
+        NetworkInstrumentationManager.shared.logger.log(level: .error) {
+            "Error: \(errorMessageOverride)"
         }
     }
 
-    if task.countOfBytesSent != 0 {
+    if let task, task.countOfBytesSent != 0 {
         span.clearAndSetAttribute(key: SemanticConventions.Http.requestBodySize, value: Int(task.countOfBytesSent))
     }
-    span.end()
+    if let endTime {
+        span.end(time: endTime)
+    }
+    else {
+        span.end()
+    }
 }
 
 /// Adds HTTP request data as attributes to a span.

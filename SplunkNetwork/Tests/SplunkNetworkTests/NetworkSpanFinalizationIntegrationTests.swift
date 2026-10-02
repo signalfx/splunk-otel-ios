@@ -18,9 +18,11 @@ limitations under the License.
 import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
+import SplunkCommon
 import XCTest
 
 @testable import SplunkNetwork
+@testable import SplunkOpenTelemetry
 
 final class NetworkSpanFinalizationIntegrationTests: XCTestCase {
 
@@ -35,7 +37,9 @@ final class NetworkSpanFinalizationIntegrationTests: XCTestCase {
 
         originalTracerProvider = OpenTelemetry.instance.tracerProvider
 
-        let processor = SimpleSpanProcessor(spanExporter: exporter)
+        let processor = SimpleSpanProcessor(
+            spanExporter: SpanInterceptorExporter(with: nil, proxy: exporter)
+        )
         let tracerProvider = TracerProviderBuilder()
             .add(spanProcessor: processor)
             .build()
@@ -91,6 +95,10 @@ final class NetworkSpanFinalizationIntegrationTests: XCTestCase {
         XCTAssertEqual(spans.count, 1, "The state and completion callbacks must finalize exactly one span")
 
         let attributes = try XCTUnwrap(spans.first?.attributes)
+        let requestStartedEvent = try XCTUnwrap(
+            spans.first?.events.first { $0.name == NetworkInstrumentationConstants.requestStartedEventName }
+        )
+        XCTAssertEqual(spans.first?.startTime, requestStartedEvent.timestamp)
         XCTAssertEqual(attributes[SemanticConventions.Http.requestMethod.rawValue], .string("GET"))
         XCTAssertEqual(attributes[SemanticConventions.Http.responseStatusCode.rawValue], .int(207))
         XCTAssertEqual(attributes[SemanticConventions.Http.responseBodySize.rawValue], .int(42))
@@ -110,6 +118,56 @@ final class NetworkSpanFinalizationIntegrationTests: XCTestCase {
         )
     }
 
+    func testNeverResumedTaskDoesNotExportSpan() {
+        let url = URLSessionMockProtocol.url(path: "/never-resumed")
+        let session = URLSession(configuration: URLSessionMockProtocol.configuration())
+        let task = session.dataTask(with: url)
+
+        task.cancel()
+        RunLoop.current.run(until: Date().addingTimeInterval(0.2))
+
+        XCTAssertTrue(Self.exporter.spans.isEmpty)
+        session.invalidateAndCancel()
+    }
+
+    func testHangingTaskExportsInstrumentationTimeout() throws {
+        let sessionConfiguration = URLSessionConfiguration.ephemeral
+        sessionConfiguration.protocolClasses = [HangingURLProtocol.self]
+        let session = URLSession(configuration: sessionConfiguration)
+        let task = session.dataTask(with: URLSessionMockProtocol.url(path: "/hang"))
+        let span = try XCTUnwrap(getCreationSpan(for: task))
+        let scheduler = NetworkSpanWatchdogScheduler(
+            queue: DispatchQueue(label: "NetworkSpanFinalizationIntegrationTests.watchdog")
+        )
+        let coordinator = NetworkSpanFinalizationCoordinator(
+            span: span,
+            watchdogDelay: 0.05,
+            watchdogScheduler: scheduler
+        )
+        setSpanFinalizationCoordinator(coordinator, for: task)
+
+        task.resume()
+        waitForSpans(count: 1)
+
+        let timeoutSpan = try XCTUnwrap(Self.exporter.spans.first)
+        XCTAssertEqual(
+            timeoutSpan.attributes[SemanticConventions.Error.type.rawValue],
+            .string(NetworkSpanFinalizationCoordinator.timeoutErrorType)
+        )
+        XCTAssertEqual(
+            timeoutSpan.attributes[SemanticConventions.Error.message.rawValue],
+            .string(NetworkSpanFinalizationCoordinator.timeoutErrorMessage)
+        )
+        XCTAssertEqual(
+            timeoutSpan.startTime,
+            try XCTUnwrap(timeoutSpan.events.first { $0.name == NetworkInstrumentationConstants.requestStartedEventName }).timestamp
+        )
+        XCTAssertLessThan(timeoutSpan.endTime.timeIntervalSince(timeoutSpan.startTime), 1)
+
+        task.cancel()
+        session.invalidateAndCancel()
+    }
+
 
     // MARK: - Waiting
 
@@ -126,6 +184,20 @@ final class NetworkSpanFinalizationIntegrationTests: XCTestCase {
             RunLoop.current.run(until: Date().addingTimeInterval(0.05))
         }
     }
+}
+
+private final class HangingURLProtocol: URLProtocol {
+    override static func canInit(with request: URLRequest) -> Bool {
+        request.url?.host == URLSessionMockProtocol.host
+    }
+
+    override static func canonicalRequest(for request: URLRequest) -> URLRequest {
+        request
+    }
+
+    override func startLoading() {}
+
+    override func stopLoading() {}
 }
 
 // MARK: - Span exporter

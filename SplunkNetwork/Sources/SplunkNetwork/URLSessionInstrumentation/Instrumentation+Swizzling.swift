@@ -59,12 +59,11 @@ extension URLSessionTask {
             return
         }
 
-        // For tasks instrumented at creation time, record the actual network start.
-        // The span is started at creation (required for traceparent header injection),
-        // but actual network activity only begins at resume. The event allows downstream
-        // systems to compute accurate network duration.
+        // For tasks instrumented at creation time, start the telemetry watchdog at the first
+        // resume. The span is created earlier (required for traceparent header injection), but
+        // actual network activity only begins at resume.
         if wasInstrumentedAtCreation(self) {
-            getCreationSpan(for: self)?.addEvent(name: "http.request.started")
+            getSpanFinalizationCoordinator(for: self)?.start(task: self)
             return
         }
 
@@ -87,6 +86,7 @@ extension URLSessionTask {
         let finalizationCoordinator = NetworkSpanFinalizationCoordinator(span: span)
         objc_setAssociatedObject(self, &associatedKeySpanResume, span, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
         setSpanFinalizationCoordinator(finalizationCoordinator, for: self)
+        finalizationCoordinator.start(task: self)
     }
 }
 
@@ -164,9 +164,24 @@ func swizzleUrlSession() {
 
     let setStateSelector = NSSelectorFromString("setState:")
     let resumeSelector = NSSelectorFromString("resume")
+    let resumeImplementations = classes.compactMap { classToSwizzle -> (AnyClass, UInt)? in
+        guard let method = class_getInstanceMethod(classToSwizzle, resumeSelector) else {
+            return nil
+        }
+
+        return (classToSwizzle, UInt(bitPattern: method_getImplementation(method)))
+    }
+    var swizzledResumeImplementations = Set<UInt>()
 
     for classToSwizzle in classes {
         swizzle(oneClass: classToSwizzle, original: setStateSelector, swizzled: #selector(URLSessionTask.splunkSwizzledSetState(state:)))
+
+        guard let resumeImplementation = resumeImplementations.first(where: { $0.0 === classToSwizzle })?.1,
+            swizzledResumeImplementations.insert(resumeImplementation).inserted
+        else {
+            continue
+        }
+
         swizzle(oneClass: classToSwizzle, original: resumeSelector, swizzled: #selector(URLSessionTask.splunkSwizzledResume))
     }
 }
