@@ -23,6 +23,10 @@ import SplunkCommon
 /// Completed requests are removed from `entries` immediately, so the scheduler retains only
 /// requests that are still waiting for a terminal URLSession signal.
 ///
+/// The deadline heap uses one bounded entry per currently open request instead of one delayed
+/// work item per request. This keeps completed-request memory bounded by the active set while
+/// avoiding a polling scan or a backlog of canceled work items.
+///
 /// The unchecked sendability is safe because all mutable scheduler state (`entries`, the deadline
 /// heap, and its token indexes) is accessed only on `queue`; `schedule`, `cancel`, and timer
 /// callbacks synchronously serialize access to that queue. Expired actions are then transferred to
@@ -66,19 +70,17 @@ final class NetworkSpanWatchdogScheduler: @unchecked Sendable {
         actionQueue: DispatchQueue = DispatchQueue(
             label: PackageIdentifier.default(named: "NetworkSpanWatchdogActions"),
             qos: .utility
-        ),
-        tickInterval: TimeInterval = 1
+        )
     ) {
         self.queue = queue
         self.actionQueue = actionQueue
         queue.setSpecific(key: queueKey, value: ())
 
         timer = DispatchSource.makeTimerSource(queue: queue)
-        let interval = max(0.01, tickInterval)
         timer.setEventHandler { [weak self] in
             self?.expireEntries()
         }
-        timer.schedule(deadline: .now() + interval, repeating: .never)
+        timer.schedule(deadline: .distantFuture, repeating: .never)
         timer.resume()
     }
 
@@ -98,8 +100,7 @@ final class NetworkSpanWatchdogScheduler: @unchecked Sendable {
     @discardableResult
     func schedule(after delay: TimeInterval, action: @escaping () -> Void) -> Token {
         let token = Token()
-        let nanoseconds = UInt64(max(0, delay) * 1_000_000_000)
-        let deadline = DispatchTime.now().uptimeNanoseconds + nanoseconds
+        let deadline = deadline(after: delay)
 
         sync {
             entries[token] = Entry(deadline: deadline, action: action)
@@ -153,10 +154,31 @@ final class NetworkSpanWatchdogScheduler: @unchecked Sendable {
             return
         }
 
+        if nextDeadline == UInt64.max {
+            timer.schedule(deadline: .distantFuture, repeating: .never)
+            return
+        }
+
         timer.schedule(
             deadline: DispatchTime(uptimeNanoseconds: nextDeadline),
             repeating: .never
         )
+    }
+
+    private func deadline(after delay: TimeInterval) -> UInt64 {
+        let now = DispatchTime.now().uptimeNanoseconds
+        guard delay.isFinite else {
+            return delay.isNaN || delay < 0 ? now : UInt64.max
+        }
+
+        let nanosecondsAsDouble = max(0, delay) * 1_000_000_000
+        guard nanosecondsAsDouble < Double(UInt64.max) else {
+            return UInt64.max
+        }
+
+        let nanoseconds = UInt64(nanosecondsAsDouble)
+        let (deadline, overflow) = now.addingReportingOverflow(nanoseconds)
+        return overflow ? UInt64.max : deadline
     }
 
     private func insertHeapNode(_ node: HeapNode) {

@@ -17,6 +17,7 @@ limitations under the License.
 
 import Foundation
 import OpenTelemetryApi
+@_spi(SplunkInternal) import SplunkCommon
 
 /// Coordinates the competing URL session completion paths for one network span.
 ///
@@ -25,8 +26,10 @@ import OpenTelemetryApi
 /// weakly because it retains this coordinator through an associated object.
 ///
 /// Safety: all mutable state is protected by `lock`. Finalization is claimed under the lock, but
-/// attribute writes and `Span.end()` run after unlocking so callbacks into the telemetry pipeline
-/// cannot deadlock or re-enter the coordinator while it is locked.
+/// most attribute writes and `Span.end()` run after unlocking so callbacks into the telemetry
+/// pipeline cannot deadlock or re-enter the coordinator while it is locked. The request-started
+/// event is recorded while the lock is held so the event and started-state transition are atomic
+/// with respect to terminal callbacks.
 final class NetworkSpanFinalizationCoordinator: @unchecked Sendable {
 
     // MARK: - Constants
@@ -34,10 +37,9 @@ final class NetworkSpanFinalizationCoordinator: @unchecked Sendable {
     /// The maximum time an ordinary data or upload request may remain open in telemetry.
     static let defaultWatchdogDelay: TimeInterval = 5 * 60
 
-    /// Downloads can legitimately outlive an ordinary request, so they receive a longer limit.
-    static let downloadWatchdogDelay: TimeInterval = 30 * 60
+    /// Downloads and uploads can legitimately outlive an ordinary request, so they receive a longer limit.
+    static let longLivedWatchdogDelay: TimeInterval = 30 * 60
 
-    static let requestStartedEventName = "http.request.started"
     static let timeoutErrorType = "instrumentation.timeout"
     static let timeoutErrorMessage = "Network task did not provide a completion callback before the SDK deadline"
 
@@ -132,7 +134,7 @@ final class NetworkSpanFinalizationCoordinator: @unchecked Sendable {
         }
 
         hasStarted = true
-        span.addEvent(name: Self.requestStartedEventName, timestamp: startTime)
+        span.addEvent(name: NetworkInstrumentationConstants.requestStartedEventName, timestamp: startTime)
 
         if let storedFinalization = pendingFinalization {
             isFinalized = true
@@ -153,12 +155,12 @@ final class NetworkSpanFinalizationCoordinator: @unchecked Sendable {
             )
         }
         else {
-            let token = watchdogScheduler.schedule(after: max(0, delay)) { [weak self, weak task] in
-                guard let self, let task else {
+            let token = watchdogScheduler.schedule(after: max(0, delay)) { [weak self] in
+                guard let self else {
                     return
                 }
 
-                finalizeTimeout(task: task)
+                finalizeTimeout(at: startTime.addingTimeInterval(max(0, delay)))
             }
 
             lock.lock()
@@ -183,10 +185,13 @@ final class NetworkSpanFinalizationCoordinator: @unchecked Sendable {
             return
         }
 
-        guard hasStarted else {
-            pendingFinalization = PendingFinalization(response: nil, error: nil)
-            lock.unlock()
-            return
+        if !hasStarted {
+            let hasTerminalEvidence = task.response != nil || task.countOfBytesSent > 0 || task.countOfBytesReceived > 0
+            guard hasTerminalEvidence else {
+                pendingFinalization = PendingFinalization(response: nil, error: nil)
+                lock.unlock()
+                return
+            }
         }
 
         isFinalized = true
@@ -249,7 +254,11 @@ final class NetworkSpanFinalizationCoordinator: @unchecked Sendable {
     }
 
     /// Finalizes a started span when URLSession fails to deliver any terminal callback.
-    func finalizeTimeout(task: URLSessionTask) {
+    ///
+    /// This path deliberately does not read the live task. URLSession may still be updating the
+    /// task while the watchdog runs, so timeout telemetry is limited to attributes already on the
+    /// span and ends at the configured watchdog deadline.
+    func finalizeTimeout(at endTime: Date) {
         let watchdogToken: NetworkSpanWatchdogScheduler.Token?
 
         lock.lock()
@@ -268,17 +277,17 @@ final class NetworkSpanFinalizationCoordinator: @unchecked Sendable {
             watchdogScheduler.cancel(watchdogToken)
         }
 
-        // The finalizer rechecks task.error immediately before applying the timeout override, so
-        // a URLSession error that arrives during finalization takes precedence.
         endHttpSpan(
             span: span,
-            task: task,
             errorTypeOverride: Self.timeoutErrorType,
-            errorMessageOverride: Self.timeoutErrorMessage
+            errorMessageOverride: Self.timeoutErrorMessage,
+            endTime: endTime
         )
     }
 
-    private static func watchdogDelay(for task: URLSessionTask) -> TimeInterval {
-        task is URLSessionDownloadTask ? downloadWatchdogDelay : defaultWatchdogDelay
+    static func watchdogDelay(for task: URLSessionTask) -> TimeInterval {
+        task is URLSessionDownloadTask || task is URLSessionUploadTask
+            ? longLivedWatchdogDelay
+            : defaultWatchdogDelay
     }
 }

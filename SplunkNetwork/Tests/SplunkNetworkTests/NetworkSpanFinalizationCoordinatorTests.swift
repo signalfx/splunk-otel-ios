@@ -18,6 +18,7 @@ limitations under the License.
 import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
+import SplunkCommon
 import XCTest
 
 @testable import SplunkNetwork
@@ -29,7 +30,7 @@ final class NetworkSpanFinalizationCoordinatorTests: XCTestCase {
     func testConcurrentCallbacksFinalizeExactlyOnceWithRichTaskAttributes() {
         let task = completedTask()
         let span = ThreadSafeMockSpan()
-        let coordinator = NetworkSpanFinalizationCoordinator(span: span)
+        let coordinator = makeCoordinator(span: span)
         coordinator.attach(to: task)
         coordinator.start(task: task)
 
@@ -50,6 +51,7 @@ final class NetworkSpanFinalizationCoordinatorTests: XCTestCase {
 
         XCTAssertEqual(group.wait(timeout: .now() + 5), .success)
         XCTAssertEqual(span.endCount, 1)
+        XCTAssertEqual(span.endInvocationCount, 1)
 
         let attributes = span.attributes
         XCTAssertEqual(attributes[SemanticConventions.Http.responseStatusCode.rawValue], .int(207))
@@ -69,7 +71,7 @@ final class NetworkSpanFinalizationCoordinatorTests: XCTestCase {
     func testCompletionBeforeTaskAttachmentFinalizesAfterAttachment() {
         let task = completedTask()
         let span = ThreadSafeMockSpan()
-        let coordinator = NetworkSpanFinalizationCoordinator(span: span)
+        let coordinator = makeCoordinator(span: span)
 
         coordinator.start(task: task)
         coordinator.finalize(response: task.response, error: task.error)
@@ -86,12 +88,26 @@ final class NetworkSpanFinalizationCoordinatorTests: XCTestCase {
     func testCompletionBeforeResumeDoesNotExportSpan() {
         let task = unstartedTask()
         let span = ThreadSafeMockSpan()
-        let coordinator = NetworkSpanFinalizationCoordinator(span: span)
+        let coordinator = makeCoordinator(span: span)
         coordinator.attach(to: task)
 
         coordinator.finalize(response: nil, error: nil)
 
         XCTAssertEqual(span.endCount, 0)
+    }
+
+    func testStartRecordsRequestStartedEventAtProvidedTimestamp() {
+        let task = unstartedTask()
+        let span = ThreadSafeMockSpan()
+        let coordinator = makeCoordinator(span: span)
+        let startTime = Date(timeIntervalSince1970: 100)
+        coordinator.attach(to: task)
+
+        coordinator.start(task: task, at: startTime)
+
+        XCTAssertEqual(span.events.count, 1)
+        XCTAssertEqual(span.events.first?.name, NetworkInstrumentationConstants.requestStartedEventName)
+        XCTAssertEqual(span.events.first?.timestamp, startTime)
     }
 
     func testPreResumeFinalizationDoesNotRetainTask() {
@@ -100,7 +116,7 @@ final class NetworkSpanFinalizationCoordinatorTests: XCTestCase {
 
         autoreleasepool {
             let task = unstartedTask()
-            let coordinator = NetworkSpanFinalizationCoordinator(span: ThreadSafeMockSpan())
+            let coordinator = makeCoordinator(span: ThreadSafeMockSpan())
             weakTask = task
             weakCoordinator = coordinator
 
@@ -119,8 +135,7 @@ final class NetworkSpanFinalizationCoordinatorTests: XCTestCase {
             span: span,
             watchdogDelay: 0.01,
             watchdogScheduler: NetworkSpanWatchdogScheduler(
-                queue: DispatchQueue(label: "NetworkSpanFinalizationCoordinatorTests.watchdog"),
-                tickInterval: 0.01
+                queue: DispatchQueue(label: "NetworkSpanFinalizationCoordinatorTests.watchdog")
             )
         )
         coordinator.attach(to: task)
@@ -143,32 +158,44 @@ final class NetworkSpanFinalizationCoordinatorTests: XCTestCase {
         XCTAssertEqual(span.attributes[NetworkSpanAttributeKeys.error], .bool(true))
     }
 
-    func testWatchdogPreservesURLSessionErrorOverInstrumentationTimeout() {
-        let task = failedTask()
+    func testWatchdogEndsAtConfiguredDeadlineWithoutReadingTask() {
+        let task = unstartedTask()
         let span = ThreadSafeMockSpan()
-        let coordinator = NetworkSpanFinalizationCoordinator(span: span)
+        let coordinator = makeCoordinator(span: span)
+        let startTime = Date(timeIntervalSince1970: 100)
+        let endTime = Date(timeIntervalSince1970: 105)
         coordinator.attach(to: task)
-        coordinator.start(task: task)
+        coordinator.start(task: task, at: startTime)
 
-        coordinator.finalizeTimeout(task: task)
+        coordinator.finalizeTimeout(at: endTime)
 
         XCTAssertEqual(span.endCount, 1)
-        XCTAssertNotEqual(
-            span.attributes[SemanticConventions.Error.type.rawValue],
-            .string(NetworkSpanFinalizationCoordinator.timeoutErrorType)
-        )
-        XCTAssertNotEqual(
-            span.attributes[SemanticConventions.Error.message.rawValue],
-            .string(NetworkSpanFinalizationCoordinator.timeoutErrorMessage)
-        )
+        XCTAssertEqual(span.endInvocationCount, 1)
+        XCTAssertEqual(span.endTimes, [endTime])
+        XCTAssertEqual(span.attributes[NetworkSpanAttributeKeys.error], .bool(true))
+    }
+
+    func testTerminalErrorWinsOverInstrumentationTimeout() {
+        let task = unstartedTask()
+        let span = ThreadSafeMockSpan()
+        let coordinator = makeCoordinator(span: span)
+        coordinator.attach(to: task)
+        coordinator.start(task: task)
+        let error = TestNetworkError()
+
+        coordinator.finalize(response: nil, error: error)
+        coordinator.finalizeTimeout(at: Date(timeIntervalSince1970: 105))
+
+        XCTAssertEqual(span.endCount, 1)
+        XCTAssertEqual(span.attributes[SemanticConventions.Error.type.rawValue], .string("TestNetworkError"))
+        XCTAssertEqual(span.attributes[SemanticConventions.Error.message.rawValue], .string(error.localizedDescription))
     }
 
     func testTerminalCallbackCancelsWatchdogAndFinalizesOnce() {
         let task = unstartedTask()
         let span = ThreadSafeMockSpan()
         let scheduler = NetworkSpanWatchdogScheduler(
-            queue: DispatchQueue(label: "NetworkSpanFinalizationCoordinatorTests.watchdog"),
-            tickInterval: 0.01
+            queue: DispatchQueue(label: "NetworkSpanFinalizationCoordinatorTests.watchdog")
         )
         let coordinator = NetworkSpanFinalizationCoordinator(
             span: span,
@@ -198,8 +225,61 @@ final class NetworkSpanFinalizationCoordinatorTests: XCTestCase {
         XCTAssertTrue(shouldFinalizeNetworkSpan(for: .completed))
     }
 
+    func testCompletedTaskWithoutResumeSignalUsesCreationStartTime() {
+        let task = completedTask()
+        let span = ThreadSafeMockSpan()
+        let coordinator = makeCoordinator(span: span)
+        coordinator.attach(to: task)
+
+        coordinator.finalize(task: task)
+
+        XCTAssertEqual(span.endCount, 1)
+        XCTAssertTrue(span.events.isEmpty)
+        XCTAssertEqual(
+            span.attributes[SemanticConventions.Http.responseStatusCode.rawValue],
+            .int(207)
+        )
+    }
+
+    func testTaskWithoutResumeEvidenceRemainsSuppressed() {
+        let task = unstartedTask()
+        let span = ThreadSafeMockSpan()
+        let coordinator = makeCoordinator(span: span)
+        coordinator.attach(to: task)
+
+        coordinator.finalize(task: task)
+
+        XCTAssertEqual(span.endCount, 0)
+    }
+
+    func testUploadTaskUsesLongWatchdogDelay() throws {
+        let configuration = URLSessionConfiguration.ephemeral
+        let session = URLSession(configuration: configuration)
+        let uploadURL = try XCTUnwrap(URL(string: "https://finalization.test/upload"))
+        let request = URLRequest(url: uploadURL)
+        let task = session.uploadTask(withStreamedRequest: request)
+
+        XCTAssertEqual(
+            NetworkSpanFinalizationCoordinator.watchdogDelay(for: task),
+            NetworkSpanFinalizationCoordinator.longLivedWatchdogDelay
+        )
+    }
+
 
     // MARK: - Helpers
+
+    private func makeCoordinator(
+        span: Span,
+        watchdogDelay: TimeInterval? = nil
+    ) -> NetworkSpanFinalizationCoordinator {
+        NetworkSpanFinalizationCoordinator(
+            span: span,
+            watchdogDelay: watchdogDelay,
+            watchdogScheduler: NetworkSpanWatchdogScheduler(
+                queue: DispatchQueue(label: "NetworkSpanFinalizationCoordinatorTests.watchdog.(UUID().uuidString)")
+            )
+        )
+    }
 
     private func completedTask() -> URLSessionDataTask {
         let configuration = URLSessionConfiguration.ephemeral
@@ -230,27 +310,15 @@ final class NetworkSpanFinalizationCoordinatorTests: XCTestCase {
         return session.dataTask(with: url)
     }
 
-    private func failedTask() -> URLSessionDataTask {
-        let configuration = URLSessionConfiguration.ephemeral
-        configuration.protocolClasses = [FailingURLProtocol.self]
-        let session = URLSession(configuration: configuration)
-        let completed = expectation(description: "Task failed")
-        guard let url = URL(string: "https://finalization.test/failure") else {
-            preconditionFailure("Static finalization test URL is invalid")
-        }
-
-        let task = session.dataTask(with: url) { _, _, _ in
-            completed.fulfill()
-        }
-
-        task.resume()
-        wait(for: [completed], timeout: 5)
-
-        return task
-    }
 }
 
 // MARK: - Test URL protocol
+
+private struct TestNetworkError: LocalizedError {
+    var errorDescription: String? {
+        "test terminal error"
+    }
+}
 
 private final class FinalizationURLProtocol: URLProtocol {
     override static func canInit(with _: URLRequest) -> Bool {
@@ -285,110 +353,4 @@ private final class FinalizationURLProtocol: URLProtocol {
     }
 
     override func stopLoading() {}
-}
-
-private final class FailingURLProtocol: URLProtocol {
-    override static func canInit(with _: URLRequest) -> Bool {
-        true
-    }
-
-    override static func canonicalRequest(for request: URLRequest) -> URLRequest {
-        request
-    }
-
-    override func startLoading() {
-        client?.urlProtocol(self, didFailWithError: URLError(.timedOut))
-    }
-
-    override func stopLoading() {}
-}
-
-// MARK: - Thread-safe span
-
-private final class ThreadSafeMockSpan: Span {
-    private let lock = NSLock()
-    private var storedAttributes: [String: AttributeValue] = [:]
-    private var storedEndCount = 0
-    private var ended = false
-
-    var attributes: [String: AttributeValue] {
-        lock.lock()
-        defer { lock.unlock() }
-        return storedAttributes
-    }
-
-    var endCount: Int {
-        lock.lock()
-        defer { lock.unlock() }
-        return storedEndCount
-    }
-
-    let context = SpanContext.create(
-        traceId: .random(),
-        spanId: .random(),
-        traceFlags: TraceFlags(),
-        traceState: TraceState()
-    )
-
-    var isRecording: Bool {
-        lock.lock()
-        defer { lock.unlock() }
-        return !ended
-    }
-
-    var status: Status = .unset
-    var name = "NetworkSpanFinalizationCoordinatorTests"
-    var kind: SpanKind {
-        .client
-    }
-
-    func setAttribute(key: String, value: AttributeValue?) {
-        lock.lock()
-        defer { lock.unlock() }
-        guard !ended else {
-            return
-        }
-
-        if let value {
-            storedAttributes[key] = value
-        }
-        else {
-            storedAttributes.removeValue(forKey: key)
-        }
-    }
-
-    func setAttributes(_ attributes: [String: AttributeValue]) {
-        for (key, value) in attributes {
-            setAttribute(key: key, value: value)
-        }
-    }
-
-    func addEvent(name _: String) {}
-    func addEvent(name _: String, timestamp _: Date) {}
-    func addEvent(name _: String, attributes _: [String: AttributeValue]) {}
-    func addEvent(name _: String, attributes _: [String: AttributeValue], timestamp _: Date) {}
-
-    func end() {
-        lock.lock()
-        defer { lock.unlock() }
-        guard !ended else {
-            return
-        }
-
-        ended = true
-        storedEndCount += 1
-    }
-
-    func end(time _: Date) {
-        end()
-    }
-
-    func recordException(_: SpanException) {}
-    func recordException(_: SpanException, timestamp _: Date) {}
-    func recordException(_: SpanException, attributes _: [String: AttributeValue]) {}
-    func recordException(_: SpanException, attributes _: [String: AttributeValue], timestamp _: Date) {}
-
-    var description: String {
-        name
-    }
 }

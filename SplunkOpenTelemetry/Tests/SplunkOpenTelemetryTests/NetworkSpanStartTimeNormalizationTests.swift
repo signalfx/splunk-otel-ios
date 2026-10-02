@@ -18,21 +18,27 @@ limitations under the License.
 import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
+import SplunkCommon
 import XCTest
 
 @testable import SplunkOpenTelemetry
 
 final class NetworkSpanStartTimeNormalizationTests: XCTestCase {
 
-    func testNetworkSpanStartTimeUsesRequestStartedEvent() {
+    func testNetworkSpanStartTimeUsesRequestStartedEvent() throws {
         let creationTime = Date(timeIntervalSince1970: 100)
         let requestStarted = Date(timeIntervalSince1970: 101)
         let endTime = Date(timeIntervalSince1970: 102)
-        let span = makeSpanData(
-            name: "HTTP GET",
+        let span = try makeSpanData(
+            name: NetworkInstrumentationConstants.httpSpanNamePrefix + "GET",
             startTime: creationTime,
             endTime: endTime,
-            events: [SpanData.Event(name: "http.request.started", timestamp: requestStarted)]
+            events: [
+                SpanData.Event(
+                    name: NetworkInstrumentationConstants.requestStartedEventName,
+                    timestamp: requestStarted
+                )
+            ]
         )
 
         let normalized = normalizeNetworkSpanStartTime(span)
@@ -41,38 +47,53 @@ final class NetworkSpanStartTimeNormalizationTests: XCTestCase {
         XCTAssertEqual(normalized.endTime, endTime)
     }
 
-    func testNonNetworkSpanIsNotNormalized() {
+    func testNonNetworkSpanIsNotNormalized() throws {
         let creationTime = Date(timeIntervalSince1970: 100)
-        let span = makeSpanData(
+        let span = try makeSpanData(
             name: "app.ui.navigation",
             startTime: creationTime,
             endTime: Date(timeIntervalSince1970: 102),
-            events: [SpanData.Event(name: "http.request.started", timestamp: Date(timeIntervalSince1970: 101))]
+            events: [
+                SpanData.Event(
+                    name: NetworkInstrumentationConstants.requestStartedEventName,
+                    timestamp: Date(timeIntervalSince1970: 101)
+                )
+            ]
         )
 
         XCTAssertEqual(normalizeNetworkSpanStartTime(span).startTime, creationTime)
     }
 
-    func testCustomHttpSpanIsNotNormalized() {
+    func testCustomHttpSpanIsNotNormalized() throws {
         let creationTime = Date(timeIntervalSince1970: 100)
-        let span = makeSpanData(
-            name: "HTTP GET",
+        let span = try makeSpanData(
+            name: NetworkInstrumentationConstants.httpSpanNamePrefix + "GET",
             startTime: creationTime,
             endTime: Date(timeIntervalSince1970: 102),
-            events: [SpanData.Event(name: "http.request.started", timestamp: Date(timeIntervalSince1970: 101))],
+            events: [
+                SpanData.Event(
+                    name: NetworkInstrumentationConstants.requestStartedEventName,
+                    timestamp: Date(timeIntervalSince1970: 101)
+                )
+            ],
             instrumentationName: "CustomInstrumentation"
         )
 
         XCTAssertEqual(normalizeNetworkSpanStartTime(span).startTime, creationTime)
     }
 
-    func testInvalidRequestStartedTimestampIsIgnored() {
+    func testInvalidRequestStartedTimestampIsIgnored() throws {
         let creationTime = Date(timeIntervalSince1970: 100)
-        let span = makeSpanData(
-            name: "HTTP GET",
+        let span = try makeSpanData(
+            name: NetworkInstrumentationConstants.httpSpanNamePrefix + "GET",
             startTime: creationTime,
             endTime: Date(timeIntervalSince1970: 102),
-            events: [SpanData.Event(name: "http.request.started", timestamp: Date(timeIntervalSince1970: 103))]
+            events: [
+                SpanData.Event(
+                    name: NetworkInstrumentationConstants.requestStartedEventName,
+                    timestamp: Date(timeIntervalSince1970: 103)
+                )
+            ]
         )
 
         XCTAssertEqual(normalizeNetworkSpanStartTime(span).startTime, creationTime)
@@ -83,8 +104,8 @@ final class NetworkSpanStartTimeNormalizationTests: XCTestCase {
         startTime: Date,
         endTime: Date,
         events: [SpanData.Event],
-        instrumentationName: String = "NetworkInstrumentation"
-    ) -> SpanData {
+        instrumentationName: String = NetworkInstrumentationConstants.instrumentationName
+    ) throws -> SpanData {
         let tracerProvider = TracerProviderBuilder()
             .add(spanProcessor: SimpleSpanProcessor(spanExporter: MockSpanExporter()))
             .build()
@@ -98,10 +119,7 @@ final class NetworkSpanStartTimeNormalizationTests: XCTestCase {
         }
         span.end(time: endTime)
 
-        guard let readableSpan = span as? ReadableSpan else {
-            fatalError("Expected SDK span to conform to ReadableSpan")
-        }
-
+        let readableSpan = try XCTUnwrap(span as? ReadableSpan)
         return readableSpan.toSpanData()
     }
 }

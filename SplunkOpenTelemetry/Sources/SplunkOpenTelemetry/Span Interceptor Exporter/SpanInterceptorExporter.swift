@@ -21,17 +21,21 @@ import SplunkCommon
 
 public typealias SplunkSpanInterceptor = (SpanData) -> SpanData?
 
-private let networkInstrumentationScopeName = "NetworkInstrumentation"
-
 /// Rewrites network span start time from task-creation time to the actual request start event.
 ///
 /// Network instrumentation creates a span before `resume()` so it can inject `traceparent`. The
 /// request-start event is the authoritative beginning of network activity and is therefore used
 /// for the exported duration. Invalid or incomplete event timing is left unchanged.
 func normalizeNetworkSpanStartTime(_ span: SpanData) -> SpanData {
-    guard span.instrumentationScope.name == networkInstrumentationScopeName,
-        span.name.hasPrefix("HTTP "),
-        let requestStarted = span.events.first(where: { $0.name == "http.request.started" })?.timestamp,
+    var requestStarted: Date?
+    for event in span.events where event.name == NetworkInstrumentationConstants.requestStartedEventName {
+        requestStarted = event.timestamp
+        break
+    }
+
+    guard span.instrumentationScope.name == NetworkInstrumentationConstants.instrumentationName,
+        span.name.hasPrefix(NetworkInstrumentationConstants.httpSpanNamePrefix),
+        let requestStarted,
         requestStarted >= span.startTime,
         requestStarted <= span.endTime
     else {

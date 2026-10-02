@@ -10,7 +10,13 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 * Replaced the external PLCrashReporter package dependency with the SDK-owned, symbol-prefixed `SplunkCrashReporter` implementation.
-* Network spans now use the `http.request.started` timestamp for their exported start time and are finalized by authoritative URLSession completion signals or an instrumentation watchdog. Requests that are never resumed are suppressed; ordinary requests time out in telemetry after five minutes without cancelling the application task.
+* Network span start times now use the `http.request.started` timestamp recorded when the task is resumed.
+* Network spans for requests that are never resumed are suppressed.
+* Downloads and uploads use a 30-minute telemetry watchdog; ordinary requests use a 5-minute watchdog without cancelling the application task.
+
+### Fixed
+
+* Fixed network spans remaining open when URLSession does not deliver a terminal callback by ending them at the instrumentation deadline.
 
 ## [2.4.2] - 2026-09-09
 
