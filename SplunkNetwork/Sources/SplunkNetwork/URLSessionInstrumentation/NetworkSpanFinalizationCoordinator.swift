@@ -178,6 +178,7 @@ final class NetworkSpanFinalizationCoordinator: @unchecked Sendable {
     /// Finalizes from the task-state callback, using the completed task as the canonical data source.
     func finalize(task: URLSessionTask) {
         let watchdogToken: NetworkSpanWatchdogScheduler.Token?
+        let storedFinalization: PendingFinalization?
 
         lock.lock()
         guard !isFinalized else {
@@ -185,8 +186,15 @@ final class NetworkSpanFinalizationCoordinator: @unchecked Sendable {
             return
         }
 
+        storedFinalization = pendingFinalization
         if !hasStarted {
-            let hasTerminalEvidence = task.response != nil || task.countOfBytesSent > 0 || task.countOfBytesReceived > 0
+            let completionErrors = [task.error, storedFinalization?.error].compactMap(\.self)
+            let hasNonCancellationError = completionErrors.contains { !Self.isCancellationError($0) }
+            let hasTerminalEvidence =
+                task.response != nil
+                || task.countOfBytesSent > 0
+                || task.countOfBytesReceived > 0
+                || hasNonCancellationError
             guard hasTerminalEvidence else {
                 pendingFinalization = PendingFinalization(response: nil, error: nil)
                 lock.unlock()
@@ -204,7 +212,12 @@ final class NetworkSpanFinalizationCoordinator: @unchecked Sendable {
             watchdogScheduler.cancel(watchdogToken)
         }
 
-        endHttpSpan(span: span, task: task)
+        endHttpSpan(
+            span: span,
+            task: task,
+            fallbackResponse: storedFinalization?.response,
+            fallbackError: storedFinalization?.error
+        )
     }
 
     /// Finalizes from a completion handler while retaining task-derived enrichment when available.
@@ -289,5 +302,10 @@ final class NetworkSpanFinalizationCoordinator: @unchecked Sendable {
         task is URLSessionDownloadTask || task is URLSessionUploadTask
             ? longLivedWatchdogDelay
             : defaultWatchdogDelay
+    }
+
+    private static func isCancellationError(_ error: Error) -> Bool {
+        let nsError = error as NSError
+        return nsError.domain == NSURLErrorDomain && nsError.code == NSURLErrorCancelled
     }
 }
