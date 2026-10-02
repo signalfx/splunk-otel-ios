@@ -27,15 +27,19 @@ public typealias SplunkSpanInterceptor = (SpanData) -> SpanData?
 /// request-start event is the authoritative beginning of network activity and is therefore used
 /// for the exported duration. Invalid or incomplete event timing is left unchanged.
 func normalizeNetworkSpanStartTime(_ span: SpanData) -> SpanData {
+    guard span.instrumentationScope.name == NetworkInstrumentationConstants.instrumentationName,
+        span.name.hasPrefix(NetworkInstrumentationConstants.httpSpanNamePrefix)
+    else {
+        return span
+    }
+
     var requestStarted: Date?
     for event in span.events where event.name == NetworkInstrumentationConstants.requestStartedEventName {
         requestStarted = event.timestamp
         break
     }
 
-    guard span.instrumentationScope.name == NetworkInstrumentationConstants.instrumentationName,
-        span.name.hasPrefix(NetworkInstrumentationConstants.httpSpanNamePrefix),
-        let requestStarted,
+    guard let requestStarted,
         requestStarted >= span.startTime,
         requestStarted <= span.endTime
     else {
