@@ -25,7 +25,7 @@ let project = Project(
             ],
             settings: .settings(
                 base: [
-                    "IPHONEOS_DEPLOYMENT_TARGET": "14.0"
+                    "IPHONEOS_DEPLOYMENT_TARGET": "15.0"
                 ]
             )
         )
