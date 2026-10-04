@@ -47,9 +47,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 * Session Replay segment metadata now includes a `userActivity` field containing Unix-millisecond timestamps of user interactions that occurred during the segment window, enabling timeline visualization in the backend. Timestamps are only collected while Session Replay is recording; disabling `InteractionsConfiguration` does not affect Session Replay segment recording but does prevent user-activity timestamps from being collected because they originate from the Interactions detector. #646
 * Added `customTracking.trackError(typeName:message:stacktrace:attributes:)` for reporting an error with an explicitly supplied stacktrace. Unlike the existing `trackError` overloads, the supplied stack is emitted verbatim as `exception.stacktrace` (no native stack is derived) and the resulting `component=error` span is named after `typeName` (falling back to `"error"`). This is the native emission path for caught JavaScript/Dart errors bridged from the React Native and Flutter agents. A matching Objective-C selector (`trackErrorWithType:message:stacktrace:attributes:`) is also available.
+* Added a bounded React Native fatal-crash persistence API that durably stores the exact crash span and arms PLCrashReporter duplicate suppression before returning to the JavaScript handler.
 
 ### Fixed
 
+* Fixed React Native fatal-crash duplicate suppression when PLCrashReporter records a whole-second crash timestamp, and retained `Error` as the fallback exception type when JavaScript does not provide one.
 * Improved accuracy of `slowRenders` and `frozenRenders` detection: the detector now derives the expected cadence per frame, counts a continuous freeze once, and makes slow and frozen classifications mutually exclusive. #696
 * Fixed a spurious `frozenRenders` event that could be emitted when the app backgrounded while a frame was in flight. #696
 
