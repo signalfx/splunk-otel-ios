@@ -208,18 +208,18 @@ extension AppStartReducer {
         end: Date,
         events: [AppStartEvent]?
     ) -> Result {
-        guard start <= end else {
-            return suppressed(.invalidTimestampOrder)
-        }
-
-        let span = AppStartSpanData(
+        switch validatedSpan(
             type: type,
             start: start,
             end: end,
             events: events
-        )
+        ) {
+        case let .success(span):
+            return (.active(.emitted), .send(span))
 
-        return (.active(.emitted), .send(span))
+        case let .failure(reason):
+            return suppressed(reason)
+        }
     }
 
     private static func suppressInitial(

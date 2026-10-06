@@ -37,28 +37,6 @@ extension AppStartTests {
 
     // MARK: - Initial classification
 
-    func testTrustedLongForegroundLaunchRemainsCold() throws {
-        let processStart = Date(timeIntervalSinceReferenceDate: 1_000)
-        let didFinishLaunching = processStart.addingTimeInterval(1)
-        let didBecomeActive = processStart.addingTimeInterval(30 * 60)
-        let (appStart, destination) = configuredAppStart(processStart: processStart)
-
-        appStart.track(
-            initialLifecycle: AppStartLifecycleSnapshot(
-                launchOrigin: .foreground,
-                didFinishLaunching: didFinishLaunching,
-                willEnterForeground: nil,
-                didBecomeActive: didBecomeActive
-            )
-        )
-
-        let span = try XCTUnwrap(destination.storedAppStart)
-        XCTAssertEqual(span.type, .cold)
-        XCTAssertEqual(span.start, processStart)
-        XCTAssertEqual(span.end, didBecomeActive)
-        XCTAssertEqual(span.end.timeIntervalSince(span.start), 30 * 60)
-    }
-
     func testDelayedHybridHandoffUsesCapturedActivationAsEnd() throws {
         let processStart = Date(timeIntervalSinceReferenceDate: 2_000)
         let didBecomeActive = processStart.addingTimeInterval(0.287)

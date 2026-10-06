@@ -63,6 +63,8 @@ public protocol AppStartModule {
     /// even if `didBecomeActive` has not occurred yet. The installed native observer
     /// completes a partial foreground/active pair and clears it if the app backgrounds
     /// before activation.
+    /// Every resolved cold, warm, or hot measurement is subject to AppStart's
+    /// five-second maximum duration guard. Longer measurements are suppressed.
     /// Calls made before installation reach the non-operational proxy and are discarded.
     /// Repeated handoffs are treated as conflicting evidence and suppressed.
     ///

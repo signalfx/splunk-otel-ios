@@ -17,11 +17,13 @@ limitations under the License.
 
 import Foundation
 
-enum AppStartSuppressionReason: String, Equatable {
+/// Also serves as the failure type for final span validation.
+enum AppStartSuppressionReason: String, Error, Equatable {
     case backgroundWithoutForeground
     case conflictingLifecycleEvidence
     case conflictingLaunchOrigin
     case invalidTimestampOrder
+    case maxDurationExceeded
     case missingDidBecomeActive
     case missingForegroundBoundary
     case missingProcessStart
@@ -33,6 +35,13 @@ enum AppStartSuppressionReason: String, Equatable {
 ///
 /// Reduction is pure and performs no I/O.
 enum AppStartReducer {
+
+    /// Final safety guard applied to every AppStart span type.
+    ///
+    /// Launch provenance determines the span boundary. This limit is a final
+    /// defense against corrupt or incomplete lifecycle evidence producing an
+    /// implausibly long measurement.
+    static let maximumAppStartDuration: TimeInterval = 5
 
     // MARK: - State
 
@@ -288,23 +297,41 @@ enum AppStartReducer {
             resolvedInitial = resolution
         }
 
-        guard valid(start), valid(end), start <= end else {
-            return (
-                .active(resolvedInitial),
-                .suppress(.invalidTimestampOrder)
-            )
+        switch validatedSpan(type: .hot, start: start, end: end, events: nil) {
+        case let .success(span):
+            return (.active(resolvedInitial), .send(span))
+
+        case let .failure(reason):
+            return (.active(resolvedInitial), .suppress(reason))
         }
-
-        let span = AppStartSpanData(
-            type: .hot,
-            start: start,
-            end: end,
-            events: nil
-        )
-
-        return (.active(resolvedInitial), .send(span))
     }
 
+    /// Internal because initial resolution is implemented in a separate file.
+    static func validatedSpan(
+        type: AppStartType,
+        start: Date,
+        end: Date,
+        events: [AppStartEvent]?
+    ) -> Swift.Result<AppStartSpanData, AppStartSuppressionReason> {
+        guard valid(start), valid(end), start <= end else {
+            return .failure(.invalidTimestampOrder)
+        }
+
+        guard end.timeIntervalSince(start) <= maximumAppStartDuration else {
+            return .failure(.maxDurationExceeded)
+        }
+
+        return .success(
+            AppStartSpanData(
+                type: type,
+                start: start,
+                end: end,
+                events: events
+            )
+        )
+    }
+
+    /// Internal because evidence and initialize validation live in separate files.
     static func valid(_ timestamp: Date) -> Bool {
         let seconds = timestamp.timeIntervalSince1970
         let maximumSeconds = Double(UInt64.max) / 1_000_000_000

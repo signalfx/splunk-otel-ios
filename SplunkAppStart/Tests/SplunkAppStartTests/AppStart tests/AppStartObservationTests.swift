@@ -37,7 +37,7 @@ extension AppStartTests {
     }
 
     func testNotificationObserverEmitsColdStart() throws {
-        let processStart = Date(timeIntervalSinceReferenceDate: 1_000)
+        let processStart = Date().addingTimeInterval(-0.1)
         let destination = DebugDestination()
         let appStart = AppStart()
         appStart.processStartTimestamp = processStart
