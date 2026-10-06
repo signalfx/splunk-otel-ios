@@ -12,6 +12,7 @@ TOOLS_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 REPO_ROOT="$(cd "${TOOLS_ROOT}/../.." && pwd)"
 
 PACKAGE_SWIFT="${REPO_ROOT}/Package.swift"
+CRASH_REPORTER_PACKAGE="${REPO_ROOT}/SplunkCrashReporter/Package.swift"
 AGENT_PROJECT="${TOOLS_ROOT}/Project.swift"
 OTEL_PROJECT="${TOOLS_ROOT}/otel/Project.swift"
 SMOKE_PROJECT="${TOOLS_ROOT}/smoke-test/Project.swift"
@@ -119,6 +120,7 @@ check_deployment_targets() {
     require_grep '\.tvOS\(\.v15\)' "${PACKAGE_SWIFT}" "Package.swift tvOS 15"
     require_grep '\.visionOS\(\.v1\)' "${PACKAGE_SWIFT}" "Package.swift visionOS 1"
     require_grep '\.macCatalyst\(\.v15\)' "${PACKAGE_SWIFT}" "Package.swift macCatalyst 15"
+    require_grep '\.iOS\(\.v15\)' "${CRASH_REPORTER_PACKAGE}" "SplunkCrashReporter Package.swift iOS 15"
 
     for project in "${AGENT_PROJECT}" "${OTEL_PROJECT}"; do
         local label
@@ -130,6 +132,7 @@ check_deployment_targets() {
     done
 
     require_grep '"XROS_DEPLOYMENT_TARGET":[[:space:]]*"1\.0"' "${AGENT_PROJECT}" "Project.swift visionOS 1.0"
+    require_grep '"IPHONEOS_DEPLOYMENT_TARGET":[[:space:]]*"15\.0"' "${AGENT_PROJECT}" "Project.swift SplunkCrashReporter iOS 15.0"
     require_grep '"XROS_DEPLOYMENT_TARGET":[[:space:]]*"1\.0"' "${OTEL_PROJECT}" "otel/Project.swift visionOS 1.0"
 
     for script in "${AGENT_BUILD_SCRIPT}" "${OTEL_BUILD_SCRIPT}"; do

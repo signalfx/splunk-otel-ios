@@ -22,7 +22,7 @@ import PackageDescription
 let package = Package(
     name: "SplunkCrashReporter",
     platforms: [
-        .iOS(.v13),
+        .iOS(.v15),
         .tvOS(.v13)
     ],
     products: [
