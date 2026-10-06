@@ -56,6 +56,34 @@ final class DefaultModulesManagerTests: XCTestCase {
         }
     }
 
+    func testModulePreparationRunsBeforeInstallation() throws {
+        let configuration = CrashReportsTestConfiguration(disableLocalProcessing: true)
+        var preparedModule: CrashReportsTestModule?
+        var hadConfigurationWhenPrepared = false
+
+        let modulesManager = DefaultModulesManager(
+            rawConfiguration: nil,
+            moduleConfigurations: [configuration],
+            for: modulesPool,
+            prepareModuleForInstallation: { module in
+                guard let module = module as? CrashReportsTestModule else {
+                    return
+                }
+
+                preparedModule = module
+                hadConfigurationWhenPrepared = module.configuration != nil
+            }
+        )
+
+        let installedModule = try XCTUnwrap(
+            modulesManager.module(ofType: CrashReportsTestModule.self)
+        )
+
+        XCTAssertTrue(preparedModule === installedModule)
+        XCTAssertFalse(hadConfigurationWhenPrepared)
+        XCTAssertEqual(installedModule.configuration, configuration)
+    }
+
 
     // MARK: - Business logic
 

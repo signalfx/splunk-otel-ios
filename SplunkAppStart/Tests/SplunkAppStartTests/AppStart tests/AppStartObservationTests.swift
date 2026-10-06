@@ -24,14 +24,10 @@ extension AppStartTests {
 
     // MARK: - Notification observation
 
-    func testModuleInstallationDefersObservationUntilAgentWiring() {
+    func testModuleInstallationStartsObservation() {
         let appStart = AppStart()
 
         appStart.install(with: nil, remoteConfiguration: nil)
-
-        XCTAssertNil(appStart.notificationTokens)
-
-        appStart.startDetection()
 
         XCTAssertNotNil(appStart.notificationTokens)
     }

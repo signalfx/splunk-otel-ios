@@ -19,6 +19,7 @@ internal import CiscoLogger
 import Combine
 import Foundation
 import OpenTelemetryApi
+internal import SplunkAppStart
 internal import SplunkCommon
 
 /// The class implementing Splunk Agent public API.
@@ -289,9 +290,19 @@ public class SplunkRum: ObservableObject {
         self.moduleConfigurations = moduleConfigurations
 
         // Starts connecting available modules to agent
+        let appStartSharedState = sharedState
         modulesManager = DefaultModulesManager(
             rawConfiguration: configurationHandler.configurationData,
-            moduleConfigurations: moduleConfigurations
+            moduleConfigurations: moduleConfigurations,
+            prepareModuleForInstallation: { module in
+                guard let appStart = module as? SplunkAppStart.AppStart else {
+                    return
+                }
+
+                // AppStart begins observing during install so lifecycle events
+                // cannot be lost while the remaining modules are connected.
+                appStart.sharedState = appStartSharedState
+            }
         )
 
         // Module installation above activates URLSession swizzling. Set the

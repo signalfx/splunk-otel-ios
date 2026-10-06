@@ -48,6 +48,7 @@ public final class AppStart {
     private let lock = NSLock()
     private var state: AppStartReducer.State
     private var agentInitializeSpanData: AgentInitializeSpanData?
+    private weak var sharedStateStorage: AgentSharedState?
 
     // Internal only because notification handling lives in a separate file.
     // Access the generation and tokens exclusively while holding this lock.
@@ -63,7 +64,14 @@ public final class AppStart {
     // MARK: - Public
 
     /// Shared state.
-    public unowned var sharedState: AgentSharedState?
+    public var sharedState: AgentSharedState? {
+        get {
+            withLock { sharedStateStorage }
+        }
+        set {
+            withLock { sharedStateStorage = newValue }
+        }
+    }
 
 
     // MARK: - Initialization
