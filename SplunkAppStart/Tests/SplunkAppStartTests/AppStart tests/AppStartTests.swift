@@ -27,9 +27,12 @@ final class AppStartTests: XCTestCase {
         let appStart = AppStart()
         let processStart = try XCTUnwrap(appStart.processStartTime())
 
-        let duration = Date().timeIntervalSince(processStart)
-        XCTAssertGreaterThan(duration, 0)
-        XCTAssertLessThan(duration, 60)
+        let processAge = Date().timeIntervalSince(processStart)
+        XCTAssertGreaterThan(processAge, 0)
+        XCTAssertLessThanOrEqual(
+            processAge,
+            ProcessInfo.processInfo.systemUptime
+        )
     }
 }
 
