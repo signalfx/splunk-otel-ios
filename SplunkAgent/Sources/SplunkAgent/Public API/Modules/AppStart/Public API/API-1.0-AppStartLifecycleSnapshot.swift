@@ -24,7 +24,6 @@ import Foundation
 /// use ``LaunchOrigin/foregroundResumed`` and replace the interrupted foreground
 /// timestamp with the boundary paired with the supplied activation. Submit exactly one
 /// snapshot immediately after agent installation; a pre-install handoff is discarded.
-@_spi(SplunkInternal)
 public struct AppStartLifecycleSnapshot {
 
     // MARK: - Launch origin
@@ -79,5 +78,4 @@ public struct AppStartLifecycleSnapshot {
 }
 
 /// Convenience name for the launch-origin type used by hybrid integrations.
-@_spi(SplunkInternal)
 public typealias AppStartLaunchOrigin = AppStartLifecycleSnapshot.LaunchOrigin

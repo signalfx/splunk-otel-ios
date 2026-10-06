@@ -11,6 +11,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 * Replaced the external PLCrashReporter package dependency with the SDK-owned, symbol-prefixed `SplunkCrashReporter` implementation.
 
+### Fixed
+
+* Fixed AppStart classification for delayed and background-launched hybrid applications. AppStart now uses the captured `didBecomeActive` timestamp, requires a one-shot lifecycle snapshot with explicit launch and activation provenance for ambiguous late handoffs, and excludes background residence from warm-start duration. The legacy timestamp-only hybrid handoff is deprecated. DEMRUM-6128
+
 ## [2.4.2] - 2026-09-09
 
 ### Changed
@@ -43,7 +47,6 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
-* Fixed AppStart classification for delayed and background-launched hybrid applications. AppStart now uses the captured `didBecomeActive` timestamp, requires a one-shot lifecycle snapshot with explicit launch and activation provenance for ambiguous late handoffs, and excludes background residence from warm-start duration. The legacy timestamp-only hybrid handoff is deprecated. DEMRUM-6128
 * Improved accuracy of `slowRenders` and `frozenRenders` detection: the detector now derives the expected cadence per frame, counts a continuous freeze once, and makes slow and frozen classifications mutually exclusive. #696
 * Fixed a spurious `frozenRenders` event that could be emitted when the app backgrounded while a frame was in flight. #696
 

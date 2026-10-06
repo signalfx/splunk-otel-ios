@@ -129,10 +129,7 @@ public class SplunkRum: ObservableObject {
         slowFrameDetectorProxy
     }
 
-    /// An object that holds the ``AppStartModule``.
-    ///
-    /// - Warning: Internal use only.
-    @_spi(SplunkInternal)
+    /// An object that provides the ``AppStartModule`` hybrid lifecycle bridge.
     public var appStart: any AppStartModule {
         appStartProxy
     }

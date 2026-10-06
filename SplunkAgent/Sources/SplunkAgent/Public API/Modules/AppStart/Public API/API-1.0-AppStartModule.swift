@@ -17,9 +17,7 @@ limitations under the License.
 
 import Foundation
 
-/// Defines a public API for the AppStart module.
-///
-/// Currently all APIs are for internal use only.
+/// Defines the AppStart API used by hybrid integrations.
 public protocol AppStartModule {
 
     // MARK: - Manual app start detection
@@ -68,14 +66,12 @@ public protocol AppStartModule {
     ///
     /// - Returns: The actual ``AppStartModule`` instance.
     ///
-    /// - Warning: Internal use only.
-    @_spi(SplunkInternal)
     func track(initialLifecycle snapshot: AppStartLifecycleSnapshot) -> any AppStartModule
 }
 
 /// Default implementation required for BUILD_LIBRARY_FOR_DISTRIBUTION
-/// compatibility. @_spi protocol requirements must have a default
-/// implementation in library evolution mode.
+/// compatibility. Protocol requirements must have a default implementation
+/// in library evolution mode.
 extension AppStartModule {
 
     @_spi(SplunkInternal)
@@ -89,7 +85,6 @@ extension AppStartModule {
         return self
     }
 
-    @_spi(SplunkInternal)
     public func track(initialLifecycle snapshot: AppStartLifecycleSnapshot) -> any AppStartModule {
         // Intentionally unused
         _ = snapshot
