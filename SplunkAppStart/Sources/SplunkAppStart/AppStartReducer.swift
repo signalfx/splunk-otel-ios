@@ -268,18 +268,31 @@ enum AppStartReducer {
         start: Date,
         end: Date
     ) -> Result {
+        let resolvedInitial: Resolution
+
         switch resolution {
-        case .invalidActivation,
-            .unobservedInitialActivation:
+        case .invalidActivation:
+            return (.active(resolution.afterDiscardedActivation), nil)
+
+        case .unobservedInitialActivation(.observationGap):
+            // A fresh foreground/active pair is a complete activation even if
+            // the initial one was not observed. Keep the initial suppression
+            // reason, but do not discard this independently bounded hot start.
+            resolvedInitial = .suppressed(.observationGap)
+
+        case .unobservedInitialActivation:
             return (.active(resolution.afterDiscardedActivation), nil)
 
         case .emitted,
             .suppressed:
-            break
+            resolvedInitial = resolution
         }
 
         guard valid(start), valid(end), start <= end else {
-            return (.active(resolution), .suppress(.invalidTimestampOrder))
+            return (
+                .active(resolvedInitial),
+                .suppress(.invalidTimestampOrder)
+            )
         }
 
         let span = AppStartSpanData(
@@ -289,7 +302,7 @@ enum AppStartReducer {
             events: nil
         )
 
-        return (.active(resolution), .send(span))
+        return (.active(resolvedInitial), .send(span))
     }
 
     static func valid(_ timestamp: Date) -> Bool {

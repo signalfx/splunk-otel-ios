@@ -87,13 +87,6 @@ extension AppStartReducer {
             return suppressed(.conflictingLifecycleEvidence)
         }
 
-        guard
-            snapshot.willEnterForeground == nil
-                || snapshot.didBecomeActive != nil
-        else {
-            return suppressed(.missingDidBecomeActive)
-        }
-
         guard validHybridSnapshot(snapshot, receivedAt: receivedAt) else {
             return suppressed(.invalidTimestampOrder)
         }

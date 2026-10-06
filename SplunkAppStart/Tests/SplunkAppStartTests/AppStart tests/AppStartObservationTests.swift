@@ -24,6 +24,18 @@ extension AppStartTests {
 
     // MARK: - Notification observation
 
+    func testModuleInstallationDefersObservationUntilAgentWiring() {
+        let appStart = AppStart()
+
+        appStart.install(with: nil, remoteConfiguration: nil)
+
+        XCTAssertNil(appStart.notificationTokens)
+
+        appStart.startDetection()
+
+        XCTAssertNotNil(appStart.notificationTokens)
+    }
+
     func testNotificationObserverEmitsColdStart() throws {
         let processStart = Date(timeIntervalSinceReferenceDate: 1_000)
         let destination = DebugDestination()
@@ -46,6 +58,33 @@ extension AppStartTests {
         )
 
         try checkDeterminedType(.cold, in: destination)
+    }
+
+    func testNotificationObserverCompletesPartialHybridWarmStart() throws {
+        let processStart = Date().addingTimeInterval(-2)
+        let foreground = Date().addingTimeInterval(-1)
+        let destination = DebugDestination()
+        let appStart = AppStart()
+        appStart.processStartTimestamp = processStart
+        appStart.destination = destination
+        appStart.track(
+            initialLifecycle: AppStartLifecycleSnapshot(
+                launchOrigin: .background,
+                didFinishLaunching: processStart.addingTimeInterval(0.1),
+                willEnterForeground: foreground,
+                didBecomeActive: nil
+            )
+        )
+        appStart.startDetection()
+
+        NotificationCenter.default.post(
+            name: UIApplication.didBecomeActiveNotification,
+            object: nil
+        )
+
+        try checkDeterminedType(.warm, in: destination)
+        let span = try XCTUnwrap(destination.storedAppStart)
+        XCTAssertEqual(span.start, foreground)
     }
 
     func testStopRemovesNotificationObserver() throws {

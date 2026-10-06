@@ -19,11 +19,28 @@ import Foundation
 
 /// Lifecycle evidence captured by a hybrid integration before the iOS SDK is installed.
 ///
+/// React Native and Flutter keep the lightweight, platform-specific early observer
+/// they already load before the agent. The observer captures evidence only; the iOS
+/// AppStart reducer owns timestamp validation, classification, suppression, and span
+/// creation after installation. No core load-time constructor is required.
+///
+/// Use the following native lifecycle contract in every hybrid adapter:
+///
+/// | Launch origin | Launch event | Events before first activation |
+/// | --- | --- | --- |
+/// | `foreground` | `didFinishLaunching` | `didBecomeActive` |
+/// | `background` | `didFinishLaunching` | `willEnterForeground` → `didBecomeActive` |
+/// | `foregroundResumed` | `didFinishLaunching` | `willResignActive` → `didEnterBackground` → `willEnterForeground` → `didBecomeActive` |
+/// | `unknown` | Incomplete or contradictory | Supply only observed events; native resolution fails closed. |
+///
 /// The foreground and active timestamps must belong to the same activation in the
 /// current process. If a foreground launch is interrupted by a background transition,
 /// use ``LaunchOrigin/foregroundResumed`` and replace the interrupted foreground
 /// timestamp with the boundary paired with the supplied activation. Submit exactly one
-/// snapshot immediately after agent installation; a pre-install handoff is discarded.
+/// snapshot immediately after agent installation, even if that snapshot is partial.
+/// A pre-install handoff is discarded. If installation occurs between
+/// `willEnterForeground` and `didBecomeActive`, the native observer completes the pending
+/// pair. If the app backgrounds first, that pending boundary is discarded.
 public struct AppStartLifecycleSnapshot {
 
     // MARK: - Launch origin
@@ -54,10 +71,14 @@ public struct AppStartLifecycleSnapshot {
     public let didFinishLaunching: Date?
 
     /// The `UIApplication.willEnterForegroundNotification` boundary paired with
-    /// `didBecomeActive`, when the process launched in the background.
+    /// `didBecomeActive`, when the process launched in the background or resumed
+    /// after its initial foreground activation was interrupted.
     public let willEnterForeground: Date?
 
     /// The first `UIApplication.didBecomeActiveNotification` timestamp, when observed.
+    ///
+    /// Leave this `nil` when the handoff occurs before activation; the native observer
+    /// will complete the pending measurement.
     public let didBecomeActive: Date?
 
 

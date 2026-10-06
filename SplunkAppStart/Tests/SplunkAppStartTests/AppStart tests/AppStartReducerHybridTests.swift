@@ -104,7 +104,7 @@ extension AppStartReducerTests {
         }
     }
 
-    func testIncompleteHybridBoundaryCannotPairWithLaterActivation() {
+    func testPartialHybridBoundaryPairsWithNativeActivation() {
         let start = Date(timeIntervalSinceReferenceDate: 1_890)
         let foreground = start.addingTimeInterval(1)
         let handoff = AppStartReducer.reduce(
@@ -120,21 +120,73 @@ extension AppStartReducerTests {
             )
         )
 
-        XCTAssertEqual(
-            handoff.state,
-            .active(.suppressed(.missingDidBecomeActive))
-        )
-        guard case .suppress(.missingDidBecomeActive) = handoff.action else {
-            XCTFail("Expected an unpaired hybrid boundary to be suppressed.")
+        XCTAssertNil(handoff.action)
+        guard case let .initial(evidence) = handoff.state else {
+            XCTFail("Expected a partial hybrid activation to remain pending.")
             return
         }
 
-        let laterActivation = AppStartReducer.reduce(
+        XCTAssertEqual(evidence.launchOrigin, .background)
+        XCTAssertEqual(evidence.foregroundBoundary, .hybrid(foreground))
+        XCTAssertEqual(evidence.hybridHandoff, .received)
+
+        let active = foreground.addingTimeInterval(0.4)
+        let completion = AppStartReducer.reduce(
             state: handoff.state,
-            event: .didBecomeActive(foreground.addingTimeInterval(3 * 60 * 60))
+            event: .didBecomeActive(active)
         )
-        XCTAssertNil(laterActivation.action)
-        XCTAssertEqual(laterActivation.state, handoff.state)
+
+        XCTAssertEqual(completion.state, .active(.emitted))
+        guard case let .send(span) = completion.action else {
+            XCTFail("Expected native activation to complete the hybrid warm start.")
+            return
+        }
+
+        XCTAssertEqual(span.type, .warm)
+        XCTAssertEqual(span.start, foreground)
+        XCTAssertEqual(span.end, active)
+    }
+
+    func testPartialHybridBoundaryIsClearedWhenActivationIsAborted() {
+        let start = Date(timeIntervalSinceReferenceDate: 1_895)
+        let interruptedForeground = start.addingTimeInterval(1)
+        let resumedForeground = start.addingTimeInterval(10)
+        let active = resumedForeground.addingTimeInterval(0.4)
+        var state =
+            AppStartReducer.reduce(
+                state: hybridInitialState(processStart: start),
+                event: .hybridSnapshot(
+                    AppStartLifecycleSnapshot(
+                        launchOrigin: .background,
+                        didFinishLaunching: start.addingTimeInterval(0.1),
+                        willEnterForeground: interruptedForeground,
+                        didBecomeActive: nil
+                    ),
+                    receivedAt: interruptedForeground.addingTimeInterval(1)
+                )
+            )
+            .state
+
+        for event in [
+            AppStartReducer.Event.didEnterBackground,
+            .willEnterForeground(resumedForeground)
+        ] {
+            state = AppStartReducer.reduce(state: state, event: event).state
+        }
+
+        let completion = AppStartReducer.reduce(
+            state: state,
+            event: .didBecomeActive(active)
+        )
+
+        guard case let .send(span) = completion.action else {
+            XCTFail("Expected the resumed activation to emit a warm start.")
+            return
+        }
+
+        XCTAssertEqual(span.type, .warm)
+        XCTAssertEqual(span.start, resumedForeground)
+        XCTAssertEqual(span.end, active)
     }
 }
 

@@ -52,13 +52,17 @@ public protocol AppStartModule {
     /// Supplies initial lifecycle evidence captured before agent installation.
     ///
     /// Hybrid integrations should capture the first lifecycle timestamps and launch
-    /// provenance as early as their native bootstrap permits. Classification remains
-    /// owned by the native AppStart state machine.
+    /// provenance as early as their existing native bootstrap permits. Hybrid adapters
+    /// own only this early capture; classification remains owned by the native AppStart
+    /// state machine and does not require a new core load-time constructor.
     /// If an activation is interrupted by a background transition, the integration
     /// must use ``AppStartLifecycleSnapshot/LaunchOrigin/foregroundResumed`` and
     /// replace that foreground timestamp with the boundary paired with the supplied
     /// activation.
-    /// Call this method exactly once, immediately after agent `install()` completes.
+    /// Call this method exactly once, immediately after agent `install()` completes,
+    /// even if `didBecomeActive` has not occurred yet. The installed native observer
+    /// completes a partial foreground/active pair and clears it if the app backgrounds
+    /// before activation.
     /// Calls made before installation reach the non-operational proxy and are discarded.
     /// Repeated handoffs are treated as conflicting evidence and suppressed.
     ///

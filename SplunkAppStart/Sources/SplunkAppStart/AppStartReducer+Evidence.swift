@@ -78,9 +78,11 @@ extension AppStartReducer.Evidence {
             snapshot.didFinishLaunching
         )
         if evidence.foregroundBoundary == nil,
-            snapshot.didBecomeActive != nil,
             let willEnterForeground = snapshot.willEnterForeground
         {
+            // Installation can occur between willEnterForeground and
+            // didBecomeActive. Keep that early boundary pending so the native
+            // observer can complete the same activation.
             evidence.foregroundBoundary = .hybrid(willEnterForeground)
         }
         evidence.didBecomeActive = first(

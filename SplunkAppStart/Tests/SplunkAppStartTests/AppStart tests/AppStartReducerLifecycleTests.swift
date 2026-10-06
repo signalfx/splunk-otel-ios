@@ -327,7 +327,7 @@ extension AppStartReducerTests {
         )
     }
 
-    func testObservationGapSuppressesUnresolvedInitialEvidence() {
+    func testObservationGapAllowsNextFullyObservedHotStart() {
         let start = Date(timeIntervalSinceReferenceDate: 5_000)
         let staleLaunch = start.addingTimeInterval(0.1)
         let foreground = start.addingTimeInterval(3 * 60 * 60)
@@ -365,7 +365,14 @@ extension AppStartReducerTests {
             event: .didBecomeActive(active)
         )
 
-        XCTAssertNil(result.action)
+        guard case let .send(span) = result.action else {
+            XCTFail("Expected a fresh foreground/active pair to emit a hot start.")
+            return
+        }
+
+        XCTAssertEqual(span.type, .hot)
+        XCTAssertEqual(span.start, foreground)
+        XCTAssertEqual(span.end, active)
         XCTAssertEqual(
             result.state,
             .active(.suppressed(.observationGap))

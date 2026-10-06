@@ -19,11 +19,16 @@ import Foundation
 
 /// Initial lifecycle evidence captured by a hybrid integration before the iOS SDK is installed.
 ///
+/// Hybrid adapters own early evidence capture. The native AppStart reducer owns
+/// validation, classification, suppression, and span creation after installation.
+/// A partial foreground boundary remains pending for the native observer to complete.
+///
 /// The foreground and active timestamps must belong to the same activation in the
 /// current process. If a foreground launch is interrupted by a background transition,
 /// use ``LaunchOrigin/foregroundResumed`` and replace the interrupted foreground
 /// timestamp with the boundary paired with the supplied activation. Submit exactly one
-/// snapshot immediately after agent installation; a pre-install handoff is discarded.
+/// snapshot immediately after agent installation, even if it is partial; a pre-install
+/// handoff is discarded.
 @_spi(SplunkInternal)
 public struct AppStartLifecycleSnapshot {
 
@@ -55,10 +60,13 @@ public struct AppStartLifecycleSnapshot {
     public let didFinishLaunching: Date?
 
     /// The `UIApplication.willEnterForegroundNotification` boundary paired with
-    /// `didBecomeActive`, when the process launched in the background.
+    /// `didBecomeActive`, when the process launched in the background or resumed
+    /// after its initial foreground activation was interrupted.
     public let willEnterForeground: Date?
 
     /// The first `UIApplication.didBecomeActiveNotification` timestamp, when observed.
+    ///
+    /// This may be `nil` when native observation will complete the pending activation.
     public let didBecomeActive: Date?
 
 

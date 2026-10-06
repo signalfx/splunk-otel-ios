@@ -38,7 +38,8 @@ extension AppStart: Module {
     // MARK: - Module methods
 
     public func install(with _: (any ModuleConfiguration)?, remoteConfiguration _: (any RemoteModuleConfiguration)?) {
-        startDetection()
+        // SplunkRum starts observation after wiring AgentSharedState. Starting
+        // here would allow an activation to race that required dependency.
     }
 
 
