@@ -92,6 +92,33 @@ require_grep() {
     fi
 }
 
+require_grep_in_settings() {
+    local settings_name="$1"
+    local pattern="$2"
+    local file="$3"
+    local label="$4"
+
+    if awk -v settings_name="${settings_name}" -v pattern="${pattern}" '
+        $0 ~ "^let " settings_name "[[:space:]]*:" {
+            in_settings = 1
+            next
+        }
+        in_settings && $0 ~ "^let " {
+            in_settings = 0
+        }
+        in_settings && index($0, pattern) {
+            found = 1
+        }
+        END {
+            exit(found ? 0 : 1)
+        }
+    ' "${file}"; then
+        pass "${label}"
+    else
+        error "${label}"
+    fi
+}
+
 check_splunk_targets() {
     log "Checking Splunk module targets"
 
@@ -126,14 +153,14 @@ check_deployment_targets() {
         local label
         label="${project#${TOOLS_ROOT}/}"
 
-        require_grep '"IPHONEOS_DEPLOYMENT_TARGET":[[:space:]]*"15\.0"' "${project}" "${label} iOS 15.0"
-        require_grep '"TVOS_DEPLOYMENT_TARGET":[[:space:]]*"15\.0"' "${project}" "${label} tvOS 15.0"
-        require_grep '"MACOSX_DEPLOYMENT_TARGET":[[:space:]]*"12\.0"' "${project}" "${label} macCatalyst 15 / macOS 12.0"
+        require_grep_in_settings "sharedSettings" '"IPHONEOS_DEPLOYMENT_TARGET": "15.0"' "${project}" "${label} sharedSettings iOS 15.0"
+        require_grep_in_settings "sharedSettings" '"TVOS_DEPLOYMENT_TARGET": "15.0"' "${project}" "${label} sharedSettings tvOS 15.0"
+        require_grep_in_settings "sharedSettings" '"MACOSX_DEPLOYMENT_TARGET": "12.0"' "${project}" "${label} sharedSettings macCatalyst 15 / macOS 12.0"
     done
 
-    require_grep '"XROS_DEPLOYMENT_TARGET":[[:space:]]*"1\.0"' "${AGENT_PROJECT}" "Project.swift visionOS 1.0"
-    require_grep '"IPHONEOS_DEPLOYMENT_TARGET":[[:space:]]*"15\.0"' "${AGENT_PROJECT}" "Project.swift SplunkCrashReporter iOS 15.0"
-    require_grep '"XROS_DEPLOYMENT_TARGET":[[:space:]]*"1\.0"' "${OTEL_PROJECT}" "otel/Project.swift visionOS 1.0"
+    require_grep_in_settings "sharedSettings" '"XROS_DEPLOYMENT_TARGET": "1.0"' "${AGENT_PROJECT}" "Project.swift sharedSettings visionOS 1.0"
+    require_grep_in_settings "crashReporterSettings" '"IPHONEOS_DEPLOYMENT_TARGET": "15.0"' "${AGENT_PROJECT}" "Project.swift crashReporterSettings iOS 15.0"
+    require_grep_in_settings "sharedSettings" '"XROS_DEPLOYMENT_TARGET": "1.0"' "${OTEL_PROJECT}" "otel/Project.swift sharedSettings visionOS 1.0"
 
     for script in "${AGENT_BUILD_SCRIPT}" "${OTEL_BUILD_SCRIPT}"; do
         local label
