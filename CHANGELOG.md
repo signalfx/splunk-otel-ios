@@ -9,6 +9,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+* Raised the minimum supported iOS and iPadOS version to 15.
 * Replaced the external PLCrashReporter package dependency with the SDK-owned, symbol-prefixed `SplunkCrashReporter` implementation.
 * Network span start times now use the `http.request.started` timestamp recorded when the task is resumed.
 * Network spans for requests that are never resumed are suppressed.

@@ -11,7 +11,7 @@ This repo is a modular Swift Package for the Splunk RUM iOS agent. It instrument
 
 ## Project Facts
 
-- Swift 5.9+, SPM, minimum iOS 13.0.
+- Swift 5.9+, SPM, minimum iOS/iPadOS 15.0.
 - Public products: `SplunkAgent`, `SplunkAgentObjC`.
 - Core dependency: `opentelemetry-swift-core` API/SDK only. Do not add upstream protocol exporters; this repo uses a custom OTLP/JSON exporter to control binary size.
 - Main modules: `SplunkAgent`, `SplunkAgentObjC`, `SplunkCommon`, `SplunkOpenTelemetry`, `SplunkOpenTelemetryBackgroundExporter`, and instrumentation modules named `Splunk<Feature>`.

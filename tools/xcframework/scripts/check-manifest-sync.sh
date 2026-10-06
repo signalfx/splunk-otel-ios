@@ -116,7 +116,7 @@ check_splunk_targets() {
 check_deployment_targets() {
     log "Checking deployment target sync"
 
-    require_grep '\.iOS\(\.v13\)' "${PACKAGE_SWIFT}" "Package.swift iOS 13"
+    require_grep '\.iOS\(\.v15\)' "${PACKAGE_SWIFT}" "Package.swift iOS 15"
     require_grep '\.tvOS\(\.v15\)' "${PACKAGE_SWIFT}" "Package.swift tvOS 15"
     require_grep '\.visionOS\(\.v1\)' "${PACKAGE_SWIFT}" "Package.swift visionOS 1"
     require_grep '\.macCatalyst\(\.v15\)' "${PACKAGE_SWIFT}" "Package.swift macCatalyst 15"
@@ -126,7 +126,7 @@ check_deployment_targets() {
         local label
         label="${project#${TOOLS_ROOT}/}"
 
-        require_grep '"IPHONEOS_DEPLOYMENT_TARGET":[[:space:]]*"13\.0"' "${project}" "${label} iOS 13.0"
+        require_grep '"IPHONEOS_DEPLOYMENT_TARGET":[[:space:]]*"15\.0"' "${project}" "${label} iOS 15.0"
         require_grep '"TVOS_DEPLOYMENT_TARGET":[[:space:]]*"15\.0"' "${project}" "${label} tvOS 15.0"
         require_grep '"MACOSX_DEPLOYMENT_TARGET":[[:space:]]*"12\.0"' "${project}" "${label} macCatalyst 15 / macOS 12.0"
     done

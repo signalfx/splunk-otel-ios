@@ -23,7 +23,7 @@ let package = Package(
     name: "SplunkCrashReporter",
     platforms: [
         .iOS(.v15),
-        .tvOS(.v13)
+        .tvOS(.v15)
     ],
     products: [
         .library(name: "SplunkCrashReporter", targets: ["SplunkCrashReporter"])
