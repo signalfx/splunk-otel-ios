@@ -22,51 +22,32 @@ public protocol AppStartModule {
 
     // MARK: - Manual app start detection
 
-    /// This method is for internal use only.
+    /// Supplies legacy lifecycle timestamps captured before installation.
     ///
-    /// App start event and its type are determined and sent based on `UIApplication` lifecycle notifications. If agent `install()` is called after
-    /// receiving `UIApplication.didBecomeActive`, the legacy timestamps cannot reliably establish launch provenance and the ambiguous event is suppressed.
-    ///
-    /// This method allows bridges (React, Flutter etc.) to track app lifecycle notifications timestamps to determine and send the app start event manually.
-    ///
-    /// This method should be called as soon as possible, but not sooner that the agent's `install()` method.
-    /// Method call is ignored if the initial app start attempt has already resolved, either automatically or by using this method.
-    /// Hybrid integrations that install after the initial lifecycle must use
-    /// ``track(initialLifecycle:)``; this legacy overload intentionally suppresses
-    /// a completed handoff when native evidence did not establish launch provenance.
+    /// This overload cannot establish launch provenance by itself. New hybrid
+    /// integrations should use ``track(initialLifecycle:)``; ambiguous legacy
+    /// handoffs are suppressed.
     ///
     /// - Parameters:
-    ///   - didBecomeActive: A timestamp of the `UIApplication.didBecomeActive` notification. Used as the exact measurement end.
-    ///   - didFinishLaunching: An optional timestamp of the `UIApplication.didFinishLaunching` notification.
-    ///   Used as cold-start metadata when native evidence has established a foreground launch.
-    ///   - willEnterForeground: An optional timestamp of the `UIApplication.willEnterForeground` notification.
-    ///   Used as the warm-start boundary when launch provenance is available from native evidence.
+    ///   - didBecomeActive: The activation timestamp and exact measurement end.
+    ///   - didFinishLaunching: The optional launch timestamp.
+    ///   - willEnterForeground: The optional warm-start boundary.
     ///
     /// - Returns: The actual ``AppStartModule`` instance.
     ///
-    /// - Warning: Internal use only.
+    /// - Warning: For internal compatibility only.
     @_spi(SplunkInternal)
     @available(*, deprecated, message: "Use track(initialLifecycle:) to supply explicit launch provenance.")
     func track(didBecomeActive: Date, didFinishLaunching: Date?, willEnterForeground: Date?) -> any AppStartModule
 
-    /// Supplies initial lifecycle evidence captured before agent installation.
+    /// Supplies lifecycle evidence captured before agent installation.
     ///
-    /// Hybrid integrations should capture the first lifecycle timestamps and launch
-    /// provenance as early as their existing native bootstrap permits. Hybrid adapters
-    /// own only this early capture; classification remains owned by the native AppStart
-    /// state machine and does not require a new core load-time constructor.
-    /// If an activation is interrupted by a background transition, the integration
-    /// must use ``AppStartLifecycleSnapshot/LaunchOrigin/foregroundResumed`` and
-    /// replace that foreground timestamp with the boundary paired with the supplied
-    /// activation.
-    /// Call this method exactly once, immediately after agent `install()` completes,
-    /// even if `didBecomeActive` has not occurred yet. The installed native observer
-    /// completes a partial foreground/active pair and clears it if the app backgrounds
-    /// before activation.
-    /// Every resolved cold, warm, or hot measurement is subject to AppStart's
-    /// five-second maximum duration guard. Longer measurements are suppressed.
-    /// Calls made before installation reach the non-operational proxy and are discarded.
-    /// Repeated handoffs are treated as conflicting evidence and suppressed.
+    /// Call this exactly once immediately after `install()`, including when the
+    /// snapshot is partial. The native observer completes a pending activation;
+    /// the native reducer owns classification, validation, and suppression.
+    /// Calls before installation are discarded, and repeated handoffs are suppressed.
+    /// Snapshots supplied after initial resolution are ignored.
+    /// Measurements longer than five seconds are suppressed.
     ///
     /// - Parameter snapshot: Initial lifecycle evidence captured by the integration.
     ///

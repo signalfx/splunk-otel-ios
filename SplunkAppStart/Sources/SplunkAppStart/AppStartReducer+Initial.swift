@@ -196,6 +196,11 @@ extension AppStartReducer {
         end: Date
     ) -> Result {
         guard let start = evidence.willEnterForeground else {
+            // A hybrid adapter may deliver its captured boundary after activation.
+            guard evidence.hybridHandoff == .received else {
+                return (.initial(evidence), nil)
+            }
+
             return suppressed(.missingForegroundBoundary)
         }
 
@@ -242,6 +247,7 @@ extension AppStartReducer {
             return false
         }
 
+        // Cross-field ordering is checked after the snapshot is merged.
         return [
             snapshot.didFinishLaunching,
             snapshot.willEnterForeground,
