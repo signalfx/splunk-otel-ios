@@ -23,6 +23,10 @@ extension AppStartReducerTests {
 
     // MARK: - Maximum duration
 
+    func testMaximumDurationIsTenSeconds() {
+        XCTAssertEqual(AppStartReducer.maximumAppStartDuration, 10)
+    }
+
     func testColdStartJustBelowMaximumDurationIsEmitted() {
         let processStart = Date(timeIntervalSinceReferenceDate: 19_000)
         let result = AppStartReducer.reduce(
@@ -134,6 +138,41 @@ extension AppStartReducerTests {
         )
     }
 
+    func testWarmStartAtMaximumDurationIsEmitted() {
+        let processStart = Date(timeIntervalSinceReferenceDate: 20_500)
+        let foreground = processStart.addingTimeInterval(13 * 60 * 60)
+        var state = durationInitialState(
+            processStart: processStart,
+            launchOrigin: .background
+        )
+
+        state =
+            AppStartReducer.reduce(
+                state: state,
+                event: .willEnterForeground(foreground)
+            )
+            .state
+        let result = AppStartReducer.reduce(
+            state: state,
+            event: .didBecomeActive(
+                foreground.addingTimeInterval(
+                    AppStartReducer.maximumAppStartDuration
+                )
+            )
+        )
+
+        guard case let .send(span) = result.action else {
+            XCTFail("Expected a warm AppStart at the maximum duration.")
+            return
+        }
+
+        XCTAssertEqual(span.type, .warm)
+        XCTAssertEqual(
+            span.end.timeIntervalSince(span.start),
+            AppStartReducer.maximumAppStartDuration
+        )
+    }
+
     func testWarmStartCannotExceedMaximumDuration() {
         let processStart = Date(timeIntervalSinceReferenceDate: 21_000)
         let foreground = processStart.addingTimeInterval(13 * 60 * 60)
@@ -167,6 +206,41 @@ extension AppStartReducerTests {
         }
     }
 
+    func testForegroundResumedStartAtMaximumDurationIsEmitted() {
+        let processStart = Date(timeIntervalSinceReferenceDate: 21_250)
+        let foreground = processStart.addingTimeInterval(13 * 60 * 60)
+        var state = durationInitialState(
+            processStart: processStart,
+            launchOrigin: .foregroundResumed
+        )
+
+        state =
+            AppStartReducer.reduce(
+                state: state,
+                event: .willEnterForeground(foreground)
+            )
+            .state
+        let result = AppStartReducer.reduce(
+            state: state,
+            event: .didBecomeActive(
+                foreground.addingTimeInterval(
+                    AppStartReducer.maximumAppStartDuration
+                )
+            )
+        )
+
+        guard case let .send(span) = result.action else {
+            XCTFail("Expected a resumed AppStart at the maximum duration.")
+            return
+        }
+
+        XCTAssertEqual(span.type, .warm)
+        XCTAssertEqual(
+            span.end.timeIntervalSince(span.start),
+            AppStartReducer.maximumAppStartDuration
+        )
+    }
+
     func testForegroundResumedStartCannotExceedMaximumDuration() {
         let processStart = Date(timeIntervalSinceReferenceDate: 21_500)
         let foreground = processStart.addingTimeInterval(13 * 60 * 60)
@@ -198,6 +272,34 @@ extension AppStartReducerTests {
             XCTFail("Expected an overlong resumed AppStart to be suppressed.")
             return
         }
+    }
+
+    func testHotStartAtMaximumDurationIsEmitted() {
+        let foreground = Date(timeIntervalSinceReferenceDate: 21_750)
+        let foregrounding = AppStartReducer.reduce(
+            state: .background(.emitted),
+            event: .willEnterForeground(foreground)
+        )
+        let result = AppStartReducer.reduce(
+            state: foregrounding.state,
+            event: .didBecomeActive(
+                foreground.addingTimeInterval(
+                    AppStartReducer.maximumAppStartDuration
+                )
+            )
+        )
+
+        guard case let .send(span) = result.action else {
+            XCTFail("Expected a hot AppStart at the maximum duration.")
+            return
+        }
+
+        XCTAssertEqual(result.state, .active(.emitted))
+        XCTAssertEqual(span.type, .hot)
+        XCTAssertEqual(
+            span.end.timeIntervalSince(span.start),
+            AppStartReducer.maximumAppStartDuration
+        )
     }
 
     func testHotStartCannotExceedMaximumDuration() {

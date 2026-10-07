@@ -47,7 +47,7 @@ public protocol AppStartModule {
     /// the native reducer owns classification, validation, and suppression.
     /// Calls before installation are discarded, and repeated handoffs are suppressed.
     /// Snapshots supplied after initial resolution are ignored.
-    /// Measurements longer than five seconds are suppressed.
+    /// Measurements longer than ten seconds are suppressed.
     ///
     /// - Parameter snapshot: Initial lifecycle evidence captured by the integration.
     ///

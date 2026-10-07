@@ -41,7 +41,7 @@ enum AppStartReducer {
     /// Launch provenance determines the span boundary. This limit is a final
     /// defense against corrupt or incomplete lifecycle evidence producing an
     /// implausibly long measurement.
-    static let maximumAppStartDuration: TimeInterval = 5
+    static let maximumAppStartDuration: TimeInterval = 10
 
     // MARK: - State
 

@@ -41,7 +41,7 @@ import Foundation
 /// A pre-install handoff is discarded. If installation occurs between
 /// `willEnterForeground` and `didBecomeActive`, the native observer completes the pending
 /// pair. If the app backgrounds first, that pending boundary is discarded.
-/// Before emission, the iOS AppStart reducer applies the same five-second maximum to the
+/// Before emission, the iOS AppStart reducer applies the same ten-second maximum to the
 /// final cold, warm, or hot span boundary. A longer measurement is suppressed rather
 /// than clamped or emitted with an implausible duration.
 public struct AppStartLifecycleSnapshot {
