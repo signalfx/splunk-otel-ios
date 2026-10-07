@@ -24,6 +24,7 @@ class DefaultModulesManager: AgentModulesManager {
     // MARK: - Private
 
     private var modulesPool: AgentModulesPool.Type
+    private var prepareModuleForInstallation: ((any Module) -> Void)?
     private var modulesDataConsumer: ((any ModuleEventMetadata, any ModuleEventData) -> Void)?
 
     private var initializationTimes: [String: Date] = [:]
@@ -45,6 +46,36 @@ class DefaultModulesManager: AgentModulesManager {
     ) {
 
         modulesPool = pool
+        prepareModuleForInstallation = nil
+
+        setUp(
+            rawConfiguration: rawConfiguration,
+            moduleConfigurations: moduleConfigurations
+        )
+    }
+
+    init(
+        rawConfiguration: Data?,
+        moduleConfigurations: [Any]?,
+        for pool: AgentModulesPool.Type = DefaultModulesPool.self,
+        prepareModuleForInstallation: @escaping (any Module) -> Void
+    ) {
+        modulesPool = pool
+        self.prepareModuleForInstallation = prepareModuleForInstallation
+
+        setUp(
+            rawConfiguration: rawConfiguration,
+            moduleConfigurations: moduleConfigurations
+        )
+    }
+
+    private func setUp(
+        rawConfiguration: Data?,
+        moduleConfigurations: [Any]?
+    ) {
+        // The preparation hook is needed only while connecting the initial pool.
+        // Do not retain its captured dependencies for the manager's lifetime.
+        defer { prepareModuleForInstallation = nil }
 
         // Initializes all known modules
         let agentModules: [any Module] = modulesPool.default.map { moduleType in
@@ -174,6 +205,10 @@ class DefaultModulesManager: AgentModulesManager {
 
         // Add module instance into managed modules
         modules.append(module)
+
+        // Wire dependencies that must exist before module installation can
+        // activate instrumentation.
+        prepareModuleForInstallation?(module)
 
         // Install and configure module for this agent
         module.install(with: configuration, remoteConfiguration: remoteConfiguration)

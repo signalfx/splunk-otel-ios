@@ -60,11 +60,13 @@ extension SplunkRum {
 
     /// Perform specific pre-defined customizations for some modules.
     func customizeModules() {
+        // AppStart is already wired and observing from module installation.
+        // Expose its operational proxy before customizing the remaining modules.
+        customizeAppStart()
         customizeCrashReports()
         customizeSessionReplay()
         customizeNavigation()
         customizeNetwork()
-        customizeAppStart()
         customizeAppState()
         customizeNetworkMonitor()
         customizeCustomTracking()
@@ -261,8 +263,6 @@ extension SplunkRum {
     /// Configure App start module with shared state and a public api proxy.
     private func customizeAppStart() {
         if let appStartModule = modulesManager?.module(ofType: SplunkAppStart.AppStart.self) {
-            appStartModule.sharedState = sharedState
-
             // Initialize proxy API for this module
             appStartProxy = AppStart(for: appStartModule)
         }
