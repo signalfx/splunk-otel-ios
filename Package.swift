@@ -192,7 +192,8 @@ func generateMainTargets() -> [Target] {
         .testTarget(
             name: "SplunkNetworkTests",
             dependencies: [
-                "SplunkNetwork"
+                "SplunkNetwork",
+                "SplunkOpenTelemetry"
             ],
             path: "SplunkNetwork/Tests",
             plugins: lintTargetPlugins()
