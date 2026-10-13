@@ -92,7 +92,7 @@ let project = Project(
             destinations: [.iPhone, .iPad],
             product: .app,
             bundleId: "com.splunk.rum.xcframework-smoke-test",
-            deploymentTargets: .iOS("14.0"),
+            deploymentTargets: .iOS("15.0"),
             sources: ["Sources/**"],
             dependencies: allFrameworks.map { name in
                 .xcframework(path: "\(xcfwDir)/\(name).xcframework")

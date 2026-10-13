@@ -15,6 +15,7 @@ PACKAGE_SWIFT="${REPO_ROOT}/Package.swift"
 AGENT_PROJECT="${TOOLS_ROOT}/Project.swift"
 OTEL_PROJECT="${TOOLS_ROOT}/otel/Project.swift"
 SMOKE_PROJECT="${TOOLS_ROOT}/smoke-test/Project.swift"
+SPIKE_PROJECT="${TOOLS_ROOT}/spike-test/Project.swift"
 DEPENDENCY_MANIFEST_SCRIPT="${TOOLS_ROOT}/scripts/generate-dependency-manifest.sh"
 AGENT_BUILD_SCRIPT="${TOOLS_ROOT}/scripts/build-xcframeworks.sh"
 OTEL_BUILD_SCRIPT="${TOOLS_ROOT}/scripts/build-otel-xcframeworks.sh"
@@ -115,7 +116,7 @@ check_splunk_targets() {
 check_deployment_targets() {
     log "Checking deployment target sync"
 
-    require_grep '\.iOS\(\.v13\)' "${PACKAGE_SWIFT}" "Package.swift iOS 13"
+    require_grep '\.iOS\(\.v15\)' "${PACKAGE_SWIFT}" "Package.swift iOS 15"
     require_grep '\.tvOS\(\.v15\)' "${PACKAGE_SWIFT}" "Package.swift tvOS 15"
     require_grep '\.visionOS\(\.v1\)' "${PACKAGE_SWIFT}" "Package.swift visionOS 1"
     require_grep '\.macCatalyst\(\.v15\)' "${PACKAGE_SWIFT}" "Package.swift macCatalyst 15"
@@ -124,13 +125,15 @@ check_deployment_targets() {
         local label
         label="${project#${TOOLS_ROOT}/}"
 
-        require_grep '"IPHONEOS_DEPLOYMENT_TARGET":[[:space:]]*"13\.0"' "${project}" "${label} iOS 13.0"
+        require_grep '"IPHONEOS_DEPLOYMENT_TARGET":[[:space:]]*"15\.0"' "${project}" "${label} iOS 15.0"
         require_grep '"TVOS_DEPLOYMENT_TARGET":[[:space:]]*"15\.0"' "${project}" "${label} tvOS 15.0"
         require_grep '"MACOSX_DEPLOYMENT_TARGET":[[:space:]]*"12\.0"' "${project}" "${label} macCatalyst 15 / macOS 12.0"
     done
 
     require_grep '"XROS_DEPLOYMENT_TARGET":[[:space:]]*"1\.0"' "${AGENT_PROJECT}" "Project.swift visionOS 1.0"
     require_grep '"XROS_DEPLOYMENT_TARGET":[[:space:]]*"1\.0"' "${OTEL_PROJECT}" "otel/Project.swift visionOS 1.0"
+    require_grep 'deploymentTargets:[[:space:]]*\.iOS\("15\.0"\)' "${SMOKE_PROJECT}" "smoke-test iOS 15.0"
+    require_grep '"IPHONEOS_DEPLOYMENT_TARGET":[[:space:]]*"15\.0"' "${SPIKE_PROJECT}" "spike-test iOS 15.0"
 
     for script in "${AGENT_BUILD_SCRIPT}" "${OTEL_BUILD_SCRIPT}"; do
         local label

@@ -80,7 +80,7 @@ let sharedSettings: SettingsDictionary = [
     "OTHER_SWIFT_FLAGS": "-package-name SplunkAgent",
 
     // Minimum deployment targets matching Package.swift.
-    "IPHONEOS_DEPLOYMENT_TARGET": "13.0",
+    "IPHONEOS_DEPLOYMENT_TARGET": "15.0",
     "TVOS_DEPLOYMENT_TARGET": "15.0",
     "XROS_DEPLOYMENT_TARGET": "1.0",
     "MACOSX_DEPLOYMENT_TARGET": "12.0",
