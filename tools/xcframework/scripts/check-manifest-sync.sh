@@ -148,6 +148,7 @@ check_deployment_targets() {
     require_grep '\.visionOS\(\.v1\)' "${PACKAGE_SWIFT}" "Package.swift visionOS 1"
     require_grep '\.macCatalyst\(\.v15\)' "${PACKAGE_SWIFT}" "Package.swift macCatalyst 15"
     require_grep '\.iOS\(\.v15\)' "${CRASH_REPORTER_PACKAGE}" "SplunkCrashReporter Package.swift iOS 15"
+    require_grep '\.tvOS\(\.v15\)' "${CRASH_REPORTER_PACKAGE}" "SplunkCrashReporter Package.swift tvOS 15"
 
     for project in "${AGENT_PROJECT}" "${OTEL_PROJECT}"; do
         local label
