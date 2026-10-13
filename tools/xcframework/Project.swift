@@ -91,6 +91,8 @@ let sharedSettings: SettingsDictionary = [
 
 /// Build settings for the vendored, namespaced crash reporter implementation.
 let crashReporterSettings: SettingsDictionary = [
+    // SplunkCrashReporter follows the agent's iOS/iPadOS 15 baseline.
+    "IPHONEOS_DEPLOYMENT_TARGET": "15.0",
     "MACH_O_TYPE": "mh_dylib",
     "SKIP_INSTALL": "NO",
     "DEFINES_MODULE": "YES",
