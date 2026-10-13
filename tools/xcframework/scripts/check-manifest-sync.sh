@@ -16,6 +16,7 @@ CRASH_REPORTER_PACKAGE="${REPO_ROOT}/SplunkCrashReporter/Package.swift"
 AGENT_PROJECT="${TOOLS_ROOT}/Project.swift"
 OTEL_PROJECT="${TOOLS_ROOT}/otel/Project.swift"
 SMOKE_PROJECT="${TOOLS_ROOT}/smoke-test/Project.swift"
+SPIKE_PROJECT="${TOOLS_ROOT}/spike-test/Project.swift"
 DEPENDENCY_MANIFEST_SCRIPT="${TOOLS_ROOT}/scripts/generate-dependency-manifest.sh"
 AGENT_BUILD_SCRIPT="${TOOLS_ROOT}/scripts/build-xcframeworks.sh"
 OTEL_BUILD_SCRIPT="${TOOLS_ROOT}/scripts/build-otel-xcframeworks.sh"
@@ -161,6 +162,9 @@ check_deployment_targets() {
     require_grep_in_settings "sharedSettings" '"XROS_DEPLOYMENT_TARGET": "1.0"' "${AGENT_PROJECT}" "Project.swift sharedSettings visionOS 1.0"
     require_grep_in_settings "crashReporterSettings" '"IPHONEOS_DEPLOYMENT_TARGET": "15.0"' "${AGENT_PROJECT}" "Project.swift crashReporterSettings iOS 15.0"
     require_grep_in_settings "sharedSettings" '"XROS_DEPLOYMENT_TARGET": "1.0"' "${OTEL_PROJECT}" "otel/Project.swift sharedSettings visionOS 1.0"
+    
+    require_grep 'deploymentTargets:[[:space:]]*\.iOS\("15\.0"\)' "${SMOKE_PROJECT}" "smoke-test iOS 15.0"
+    require_grep '"IPHONEOS_DEPLOYMENT_TARGET":[[:space:]]*"15\.0"' "${SPIKE_PROJECT}" "spike-test iOS 15.0"
 
     for script in "${AGENT_BUILD_SCRIPT}" "${OTEL_BUILD_SCRIPT}"; do
         local label
