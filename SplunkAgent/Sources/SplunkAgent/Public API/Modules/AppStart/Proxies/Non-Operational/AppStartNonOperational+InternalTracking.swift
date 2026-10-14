@@ -22,12 +22,22 @@ extension AppStartNonOperational {
     // MARK: - Manual detection
 
     @discardableResult
+    @available(*, deprecated, message: "Use track(initialLifecycle:) to supply explicit launch provenance.")
     func track(didBecomeActive: Date, didFinishLaunching: Date?, willEnterForeground: Date?) -> any AppStartModule {
         logAccess(toApi: #function)
         // Intentionally unused
         _ = didBecomeActive
         _ = didFinishLaunching
         _ = willEnterForeground
+
+        return self
+    }
+
+    @discardableResult
+    func track(initialLifecycle snapshot: AppStartLifecycleSnapshot) -> any AppStartModule {
+        logAccess(toApi: #function)
+        // Intentionally unused
+        _ = snapshot
 
         return self
     }

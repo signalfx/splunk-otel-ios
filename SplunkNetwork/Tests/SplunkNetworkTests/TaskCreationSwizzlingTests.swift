@@ -319,8 +319,11 @@ final class TaskCreationSwizzlingTests: XCTestCase {
         XCTAssertEqual(spans.count, 1)
 
         let span = try XCTUnwrap(spans.first)
-        let resumeEvent = span.events.first { $0.name == "http.request.started" }
-        XCTAssertNotNil(resumeEvent, "Creation-instrumented span should contain an http.request.started event recorded at resume")
+        let resumeEvent = span.events.first { $0.name == NetworkInstrumentationConstants.requestStartedEventName }
+        XCTAssertNotNil(
+            resumeEvent,
+            "Creation-instrumented span should contain an http.request.started event recorded at resume"
+        )
         if let resumeEvent {
             XCTAssertTrue(resumeEvent.timestamp >= span.startTime, "Resume event should be at or after span start (creation) time")
         }

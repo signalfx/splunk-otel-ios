@@ -15,18 +15,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import CrashReporter
 import Foundation
+internal import SplunkCrashReporter
 
 // Support for Threads
 
 extension CrashReports {
 
-    func allThreadsFromCrashReport(report: PLCrashReport) -> [[CrashReportKeys: Any]] {
+    func allThreadsFromCrashReport(report: SPLKPLCrashReport) -> [[CrashReportKeys: Any]] {
         var threads: [[CrashReportKeys: Any]] = []
 
         for thread in report.threads {
-            if let thread = thread as? PLCrashReportThreadInfo {
+            if let thread = thread as? SPLKPLCrashReportThreadInfo {
                 let thr = oneThreadFromCrashReport(thread: thread, report: report)
 
                 threads.append(thr)
@@ -36,8 +36,8 @@ extension CrashReports {
     }
 
     private func oneThreadFromCrashReport(
-        thread: PLCrashReportThreadInfo,
-        report: PLCrashReport
+        thread: SPLKPLCrashReportThreadInfo,
+        report: SPLKPLCrashReport
     ) -> [CrashReportKeys: Any] {
 
         var oneThread: [CrashReportKeys: Any] = [:]
@@ -46,12 +46,12 @@ extension CrashReports {
         return oneThread
     }
 
-    private func convertStackFrames(frames: [Any], report: PLCrashReport) -> [Any] {
+    private func convertStackFrames(frames: [Any], report: SPLKPLCrashReport) -> [Any] {
 
         var stackFrames: [Any] = []
         var isFirstTime = true
 
-        guard let frames = frames as? [PLCrashReportStackFrameInfo] else {
+        guard let frames = frames as? [SPLKPLCrashReportStackFrameInfo] else {
             logger.log(level: .error) {
                 "CrashReporter received incorrect stackFrame type."
             }
@@ -116,7 +116,7 @@ extension CrashReports {
             var threadDictionary: [CrashReportKeys: Any] = [:]
             threadDictionary[.stackFrames] = thread[CrashReportKeys.stackFrames]
 
-            if let info = thread[CrashReportKeys.details] as? PLCrashReportThreadInfo {
+            if let info = thread[CrashReportKeys.details] as? SPLKPLCrashReportThreadInfo {
                 threadDictionary[.threadNumber] = info.threadNumber
                 threadDictionary[.isCrashedThread] = info.crashed
             }

@@ -7,6 +7,24 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.4.3] - 2026-10-14
+
+### Changed
+
+* Raised the minimum supported iOS and iPadOS version from 13 to 15. Applications targeting iOS or iPadOS 13 and 14 are no longer supported.
+* Replaced the external PLCrashReporter package dependency with the SDK-owned, symbol-prefixed `SplunkCrashReporter` implementation.
+* Network span start times now use the `http.request.started` timestamp recorded when the task is resumed.
+* Network spans for requests that are never resumed are suppressed.
+* Downloads and uploads use a 30-minute telemetry watchdog; ordinary requests use a 5-minute watchdog without cancelling the application task.
+
+### Fixed
+
+* Fixed network spans remaining open when URLSession does not deliver a terminal callback by ending them at the instrumentation deadline.
+
+### Fixed
+
+* Fixed AppStart classification for delayed and background-launched hybrid applications. AppStart now uses the captured `didBecomeActive` timestamp, requires a one-shot lifecycle snapshot with explicit launch and activation provenance for ambiguous late handoffs, excludes background residence from warm-start duration, and suppresses any resolved cold, warm, or hot span longer than ten seconds. The legacy timestamp-only hybrid handoff is deprecated. DEMRUM-6128
+
 ## [2.4.2] - 2026-09-09
 
 ### Changed
@@ -22,6 +40,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Fixed
 
 * Fixed Server-Timing `traceparent` parsing to support bitmask trace flags, including the W3C random trace ID flag.
+* Fixed Server-Timing `traceparent` parsing to reject all-zero trace IDs and span IDs, which are invalid according to the OpenTelemetry trace context requirements.
 * Fixed URLSession network span finalization races that could drop Server-Timing links and response attributes, duplicate attribute processing, or end spans on nonterminal task states.
 * Fixed a crash during `NavigationSplitView` multiwindow resizing on iPad when automated navigation tracking is enabled. Fixes issue #711.
 

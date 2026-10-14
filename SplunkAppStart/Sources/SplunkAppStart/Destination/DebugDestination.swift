@@ -27,6 +27,9 @@ class DebugDestination: AppStartDestination {
     /// Stored app start.
     var storedAppStart: AppStartSpanData?
 
+    /// All stored app starts.
+    var storedAppStarts: [AppStartSpanData] = []
+
     /// Stored initialize.
     var storedInitialize: AgentInitializeSpanData?
 
@@ -38,6 +41,7 @@ class DebugDestination: AppStartDestination {
 
     func send(appStart: AppStartSpanData, agentInitialize: AgentInitializeSpanData?, sharedState _: (any AgentSharedState)?) {
         storedAppStart = appStart
+        storedAppStarts.append(appStart)
         storedInitialize = agentInitialize
 
         let appStartDuration = appStart.end.timeIntervalSince(appStart.start)

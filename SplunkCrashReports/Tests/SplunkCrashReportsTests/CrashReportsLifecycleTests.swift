@@ -49,6 +49,23 @@ final class CrashReportsLifecycleTests: XCTestCase {
         _ = crashReports.initializeCrashReporter()
     }
 
+    func testInitializePreservesExistingExceptionHandler() {
+        let previousHandler = NSGetUncaughtExceptionHandler()
+        NSSetUncaughtExceptionHandler(testUncaughtExceptionHandler)
+
+        defer {
+            NSSetUncaughtExceptionHandler(previousHandler)
+        }
+
+        let crashReports = CrashReports()
+        crashReports.configureCrashReporter()
+
+        let result = crashReports.initializeCrashReporter()
+
+        XCTAssertFalse(result)
+        XCTAssertNotNil(NSGetUncaughtExceptionHandler())
+    }
+
     // MARK: - crashReportUpdateScreenName
 
     func testUpdateScreenNameDoesNotThrow() {
@@ -109,6 +126,8 @@ final class CrashReportsLifecycleTests: XCTestCase {
         XCTAssertNil(crashReports.sharedState)
     }
 }
+
+private func testUncaughtExceptionHandler(_: NSException) {}
 
 
 // MARK: - Test Support
