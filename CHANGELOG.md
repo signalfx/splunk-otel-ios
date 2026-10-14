@@ -7,6 +7,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.4.3] - 2026-10-14
+
 ### Changed
 
 * Raised the minimum supported iOS and iPadOS version from 13 to 15. Applications targeting iOS or iPadOS 13 and 14 are no longer supported.
