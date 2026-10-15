@@ -100,6 +100,11 @@ cat > "${MANIFEST_PATH}" << JSONEOF
         "CiscoSwizzling.xcframework",
         "CiscoInteractions.xcframework",
         "CiscoDiskStorage.xcframework",
+        "CiscoVideoEncoder.xcframework",
+        "CiscoScreenshot.xcframework",
+        "CiscoWireframe.xcframework",
+        "CiscoDataExporter.xcframework",
+        "CiscoSnapshotManager.xcframework",
         "CiscoSessionReplay.xcframework",
         "CiscoInstanceManager.xcframework",
         "CiscoRuntimeCache.xcframework"

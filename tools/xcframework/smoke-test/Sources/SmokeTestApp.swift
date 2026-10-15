@@ -11,6 +11,11 @@
 // Each import below proves the corresponding xcframework is found by the
 // linker and the Swift module interface resolves correctly.
 
+import CiscoDataExporter
+import CiscoScreenshot
+import CiscoSnapshotManager
+import CiscoVideoEncoder
+import CiscoWireframe
 import CiscoDiskStorage
 import CiscoEncryption
 import CiscoInstanceManager

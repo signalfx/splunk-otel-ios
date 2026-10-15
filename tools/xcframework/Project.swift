@@ -184,10 +184,11 @@ func ciscoInteractionsDependencies() -> [TargetDependency] {
     ]
 }
 
-/// CiscoRuntimeCache's swiftinterface imports CiscoLogger.
+/// CiscoRuntimeCache's swiftinterface imports CiscoCommon and CiscoLogger.
 func ciscoRuntimeCacheDependencies() -> [TargetDependency] {
     [
         dep("CiscoRuntimeCache"),
+        dep("CiscoCommon"),
         dep("CiscoLogger")
     ]
 }
@@ -197,13 +198,18 @@ func ciscoSessionReplayDependencies() -> [TargetDependency] {
     [
         dep("CiscoSessionReplay"),
         dep("CiscoCommon"),
+        dep("CiscoDataExporter"),
         dep("CiscoDiskStorage"),
         dep("CiscoEncryption"),
         dep("CiscoInteractions"),
         dep("CiscoLogger"),
+        dep("CiscoRuntimeCache"),
+        dep("CiscoScreenshot"),
+        dep("CiscoSnapshotManager"),
         dep("CiscoSwizzling"),
-        dep("CiscoInstanceManager"),
-        dep("CiscoRuntimeCache")
+        dep("CiscoVideoEncoder"),
+        dep("CiscoWireframe"),
+        dep("CiscoInstanceManager")
     ]
 }
 
