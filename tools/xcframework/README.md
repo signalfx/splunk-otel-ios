@@ -26,7 +26,7 @@ The `make build` target requires `SESSION_REPLAY_LOCAL_PATH` and runs four stage
 | Stage | Command | What it does |
 |-------|---------|-------------|
 | 1 | `make build-otel` | Clones `opentelemetry-swift-core`, generates a Tuist project, and archives `OpenTelemetryApi` + `OpenTelemetrySdk` for all 7 platform slices, or 2 slices with `IOS_ONLY=true` |
-| 2 | `make build-cisco` | Builds the 9 Cisco Session Replay frameworks as **dynamic** xcframeworks from the local Session Replay checkout |
+| 2 | `make build-cisco` | Builds all 14 Cisco Session Replay frameworks as **dynamic** xcframeworks from the local Session Replay checkout |
 | 3 | `make populate-deps` | Stages OTel and already-built dynamic Cisco xcframeworks into `dependencies/` |
 | 4 | `make build-agent` | Generates the main Tuist workspace and builds all Splunk module xcframeworks, including the vendored `SplunkCrashReporter` |
 
@@ -45,6 +45,11 @@ output/xcframeworks/
 ├── CiscoSwizzling.xcframework
 ├── CiscoInteractions.xcframework
 ├── CiscoDiskStorage.xcframework
+├── CiscoVideoEncoder.xcframework
+├── CiscoScreenshot.xcframework
+├── CiscoWireframe.xcframework
+├── CiscoDataExporter.xcframework
+├── CiscoSnapshotManager.xcframework
 ├── CiscoSessionReplay.xcframework
 ├── CiscoInstanceManager.xcframework
 ├── CiscoRuntimeCache.xcframework

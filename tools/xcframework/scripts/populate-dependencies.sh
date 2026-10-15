@@ -47,7 +47,22 @@ DOWNLOAD_CISCO=false
 
 # Expected xcframeworks
 OTEL_FRAMEWORKS=("OpenTelemetryApi" "OpenTelemetrySdk")
-CISCO_FRAMEWORKS=("CiscoCommon" "CiscoLogger" "CiscoEncryption" "CiscoSwizzling" "CiscoInteractions" "CiscoDiskStorage" "CiscoSessionReplay" "CiscoInstanceManager" "CiscoRuntimeCache")
+CISCO_FRAMEWORKS=(
+    "CiscoCommon"
+    "CiscoLogger"
+    "CiscoEncryption"
+    "CiscoSwizzling"
+    "CiscoInteractions"
+    "CiscoDiskStorage"
+    "CiscoVideoEncoder"
+    "CiscoScreenshot"
+    "CiscoWireframe"
+    "CiscoDataExporter"
+    "CiscoSnapshotManager"
+    "CiscoSessionReplay"
+    "CiscoInstanceManager"
+    "CiscoRuntimeCache"
+)
 
 
 # ---------------------------------------------------------------------------

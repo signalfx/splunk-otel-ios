@@ -7,6 +7,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+* Session Replay now captures text content in wireframes for SwiftUI applications.
+
+### Changed
+
+* Updated Cisco Session Replay binaries to 2.0.0.300.
+
 ## [2.4.3] - 2026-10-14
 
 ### Changed
