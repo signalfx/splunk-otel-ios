@@ -259,7 +259,7 @@ public class OTLPBackgroundHTTPBaseExporter {
                 continue
             }
 
-            if let existingTaskDescription = allTaskDescriptions.first(where: { $0.id == requestId }) {
+            if allTaskDescriptions.contains(where: { $0.id == requestId }) {
                 if cancelledTaskIds.contains(requestId) {
                     let taskDescription = RequestDescriptor(
                         id: requestId,
@@ -326,11 +326,9 @@ public class OTLPBackgroundHTTPBaseExporter {
 extension OTLPBackgroundHTTPBaseExporter {
     /// Flushes any data stored in pending storage by moving it to active storage and scheduling uploads.
     private func flushPendingData(for activationRevision: UInt64) {
-        guard endpointState(for: activationRevision) != nil else {
-            return
-        }
-
-        guard let pendingFiles = try? diskStorage.list(forKey: getPendingStorageKey()) else {
+        guard endpointState(for: activationRevision) != nil,
+            let pendingFiles = try? diskStorage.list(forKey: getPendingStorageKey())
+        else {
             return
         }
 

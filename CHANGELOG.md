@@ -9,6 +9,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+* Added Swift and Objective-C runtime controls under `sessionReplay.preferences.interactionCapture` for enabling or disabling keyboard, touch, gesture, focus, and rage tap interactions in Session Replay.
 * Session Replay now captures text content in wireframes for SwiftUI applications.
 
 ### Changed
@@ -32,6 +33,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Fixed
 
 * Fixed AppStart classification for delayed and background-launched hybrid applications. AppStart now uses the captured `didBecomeActive` timestamp, requires a one-shot lifecycle snapshot with explicit launch and activation provenance for ambiguous late handoffs, excludes background residence from warm-start duration, and suppresses any resolved cold, warm, or hot span longer than ten seconds. The legacy timestamp-only hybrid handoff is deprecated. DEMRUM-6128
+
 
 ## [2.4.2] - 2026-09-09
 

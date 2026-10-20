@@ -215,8 +215,7 @@ public final class Navigation: Sendable {
         case .navigationControllerDidShow:
             await processNavigationControllerDidShow(event: event)
 
-
-        default:
+        @unknown default:
             break
         }
     }

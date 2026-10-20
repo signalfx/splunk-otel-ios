@@ -36,4 +36,14 @@ limitations under the License.
     return agent;
 }
 
++ (SPLKAgent *)buildWithOperationalSessionReplayForTestNamed:(NSString *)testName {
+    SPLKAgentConfiguration *configuration = [STSAgentTesting buildTestConfiguration];
+
+    SPLKAgent *agent = [STSAgentTesting buildTestAgentWith:configuration
+                                             sessionReplay:YES
+                                                 testNamed:testName];
+
+    return agent;
+}
+
 @end

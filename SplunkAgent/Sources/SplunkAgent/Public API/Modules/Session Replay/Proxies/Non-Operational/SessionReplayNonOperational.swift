@@ -24,9 +24,9 @@ internal import SplunkCommon
 /// but we still need to keep the API available to the user.
 final class SessionReplayNonOperational: SessionReplayModule {
 
-    // MARK: - Private
+    // MARK: - Internal
 
-    private let logger: DefaultLogAgent
+    let logger: DefaultLogAgent
 
 
     // MARK: - Sensitivity

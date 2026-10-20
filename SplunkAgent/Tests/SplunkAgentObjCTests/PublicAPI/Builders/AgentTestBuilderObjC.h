@@ -24,5 +24,6 @@ limitations under the License.
 
 + (SPLKAgent *)buildDefault;
 + (SPLKAgent *)buildDefaultForTestNamed:(NSString *)testName;
++ (SPLKAgent *)buildWithOperationalSessionReplayForTestNamed:(NSString *)testName;
 
 @end

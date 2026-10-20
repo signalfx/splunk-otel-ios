@@ -61,9 +61,38 @@ public class AgentTestingObjC: NSObject {
     ///
     /// - Returns: A newly initialized agent instance.
     public static func buildTestAgent(with configuration: AgentConfigurationObjC?, testNamed named: String? = nil) -> SplunkRumObjC {
+        buildTestAgent(
+            with: configuration,
+            sessionReplay: false,
+            testNamed: named
+        )
+    }
+
+    /// Private method for creating test instances of the agent with optional Session Replay support.
+    ///
+    /// **Warning:** This method is not meant for client applications and may produce
+    ///            unexpected results, which are not supported by the product.
+    ///
+    /// - Parameters:
+    ///   - configuration: A `SPLKAgentConfiguration` for the initial SDK setup.
+    ///   - sessionReplay: Whether an operational Session Replay proxy should be linked with the agent.
+    ///   - named: A `NSString` with the name of the test being performed.
+    ///
+    /// - Returns: A newly initialized agent instance.
+    @objc(buildTestAgentWith:sessionReplay:testNamed:)
+    public static func buildTestAgent(
+        with configuration: AgentConfigurationObjC?,
+        sessionReplay: Bool,
+        testNamed named: String? = nil
+    ) -> SplunkRumObjC {
         let configuration = configuration ?? buildTestConfiguration()
+        let sessionReplayModule = sessionReplay ? SplunkRum.buildTestSessionReplay() : nil
+
+        sessionReplayModule?.preferences.interactionCapture.enableAll()
+
         let agent = SplunkRum.buildTestInstance(
             with: configuration.agentConfiguration(),
+            sessionReplay: sessionReplayModule,
             testNamed: named
         )
 

@@ -27,22 +27,26 @@ extension SplunkSessionReplayPreferences {
     // MARK: - Initialization conversion
 
     convenience init(preferences: SessionReplayModulePreferences) {
-        guard let srRenderingMode = preferences.renderingMode?.srRenderingMode else {
-            self.init(renderingMode: .default)
-            return
-        }
+        let renderingMode = preferences.renderingMode?.srRenderingMode ?? .default
+        let interactionCapture = SplunkSessionReplayInteractionCapture(from: preferences.interactionCapture)
 
-        self.init(renderingMode: srRenderingMode)
+        self.init(
+            renderingMode: renderingMode,
+            interactionCapture: interactionCapture
+        )
     }
 }
 
-extension SessionReplayModulePreferences {
+extension SessionReplayPreferences {
 
     // MARK: - Initialization conversion
 
-    init(srPreferences: SplunkSessionReplayPreferences) {
+    convenience init(srPreferences: SplunkSessionReplayPreferences) {
         let renderingMode = RenderingMode(with: srPreferences.renderingMode)
+        let interactionCapture = SessionReplayInteractionCapture(from: srPreferences.interactionCapture)
 
-        self.init(renderingMode: renderingMode)
+        self.init(interactionCapture: interactionCapture)
+
+        self.renderingMode = renderingMode
     }
 }
