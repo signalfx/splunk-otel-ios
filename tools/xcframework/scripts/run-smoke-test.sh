@@ -52,8 +52,20 @@ REQUIRED_FRAMEWORKS=(
     "OpenTelemetryApi"
     "OpenTelemetrySdk"
     "SplunkCrashReporter"
+    "CiscoCommon"
     "CiscoLogger"
+    "CiscoEncryption"
+    "CiscoSwizzling"
+    "CiscoInteractions"
+    "CiscoDiskStorage"
+    "CiscoVideoEncoder"
+    "CiscoScreenshot"
+    "CiscoWireframe"
+    "CiscoDataExporter"
+    "CiscoSnapshotManager"
     "CiscoSessionReplay"
+    "CiscoInstanceManager"
+    "CiscoRuntimeCache"
 )
 
 ALL_PRESENT=true

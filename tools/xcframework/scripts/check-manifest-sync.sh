@@ -35,6 +35,11 @@ EXPECTED_EXTERNAL_XCFRAMEWORKS=(
     "CiscoSessionReplay"
     "CiscoInstanceManager"
     "CiscoRuntimeCache"
+    "CiscoVideoEncoder"
+    "CiscoScreenshot"
+    "CiscoWireframe"
+    "CiscoDataExporter"
+    "CiscoSnapshotManager"
 )
 
 EXPECTED_DISTRIBUTION_FRAMEWORKS=(
@@ -50,6 +55,11 @@ EXPECTED_DISTRIBUTION_FRAMEWORKS=(
     "CiscoSessionReplay"
     "CiscoInstanceManager"
     "CiscoRuntimeCache"
+    "CiscoVideoEncoder"
+    "CiscoScreenshot"
+    "CiscoWireframe"
+    "CiscoDataExporter"
+    "CiscoSnapshotManager"
     "SplunkCommon"
     "SplunkNavigation"
     "SplunkNetwork"
@@ -180,6 +190,9 @@ check_external_dependencies() {
     log "Checking external xcframework dependencies"
 
     for framework in "${EXPECTED_EXTERNAL_XCFRAMEWORKS[@]}"; do
+        if [[ "${framework}" == Cisco* ]]; then
+            require_grep "name:[[:space:]]*\"${framework}\"" "${PACKAGE_SWIFT}" "Package.swift registry contains ${framework}"
+        fi
         require_grep "dep\\(\"${framework}\"" "${AGENT_PROJECT}" "Project.swift references ${framework}"
     done
 }
