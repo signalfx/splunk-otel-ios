@@ -61,6 +61,20 @@ is_vendor_signed_xcframework() {
     [[ "${name}" == Cisco*.xcframework ]]
 }
 
+is_static_xcframework() {
+    local name="$1"
+    local binary_count=0
+    local binary_path
+
+    while IFS= read -r binary_path; do
+        [[ -n "${binary_path}" ]] || continue
+        binary_count=$((binary_count + 1))
+        file "${binary_path}" 2>/dev/null | grep -Eqi 'archive' || return 1
+    done < <(find "${OUTPUT_DIR}/${name}" -path "*/${name%.xcframework}.framework/${name%.xcframework}" -type f)
+
+    [[ "${binary_count}" -gt 0 ]]
+}
+
 log "Signing xcframeworks with identity: ${SIGNING_IDENTITY}"
 if [[ "${SIGN_CISCO_FRAMEWORKS}" == "true" ]]; then
     log "Cisco signing: included"
@@ -75,6 +89,12 @@ FAILED_COUNT=0
 for xcfw in "${OUTPUT_DIR}"/*.xcframework; do
     [[ -d "${xcfw}" ]] || continue
     name="$(basename "${xcfw}")"
+
+    if is_static_xcframework "${name}"; then
+        echo "  Skipping ${name} (static framework does not require a code signature)"
+        ((SKIPPED_COUNT++))
+        continue
+    fi
 
     if [[ "${SIGN_CISCO_FRAMEWORKS}" != "true" ]] && is_vendor_signed_xcframework "${name}"; then
         echo "  Skipping ${name} (pre-signed external framework)"

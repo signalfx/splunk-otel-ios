@@ -5,7 +5,7 @@ name: Build XCFrameworks
 # read-only repository token.
 #
 # Architecture:
-#   Job 1 (build): Build OTel + static Session Replay + Agent modules → upload artifact
+#   Job 1 (build): Build OTel + static Session Replay + static Agent modules → upload artifact
 #   Job 2 (sign-and-release): Optional signing, validation, and packaging
 
 on:
@@ -41,9 +41,13 @@ jobs:
   build:
     name: Build XCFrameworks
     runs-on: macos-15
+    permissions:
+      contents: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v6
+        with:
+          persist-credentials: false
 
       - name: Select latest Xcode
         run: bash .github/actions/build-and-tests/scripts/select-xcode.sh

@@ -5,7 +5,7 @@ Build tooling for producing signed, multi-platform xcframeworks from the Splunk 
 ## Quick Start
 
 ```bash
-# Full build: OTel + static Cisco Session Replay + Agent modules
+# Full build: OTel + static Cisco Session Replay + static Agent modules
 export SESSION_REPLAY_LOCAL_PATH=/path/to/session-replay-repo
 make build
 
@@ -28,7 +28,7 @@ The `make build` target requires `SESSION_REPLAY_LOCAL_PATH` and runs four stage
 | 1 | `make build-otel` | Clones `opentelemetry-swift-core`, generates a Tuist project, and archives `OpenTelemetryApi` + `OpenTelemetrySdk` for all 7 platform slices, or 2 slices with `IOS_ONLY=true` |
 | 2 | `make build-cisco` | Builds all 14 Cisco Session Replay frameworks as **static-library** xcframeworks from the local Session Replay checkout |
 | 3 | `make populate-deps` | Stages OTel and already-built static Cisco xcframeworks into `dependencies/` |
-| 4 | `make build-agent` | Generates the main Tuist workspace and builds all Splunk module xcframeworks, including the vendored `SplunkCrashReporter` |
+| 4 | `make build-agent` | Generates the main Tuist workspace and builds all Splunk modules as static xcframeworks, plus the dynamic vendored `SplunkCrashReporter` |
 
 ### Output
 
@@ -76,7 +76,7 @@ output/xcframeworks/
 └── SplunkSessionReplayProxy.xcframework
 ```
 
-Cisco Session Replay xcframeworks are built from the private Session Replay source as static libraries. This permits hybrid consumers, including React Native apps using static framework linkage, to link the Agent distribution without embedding a second set of dynamic Cisco frameworks. `Package.swift` uses a separate registry of published static binaries; update that registry when upstream publishes the five new module artifacts and checksums.
+Cisco Session Replay and Splunk Agent module xcframeworks are built as static frameworks for hybrid consumers, including React Native apps using static framework linkage. Keeping the Agent modules static also ensures shared Cisco archives are linked into the final app once instead of being copied into multiple dynamic Agent frameworks. `SplunkCrashReporter` and OpenTelemetry remain dynamic frameworks. `Package.swift` uses a separate registry of published static Cisco binaries; update that registry when upstream publishes the five new module artifacts and checksums. The legacy `populate-dependencies.sh --download-cisco` option is disabled until that registry contains all 14 modules.
 
 ### Platform Matrix
 
@@ -108,7 +108,7 @@ Key variables in the Makefile:
 
 ## Release
 
-The build workflow checks out the private Session Replay repository, builds all required static Cisco modules and Agent xcframeworks, validates platform slices, and runs the consumer linkage smoke test. Configure the `SESSION_REPLAY_READ_TOKEN` repository secret with read access to `smartlook-ios-sdk-private`. Signed release packaging remains a local process while distribution certificates cannot be stored in GitHub secrets.
+The build workflow checks out the private Session Replay repository with read-only access, builds static Cisco and Agent modules, validates platform slices, and runs the consumer linkage smoke test. Configure the `SESSION_REPLAY_READ_TOKEN` repository secret with read access to `smartlook-ios-sdk-private`. Signed release packaging remains a local process while distribution certificates cannot be stored in GitHub secrets.
 
 ### How it works
 

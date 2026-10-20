@@ -363,7 +363,7 @@ validate_xcframework() {
 
         if [[ -f "${fw_binary}" ]]; then
             check_pass "Slice ${slice_name}: binary present"
-            if [[ "${name}" == Cisco* && "${CISCO_MACH_O_TYPE}" == "staticlib" ]]; then
+            if file "${fw_binary}" 2>/dev/null | grep -Eqi 'archive'; then
                 validate_static_binary "${fw_binary}" "${slice_name}"
             else
                 validate_dynamic_binary "${fw_binary}" "${slice_name}"
@@ -404,7 +404,7 @@ validate_xcframework() {
     fi
 
     if [[ "${RELEASE}" == "true" ]]; then
-        if [[ "${name}" == Cisco* && "${CISCO_MACH_O_TYPE}" == "staticlib" ]]; then
+        if file "${fw_binary}" 2>/dev/null | grep -Eqi 'archive'; then
             check_pass "Static library does not require a framework code signature"
         elif codesign --verify --deep --strict "${xcfw_path}" 2>/dev/null; then
             check_pass "Code signature valid"
