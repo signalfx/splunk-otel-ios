@@ -202,7 +202,7 @@ For an iOS-only manual build, pass `IOS_ONLY=true` to `make build`, `make valida
 
 2. **Drag and drop** all `.xcframework` bundles into your Xcode project navigator.
 
-3. For each target that uses Splunk RUM, go to **General > Frameworks, Libraries, and Embedded Content** and ensure every framework is set to **Embed & Sign**.
+3. For each target that uses Splunk RUM, go to **General > Frameworks, Libraries, and Embedded Content**. Set the static Cisco and Splunk Agent module frameworks to **Do Not Embed**. Set the dynamic `OpenTelemetryApi`, `OpenTelemetrySdk`, and `SplunkCrashReporter` frameworks to **Embed & Sign**.
 
 4. **Import** the SDK in your code:
 
