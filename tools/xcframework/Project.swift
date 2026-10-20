@@ -1,6 +1,3 @@
-Warning: truncated output (original token count: 6217)
-Total output lines: 627
-
 // tools/xcframework/Project.swift
 //
 // Tuist manifest for building all SplunkAgent SDK modules as static
@@ -257,7 +254,138 @@ let crashReporterTarget = Target.target(
         configurations: [
             .debug(name: "Debug", settings: [:]),
             .release(
-                name: "Relea…1217 tokens truncated…=============================================
+                name: "Release",
+                settings: [
+                    "GCC_PREPROCESSOR_DEFINITIONS": [
+                        "PLCR_PRIVATE=1",
+                        "PLCF_RELEASE_BUILD=1",
+                        "NDEBUG=1",
+                        "PLCRASHREPORTER_PREFIX=SPLK",
+                        "SWIFT_PACKAGE=1"
+                    ]
+                ]
+            )
+        ]
+    )
+)
+
+
+// ---------------------------------------------------------------------------
+// MARK: - Project Definition
+// ---------------------------------------------------------------------------
+
+let project = Project(
+    name: "SplunkAgentXCFrameworks",
+    settings: .settings(
+        base: sharedSettings,
+        configurations: [
+            .debug(name: "Debug", settings: [:]),
+            .release(name: "Release", settings: [:])
+        ]
+    ),
+    targets: [
+
+        // =================================================================
+        // MARK: SplunkCommon
+        // =================================================================
+        // Shared utilities, protocols, and types used by all other modules.
+        // Depends on Cisco logger, disk storage, encryption, and OTel API.
+        .target(
+            name: "SplunkCommon",
+            destinations: allPlatforms,
+            product: .staticFramework,
+            bundleId: "com.splunk.rum.common",
+            sources: "\(repoRoot)/SplunkCommon/Sources/**",
+            dependencies: [
+                dep("OpenTelemetryApi"),
+                dep("CiscoLogger")
+            ] + ciscoDiskStorageDependencies()
+        ),
+
+
+        // =================================================================
+        // MARK: SplunkNavigation
+        // =================================================================
+        // Screen navigation tracking. Uses swizzling for automatic detection.
+        .target(
+            name: "SplunkNavigation",
+            destinations: allPlatforms,
+            product: .staticFramework,
+            bundleId: "com.splunk.rum.navigation",
+            sources: "\(repoRoot)/SplunkNavigation/Sources/**",
+            dependencies: [
+                mod("SplunkCommon"),
+                dep("OpenTelemetryApi"),
+                dep("CiscoLogger")
+            ] + ciscoSwizzlingDependencies()
+        ),
+
+
+        // =================================================================
+        // MARK: SplunkNetwork
+        // =================================================================
+        // URLSession instrumentation for automatic HTTP span creation.
+        .target(
+            name: "SplunkNetwork",
+            destinations: allPlatforms,
+            product: .staticFramework,
+            bundleId: "com.splunk.rum.network",
+            sources: "\(repoRoot)/SplunkNetwork/Sources/**",
+            dependencies: [
+                mod("SplunkCommon"),
+                dep("OpenTelemetryApi"),
+                dep("OpenTelemetrySdk"),
+                dep("CiscoLogger")
+            ]
+        ),
+
+
+        // =================================================================
+        // MARK: SplunkNetworkMonitor
+        // =================================================================
+        // Network status monitoring (reachability, connection type).
+        .target(
+            name: "SplunkNetworkMonitor",
+            destinations: allPlatforms,
+            product: .staticFramework,
+            bundleId: "com.splunk.rum.networkmonitor",
+            sources: "\(repoRoot)/SplunkNetworkMonitor/Sources/**",
+            dependencies: [
+                mod("SplunkCommon"),
+                dep("OpenTelemetryApi"),
+                dep("CiscoLogger")
+            ]
+        ),
+
+
+        // =================================================================
+        // MARK: SplunkSlowFrameDetector
+        // =================================================================
+        // Slow/frozen frame detection. Uses conditional compilation for
+        // platform-specific display link APIs.
+        .target(
+            name: "SplunkSlowFrameDetector",
+            destinations: allPlatforms,
+            product: .staticFramework,
+            bundleId: "com.splunk.rum.slowframedetector",
+            sources: "\(repoRoot)/SplunkSlowFrameDetector/Sources/**",
+            dependencies: [
+                mod("SplunkCommon"),
+                dep("OpenTelemetryApi"),
+                dep("CiscoLogger")
+            ]
+        ),
+
+
+        // =================================================================
+        // MARK: SplunkCrashReporter
+        // =================================================================
+        // Vendored and symbol-prefixed PLCrashReporter implementation.
+        // The SPLK prefix prevents collisions with another copy linked by a host app.
+        crashReporterTarget,
+
+
+        // =================================================================
         // MARK: SplunkCrashReports
         // =================================================================
         // Crash reporting via PLCrashReporter.
