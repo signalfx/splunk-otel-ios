@@ -21,6 +21,35 @@ import SplunkCommon
 
 public typealias SplunkSpanInterceptor = (SpanData) -> SpanData?
 
+/// Rewrites network span start time from task-creation time to the actual request start event.
+///
+/// Network instrumentation creates a span before `resume()` so it can inject `traceparent`. The
+/// request-start event is the authoritative beginning of network activity and is therefore used
+/// for the exported duration. Invalid or incomplete event timing is left unchanged.
+func normalizeNetworkSpanStartTime(_ span: SpanData) -> SpanData {
+    guard span.instrumentationScope.name == NetworkInstrumentationConstants.instrumentationName,
+        span.name.hasPrefix(NetworkInstrumentationConstants.httpSpanNamePrefix)
+    else {
+        return span
+    }
+
+    var requestStarted: Date?
+    for event in span.events where event.name == NetworkInstrumentationConstants.requestStartedEventName {
+        requestStarted = event.timestamp
+        break
+    }
+
+    guard let requestStarted,
+        requestStarted >= span.startTime,
+        requestStarted <= span.endTime
+    else {
+        return span
+    }
+
+    var normalized = span
+    return normalized.settingStartTime(requestStarted)
+}
+
 class SpanInterceptorExporter: SpanExporter {
 
     // MARK: - Private
@@ -56,7 +85,10 @@ class SpanInterceptorExporter: SpanExporter {
         // When captured in async closures (e.g., by SimpleSpanProcessor), the
         // dictionary storage is shared. If the original goes out of scope while
         // the closure executes, reference count operations can race, causing crashes.
-        let isolatedSpans = spans.map { $0.isolatedCopy() }
+        let isolatedSpans =
+            spans
+            .map(normalizeNetworkSpanStartTime)
+            .map { $0.isolatedCopy() }
 
         // Simply re-export the spans if no interceptor was set.
         guard let spanInterceptor else {

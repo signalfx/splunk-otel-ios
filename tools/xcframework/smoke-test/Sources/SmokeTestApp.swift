@@ -11,18 +11,23 @@
 // Each import below proves the corresponding xcframework is found by the
 // linker and the Swift module interface resolves correctly.
 
+import CiscoDataExporter
 import CiscoDiskStorage
 import CiscoEncryption
 import CiscoInstanceManager
 import CiscoInteractions
 import CiscoLogger
 import CiscoRuntimeCache
+import CiscoScreenshot
 import CiscoSessionReplay
+import CiscoSnapshotManager
 import CiscoSwizzling
-import CrashReporter
+import CiscoVideoEncoder
+import CiscoWireframe
 import OpenTelemetryApi
 import OpenTelemetrySdk
 import SplunkAgent
+import SplunkCrashReporter
 import SwiftUI
 
 
@@ -69,8 +74,8 @@ enum SmokeTestRunner {
         results.append("PASS: OpenTelemetrySdk types accessible (SpanLimits)")
 
         // Check 5: PLCrashReporter type is accessible
-        let _ = PLCrashReporterConfig.defaultConfiguration()
-        results.append("PASS: CrashReporter types accessible (PLCrashReporterConfig)")
+        let _ = SPLKPLCrashReporterConfig.defaultConfiguration()
+        results.append("PASS: SplunkCrashReporter types accessible (SPLKPLCrashReporterConfig)")
 
         return results
     }

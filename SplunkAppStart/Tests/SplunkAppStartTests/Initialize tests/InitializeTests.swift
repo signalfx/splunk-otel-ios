@@ -21,26 +21,30 @@ import XCTest
 
 final class InitializeTests: XCTestCase {
     func testInitialize() throws {
+        let processStart = Date(timeIntervalSinceReferenceDate: 1_000)
         let destination = DebugDestination()
-
-        let initializeStart = Date()
-
+        let initializeStart = processStart.addingTimeInterval(0.2)
+        let initializeEnd = processStart.addingTimeInterval(0.4)
         let eventName = "test"
-        let eventTimestamp = Date()
+        let eventTimestamp = processStart.addingTimeInterval(0.3)
 
         let appStart = AppStart()
+        appStart.processStartTimestamp = processStart
         appStart.destination = destination
-
-        appStart.startDetection()
 
         appStart.reportAgentInitialize(
             start: initializeStart,
-            end: Date(),
+            end: initializeEnd,
             events: [eventName: eventTimestamp],
             configurationSettings: [:]
         )
-
-        simulateColdStartNotifications()
+        appStart.process(
+            event: .didFinishLaunching(
+                processStart.addingTimeInterval(0.1),
+                .foreground
+            )
+        )
+        appStart.process(event: .didBecomeActive(processStart.addingTimeInterval(1)))
 
         // Check dates
         try checkDates(in: destination)
@@ -55,5 +59,85 @@ final class InitializeTests: XCTestCase {
         let testEvent = try XCTUnwrap(events.first)
         XCTAssertTrue(testEvent.name == eventName)
         XCTAssertTrue(testEvent.timestamp == eventTimestamp)
+    }
+
+    func testInitializeOutsideCapturedAppStartIsDiscarded() throws {
+        let processStart = Date(timeIntervalSinceReferenceDate: 2_000)
+        let destination = DebugDestination()
+        let appStart = AppStart()
+        appStart.processStartTimestamp = processStart
+        appStart.destination = destination
+
+        appStart.reportAgentInitialize(
+            start: processStart.addingTimeInterval(60 * 60),
+            end: processStart.addingTimeInterval(60 * 60 + 1),
+            events: [:],
+            configurationSettings: [:]
+        )
+        appStart.process(
+            event: .didFinishLaunching(
+                processStart.addingTimeInterval(0.1),
+                .foreground
+            )
+        )
+        appStart.process(event: .didBecomeActive(processStart.addingTimeInterval(1)))
+
+        let storedAppStart = try XCTUnwrap(destination.storedAppStart)
+        XCTAssertEqual(storedAppStart.type, .cold)
+        XCTAssertNil(destination.storedInitialize)
+    }
+
+    func testInitializeIsNotAttachedToWarmStart() throws {
+        let processStart = Date(timeIntervalSinceReferenceDate: 3_000)
+        let foreground = processStart.addingTimeInterval(60 * 60)
+        let destination = DebugDestination()
+        let appStart = AppStart()
+        appStart.processStartTimestamp = processStart
+        appStart.destination = destination
+
+        appStart.reportAgentInitialize(
+            start: processStart.addingTimeInterval(0.2),
+            end: processStart.addingTimeInterval(0.4),
+            events: [:],
+            configurationSettings: [:]
+        )
+        appStart.process(
+            event: .didFinishLaunching(
+                processStart.addingTimeInterval(0.1),
+                .background
+            )
+        )
+        appStart.process(event: .willEnterForeground(foreground))
+        appStart.process(event: .didBecomeActive(foreground.addingTimeInterval(0.5)))
+
+        let storedAppStart = try XCTUnwrap(destination.storedAppStart)
+        XCTAssertEqual(storedAppStart.type, .warm)
+        XCTAssertNil(destination.storedInitialize)
+    }
+
+    func testInitializeWithEventOutsideChildIntervalIsDiscarded() throws {
+        let processStart = Date(timeIntervalSinceReferenceDate: 4_000)
+        let destination = DebugDestination()
+        let appStart = AppStart()
+        appStart.processStartTimestamp = processStart
+        appStart.destination = destination
+
+        appStart.reportAgentInitialize(
+            start: processStart.addingTimeInterval(0.2),
+            end: processStart.addingTimeInterval(0.4),
+            events: ["late": processStart.addingTimeInterval(0.5)],
+            configurationSettings: [:]
+        )
+        appStart.process(
+            event: .didFinishLaunching(
+                processStart.addingTimeInterval(0.1),
+                .foreground
+            )
+        )
+        appStart.process(event: .didBecomeActive(processStart.addingTimeInterval(1)))
+
+        let storedAppStart = try XCTUnwrap(destination.storedAppStart)
+        XCTAssertEqual(storedAppStart.type, .cold)
+        XCTAssertNil(destination.storedInitialize)
     }
 }
