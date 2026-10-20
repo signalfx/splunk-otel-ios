@@ -6,7 +6,7 @@
 # GitHub release.
 #
 # Default mode is fully local and requires SESSION_REPLAY_LOCAL_PATH (or
-# --session-replay-path) so Cisco frameworks are built as dynamic frameworks
+# --session-replay-path) so Cisco frameworks are built as static frameworks
 # from the Session Replay repository. The --run-id mode is a legacy path for
 # downloading a prebuilt unsigned artifact and must not refresh Cisco from
 # Package.swift static binary target URLs.
@@ -143,6 +143,7 @@ download_legacy_artifact() {
     log "Downloading unsigned xcframeworks from CI run ${RUN_ID}"
 
     rm -rf "${OUTPUT_DIR}"
+    rm -rf "${TOOLS_ROOT}/output/resources"
     rm -f "${TOOLS_ROOT}/output/size-report.md"
     mkdir -p "${TOOLS_ROOT}/output"
 
@@ -214,7 +215,14 @@ main() {
     "${SCRIPT_DIR}/sign-xcframeworks.sh" "${SIGNING_IDENTITY}"
 
     log "Validating signed xcframeworks"
-    RELEASE=true IOS_ONLY="${IOS_ONLY}" "${SCRIPT_DIR}/validate-xcframeworks.sh"
+    local validation_args=()
+    if [[ "${IOS_ONLY}" == "true" ]]; then
+        validation_args+=(--ios-only)
+    fi
+    if [[ "${legacy_mode}" == "true" ]]; then
+        validation_args+=(--legacy-artifact)
+    fi
+    RELEASE=true "${SCRIPT_DIR}/validate-xcframeworks.sh" "${validation_args[@]}"
 
     local release_args=("${VERSION}")
     if [[ "${IOS_ONLY}" == "true" ]]; then

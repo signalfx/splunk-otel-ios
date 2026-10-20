@@ -19,6 +19,7 @@ RESOURCE_BUNDLES_DIR="${TOOLS_ROOT}/output/resources"
 
 RELEASE="${RELEASE:-false}"
 IOS_ONLY="${IOS_ONLY:-false}"
+LEGACY_ARTIFACT=false
 CISCO_MACH_O_TYPE="${CISCO_MACH_O_TYPE:-}"
 if [[ -z "${CISCO_MACH_O_TYPE}" && -f "${OUTPUT_DIR}/cisco-release-manifest.txt" ]]; then
     CISCO_MACH_O_TYPE="$(awk -F= '$1 == "mach_o_type" { print $2; exit }' "${OUTPUT_DIR}/cisco-release-manifest.txt")"
@@ -81,12 +82,25 @@ while [[ $# -gt 0 ]]; do
             IOS_ONLY=true
             shift
             ;;
+        --legacy-artifact)
+            LEGACY_ARTIFACT=true
+            shift
+            ;;
         *)
             echo "Unknown argument: $1"
             exit 1
             ;;
     esac
 done
+
+if [[ "${LEGACY_ARTIFACT}" == "true" ]]; then
+    # Artifacts from the previous pipeline contain only the original nine
+    # dynamic Cisco frameworks and dynamic Agent frameworks, with no resource
+    # bundles. Keep this compatibility path explicit and separate from current
+    # release validation.
+    EXPECTED_FRAMEWORKS=("${EXPECTED_FRAMEWORKS[@]:0:12}" "${EXPECTED_FRAMEWORKS[@]:17}")
+    CISCO_MACH_O_TYPE="mh_dylib"
+fi
 
 log() {
     echo "==> $*"
@@ -114,6 +128,34 @@ is_expected_framework() {
     done
 
     return 1
+}
+
+expected_linkage_for() {
+    local name="$1"
+
+    if [[ "${LEGACY_ARTIFACT}" == "true" ]]; then
+        echo "dynamic"
+        return
+    fi
+
+    case "${name}" in
+        OpenTelemetryApi|OpenTelemetrySdk|SplunkCrashReporter)
+            echo "dynamic"
+            ;;
+        Cisco*)
+            case "${CISCO_MACH_O_TYPE}" in
+                staticlib) echo "static" ;;
+                mh_dylib) echo "dynamic" ;;
+                *) return 1 ;;
+            esac
+            ;;
+        Splunk*)
+            echo "static"
+            ;;
+        *)
+            return 1
+            ;;
+    esac
 }
 
 expected_slices_for() {
@@ -157,17 +199,56 @@ validate_expected_framework_set() {
         fi
     done
 
-    local webview_bundle_count=0
-    if [[ -d "${RESOURCE_BUNDLES_DIR}" ]]; then
-        for bundle in "${RESOURCE_BUNDLES_DIR}"/*.bundle; do
-            [[ -d "${bundle}" ]] || continue
-            webview_bundle_count=$((webview_bundle_count + 1))
-        done
-    fi
-    if [[ "${webview_bundle_count}" -eq 1 ]]; then
-        check_pass "SplunkWebView resource bundle present"
+    if [[ "${LEGACY_ARTIFACT}" == "true" ]]; then
+        local resource_bundle_count=0
+        if [[ -d "${RESOURCE_BUNDLES_DIR}" ]]; then
+            for bundle in "${RESOURCE_BUNDLES_DIR}"/*.bundle; do
+                [[ -d "${bundle}" ]] || continue
+                resource_bundle_count=$((resource_bundle_count + 1))
+            done
+        fi
+        if [[ "${resource_bundle_count}" -eq 0 ]]; then
+            check_pass "Legacy artifact has no companion resource bundles"
+        else
+            check_fail "Legacy artifact unexpectedly contains ${resource_bundle_count} resource bundles"
+        fi
     else
-        check_fail "SplunkWebView resource bundle count: ${webview_bundle_count} (expected 1)"
+        local resource_bundle_count=0
+        if [[ -d "${RESOURCE_BUNDLES_DIR}" ]]; then
+            for bundle in "${RESOURCE_BUNDLES_DIR}"/*.bundle; do
+                [[ -d "${bundle}" ]] || continue
+                resource_bundle_count=$((resource_bundle_count + 1))
+            done
+        fi
+        if [[ "${resource_bundle_count}" -eq 3 ]]; then
+            check_pass "Resource bundle count: ${resource_bundle_count}"
+        else
+            check_fail "Resource bundle count: ${resource_bundle_count} (expected 3)"
+        fi
+
+        local resource_bundle_names=(
+            "SplunkAgentXCFrameworks_SplunkWebView|WebViewBridgeScript.js"
+            "SplunkAgentXCFrameworks_SplunkAgent|PrivacyInfo.xcprivacy"
+            "SplunkAgentXCFrameworks_SplunkAgent|NOTICES"
+            "SplunkAgentXCFrameworks_SplunkAgentObjC|PrivacyInfo.xcprivacy"
+            "SplunkAgentXCFrameworks_SplunkAgentObjC|NOTICES"
+        )
+        for bundle_spec in "${resource_bundle_names[@]}"; do
+            local bundle_name="${bundle_spec%%|*}"
+            local resource_name="${bundle_spec#*|}"
+            local bundle_path="${RESOURCE_BUNDLES_DIR}/${bundle_name}.bundle"
+            if [[ -d "${bundle_path}" ]]; then
+                check_pass "${bundle_name}.bundle present"
+            else
+                check_fail "${bundle_name}.bundle missing"
+                continue
+            fi
+            if [[ -f "${bundle_path}/${resource_name}" ]]; then
+                check_pass "${bundle_name}.bundle contains ${resource_name}"
+            else
+                check_fail "${bundle_name}.bundle is missing ${resource_name}"
+            fi
+        done
     fi
 
     for xcfw in "${OUTPUT_DIR}"/*.xcframework; do
@@ -377,7 +458,10 @@ validate_xcframework() {
 
         if [[ -f "${fw_binary}" ]]; then
             check_pass "Slice ${slice_name}: binary present"
-            if file "${fw_binary}" 2>/dev/null | grep -Eqi 'archive'; then
+            local expected_linkage
+            if ! expected_linkage="$(expected_linkage_for "${name}")"; then
+                check_fail "Slice ${slice_name}: no expected linkage type for ${name}"
+            elif [[ "${expected_linkage}" == "static" ]]; then
                 validate_static_binary "${fw_binary}" "${slice_name}"
             else
                 validate_dynamic_binary "${fw_binary}" "${slice_name}"
@@ -418,7 +502,9 @@ validate_xcframework() {
     fi
 
     if [[ "${RELEASE}" == "true" ]]; then
-        if file "${fw_binary}" 2>/dev/null | grep -Eqi 'archive'; then
+        local expected_linkage
+        expected_linkage="$(expected_linkage_for "${name}" || true)"
+        if [[ "${expected_linkage}" == "static" ]]; then
             check_pass "Static library does not require a framework code signature"
         elif codesign --verify --deep --strict "${xcfw_path}" 2>/dev/null; then
             check_pass "Code signature valid"
