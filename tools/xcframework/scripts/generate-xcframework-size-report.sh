@@ -73,6 +73,15 @@ for path in "${XCFW_DIR}"/*.xcframework; do
 done
 [[ "${#FRAMEWORKS[@]}" -gt 0 ]] || fail "No XCFrameworks found in ${XCFW_DIR}"
 
+RESOURCE_BUNDLE_KB=0
+if [[ -d "${OUTPUT_DIR}/resources" ]]; then
+    for bundle in "${OUTPUT_DIR}"/resources/*.bundle; do
+        [[ -d "${bundle}" ]] || continue
+        RESOURCE_BUNDLE_KB=$((RESOURCE_BUNDLE_KB + $(size_kb "${bundle}")))
+    done
+fi
+SDK_TOTAL_KB=$((SDK_TOTAL_KB + RESOURCE_BUNDLE_KB))
+
 CISCO_TOTAL_KB="$(sum_frameworks "${CISCO_FRAMEWORKS[@]}")"
 NEW_CISCO_TOTAL_KB="$(sum_frameworks "${NEW_CISCO_FRAMEWORKS[@]}")"
 BASE_CISCO_FRAMEWORKS=("${CISCO_FRAMEWORKS[@]:0:9}")
@@ -88,11 +97,12 @@ fi
     echo
     echo "Variant: ${VARIANT}"
     echo
-    echo "Sizes are uncompressed on-disk sizes of the complete XCFramework bundles, including all shipped platform and architecture slices."
+    echo "Sizes are uncompressed on-disk sizes of the complete XCFramework bundles, including all shipped platform and architecture slices, plus shipped resource bundles."
     echo
     echo "| Distribution | Size |"
     echo "| --- | ---: |"
-    echo "| Overall SDK XCFrameworks (${#FRAMEWORKS[@]} frameworks) | $(format_mib "${SDK_TOTAL_KB}") |"
+    echo "| Overall SDK distribution (${#FRAMEWORKS[@]} frameworks + resource bundles) | $(format_mib "${SDK_TOTAL_KB}") |"
+    echo "| SplunkWebView resource bundles | $(format_mib "${RESOURCE_BUNDLE_KB}") |"
     echo "| Session Replay frameworks (${#CISCO_FRAMEWORKS[@]} frameworks) | $(format_mib "${CISCO_TOTAL_KB}") |"
     echo "| Existing Session Replay modules (9 frameworks) | $(format_mib "${BASE_CISCO_TOTAL_KB}") |"
     echo "| Added Session Replay modules (5 frameworks) | $(format_mib "${NEW_CISCO_TOTAL_KB}") |"

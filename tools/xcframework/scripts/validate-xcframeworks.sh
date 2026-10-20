@@ -15,6 +15,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TOOLS_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 OUTPUT_DIR="${TOOLS_ROOT}/output/xcframeworks"
+RESOURCE_BUNDLES_DIR="${TOOLS_ROOT}/output/resources"
 
 RELEASE="${RELEASE:-false}"
 IOS_ONLY="${IOS_ONLY:-false}"
@@ -155,6 +156,19 @@ validate_expected_framework_set() {
             check_fail "${expected}.xcframework missing"
         fi
     done
+
+    local webview_bundle_count=0
+    if [[ -d "${RESOURCE_BUNDLES_DIR}" ]]; then
+        for bundle in "${RESOURCE_BUNDLES_DIR}"/*.bundle; do
+            [[ -d "${bundle}" ]] || continue
+            webview_bundle_count=$((webview_bundle_count + 1))
+        done
+    fi
+    if [[ "${webview_bundle_count}" -eq 1 ]]; then
+        check_pass "SplunkWebView resource bundle present"
+    else
+        check_fail "SplunkWebView resource bundle count: ${webview_bundle_count} (expected 1)"
+    fi
 
     for xcfw in "${OUTPUT_DIR}"/*.xcframework; do
         [[ -d "${xcfw}" ]] || continue

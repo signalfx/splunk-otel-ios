@@ -31,6 +31,7 @@ TOOLS_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 BUILD_DIR="${TOOLS_ROOT}/build/agent"
 ARCHIVES_DIR="${BUILD_DIR}/archives"
 OUTPUT_DIR="${TOOLS_ROOT}/output/xcframeworks"
+RESOURCES_DIR="${TOOLS_ROOT}/output/resources"
 
 CONFIGURATION="Release"
 IOS_ONLY="${IOS_ONLY:-false}"
@@ -320,6 +321,21 @@ create_all_xcframeworks() {
     for scheme in "${BUILD_ORDER[@]}"; do
         create_xcframework "${scheme}"
     done
+
+    # Static frameworks cannot carry runtime resources into the consuming app.
+    # Tuist synthesizes a companion bundle for SplunkWebView's JavaScript, so
+    # ship that bundle alongside the XCFrameworks and include it in the smoke app.
+    local webview_archive="${ARCHIVES_DIR}/SplunkWebView-ios.xcarchive"
+    local resource_bundle
+    resource_bundle="$(find "${webview_archive}/Products" -type d -name 'SplunkAgentXCFrameworks_SplunkWebView.bundle' -print -quit)"
+    if [[ -z "${resource_bundle}" ]]; then
+        echo "ERROR: SplunkWebView resource bundle not found in ${webview_archive}"
+        exit 1
+    fi
+
+    mkdir -p "${RESOURCES_DIR}"
+    cp -R "${resource_bundle}" "${RESOURCES_DIR}/"
+    echo "  ✓ $(basename "${resource_bundle}") resource bundle"
 }
 
 
