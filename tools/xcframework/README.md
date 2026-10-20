@@ -5,7 +5,7 @@ Build tooling for producing signed, multi-platform xcframeworks from the Splunk 
 ## Quick Start
 
 ```bash
-# Full build: OTel + dynamic Cisco + Agent modules
+# Full build: OTel + static Cisco Session Replay + Agent modules
 export SESSION_REPLAY_LOCAL_PATH=/path/to/session-replay-repo
 make build
 
@@ -26,8 +26,8 @@ The `make build` target requires `SESSION_REPLAY_LOCAL_PATH` and runs four stage
 | Stage | Command | What it does |
 |-------|---------|-------------|
 | 1 | `make build-otel` | Clones `opentelemetry-swift-core`, generates a Tuist project, and archives `OpenTelemetryApi` + `OpenTelemetrySdk` for all 7 platform slices, or 2 slices with `IOS_ONLY=true` |
-| 2 | `make build-cisco` | Builds all 14 Cisco Session Replay frameworks as **dynamic** xcframeworks from the local Session Replay checkout |
-| 3 | `make populate-deps` | Stages OTel and already-built dynamic Cisco xcframeworks into `dependencies/` |
+| 2 | `make build-cisco` | Builds all 14 Cisco Session Replay frameworks as **static-library** xcframeworks from the local Session Replay checkout |
+| 3 | `make populate-deps` | Stages OTel and already-built static Cisco xcframeworks into `dependencies/` |
 | 4 | `make build-agent` | Generates the main Tuist workspace and builds all Splunk module xcframeworks, including the vendored `SplunkCrashReporter` |
 
 ### Output
@@ -53,6 +53,11 @@ output/xcframeworks/
 ├── CiscoSessionReplay.xcframework
 ├── CiscoInstanceManager.xcframework
 ├── CiscoRuntimeCache.xcframework
+├── CiscoVideoEncoder.xcframework
+├── CiscoScreenshot.xcframework
+├── CiscoWireframe.xcframework
+├── CiscoDataExporter.xcframework
+├── CiscoSnapshotManager.xcframework
 ├── SplunkAgent.xcframework
 ├── SplunkAgentObjC.xcframework
 ├── SplunkCommon.xcframework
@@ -71,7 +76,7 @@ output/xcframeworks/
 └── SplunkSessionReplayProxy.xcframework
 ```
 
-Cisco Session Replay xcframeworks are built locally as dynamic frameworks. The Agent `Package.swift` Cisco binary target URLs intentionally point to static artifacts for SPM and are not used by this xcframework release path.
+Cisco Session Replay xcframeworks are built from the private Session Replay source as static libraries. This permits hybrid consumers, including React Native apps using static framework linkage, to link the Agent distribution without embedding a second set of dynamic Cisco frameworks. `Package.swift` uses a separate registry of published static binaries; update that registry when upstream publishes the five new module artifacts and checksums.
 
 ### Platform Matrix
 
@@ -95,24 +100,27 @@ Key variables in the Makefile:
 |----------|---------|-------------|
 | `OTEL_VERSION` | `2.3.0` | OpenTelemetry Swift Core tag to build |
 | `SESSION_REPLAY_LOCAL_PATH` | *(required)* | Local path to the Session Replay repository |
-| `CISCO_XCFRAMEWORKS_PATH` | *(empty)* | Legacy path to prebuilt dynamic Cisco xcframeworks |
+| `CISCO_MACH_O_TYPE` | `staticlib` | Session Replay output type (`staticlib` or `mh_dylib`) |
+| `CISCO_XCFRAMEWORKS_PATH` | *(empty)* | Legacy path to prebuilt Cisco xcframeworks |
 | `IOS_ONLY` | `false` | Build and validate only `ios-arm64` and `ios-arm64_x86_64-simulator` slices |
 
 ---
 
 ## Release
 
-Releasing xcframeworks is currently a local process while the Agent and Session Replay repositories are separate. The local release script builds dynamic Cisco frameworks from `SESSION_REPLAY_LOCAL_PATH`, signs non-Cisco xcframeworks, validates all shipped signatures, packages, and optionally uploads to the GitHub release.
+The build workflow checks out the private Session Replay repository, builds all required static Cisco modules and Agent xcframeworks, validates platform slices, and runs the consumer linkage smoke test. Configure the `SESSION_REPLAY_READ_TOKEN` repository secret with read access to `smartlook-ios-sdk-private`. Signed release packaging remains a local process while distribution certificates cannot be stored in GitHub secrets.
 
 ### How it works
 
 1. A developer triggers `release.yml` with a version and ticket ID.
 2. The release PR is reviewed and merged to `main`.
 3. `merge_release.yml` runs automatically — creates a git tag and a GitHub Release.
-4. A developer runs `scripts/sign-and-upload.sh` locally with `SESSION_REPLAY_LOCAL_PATH` set.
-5. The script builds, signs, validates, packages, and uploads `SplunkAgent-XCFrameworks.zip`.
+4. The `build-xcframeworks.yml` workflow builds the distribution from the selected Session Replay ref and uploads the unsigned frameworks and size report.
+5. A developer runs `scripts/sign-and-upload.sh` locally with `SESSION_REPLAY_LOCAL_PATH` set to build, sign, validate, package, and upload `SplunkAgent-XCFrameworks.zip`.
 
-`build-xcframeworks.yml` is now a manual legacy/testing workflow. It requires caller-provided dynamic Cisco artifacts and must not download Cisco artifacts from Agent `Package.swift`.
+`build-xcframeworks.yml` checks out Session Replay source directly and builds the complete static-linking-friendly distribution. Set its `session-replay-ref` input to the branch, tag, or commit being released.
+
+Each build writes `output/size-report.md`, which records overall XCFramework size, the existing Session Replay size, and the contribution from the five new modules. The report is included in the release zip.
 
 ### Local signing
 
@@ -126,7 +134,7 @@ export SESSION_REPLAY_LOCAL_PATH=/path/to/session-replay-repo
 
 The script will:
 - Auto-detect your signing identity from the local keychain
-- Build OTel, dynamic Cisco, and Splunk xcframeworks locally
+- Build OTel, static Cisco, and Splunk xcframeworks locally
 - Record the Session Replay commit, branch, and dirty state in `cisco-release-manifest.txt`
 - Sign non-Cisco xcframeworks while preserving pre-signed Cisco framework signatures
 - Validate signatures for all shipped xcframeworks
@@ -135,7 +143,7 @@ The script will:
 #### Options
 
 ```bash
-# Legacy: use a specific CI run with already-dynamic Cisco artifacts
+# Legacy: use a specific CI run with prebuilt Cisco artifacts
 ./scripts/sign-and-upload.sh 1.2.0 --run-id 12345678
 
 # Use a specific signing identity

@@ -143,11 +143,12 @@ download_legacy_artifact() {
     log "Downloading unsigned xcframeworks from CI run ${RUN_ID}"
 
     rm -rf "${OUTPUT_DIR}"
-    mkdir -p "${OUTPUT_DIR}"
+    rm -f "${TOOLS_ROOT}/output/size-report.md"
+    mkdir -p "${TOOLS_ROOT}/output"
 
     gh run download "${RUN_ID}" \
         -n "splunk-agent-xcframeworks-unsigned" \
-        -D "${OUTPUT_DIR}" \
+        -D "${TOOLS_ROOT}/output" \
         -R "$(resolve_repo_full_name)"
 
     local xcfw_count

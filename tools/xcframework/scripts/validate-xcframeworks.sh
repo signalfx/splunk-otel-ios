@@ -18,6 +18,11 @@ OUTPUT_DIR="${TOOLS_ROOT}/output/xcframeworks"
 
 RELEASE="${RELEASE:-false}"
 IOS_ONLY="${IOS_ONLY:-false}"
+CISCO_MACH_O_TYPE="${CISCO_MACH_O_TYPE:-}"
+if [[ -z "${CISCO_MACH_O_TYPE}" && -f "${OUTPUT_DIR}/cisco-release-manifest.txt" ]]; then
+    CISCO_MACH_O_TYPE="$(awk -F= '$1 == "mach_o_type" { print $2; exit }' "${OUTPUT_DIR}/cisco-release-manifest.txt")"
+fi
+CISCO_MACH_O_TYPE="${CISCO_MACH_O_TYPE:-mh_dylib}"
 
 TOTAL_CHECKS=0
 PASSED_CHECKS=0
@@ -196,6 +201,19 @@ validate_dynamic_binary() {
     fi
 }
 
+validate_static_binary() {
+    local binary_path="$1"
+    local slice_name="$2"
+    local file_info
+
+    file_info="$(file "${binary_path}" 2>/dev/null || true)"
+    if [[ "${file_info}" == *archive* ]]; then
+        check_pass "Slice ${slice_name}: static library binary"
+    else
+        check_fail "Slice ${slice_name}: binary is not a static library (${file_info:-unknown})"
+    fi
+}
+
 validate_no_nested_frameworks() {
     local framework_path="$1"
     local slice_name="$2"
@@ -345,7 +363,11 @@ validate_xcframework() {
 
         if [[ -f "${fw_binary}" ]]; then
             check_pass "Slice ${slice_name}: binary present"
-            validate_dynamic_binary "${fw_binary}" "${slice_name}"
+            if [[ "${name}" == Cisco* && "${CISCO_MACH_O_TYPE}" == "staticlib" ]]; then
+                validate_static_binary "${fw_binary}" "${slice_name}"
+            else
+                validate_dynamic_binary "${fw_binary}" "${slice_name}"
+            fi
 
             local arch_info
             arch_info="$(lipo -info "${fw_binary}" 2>/dev/null || echo "unknown")"
@@ -382,7 +404,9 @@ validate_xcframework() {
     fi
 
     if [[ "${RELEASE}" == "true" ]]; then
-        if codesign --verify --deep --strict "${xcfw_path}" 2>/dev/null; then
+        if [[ "${name}" == Cisco* && "${CISCO_MACH_O_TYPE}" == "staticlib" ]]; then
+            check_pass "Static library does not require a framework code signature"
+        elif codesign --verify --deep --strict "${xcfw_path}" 2>/dev/null; then
             check_pass "Code signature valid"
         else
             check_fail "Code signature invalid or missing (required for release)"

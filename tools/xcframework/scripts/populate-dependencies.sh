@@ -7,14 +7,14 @@
 #
 # Sources:
 #   - OpenTelemetryApi/Sdk: Built by build-otel-xcframeworks.sh → output/xcframeworks/
-#   - Cisco modules: Built locally as dynamic xcframeworks by build-cisco-xcframeworks.sh
+#   - Cisco modules: Built locally as static xcframeworks by build-cisco-xcframeworks.sh
 #                    (or linked from a legacy local path via --cisco-path)
 #
 # Usage:
 #   ./scripts/populate-dependencies.sh [options]
 #
 # Options:
-#   --cisco-path PATH     Legacy path to directory containing dynamic Cisco xcframeworks
+#   --cisco-path PATH     Legacy path to directory containing Cisco xcframeworks
 #   --skip-otel           Skip OTel (assumes already built in output/xcframeworks/)
 #   --skip-cisco          Skip Cisco staging
 #   --download-cisco      Legacy mode: download Cisco from Package.swift registry
@@ -164,7 +164,7 @@ if [[ "${SKIP_CISCO}" == "false" ]]; then
             if [[ ! -d "${dst}" ]]; then
                 echo "ERROR: Cisco xcframework not found: ${dst}"
                 echo "  Run build-cisco-xcframeworks.sh first with SESSION_REPLAY_LOCAL_PATH set,"
-                echo "  or pass --cisco-path with prebuilt dynamic Cisco xcframeworks."
+                echo "  or pass --cisco-path with prebuilt Cisco xcframeworks."
                 exit 1
             fi
         done

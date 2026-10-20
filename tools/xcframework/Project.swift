@@ -193,7 +193,7 @@ func ciscoRuntimeCacheDependencies() -> [TargetDependency] {
     ]
 }
 
-/// CiscoSessionReplay imports most Cisco support frameworks in its public interface.
+/// CiscoSessionReplay imports its support modules in its public interface.
 func ciscoSessionReplayDependencies() -> [TargetDependency] {
     [
         dep("CiscoSessionReplay"),
@@ -209,7 +209,11 @@ func ciscoSessionReplayDependencies() -> [TargetDependency] {
         dep("CiscoSwizzling"),
         dep("CiscoVideoEncoder"),
         dep("CiscoWireframe"),
-        dep("CiscoInstanceManager")
+        dep("CiscoInstanceManager"),
+        dep("CiscoRuntimeCache"),
+        dep("CiscoScreenshot"),
+        dep("CiscoSnapshotManager"),
+        dep("CiscoDataExporter"),
     ]
 }
 

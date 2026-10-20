@@ -24,6 +24,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 * Network span start times now use the `http.request.started` timestamp recorded when the task is resumed.
 * Network spans for requests that are never resumed are suppressed.
 * Downloads and uploads use a 30-minute telemetry watchdog; ordinary requests use a 5-minute watchdog without cancelling the application task.
+* The XCFramework distribution now includes the Cisco VideoEncoder, Screenshot, Wireframe, DataExporter, and SnapshotManager modules, built as static libraries for hybrid integrations. Release artifacts include an SDK size report.
 
 ### Fixed
 

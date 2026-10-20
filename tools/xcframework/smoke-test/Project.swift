@@ -72,7 +72,12 @@ let ciscoFrameworks = [
     "CiscoSnapshotManager",
     "CiscoSessionReplay",
     "CiscoInstanceManager",
-    "CiscoRuntimeCache"
+    "CiscoRuntimeCache",
+    "CiscoVideoEncoder",
+    "CiscoScreenshot",
+    "CiscoWireframe",
+    "CiscoDataExporter",
+    "CiscoSnapshotManager"
 ]
 
 /// All frameworks combined.
