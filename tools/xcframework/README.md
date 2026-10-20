@@ -200,9 +200,9 @@ For an iOS-only manual build, pass `IOS_ONLY=true` to `make build`, `make valida
 
 1. **Download** the release `.zip` and extract it. You will have a folder containing all `.xcframework` bundles.
 
-2. **Drag and drop** all `.xcframework` bundles into your Xcode project navigator.
+2. **Drag and drop** all `.xcframework` bundles and `resources/SplunkAgentXCFrameworks_SplunkWebView.bundle` into your Xcode project navigator.
 
-3. For each target that uses Splunk RUM, go to **General > Frameworks, Libraries, and Embedded Content**. Set the static Cisco and Splunk Agent module frameworks to **Do Not Embed**. Set the dynamic `OpenTelemetryApi`, `OpenTelemetrySdk`, and `SplunkCrashReporter` frameworks to **Embed & Sign**. Add `resources/SplunkAgentXCFrameworks_SplunkWebView.bundle` from the release to the app target and set it to **Embed & Sign**; the static framework does not carry that bundle into the app automatically.
+3. For each target that uses Splunk RUM, go to **General > Frameworks, Libraries, and Embedded Content**. Set the static Cisco and Splunk Agent module frameworks to **Do Not Embed**. Set the dynamic `OpenTelemetryApi`, `OpenTelemetrySdk`, and `SplunkCrashReporter` frameworks to **Embed & Sign**. Ensure the `SplunkAgentXCFrameworks_SplunkWebView.bundle` appears in the app target's **Build Phases > Copy Bundle Resources**; the static framework does not carry that bundle into the app automatically.
 
 4. **Import** the SDK in your code:
 
