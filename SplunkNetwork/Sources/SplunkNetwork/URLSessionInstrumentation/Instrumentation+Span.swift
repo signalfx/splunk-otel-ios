@@ -46,23 +46,23 @@ func startHttpSpan(request: URLRequest?) -> Span? {
     let manager = NetworkInstrumentationManager.shared
 
     // Filter using excludedEndpoints, backend URLs
-    if let excludedEndpoints = manager.getModule()?.excludedEndpoints {
-        if shouldExcludeURL(url, excludedEndpoints: excludedEndpoints) {
-            manager.logger.log(level: .debug) {
-                "Should Not Instrument Backend URL \(url.absoluteString)"
-            }
-            return nil
+    if let excludedEndpoints = manager.getModule()?.excludedEndpoints,
+        shouldExcludeURL(url, excludedEndpoints: excludedEndpoints)
+    {
+        manager.logger.log(level: .debug) {
+            "Should Not Instrument Backend URL \(url.absoluteString)"
         }
+        return nil
     }
 
     // Filter using ignoreURLs API
-    if let ignoreURLs = manager.getModule()?.getIgnoreURLs() {
-        if ignoreURLs.matches(url: url) {
-            manager.logger.log(level: .debug) {
-                "URL excluded via IgnoreURLs API \(url.absoluteString)"
-            }
-            return nil
+    if let ignoreURLs = manager.getModule()?.getIgnoreURLs(),
+        ignoreURLs.matches(url: url)
+    {
+        manager.logger.log(level: .debug) {
+            "URL excluded via IgnoreURLs API \(url.absoluteString)"
         }
+        return nil
     }
 
     let tracer = OpenTelemetry.instance

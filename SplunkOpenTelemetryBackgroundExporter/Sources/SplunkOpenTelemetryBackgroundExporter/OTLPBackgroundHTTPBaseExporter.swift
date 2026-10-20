@@ -326,11 +326,9 @@ public class OTLPBackgroundHTTPBaseExporter {
 extension OTLPBackgroundHTTPBaseExporter {
     /// Flushes any data stored in pending storage by moving it to active storage and scheduling uploads.
     private func flushPendingData(for activationRevision: UInt64) {
-        guard endpointState(for: activationRevision) != nil else {
-            return
-        }
-
-        guard let pendingFiles = try? diskStorage.list(forKey: getPendingStorageKey()) else {
+        guard endpointState(for: activationRevision) != nil,
+            let pendingFiles = try? diskStorage.list(forKey: getPendingStorageKey())
+        else {
             return
         }
 
