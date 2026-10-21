@@ -5,7 +5,7 @@ name: Build XCFrameworks
 # read-only repository token.
 #
 # Architecture:
-#   Job 1 (build): Build OTel + static Session Replay + static Agent modules → upload artifact
+#   Job 1 (build): Build OTel + dynamic Session Replay + static Agent modules → upload artifact
 #   Job 2 (sign-and-release): Optional signing, validation, and packaging
 
 on:
@@ -79,13 +79,13 @@ jobs:
           persist-credentials: false
 
       # -----------------------------------------------------------------
-      # Step 2: Build the full distribution with static Session Replay libraries
+      # Step 2: Build the full distribution with dynamic Session Replay frameworks
       # -----------------------------------------------------------------
       - name: Build complete XCFramework distribution
         working-directory: tools/xcframework
         env:
           SESSION_REPLAY_LOCAL_PATH: ${{ github.workspace }}/tools/xcframework/session-replay
-          CISCO_MACH_O_TYPE: staticlib
+          CISCO_MACH_O_TYPE: mh_dylib
         run: make clean build
 
       # -----------------------------------------------------------------

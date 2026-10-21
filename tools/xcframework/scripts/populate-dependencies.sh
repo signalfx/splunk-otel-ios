@@ -7,7 +7,7 @@
 #
 # Sources:
 #   - OpenTelemetryApi/Sdk: Built by build-otel-xcframeworks.sh → output/xcframeworks/
-#   - Cisco modules: Built locally as static xcframeworks by build-cisco-xcframeworks.sh
+#   - Cisco modules: Built locally as dynamic xcframeworks by build-cisco-xcframeworks.sh
 #                    (or linked from a legacy local path via --cisco-path)
 #
 # Usage:

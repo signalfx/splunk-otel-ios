@@ -3,9 +3,8 @@
 #
 # Signs .xcframework bundles in the output directory using codesign.
 # Signing protects all files inside the xcframework including privacy manifests.
-# Cisco Session Replay xcframeworks are skipped by default. Static-library
-# frameworks do not need code signatures, and vendor-built dynamic frameworks
-# retain their upstream signatures.
+# Cisco Session Replay xcframeworks are skipped by default because the
+# vendor-built dynamic frameworks retain their upstream signatures.
 #
 # Usage:
 #   ./scripts/sign-xcframeworks.sh [--include-cisco|--skip-cisco] "Apple Distribution: Splunk Inc. (TEAMID)"

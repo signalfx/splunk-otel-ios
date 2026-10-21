@@ -1,9 +1,9 @@
 #!/bin/bash
 # tools/xcframework/scripts/build-cisco-xcframeworks.sh
 #
-# Builds Cisco Session Replay xcframeworks from a local Session Replay
-# repository checkout. Static libraries are the default so the distribution
-# can be consumed by hybrid apps that use static framework linkage.
+# Builds Cisco Session Replay xcframeworks as dynamic frameworks from a local
+# Session Replay repository checkout, preserving the distribution model used
+# to address package-resolution issues for T-Mobile integrations.
 #
 # Usage:
 #   SESSION_REPLAY_LOCAL_PATH=/path/to/session-replay ./scripts/build-cisco-xcframeworks.sh
@@ -24,7 +24,7 @@ OUTPUT_DIR="${TOOLS_ROOT}/output/xcframeworks"
 DEPS_DIR="${TOOLS_ROOT}/dependencies"
 BUILD_ROOT="${CISCO_BUILD_DIR:-${TOOLS_ROOT}/build/cisco-session-replay}"
 CISCO_DIST_DIR="${BUILD_ROOT}/cisco-session-replay-frameworks"
-CISCO_MACH_O_TYPE="${CISCO_MACH_O_TYPE:-staticlib}"
+CISCO_MACH_O_TYPE="${CISCO_MACH_O_TYPE:-mh_dylib}"
 
 SESSION_REPLAY_PATH="${SESSION_REPLAY_LOCAL_PATH:-}"
 SOURCE_COMMIT=""

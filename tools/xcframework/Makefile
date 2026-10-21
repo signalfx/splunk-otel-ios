@@ -6,7 +6,7 @@
 # Usage:
 #   make build                                     # Build all xcframeworks
 #   make build-otel                                # Build only OTel xcframeworks
-#   make build-cisco                               # Build static Cisco xcframeworks from local Session Replay checkout
+#   make build-cisco                               # Build dynamic Cisco xcframeworks from local Session Replay checkout
 #   make build-agent                               # Build only SplunkAgent xcframeworks
 #   make sign SIGNING_IDENTITY="Apple Distribution: Splunk Inc."  # Sign non-Cisco xcframeworks
 #   make validate                                  # Validate all xcframeworks
@@ -23,7 +23,7 @@
 # Environment Variables:
 #   OTEL_VERSION          - OpenTelemetry Swift Core version (read from Package.swift)
 #   SESSION_REPLAY_LOCAL_PATH - Required path to local Session Replay repo for Cisco xcframeworks
-#   CISCO_MACH_O_TYPE - Session Replay output type (staticlib by default)
+#   CISCO_MACH_O_TYPE - Session Replay output type (mh_dylib by default)
 #   CISCO_XCFRAMEWORKS_PATH - Legacy path to prebuilt Cisco SR xcframeworks directory
 #   SIGNING_IDENTITY      - Code signing identity for codesign
 #   VERSION               - Release version number
@@ -58,7 +58,7 @@ RELEASE                 ?= false
 IOS_ONLY                ?= false
 SESSION_REPLAY_LOCAL_PATH ?=
 CISCO_XCFRAMEWORKS_PATH ?=
-CISCO_MACH_O_TYPE       ?= staticlib
+CISCO_MACH_O_TYPE       ?= mh_dylib
 
 # ---------------------------------------------------------------------------
 # Targets
@@ -78,7 +78,7 @@ help:
 	@echo "Variables:"
 	@echo "  OTEL_VERSION              OTel Swift Core version (default: $(OTEL_VERSION))"
 	@echo "  SESSION_REPLAY_LOCAL_PATH Required path to local Session Replay repo"
-	@echo "  CISCO_MACH_O_TYPE         Session Replay output type (default: staticlib)"
+	@echo "  CISCO_MACH_O_TYPE         Session Replay output type (default: mh_dylib)"
 	@echo "  CISCO_XCFRAMEWORKS_PATH   Legacy path to prebuilt Cisco xcframeworks"
 	@echo "  SIGNING_IDENTITY          Apple code signing identity"
 	@echo "  VERSION                   Release version (required for 'make release')"
@@ -120,7 +120,7 @@ build-otel:
 	OTEL_VERSION=$(OTEL_VERSION) IOS_ONLY=$(IOS_ONLY) $(SCRIPTS_DIR)/build-otel-xcframeworks.sh
 
 
-## build-cisco: Build static Cisco Session Replay xcframeworks from local source
+## build-cisco: Build dynamic Cisco Session Replay xcframeworks from local source
 .PHONY: build-cisco
 build-cisco:
 	@echo "==> Building $(CISCO_MACH_O_TYPE) Cisco Session Replay xcframeworks..."

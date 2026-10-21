@@ -5,7 +5,7 @@ Build tooling for producing signed, multi-platform xcframeworks from the Splunk 
 ## Quick Start
 
 ```bash
-# Full build: OTel + static Cisco Session Replay + static Agent modules
+# Full build: OTel + dynamic Cisco Session Replay + static Agent modules
 export SESSION_REPLAY_LOCAL_PATH=/path/to/session-replay-repo
 make build
 
@@ -26,8 +26,8 @@ The `make build` target requires `SESSION_REPLAY_LOCAL_PATH` and runs four stage
 | Stage | Command | What it does |
 |-------|---------|-------------|
 | 1 | `make build-otel` | Clones `opentelemetry-swift-core`, generates a Tuist project, and archives `OpenTelemetryApi` + `OpenTelemetrySdk` for all 7 platform slices, or 2 slices with `IOS_ONLY=true` |
-| 2 | `make build-cisco` | Builds all 14 Cisco Session Replay frameworks as **static-library** xcframeworks from the local Session Replay checkout |
-| 3 | `make populate-deps` | Stages OTel and already-built static Cisco xcframeworks into `dependencies/` |
+| 2 | `make build-cisco` | Builds all 14 Cisco Session Replay frameworks as **dynamic** xcframeworks from the local Session Replay checkout |
+| 3 | `make populate-deps` | Stages OTel and already-built dynamic Cisco xcframeworks into `dependencies/` |
 | 4 | `make build-agent` | Generates the main Tuist workspace and builds all Splunk modules as static xcframeworks, plus the dynamic vendored `SplunkCrashReporter` |
 
 ### Output
@@ -78,7 +78,7 @@ output/xcframeworks/
 
 Static framework companion bundles for `SplunkAgent`, `SplunkAgentObjC`, and `SplunkWebView` are placed in `output/resources/` and included in the release archive.
 
-Cisco Session Replay and Splunk Agent module xcframeworks are built as static frameworks for hybrid consumers, including React Native apps using static framework linkage. Keeping the Agent modules static also ensures shared Cisco archives are linked into the final app once instead of being copied into multiple dynamic Agent frameworks. `SplunkCrashReporter` and OpenTelemetry remain dynamic frameworks. `Package.swift` uses a separate registry of published static Cisco binaries; update that registry when upstream publishes the five new module artifacts and checksums. The legacy `populate-dependencies.sh --download-cisco` option is disabled until that registry contains all 14 modules.
+Cisco Session Replay xcframeworks in the binary distribution are built as dynamic frameworks, preserving the distribution model established to address package-resolution issues for T-Mobile integrations. Splunk Agent module xcframeworks remain static for hybrid consumers, including React Native apps using static framework linkage; `SplunkCrashReporter` and OpenTelemetry remain dynamic. `Package.swift` uses a separate registry of published static Cisco binaries, which this build-output setting does not change. The legacy `populate-dependencies.sh --download-cisco` option is disabled until that registry contains all 14 modules.
 
 ### Platform Matrix
 
@@ -102,7 +102,7 @@ Key variables in the Makefile:
 |----------|---------|-------------|
 | `OTEL_VERSION` | `2.3.0` | OpenTelemetry Swift Core tag to build |
 | `SESSION_REPLAY_LOCAL_PATH` | *(required)* | Local path to the Session Replay repository |
-| `CISCO_MACH_O_TYPE` | `staticlib` | Session Replay output type (`staticlib` or `mh_dylib`) |
+| `CISCO_MACH_O_TYPE` | `mh_dylib` | Session Replay output type (`mh_dylib` or `staticlib`) |
 | `CISCO_XCFRAMEWORKS_PATH` | *(empty)* | Legacy path to prebuilt Cisco xcframeworks |
 | `IOS_ONLY` | `false` | Build and validate only `ios-arm64` and `ios-arm64_x86_64-simulator` slices |
 
@@ -110,7 +110,7 @@ Key variables in the Makefile:
 
 ## Release
 
-The build workflow checks out the private Session Replay repository with read-only access, builds static Cisco and Agent modules, validates platform slices, and runs the consumer linkage smoke test. Configure the `SESSION_REPLAY_READ_TOKEN` repository secret with read access to `smartlook-ios-sdk-private`. Signed release packaging remains a local process while distribution certificates cannot be stored in GitHub secrets.
+The build workflow checks out the private Session Replay repository with read-only access, builds dynamic Cisco and static Agent modules, validates platform slices, and runs the consumer linkage smoke test. Configure the `SESSION_REPLAY_READ_TOKEN` repository secret with read access to `smartlook-ios-sdk-private`. Signed release packaging remains a local process while distribution certificates cannot be stored in GitHub secrets.
 
 ### How it works
 
@@ -136,7 +136,7 @@ export SESSION_REPLAY_LOCAL_PATH=/path/to/session-replay-repo
 
 The script will:
 - Auto-detect your signing identity from the local keychain
-- Build OTel, static Cisco, and Splunk xcframeworks locally
+- Build OTel, dynamic Cisco, and Splunk xcframeworks locally
 - Record the Session Replay commit, branch, and dirty state in `cisco-release-manifest.txt`
 - Sign non-Cisco xcframeworks while preserving pre-signed Cisco framework signatures
 - Validate signatures for all shipped xcframeworks
@@ -204,7 +204,7 @@ For an iOS-only manual build, pass `IOS_ONLY=true` to `make build`, `make valida
 
 2. **Drag and drop** all `.xcframework` bundles and the three resource bundles under `resources/` into your Xcode project navigator.
 
-3. For each target that uses Splunk RUM, go to **General > Frameworks, Libraries, and Embedded Content**. Set the static Cisco and Splunk Agent module frameworks to **Do Not Embed**. Set the dynamic `OpenTelemetryApi`, `OpenTelemetrySdk`, and `SplunkCrashReporter` frameworks to **Embed & Sign**. Ensure all three resource bundles appear in the app target's **Build Phases > Copy Bundle Resources**; static frameworks do not carry them into the app automatically.
+3. For each target that uses Splunk RUM, go to **General > Frameworks, Libraries, and Embedded Content**. Set the static Splunk Agent module frameworks to **Do Not Embed**. Set the dynamic Cisco, `OpenTelemetryApi`, `OpenTelemetrySdk`, and `SplunkCrashReporter` frameworks to **Embed & Sign**. Ensure all three resource bundles appear in the app target's **Build Phases > Copy Bundle Resources**; static frameworks do not carry them into the app automatically.
 
 4. **Import** the SDK in your code:
 

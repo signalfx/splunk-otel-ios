@@ -6,7 +6,7 @@
 # GitHub release.
 #
 # Default mode is fully local and requires SESSION_REPLAY_LOCAL_PATH (or
-# --session-replay-path) so Cisco frameworks are built as static frameworks
+# --session-replay-path) so Cisco frameworks are built as dynamic frameworks
 # from the Session Replay repository. The --run-id mode is a legacy path for
 # downloading a prebuilt unsigned artifact and must not refresh Cisco from
 # Package.swift static binary target URLs.
