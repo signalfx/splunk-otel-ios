@@ -14,7 +14,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 * Updated Cisco Session Replay binaries to 2.0.0.300.
-* The XCFramework release pipeline builds Cisco Session Replay modules as dynamic frameworks and Splunk Agent modules as static frameworks. It includes an SDK size report for the five new Session Replay modules and ships the SplunkAgent, SplunkAgentObjC, and SplunkWebView resource bundles required by static linkage.
+* The XCFramework release pipeline builds Cisco Session Replay modules as dynamic frameworks and Splunk Agent modules as static frameworks. It includes an SDK size report for the five new Session Replay modules and ships platform-specific SplunkAgent, SplunkAgentObjC, and SplunkWebView resource bundles required by static linkage.
 
 ## [2.4.3] - 2026-10-14
 

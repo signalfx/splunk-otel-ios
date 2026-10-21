@@ -158,7 +158,9 @@ xcframework_dir = pathlib.Path(sys.argv[2])
 resource_dir = pathlib.Path(sys.argv[3])
 available = {path.name for path in xcframework_dir.glob("*.xcframework") if path.is_dir()}
 resources = sorted(
-    f"resources/{path.name}" for path in resource_dir.glob("*.bundle") if path.is_dir()
+    f"resources/{path.relative_to(resource_dir)}"
+    for path in resource_dir.rglob("*.bundle")
+    if path.is_dir()
 )
 
 manifest = json.loads(manifest_path.read_text())

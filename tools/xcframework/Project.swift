@@ -213,7 +213,7 @@ func ciscoSessionReplayDependencies() -> [TargetDependency] {
         dep("CiscoRuntimeCache"),
         dep("CiscoScreenshot"),
         dep("CiscoSnapshotManager"),
-        dep("CiscoDataExporter"),
+        dep("CiscoDataExporter")
     ]
 }
 

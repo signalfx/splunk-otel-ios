@@ -323,7 +323,9 @@ create_all_xcframeworks() {
     done
 
     # Static frameworks cannot carry runtime resources into the consuming app.
-    # Ship each Tuist-generated companion bundle alongside the XCFrameworks.
+    # Preserve the Tuist-generated bundle for each platform slice so consumers
+    # can copy the matching platform bundle into their app target.
+    rm -rf "${RESOURCES_DIR}"
     mkdir -p "${RESOURCES_DIR}"
     copy_resource_bundle SplunkWebView SplunkAgentXCFrameworks_SplunkWebView
     copy_resource_bundle SplunkAgent SplunkAgentXCFrameworks_SplunkAgent
@@ -333,17 +335,24 @@ create_all_xcframeworks() {
 copy_resource_bundle() {
     local scheme="$1"
     local bundle_name="$2"
-    local archive_path="${ARCHIVES_DIR}/${scheme}-ios.xcarchive"
-    local resource_bundle
-    resource_bundle="$(find "${archive_path}/Products" -type d -name "${bundle_name}.bundle" -print -quit)"
-    if [[ -z "${resource_bundle}" ]]; then
-        echo "ERROR: ${bundle_name}.bundle not found in ${archive_path}"
-        exit 1
-    fi
+    while IFS= read -r platform_entry; do
+        [[ -z "${platform_entry}" ]] && continue
+        local label
+        label="$(platform_label "${platform_entry}")"
+        local archive_path="${ARCHIVES_DIR}/${scheme}-${label}.xcarchive"
+        local resource_bundle
+        resource_bundle="$(find "${archive_path}/Products" -type d -name "${bundle_name}.bundle" -print -quit)"
+        if [[ -z "${resource_bundle}" ]]; then
+            echo "ERROR: ${bundle_name}.bundle not found in ${archive_path}"
+            exit 1
+        fi
 
-    rm -rf "${RESOURCES_DIR}/${bundle_name}.bundle"
-    cp -R "${resource_bundle}" "${RESOURCES_DIR}/"
-    echo "  ✓ ${bundle_name}.bundle resource bundle"
+        local platform_resources_dir="${RESOURCES_DIR}/${label}"
+        mkdir -p "${platform_resources_dir}"
+        rm -rf "${platform_resources_dir}/${bundle_name}.bundle"
+        cp -R "${resource_bundle}" "${platform_resources_dir}/"
+        echo "  ✓ ${label}/${bundle_name}.bundle resource bundle"
+    done < <(get_platforms "${scheme}")
 }
 
 

@@ -76,7 +76,7 @@ output/xcframeworks/
 └── SplunkSessionReplayProxy.xcframework
 ```
 
-Static framework companion bundles for `SplunkAgent`, `SplunkAgentObjC`, and `SplunkWebView` are placed in `output/resources/` and included in the release archive.
+Static framework companion bundles for `SplunkAgent`, `SplunkAgentObjC`, and `SplunkWebView` are built for each supported platform and included under platform-named directories in `output/resources/` and the release archive.
 
 Cisco Session Replay xcframeworks in the binary distribution are built as dynamic frameworks, preserving the distribution model established to address package-resolution issues for T-Mobile integrations. Splunk Agent module xcframeworks remain static for hybrid consumers, including React Native apps using static framework linkage; `SplunkCrashReporter` and OpenTelemetry remain dynamic. `Package.swift` uses a separate registry of published static Cisco binaries, which this build-output setting does not change. The legacy `populate-dependencies.sh --download-cisco` option is disabled until that registry contains all 14 modules.
 
@@ -202,9 +202,9 @@ For an iOS-only manual build, pass `IOS_ONLY=true` to `make build`, `make valida
 
 1. **Download** the release `.zip` and extract it. You will have a folder containing all `.xcframework` bundles.
 
-2. **Drag and drop** all `.xcframework` bundles and the three resource bundles under `resources/` into your Xcode project navigator.
+2. **Drag and drop** all `.xcframework` bundles and the three resource bundles from the directory under `resources/` matching the app target's platform (for example, `resources/ios/` for iOS device builds or `resources/tvos/` for tvOS).
 
-3. For each target that uses Splunk RUM, go to **General > Frameworks, Libraries, and Embedded Content**. Set the static Splunk Agent module frameworks to **Do Not Embed**. Set the dynamic Cisco, `OpenTelemetryApi`, `OpenTelemetrySdk`, and `SplunkCrashReporter` frameworks to **Embed & Sign**. Ensure all three resource bundles appear in the app target's **Build Phases > Copy Bundle Resources**; static frameworks do not carry them into the app automatically.
+3. For each target that uses Splunk RUM, go to **General > Frameworks, Libraries, and Embedded Content**. Set the static Splunk Agent module frameworks to **Do Not Embed**. Set the dynamic Cisco, `OpenTelemetryApi`, `OpenTelemetrySdk`, and `SplunkCrashReporter` frameworks to **Embed & Sign**. Ensure the three matching platform resource bundles appear in the app target's **Build Phases > Copy Bundle Resources**; static frameworks do not carry them into the app automatically.
 
 4. **Import** the SDK in your code:
 
@@ -233,9 +233,9 @@ At a minimum, you need these frameworks:
 | Framework | Purpose |
 |-----------|---------|
 | `SplunkAgent.xcframework` | Main SDK and public API |
-| `resources/SplunkAgentXCFrameworks_SplunkAgent.bundle` | Privacy manifest and notices for the Swift SDK |
-| `resources/SplunkAgentXCFrameworks_SplunkAgentObjC.bundle` | Privacy manifest and notices for the Objective-C SDK |
-| `resources/SplunkAgentXCFrameworks_SplunkWebView.bundle` | JavaScript injected by `SplunkWebView` |
+| `resources/<platform>/SplunkAgentXCFrameworks_SplunkAgent.bundle` | Privacy manifest and notices for the Swift SDK |
+| `resources/<platform>/SplunkAgentXCFrameworks_SplunkAgentObjC.bundle` | Privacy manifest and notices for the Objective-C SDK |
+| `resources/<platform>/SplunkAgentXCFrameworks_SplunkWebView.bundle` | JavaScript injected by `SplunkWebView` |
 | `SplunkCommon.xcframework` | Shared types and protocols |
 | `SplunkOpenTelemetry.xcframework` | OpenTelemetry integration |
 | `SplunkOpenTelemetryBackgroundExporter.xcframework` | OTLP export with background support |

@@ -90,7 +90,7 @@ cd "${OUTPUT_DIR}"
 
 ZIP_INPUTS=(xcframeworks/*.xcframework dependency-manifest.json)
 if [[ -d "resources" ]]; then
-    ZIP_INPUTS+=(resources/*.bundle)
+    ZIP_INPUTS+=(resources)
 fi
 if [[ -f "size-report.md" ]]; then
     ZIP_INPUTS+=(size-report.md)

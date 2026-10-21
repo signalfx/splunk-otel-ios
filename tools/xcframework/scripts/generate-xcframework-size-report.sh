@@ -75,10 +75,9 @@ done
 
 RESOURCE_BUNDLE_KB=0
 if [[ -d "${OUTPUT_DIR}/resources" ]]; then
-    for bundle in "${OUTPUT_DIR}"/resources/*.bundle; do
-        [[ -d "${bundle}" ]] || continue
+    while IFS= read -r -d '' bundle; do
         RESOURCE_BUNDLE_KB=$((RESOURCE_BUNDLE_KB + $(size_kb "${bundle}")))
-    done
+    done < <(find "${OUTPUT_DIR}/resources" -type d -name '*.bundle' -print0)
 fi
 SDK_TOTAL_KB=$((SDK_TOTAL_KB + RESOURCE_BUNDLE_KB))
 
@@ -102,7 +101,7 @@ fi
     echo "| Distribution | Size |"
     echo "| --- | ---: |"
     echo "| Overall SDK distribution (${#FRAMEWORKS[@]} frameworks + resource bundles) | $(format_mib "${SDK_TOTAL_KB}") |"
-    echo "| SplunkWebView resource bundles | $(format_mib "${RESOURCE_BUNDLE_KB}") |"
+    echo "| Static framework resource bundles | $(format_mib "${RESOURCE_BUNDLE_KB}") |"
     echo "| Session Replay frameworks (${#CISCO_FRAMEWORKS[@]} frameworks) | $(format_mib "${CISCO_TOTAL_KB}") |"
     echo "| Existing Session Replay modules (9 frameworks) | $(format_mib "${BASE_CISCO_TOTAL_KB}") |"
     echo "| Added Session Replay modules (5 frameworks) | $(format_mib "${NEW_CISCO_TOTAL_KB}") |"
