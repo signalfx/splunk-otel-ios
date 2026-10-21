@@ -376,23 +376,10 @@ struct SpanDataIsolatedCopyTests {
                     let copy = original.isolatedCopy()
 
                     // Verify all expected data is present and correct
-                    guard copy.attributes["http.method"]?.description == "GET" else {
-                        return false
-                    }
-
-                    guard copy.attributes["http.status_code"]?.description == "200" else {
-                        return false
-                    }
-
-                    guard copy.attributes["http.url"]?.description == "https://example.com/api" else {
-                        return false
-                    }
-
-                    guard copy.events.first?.name == expectedEventName else {
-                        return false
-                    }
-
-                    guard copy.events.first?.attributes[expectedEventAttr]?.description == "2025-01-01" else {
+                    guard copy.attributes["http.method"]?.description == "GET", copy.attributes["http.status_code"]?.description == "200",
+                        copy.attributes["http.url"]?.description == "https://example.com/api", copy.events.first?.name == expectedEventName,
+                        copy.events.first?.attributes[expectedEventAttr]?.description == "2025-01-01"
+                    else {
                         return false
                     }
 
