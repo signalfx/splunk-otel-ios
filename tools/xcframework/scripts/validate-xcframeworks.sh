@@ -502,11 +502,7 @@ validate_xcframework() {
     fi
 
     if [[ "${RELEASE}" == "true" ]]; then
-        local expected_linkage
-        expected_linkage="$(expected_linkage_for "${name}" || true)"
-        if [[ "${expected_linkage}" == "static" ]]; then
-            check_pass "Static library does not require a framework code signature"
-        elif codesign --verify --deep --strict "${xcfw_path}" 2>/dev/null; then
+        if codesign --verify --deep --strict "${xcfw_path}" 2>/dev/null; then
             check_pass "Code signature valid"
         else
             check_fail "Code signature invalid or missing (required for release)"
