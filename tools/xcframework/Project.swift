@@ -1,6 +1,6 @@
 // tools/xcframework/Project.swift
 //
-// Tuist manifest for building all SplunkAgent SDK modules as dynamic
+// Tuist manifest for building all SplunkAgent SDK modules as static
 // xcframeworks. Each module is a separate framework target with
 // BUILD_LIBRARY_FOR_DISTRIBUTION=YES for stable ABI.
 //
@@ -193,7 +193,7 @@ func ciscoRuntimeCacheDependencies() -> [TargetDependency] {
     ]
 }
 
-/// CiscoSessionReplay imports most Cisco support frameworks in its public interface.
+/// CiscoSessionReplay imports its support modules in its public interface.
 func ciscoSessionReplayDependencies() -> [TargetDependency] {
     [
         dep("CiscoSessionReplay"),
@@ -209,7 +209,11 @@ func ciscoSessionReplayDependencies() -> [TargetDependency] {
         dep("CiscoSwizzling"),
         dep("CiscoVideoEncoder"),
         dep("CiscoWireframe"),
-        dep("CiscoInstanceManager")
+        dep("CiscoInstanceManager"),
+        dep("CiscoRuntimeCache"),
+        dep("CiscoScreenshot"),
+        dep("CiscoSnapshotManager"),
+        dep("CiscoDataExporter")
     ]
 }
 
@@ -289,7 +293,7 @@ let project = Project(
         .target(
             name: "SplunkCommon",
             destinations: allPlatforms,
-            product: .framework,
+            product: .staticFramework,
             bundleId: "com.splunk.rum.common",
             sources: "\(repoRoot)/SplunkCommon/Sources/**",
             dependencies: [
@@ -306,7 +310,7 @@ let project = Project(
         .target(
             name: "SplunkNavigation",
             destinations: allPlatforms,
-            product: .framework,
+            product: .staticFramework,
             bundleId: "com.splunk.rum.navigation",
             sources: "\(repoRoot)/SplunkNavigation/Sources/**",
             dependencies: [
@@ -324,7 +328,7 @@ let project = Project(
         .target(
             name: "SplunkNetwork",
             destinations: allPlatforms,
-            product: .framework,
+            product: .staticFramework,
             bundleId: "com.splunk.rum.network",
             sources: "\(repoRoot)/SplunkNetwork/Sources/**",
             dependencies: [
@@ -343,7 +347,7 @@ let project = Project(
         .target(
             name: "SplunkNetworkMonitor",
             destinations: allPlatforms,
-            product: .framework,
+            product: .staticFramework,
             bundleId: "com.splunk.rum.networkmonitor",
             sources: "\(repoRoot)/SplunkNetworkMonitor/Sources/**",
             dependencies: [
@@ -362,7 +366,7 @@ let project = Project(
         .target(
             name: "SplunkSlowFrameDetector",
             destinations: allPlatforms,
-            product: .framework,
+            product: .staticFramework,
             bundleId: "com.splunk.rum.slowframedetector",
             sources: "\(repoRoot)/SplunkSlowFrameDetector/Sources/**",
             dependencies: [
@@ -392,7 +396,7 @@ let project = Project(
         .target(
             name: "SplunkCrashReports",
             destinations: platformsNoCrashReporter,
-            product: .framework,
+            product: .staticFramework,
             bundleId: "com.splunk.rum.crashreports",
             sources: "\(repoRoot)/SplunkCrashReports/Sources/**",
             dependencies: [
@@ -411,7 +415,7 @@ let project = Project(
         .target(
             name: "SplunkOpenTelemetryBackgroundExporter",
             destinations: allPlatforms,
-            product: .framework,
+            product: .staticFramework,
             bundleId: "com.splunk.rum.otelbackgroundexporter",
             sources: "\(repoRoot)/SplunkOpenTelemetryBackgroundExporter/Sources/**",
             dependencies: [
@@ -431,7 +435,7 @@ let project = Project(
         .target(
             name: "SplunkOpenTelemetry",
             destinations: allPlatforms,
-            product: .framework,
+            product: .staticFramework,
             bundleId: "com.splunk.rum.opentelemetry",
             sources: "\(repoRoot)/SplunkOpenTelemetry/Sources/**",
             dependencies: [
@@ -451,7 +455,7 @@ let project = Project(
         .target(
             name: "SplunkInteractions",
             destinations: allPlatforms,
-            product: .framework,
+            product: .staticFramework,
             bundleId: "com.splunk.rum.interactions",
             sources: "\(repoRoot)/SplunkInteractions/Sources/**",
             dependencies: [
@@ -469,7 +473,7 @@ let project = Project(
         .target(
             name: "SplunkAppStart",
             destinations: allPlatforms,
-            product: .framework,
+            product: .staticFramework,
             bundleId: "com.splunk.rum.appstart",
             sources: "\(repoRoot)/SplunkAppStart/Sources/**",
             dependencies: [
@@ -487,7 +491,7 @@ let project = Project(
         .target(
             name: "SplunkAppState",
             destinations: allPlatforms,
-            product: .framework,
+            product: .staticFramework,
             bundleId: "com.splunk.rum.appstate",
             sources: "\(repoRoot)/SplunkAppState/Sources/**",
             dependencies: [
@@ -506,7 +510,7 @@ let project = Project(
         .target(
             name: "SplunkWebView",
             destinations: allPlatforms,
-            product: .framework,
+            product: .staticFramework,
             bundleId: "com.splunk.rum.webview",
             sources: "\(repoRoot)/SplunkWebView/Sources/**",
             resources: [
@@ -526,7 +530,7 @@ let project = Project(
         .target(
             name: "SplunkCustomTracking",
             destinations: allPlatforms,
-            product: .framework,
+            product: .staticFramework,
             bundleId: "com.splunk.rum.customtracking",
             sources: "\(repoRoot)/SplunkCustomTracking/Sources/**",
             dependencies: [
@@ -545,7 +549,7 @@ let project = Project(
         .target(
             name: "SplunkSessionReplayProxy",
             destinations: allPlatforms,
-            product: .framework,
+            product: .staticFramework,
             bundleId: "com.splunk.rum.sessionreplayproxy",
             sources: "\(repoRoot)/SplunkSessionReplayProxy/Sources/**",
             dependencies: [
@@ -566,7 +570,7 @@ let project = Project(
         .target(
             name: "SplunkAgent",
             destinations: allPlatforms,
-            product: .framework,
+            product: .staticFramework,
             bundleId: "com.splunk.rum.agent",
             sources: "\(repoRoot)/SplunkAgent/Sources/SplunkAgent/**",
             resources: [
@@ -603,7 +607,7 @@ let project = Project(
         .target(
             name: "SplunkAgentObjC",
             destinations: allPlatforms,
-            product: .framework,
+            product: .staticFramework,
             bundleId: "com.splunk.rum.agentobjc",
             sources: "\(repoRoot)/SplunkAgent/Sources/SplunkAgentObjC/**",
             resources: [

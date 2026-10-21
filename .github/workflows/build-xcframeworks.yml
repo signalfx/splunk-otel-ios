@@ -1,16 +1,12 @@
 name: Build XCFrameworks
 
-# Trigger:
-#   1. Manually via workflow_dispatch for legacy/testing builds with caller-provided
-#      dynamic Cisco xcframework artifacts.
-#
-# This workflow is no longer the default release path while Session Replay lives
-# in a separate repository. The supported release path is local:
-#   tools/xcframework/scripts/sign-and-upload.sh <VERSION>
+# Trigger manually to build and validate the complete binary distribution.
+# Session Replay source is checked out from its private repository using a
+# read-only repository token.
 #
 # Architecture:
-#   Job 1 (build): Build OTel + Agent modules, stage Cisco artifacts → upload artifact
-#   Job 2 (sign-and-release): Optional legacy signing, validation, and packaging
+#   Job 1 (build): Build OTel + dynamic Session Replay + static Agent modules → upload artifact
+#   Job 2 (sign-and-release): Optional signing, validation, and packaging
 
 on:
   workflow_dispatch:
@@ -20,15 +16,11 @@ on:
         required: false
         default: "2.3.0"
         type: string
-      cisco-xcframeworks-run-id:
-        description: "GitHub Actions run ID with dynamic Cisco SR xcframeworks artifact (required)"
-        required: true
-        type: string
-      skip-cisco:
-        description: "Skip Cisco SR frameworks (for partial builds without Session Replay)"
+      session-replay-ref:
+        description: "Branch, tag, or commit of smartlook-ios-sdk-private"
         required: false
-        default: false
-        type: boolean
+        default: "develop"
+        type: string
       skip-signing:
         description: "Skip code signing (for local testing)"
         required: false
@@ -49,9 +41,13 @@ jobs:
   build:
     name: Build XCFrameworks
     runs-on: macos-15
+    permissions:
+      contents: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v6
+        with:
+          persist-credentials: false
 
       - name: Select latest Xcode
         run: bash .github/actions/build-and-tests/scripts/select-xcode.sh
@@ -62,86 +58,58 @@ jobs:
           tuist version
 
       # -----------------------------------------------------------------
-      # Step 1: Build OTel xcframeworks from source
+      # Step 1: Check out private Session Replay source
       # -----------------------------------------------------------------
-      - name: Build OpenTelemetry xcframeworks
-        working-directory: tools/xcframework
+      - name: Check Session Replay repository credential
+        env:
+          SESSION_REPLAY_READ_TOKEN: ${{ secrets.SESSION_REPLAY_READ_TOKEN }}
         run: |
-          chmod +x scripts/*.sh
-          OTEL_VERSION="${OTEL_VERSION}" scripts/build-otel-xcframeworks.sh
+          if [ -z "$SESSION_REPLAY_READ_TOKEN" ]; then
+            echo "::error::Configure SESSION_REPLAY_READ_TOKEN with read access to smartlook-ios-sdk-private"
+            exit 1
+          fi
 
-      # -----------------------------------------------------------------
-      # Step 2: Download dynamic Cisco Session Replay xcframeworks
-      # -----------------------------------------------------------------
-      # Cisco xcframeworks must be provided explicitly. Package.swift now
-      # intentionally points to static Cisco artifacts for SPM, so this
-      # workflow must not download Cisco from Package.swift/S3 by default.
-      - name: Download Cisco SR xcframeworks
-        if: inputs.cisco-xcframeworks-run-id != ''
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+      - name: Checkout Session Replay source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v6
         with:
-          name: cisco-session-replay-dist-${{ inputs.cisco-xcframeworks-run-id }}
-          path: tools/xcframework/cisco-sr-download
-          run-id: ${{ inputs.cisco-xcframeworks-run-id }}
+          repository: smartlook/smartlook-ios-sdk-private
+          ref: ${{ inputs.session-replay-ref }}
+          token: ${{ secrets.SESSION_REPLAY_READ_TOKEN }}
+          path: tools/xcframework/session-replay
+          persist-credentials: false
 
       # -----------------------------------------------------------------
-      # Step 3: Populate dependencies and build Agent modules
+      # Step 2: Build the full distribution with dynamic Session Replay frameworks
       # -----------------------------------------------------------------
-      - name: Populate dependencies
+      - name: Build complete XCFramework distribution
         working-directory: tools/xcframework
-        run: |
-          if [ "${{ inputs.skip-cisco }}" = "true" ]; then
-            echo "::warning::skip-cisco requested — modules depending on Cisco will fail to build"
-            scripts/populate-dependencies.sh --skip-cisco
-            exit 0
-          fi
-
-          if [ ! -d "cisco-sr-download" ]; then
-            echo "::error::cisco-xcframeworks-run-id is required and must contain dynamic Cisco xcframeworks"
-            exit 1
-          fi
-
-          CISCO_DIR="$(find cisco-sr-download -name "*.xcframework" -maxdepth 2 -exec dirname {} \; | head -1)"
-          if [ -z "$CISCO_DIR" ]; then
-            echo "::error::No Cisco xcframeworks found in downloaded artifact"
-            exit 1
-          fi
-
-          echo "Using dynamic Cisco xcframeworks from artifact: $CISCO_DIR"
-          scripts/populate-dependencies.sh --cisco-path "$(pwd)/$CISCO_DIR"
-
-      - name: Generate Tuist project
-        working-directory: tools/xcframework
-        run: |
-          tuist generate --no-open --no-binary-cache
-          scripts/fix-tuist-warnings.sh SplunkAgentXCFrameworks.xcodeproj
-
-      - name: Build Agent module xcframeworks
-        working-directory: tools/xcframework
-        run: scripts/build-xcframeworks.sh
+        env:
+          SESSION_REPLAY_LOCAL_PATH: ${{ github.workspace }}/tools/xcframework/session-replay
+          CISCO_MACH_O_TYPE: mh_dylib
+        run: make clean build
 
       # -----------------------------------------------------------------
-      # Step 4: Validate (pre-signing)
+      # Step 3: Validate (pre-signing)
       # -----------------------------------------------------------------
       - name: Validate xcframeworks (pre-signing)
         working-directory: tools/xcframework
         run: RELEASE=false scripts/validate-xcframeworks.sh
 
       # -----------------------------------------------------------------
-      # Step 5: Smoke test (consumer linkage)
+      # Step 4: Smoke test (consumer linkage)
       # -----------------------------------------------------------------
       - name: Run smoke test
         working-directory: tools/xcframework
         run: scripts/run-smoke-test.sh
 
       # -----------------------------------------------------------------
-      # Step 6: Upload build artifacts
+      # Step 5: Upload build artifacts
       # -----------------------------------------------------------------
       - name: Upload xcframeworks artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: splunk-agent-xcframeworks-unsigned
-          path: tools/xcframework/output/xcframeworks/
+          path: tools/xcframework/output/
           retention-days: 7
 
 
@@ -170,7 +138,7 @@ jobs:
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           name: splunk-agent-xcframeworks-unsigned
-          path: tools/xcframework/output/xcframeworks/
+          path: tools/xcframework/output/
 
       # -----------------------------------------------------------------
       # Signing
@@ -186,7 +154,7 @@ jobs:
         working-directory: tools/xcframework
         run: |
           chmod +x scripts/*.sh
-          scripts/sign-xcframeworks.sh --include-cisco "${{ steps.signing.outputs.signing-identity }}"
+          scripts/sign-xcframeworks.sh "${{ steps.signing.outputs.signing-identity }}"
 
       # -----------------------------------------------------------------
       # Post-signing validation

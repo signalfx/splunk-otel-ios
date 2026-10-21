@@ -2,17 +2,18 @@
 # tools/xcframework/scripts/build-cisco-xcframeworks.sh
 #
 # Builds Cisco Session Replay xcframeworks as dynamic frameworks from a local
-# Session Replay repository checkout. This is intentionally separate from
-# Package.swift binary target URLs, which point at static Cisco artifacts for
-# SPM consumption.
+# Session Replay repository checkout, preserving the distribution model used
+# to address package-resolution issues for T-Mobile integrations.
 #
 # Usage:
 #   SESSION_REPLAY_LOCAL_PATH=/path/to/session-replay ./scripts/build-cisco-xcframeworks.sh
 #   ./scripts/build-cisco-xcframeworks.sh --session-replay-path /path/to/session-replay
 #   ./scripts/build-cisco-xcframeworks.sh --session-replay-path /path/to/session-replay --ios-only
+#   ./scripts/build-cisco-xcframeworks.sh --build-dir /tmp/cisco-build
 #
 # Environment variables:
 #   IOS_ONLY - When true, build only iOS device and simulator slices
+#   CISCO_MACH_O_TYPE - Session Replay output type: staticlib or mh_dylib
 
 set -euo pipefail
 
@@ -21,8 +22,9 @@ TOOLS_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
 OUTPUT_DIR="${TOOLS_ROOT}/output/xcframeworks"
 DEPS_DIR="${TOOLS_ROOT}/dependencies"
-BUILD_ROOT="${TOOLS_ROOT}/build/cisco-session-replay"
+BUILD_ROOT="${CISCO_BUILD_DIR:-${TOOLS_ROOT}/build/cisco-session-replay}"
 CISCO_DIST_DIR="${BUILD_ROOT}/cisco-session-replay-frameworks"
+CISCO_MACH_O_TYPE="${CISCO_MACH_O_TYPE:-mh_dylib}"
 
 SESSION_REPLAY_PATH="${SESSION_REPLAY_LOCAL_PATH:-}"
 SOURCE_COMMIT=""
@@ -46,6 +48,11 @@ CISCO_FRAMEWORKS=(
     "CiscoSessionReplay"
     "CiscoInstanceManager"
     "CiscoRuntimeCache"
+    "CiscoVideoEncoder"
+    "CiscoScreenshot"
+    "CiscoWireframe"
+    "CiscoDataExporter"
+    "CiscoSnapshotManager"
 )
 
 while [[ $# -gt 0 ]]; do
@@ -62,6 +69,10 @@ while [[ $# -gt 0 ]]; do
             DEPS_DIR="$2"
             shift 2
             ;;
+        --build-dir)
+            BUILD_ROOT="$2/cisco-session-replay"
+            shift 2
+            ;;
         --ios-only)
             IOS_ONLY=true
             shift
@@ -72,6 +83,10 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
+# Recompute derived paths after argument parsing so --build-dir isolates both
+# this script's staging directory and the output consumed by the upstream build.
+CISCO_DIST_DIR="${BUILD_ROOT}/cisco-session-replay-frameworks"
 
 log() {
     echo "==> $*"
@@ -149,11 +164,30 @@ verify_dynamic_framework() {
     fi
 }
 
+verify_static_framework() {
+    local framework="$1"
+    local xcfw_path="$2"
+    local binary_count=0
+
+    while IFS= read -r binary_path; do
+        [[ -n "${binary_path}" ]] || continue
+        binary_count=$((binary_count + 1))
+
+        if ! file "${binary_path}" | grep -Eqi 'archive'; then
+            fail "${framework}.xcframework contains a non-static binary: ${binary_path}"
+        fi
+    done < <(find "${xcfw_path}" -path "*/${framework}.framework/${framework}" -type f)
+
+    if [[ "${binary_count}" -eq 0 ]]; then
+        fail "No framework binaries found in ${xcfw_path}"
+    fi
+}
+
 stage_framework() {
     local framework="$1"
     local zip_file
     zip_file="$(
-        find "${CISCO_DIST_DIR}" -path "*/mh_dylib/*.zip" -type f 2>/dev/null | while IFS= read -r candidate; do
+        find "${CISCO_DIST_DIR}" -path "*/${CISCO_MACH_O_TYPE}/*.zip" -type f 2>/dev/null | while IFS= read -r candidate; do
             if zipinfo -1 "${candidate}" "${framework}.xcframework/*" >/dev/null 2>&1; then
                 echo "${candidate}"
                 break
@@ -162,7 +196,7 @@ stage_framework() {
     )"
 
     if [[ -z "${zip_file}" || ! -f "${zip_file}" ]]; then
-        fail "Built dynamic zip for ${framework} not found in ${CISCO_DIST_DIR}"
+        fail "Built ${CISCO_MACH_O_TYPE} zip for ${framework} not found in ${CISCO_DIST_DIR}"
     fi
 
     local tmp_dir
@@ -183,7 +217,17 @@ stage_framework() {
 
     rm -rf "${output_xcfw}" "${deps_xcfw}"
     ditto "${extracted_xcfw}" "${output_xcfw}"
-    verify_dynamic_framework "${framework}" "${output_xcfw}"
+    case "${CISCO_MACH_O_TYPE}" in
+        mh_dylib)
+            verify_dynamic_framework "${framework}" "${output_xcfw}"
+            ;;
+        staticlib)
+            verify_static_framework "${framework}" "${output_xcfw}"
+            ;;
+        *)
+            fail "Unsupported CISCO_MACH_O_TYPE: ${CISCO_MACH_O_TYPE} (expected staticlib or mh_dylib)"
+            ;;
+    esac
 
     ln -s "${output_xcfw}" "${deps_xcfw}"
 
@@ -218,7 +262,7 @@ write_traceability_manifest() {
         echo "source_commit=${SOURCE_COMMIT}"
         echo "source_branch=${SOURCE_BRANCH}"
         echo "source_dirty=${SOURCE_DIRTY}"
-        echo "mach_o_type=mh_dylib"
+        echo "mach_o_type=${CISCO_MACH_O_TYPE}"
         if [[ "${IOS_ONLY}" == "true" ]]; then
             echo "variant=ios-only"
             echo "sdks=iphoneos,iphonesimulator"
@@ -228,7 +272,7 @@ write_traceability_manifest() {
         fi
         echo "generated_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
         for framework in "${CISCO_FRAMEWORKS[@]}"; do
-            echo "${framework}|local|mh_dylib"
+            echo "${framework}|local|${CISCO_MACH_O_TYPE}"
         done
     } > "${manifest_path}"
 
@@ -238,7 +282,12 @@ write_traceability_manifest() {
 main() {
     require_session_replay_path
 
-    log "Building dynamic Cisco xcframeworks from ${SESSION_REPLAY_PATH}"
+    case "${CISCO_MACH_O_TYPE}" in
+        staticlib|mh_dylib) ;;
+        *) fail "Unsupported CISCO_MACH_O_TYPE: ${CISCO_MACH_O_TYPE} (expected staticlib or mh_dylib)" ;;
+    esac
+
+    log "Building ${CISCO_MACH_O_TYPE} Cisco xcframeworks from ${SESSION_REPLAY_PATH}"
     log "Output: ${OUTPUT_DIR}"
     log "Dependencies: ${DEPS_DIR}"
     log "iOS-only: ${IOS_ONLY}"
@@ -250,7 +299,7 @@ main() {
 
     local build_args=(
         --frameworks "$(frameworks_argument)"
-        --mach-o-types mh_dylib
+        --mach-o-types "${CISCO_MACH_O_TYPE}"
         --distribution-output "${CISCO_DIST_DIR}"
     )
     if [[ "${IOS_ONLY}" == "true" ]]; then
@@ -259,7 +308,7 @@ main() {
 
     "${SESSION_REPLAY_PATH}/Tools/build_frameworks.sh" "${build_args[@]}"
 
-    log "Staging dynamic Cisco xcframeworks"
+    log "Staging ${CISCO_MACH_O_TYPE} Cisco xcframeworks"
     for framework in "${CISCO_FRAMEWORKS[@]}"; do
         stage_framework "${framework}"
     done

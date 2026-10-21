@@ -143,12 +143,32 @@ download_legacy_artifact() {
     log "Downloading unsigned xcframeworks from CI run ${RUN_ID}"
 
     rm -rf "${OUTPUT_DIR}"
-    mkdir -p "${OUTPUT_DIR}"
+    rm -rf "${TOOLS_ROOT}/output/resources"
+    rm -f "${TOOLS_ROOT}/output/size-report.md"
+    mkdir -p "${TOOLS_ROOT}/output"
 
     gh run download "${RUN_ID}" \
         -n "splunk-agent-xcframeworks-unsigned" \
-        -D "${OUTPUT_DIR}" \
+        -D "${TOOLS_ROOT}/output" \
         -R "$(resolve_repo_full_name)"
+
+    # Older workflow runs uploaded the contents of output/xcframeworks/ at
+    # the artifact root. Normalize that layout for the current signer, which
+    # expects frameworks under output/xcframeworks/.
+    local direct_frameworks=()
+    while IFS= read -r -d '' framework; do
+        direct_frameworks+=("${framework}")
+    done < <(find "${TOOLS_ROOT}/output" -mindepth 1 -maxdepth 1 -type d -name "*.xcframework" -print0)
+
+    if [[ ! -d "${OUTPUT_DIR}" && "${#direct_frameworks[@]}" -gt 0 ]]; then
+        mkdir -p "${OUTPUT_DIR}"
+    fi
+
+    if [[ -d "${OUTPUT_DIR}" ]] && [[ "$(find "${OUTPUT_DIR}" -maxdepth 1 -type d -name "*.xcframework" -print -quit)" == "" ]]; then
+        for framework in "${direct_frameworks[@]}"; do
+            mv "${framework}" "${OUTPUT_DIR}/"
+        done
+    fi
 
     local xcfw_count
     xcfw_count="$(find "${OUTPUT_DIR}" -maxdepth 1 -name "*.xcframework" -type d | wc -l | tr -d ' ')"
@@ -195,7 +215,14 @@ main() {
     "${SCRIPT_DIR}/sign-xcframeworks.sh" "${SIGNING_IDENTITY}"
 
     log "Validating signed xcframeworks"
-    RELEASE=true IOS_ONLY="${IOS_ONLY}" "${SCRIPT_DIR}/validate-xcframeworks.sh"
+    local validation_args=()
+    if [[ "${IOS_ONLY}" == "true" ]]; then
+        validation_args+=(--ios-only)
+    fi
+    if [[ "${legacy_mode}" == "true" ]]; then
+        validation_args+=(--legacy-artifact)
+    fi
+    RELEASE=true "${SCRIPT_DIR}/validate-xcframeworks.sh" "${validation_args[@]}"
 
     local release_args=("${VERSION}")
     if [[ "${IOS_ONLY}" == "true" ]]; then

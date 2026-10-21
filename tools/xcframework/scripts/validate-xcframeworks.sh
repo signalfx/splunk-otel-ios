@@ -15,9 +15,16 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TOOLS_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 OUTPUT_DIR="${TOOLS_ROOT}/output/xcframeworks"
+RESOURCE_BUNDLES_DIR="${TOOLS_ROOT}/output/resources"
 
 RELEASE="${RELEASE:-false}"
 IOS_ONLY="${IOS_ONLY:-false}"
+LEGACY_ARTIFACT=false
+CISCO_MACH_O_TYPE="${CISCO_MACH_O_TYPE:-}"
+if [[ -z "${CISCO_MACH_O_TYPE}" && -f "${OUTPUT_DIR}/cisco-release-manifest.txt" ]]; then
+    CISCO_MACH_O_TYPE="$(awk -F= '$1 == "mach_o_type" { print $2; exit }' "${OUTPUT_DIR}/cisco-release-manifest.txt")"
+fi
+CISCO_MACH_O_TYPE="${CISCO_MACH_O_TYPE:-mh_dylib}"
 
 TOTAL_CHECKS=0
 PASSED_CHECKS=0
@@ -29,6 +36,15 @@ EXPECTED_IOS_ONLY_SLICES=2
 EXPECTED_IOS_ONLY_SLICE_NAMES=(
     "ios-arm64"
     "ios-arm64_x86_64-simulator"
+)
+ALL_RESOURCE_PLATFORMS=(
+    "ios"
+    "ios-simulator"
+    "tvos"
+    "tvos-simulator"
+    "xros"
+    "xros-simulator"
+    "maccatalyst"
 )
 
 EXPECTED_FRAMEWORKS=(
@@ -75,12 +91,25 @@ while [[ $# -gt 0 ]]; do
             IOS_ONLY=true
             shift
             ;;
+        --legacy-artifact)
+            LEGACY_ARTIFACT=true
+            shift
+            ;;
         *)
             echo "Unknown argument: $1"
             exit 1
             ;;
     esac
 done
+
+if [[ "${LEGACY_ARTIFACT}" == "true" ]]; then
+    # Artifacts from the previous pipeline contain only the original nine
+    # dynamic Cisco frameworks and dynamic Agent frameworks, with no resource
+    # bundles. Keep this compatibility path explicit and separate from current
+    # release validation.
+    EXPECTED_FRAMEWORKS=("${EXPECTED_FRAMEWORKS[@]:0:12}" "${EXPECTED_FRAMEWORKS[@]:17}")
+    CISCO_MACH_O_TYPE="mh_dylib"
+fi
 
 log() {
     echo "==> $*"
@@ -108,6 +137,34 @@ is_expected_framework() {
     done
 
     return 1
+}
+
+expected_linkage_for() {
+    local name="$1"
+
+    if [[ "${LEGACY_ARTIFACT}" == "true" ]]; then
+        echo "dynamic"
+        return
+    fi
+
+    case "${name}" in
+        OpenTelemetryApi|OpenTelemetrySdk|SplunkCrashReporter)
+            echo "dynamic"
+            ;;
+        Cisco*)
+            case "${CISCO_MACH_O_TYPE}" in
+                staticlib) echo "static" ;;
+                mh_dylib) echo "dynamic" ;;
+                *) return 1 ;;
+            esac
+            ;;
+        Splunk*)
+            echo "static"
+            ;;
+        *)
+            return 1
+            ;;
+    esac
 }
 
 expected_slices_for() {
@@ -151,6 +208,65 @@ validate_expected_framework_set() {
         fi
     done
 
+    if [[ "${LEGACY_ARTIFACT}" == "true" ]]; then
+        local resource_bundle_count=0
+        if [[ -d "${RESOURCE_BUNDLES_DIR}" ]]; then
+            for bundle in "${RESOURCE_BUNDLES_DIR}"/*.bundle; do
+                [[ -d "${bundle}" ]] || continue
+                resource_bundle_count=$((resource_bundle_count + 1))
+            done
+        fi
+        if [[ "${resource_bundle_count}" -eq 0 ]]; then
+            check_pass "Legacy artifact has no companion resource bundles"
+        else
+            check_fail "Legacy artifact unexpectedly contains ${resource_bundle_count} resource bundles"
+        fi
+    else
+        local resource_bundle_count=0
+        if [[ -d "${RESOURCE_BUNDLES_DIR}" ]]; then
+            while IFS= read -r -d '' bundle; do
+                [[ -d "${bundle}" ]] || continue
+                resource_bundle_count=$((resource_bundle_count + 1))
+            done < <(find "${RESOURCE_BUNDLES_DIR}" -type d -name '*.bundle' -print0)
+        fi
+        local expected_resource_platforms=("${ALL_RESOURCE_PLATFORMS[@]}")
+        if [[ "${IOS_ONLY}" == "true" ]]; then
+            expected_resource_platforms=("ios" "ios-simulator")
+        fi
+        local expected_resource_bundle_count=$((3 * ${#expected_resource_platforms[@]}))
+        if [[ "${resource_bundle_count}" -eq "${expected_resource_bundle_count}" ]]; then
+            check_pass "Resource bundle count: ${resource_bundle_count}"
+        else
+            check_fail "Resource bundle count: ${resource_bundle_count} (expected ${expected_resource_bundle_count})"
+        fi
+
+        local resource_bundle_names=(
+            "SplunkAgentXCFrameworks_SplunkWebView|WebViewBridgeScript.js"
+            "SplunkAgentXCFrameworks_SplunkAgent|PrivacyInfo.xcprivacy"
+            "SplunkAgentXCFrameworks_SplunkAgent|NOTICES"
+            "SplunkAgentXCFrameworks_SplunkAgentObjC|PrivacyInfo.xcprivacy"
+            "SplunkAgentXCFrameworks_SplunkAgentObjC|NOTICES"
+        )
+        for platform_label in "${expected_resource_platforms[@]}"; do
+            for bundle_spec in "${resource_bundle_names[@]}"; do
+                local bundle_name="${bundle_spec%%|*}"
+                local resource_name="${bundle_spec#*|}"
+                local bundle_path="${RESOURCE_BUNDLES_DIR}/${platform_label}/${bundle_name}.bundle"
+                if [[ -d "${bundle_path}" ]]; then
+                    check_pass "${platform_label}/${bundle_name}.bundle present"
+                else
+                    check_fail "${platform_label}/${bundle_name}.bundle missing"
+                    continue
+                fi
+                if [[ -f "${bundle_path}/${resource_name}" ]]; then
+                    check_pass "${platform_label}/${bundle_name}.bundle contains ${resource_name}"
+                else
+                    check_fail "${platform_label}/${bundle_name}.bundle is missing ${resource_name}"
+                fi
+            done
+        done
+    fi
+
     for xcfw in "${OUTPUT_DIR}"/*.xcframework; do
         [[ -d "${xcfw}" ]] || continue
         local name
@@ -193,6 +309,19 @@ validate_dynamic_binary() {
                 sed 's/[[:space:]]*$//'
         )"
         check_fail "Slice ${slice_name}: binary is not MH_DYLIB for every architecture (${filetypes:-unknown})"
+    fi
+}
+
+validate_static_binary() {
+    local binary_path="$1"
+    local slice_name="$2"
+    local file_info
+
+    file_info="$(file "${binary_path}" 2>/dev/null || true)"
+    if [[ "${file_info}" == *archive* ]]; then
+        check_pass "Slice ${slice_name}: static library binary"
+    else
+        check_fail "Slice ${slice_name}: binary is not a static library (${file_info:-unknown})"
     fi
 }
 
@@ -345,7 +474,14 @@ validate_xcframework() {
 
         if [[ -f "${fw_binary}" ]]; then
             check_pass "Slice ${slice_name}: binary present"
-            validate_dynamic_binary "${fw_binary}" "${slice_name}"
+            local expected_linkage
+            if ! expected_linkage="$(expected_linkage_for "${name}")"; then
+                check_fail "Slice ${slice_name}: no expected linkage type for ${name}"
+            elif [[ "${expected_linkage}" == "static" ]]; then
+                validate_static_binary "${fw_binary}" "${slice_name}"
+            else
+                validate_dynamic_binary "${fw_binary}" "${slice_name}"
+            fi
 
             local arch_info
             arch_info="$(lipo -info "${fw_binary}" 2>/dev/null || echo "unknown")"
