@@ -22,7 +22,6 @@ import Testing
 
 @testable import SplunkOpenTelemetry
 
-// swiftlint:disable type_body_length
 // swiftlint:disable file_length
 @Suite
 struct SpanDataIsolatedCopyTests {
@@ -413,5 +412,4 @@ private class NoOpSpanExporter: SpanExporter {
     func shutdown(explicitTimeout _: TimeInterval?) {}
 }
 
-// swiftlint:enable type_body_length
 // swiftlint:enable file_length
