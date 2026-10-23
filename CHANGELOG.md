@@ -9,6 +9,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+* Added the opt-in `SplunkAppHangMonitor` module. It reports recovered main-run-loop stalls as `app.hang` spans, defaults to a 250 ms threshold, and can attach recent interaction timing. Monitoring is disabled by default while host-app overhead is evaluated.
 * Session Replay now captures text content in wireframes for SwiftUI applications.
 
 ### Changed

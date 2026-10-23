@@ -21,6 +21,10 @@ internal import SplunkCommon
     internal import SplunkAppStart
 #endif
 
+#if canImport(SplunkAppHangMonitor)
+    internal import SplunkAppHangMonitor
+#endif
+
 #if canImport(SplunkAppState)
     internal import SplunkAppState
 #endif
@@ -77,6 +81,11 @@ class DefaultModulesPool: AgentModulesPool {
         // App Start
         #if canImport(SplunkAppStart)
             knownModules.append(SplunkAppStart.AppStart.self)
+        #endif
+
+        // App Hang Monitor
+        #if canImport(SplunkAppHangMonitor)
+            knownModules.append(SplunkAppHangMonitor.AppHangMonitor.self)
         #endif
 
         // App State

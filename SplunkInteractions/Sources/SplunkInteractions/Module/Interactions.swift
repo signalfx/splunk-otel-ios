@@ -31,6 +31,7 @@ public final class Interactions: SplunkInteractionsModule {
     private var interactionsTask: Task<Void, Never>?
 
     private var storedOnActivity: ((Date) -> Void)?
+    private var storedOnActivityWithType: ((String, Date) -> Void)?
     private let onActivityLock = NSLock()
 
 
@@ -45,6 +46,13 @@ public final class Interactions: SplunkInteractionsModule {
     public var onActivity: ((Date) -> Void)? {
         get { onActivityLock.withLock { storedOnActivity } }
         set { onActivityLock.withLock { storedOnActivity = newValue } }
+    }
+
+    /// Synchronous callback with coarse interaction type and timestamp for internal consumers.
+    @_spi(SplunkInternal)
+    public var onActivityWithType: ((String, Date) -> Void)? {
+        get { onActivityLock.withLock { storedOnActivityWithType } }
+        set { onActivityLock.withLock { storedOnActivityWithType = newValue } }
     }
 
     var interactionsDetector: InteractionsDetector<DefaultSwizzling>?
@@ -113,6 +121,7 @@ public final class Interactions: SplunkInteractionsModule {
 
     func handleEvent(_ event: InteractionEvent) async {
         onActivity?(event.time)
+        onActivityWithType?(activityType(from: event.type), event.time)
 
         await handleEventType(
             event.type,
@@ -269,5 +278,17 @@ public final class Interactions: SplunkInteractionsModule {
         default:
             nil
         }
+    }
+
+    private func activityType(from eventType: CiscoInteractions.InteractionType) -> String {
+        if let interactionType = interactionType(from: eventType) {
+            return interactionType
+        }
+
+        if eventType == .gestureRageTap {
+            return "rage_tap"
+        }
+
+        return "other"
     }
 }

@@ -19,6 +19,7 @@ internal import CiscoSessionReplay
 import Combine
 import Foundation
 internal import SplunkAppStart
+@_spi(SplunkInternal) internal import SplunkAppHangMonitor
 internal import SplunkAppState
 internal import SplunkCustomTracking
 @_spi(SplunkInternal) internal import SplunkInteractions
@@ -73,6 +74,7 @@ extension SplunkRum {
         customizeInteractions()
         customizeWebView()
         customizeSlowFrameDetector()
+        customizeAppHangMonitor()
     }
 
     // MARK: - Session Replay
@@ -319,15 +321,24 @@ extension SplunkRum {
     /// segment survives long enough for `publishSessionReplay` to flush it
     /// after `module.stop()` closes the last record).
     private func wireUserActivityCollector(interactionsModule: SplunkInteractions.Interactions) {
-        guard
-            let collector = (eventManager as? DefaultEventManager)?.userActivityCollector,
-            let srProxy = sessionReplayProxy as? SessionReplay
-        else {
+        let collector = (eventManager as? DefaultEventManager)?.userActivityCollector
+        let srProxy = sessionReplayProxy as? SessionReplay
+        let appHangMonitor = modulesManager?.module(ofType: SplunkAppHangMonitor.AppHangMonitor.self)
+
+        guard collector != nil || srProxy != nil || appHangMonitor?.isEnabled == true else {
             return
         }
 
         interactionsModule.onActivity = { [weak collector] date in
             collector?.record(at: date)
+        }
+
+        interactionsModule.onActivityWithType = { [weak appHangMonitor] type, date in
+            appHangMonitor?.recordInteraction(at: date, type: type)
+        }
+
+        guard let collector, let srProxy else {
+            return
         }
 
         // `$isRecording` is Combine-@Published; the first sink call fires
@@ -377,6 +388,13 @@ extension SplunkRum {
         if let slowFrameDetectorModule = modulesManager?.module(ofType: SplunkSlowFrameDetector.SlowFrameDetector.self) {
             // Initialize proxy API for this module
             slowFrameDetectorProxy = SlowFrameDetector(for: slowFrameDetectorModule)
+        }
+    }
+
+    /// Configure app hang monitoring and its public API proxy.
+    private func customizeAppHangMonitor() {
+        if let appHangMonitor = modulesManager?.module(ofType: SplunkAppHangMonitor.AppHangMonitor.self) {
+            appHangMonitorProxy = AppHangMonitor(for: appHangMonitor)
         }
     }
 }
