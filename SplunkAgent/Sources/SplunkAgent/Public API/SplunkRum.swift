@@ -61,6 +61,7 @@ public class SplunkRum: ObservableObject {
     lazy var customTrackingProxy: any CustomTrackingModule = CustomTrackingNonOperational()
     lazy var interactions: any InteractionsModule = InteractionsNonOperational()
     lazy var slowFrameDetectorProxy: any SlowFrameDetectorModule = SlowFrameDetectorNonOperational()
+    lazy var appHangMonitorProxy: any AppHangMonitorModule = AppHangMonitorNonOperational()
     lazy var appStartProxy: any AppStartModule = AppStartNonOperational()
 
 
@@ -128,6 +129,11 @@ public class SplunkRum: ObservableObject {
     /// An object that holds the ``SlowFrameDetectorModule``.
     public var slowFrameDetector: any SlowFrameDetectorModule {
         slowFrameDetectorProxy
+    }
+
+    /// An object that controls app hang detection and exposes its current state.
+    public var appHangMonitor: any AppHangMonitorModule {
+        appHangMonitorProxy
     }
 
     /// An object that provides the ``AppStartModule`` hybrid lifecycle bridge.

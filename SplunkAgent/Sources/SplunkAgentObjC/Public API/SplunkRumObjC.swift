@@ -91,6 +91,10 @@ public final class SplunkRumObjC: NSObject {
     @objc
     public private(set) lazy var slowFrameDetector = SlowFrameDetectorModuleObjC(for: self)
 
+    /// An object that controls app hang monitoring and exposes its current state.
+    @objc
+    public private(set) lazy var appHangMonitor = AppHangMonitorModuleObjC(for: self)
+
     /// An object that provides a bridge for WebView instrumentation.
     @objc
     public private(set) lazy var webViewNativeBridge = WebViewModuleObjC(for: self)

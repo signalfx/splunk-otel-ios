@@ -20,6 +20,7 @@ SPIKE_PROJECT="${TOOLS_ROOT}/spike-test/Project.swift"
 DEPENDENCY_MANIFEST_SCRIPT="${TOOLS_ROOT}/scripts/generate-dependency-manifest.sh"
 AGENT_BUILD_SCRIPT="${TOOLS_ROOT}/scripts/build-xcframeworks.sh"
 OTEL_BUILD_SCRIPT="${TOOLS_ROOT}/scripts/build-otel-xcframeworks.sh"
+XCFRAMEWORK_VALIDATION_SCRIPT="${TOOLS_ROOT}/scripts/validate-xcframeworks.sh"
 
 ERRORS=0
 
@@ -65,6 +66,7 @@ EXPECTED_DISTRIBUTION_FRAMEWORKS=(
     "SplunkNetwork"
     "SplunkNetworkMonitor"
     "SplunkSlowFrameDetector"
+    "SplunkAppHangMonitor"
     "SplunkCrashReports"
     "SplunkOpenTelemetryBackgroundExporter"
     "SplunkOpenTelemetry"
@@ -203,6 +205,21 @@ check_distribution_lists() {
     for framework in "${EXPECTED_DISTRIBUTION_FRAMEWORKS[@]}"; do
         require_grep "\"${framework}\"" "${SMOKE_PROJECT}" "smoke test includes ${framework}"
         require_grep "\"${framework}\\.xcframework\"" "${DEPENDENCY_MANIFEST_SCRIPT}" "dependency manifest includes ${framework}"
+
+        if [[ "${framework}" == Splunk* ]]; then
+            if awk -v framework="${framework}" '
+                /^BUILD_ORDER=\(/ { in_build_order = 1; next }
+                in_build_order && /^\)/ { exit }
+                in_build_order && $1 == framework { found = 1 }
+                END { exit(found ? 0 : 1) }
+            ' "${AGENT_BUILD_SCRIPT}"; then
+                pass "build order includes ${framework}"
+            else
+                error "build order omits ${framework}"
+            fi
+
+            require_grep "\"${framework}\"" "${XCFRAMEWORK_VALIDATION_SCRIPT}" "xcframework validation includes ${framework}"
+        fi
     done
 }
 

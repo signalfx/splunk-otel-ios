@@ -82,6 +82,7 @@ cat > "${MANIFEST_PATH}" << JSONEOF
         "SplunkNetwork.xcframework",
         "SplunkNetworkMonitor.xcframework",
         "SplunkSlowFrameDetector.xcframework",
+        "SplunkAppHangMonitor.xcframework",
         "SplunkCrashReporter.xcframework",
         "SplunkCrashReports.xcframework",
         "SplunkOpenTelemetry.xcframework",

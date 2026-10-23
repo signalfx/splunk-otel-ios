@@ -374,6 +374,23 @@ let project = Project(
 
 
         // =================================================================
+        // MARK: SplunkAppHangMonitor
+        // =================================================================
+        // Main-run-loop hang detection with an off-main watchdog.
+        .target(
+            name: "SplunkAppHangMonitor",
+            destinations: allPlatforms,
+            product: .framework,
+            bundleId: "com.splunk.rum.apphangmonitor",
+            sources: "\(repoRoot)/SplunkAppHangMonitor/Sources/**",
+            dependencies: [
+                mod("SplunkCommon"),
+                dep("OpenTelemetryApi")
+            ]
+        ),
+
+
+        // =================================================================
         // MARK: SplunkCrashReporter
         // =================================================================
         // Vendored and symbol-prefixed PLCrashReporter implementation.
@@ -580,6 +597,7 @@ let project = Project(
                 mod("SplunkNetwork"),
                 mod("SplunkNetworkMonitor"),
                 mod("SplunkSlowFrameDetector"),
+                mod("SplunkAppHangMonitor"),
                 mod("SplunkOpenTelemetry"),
                 mod("SplunkInteractions"),
                 mod("SplunkAppStart"),
@@ -618,6 +636,7 @@ let project = Project(
                 mod("SplunkNavigation"),
                 mod("SplunkNetworkMonitor"),
                 mod("SplunkSlowFrameDetector"),
+                mod("SplunkAppHangMonitor"),
 
                 // Conditional: needed for CrashReportsConfigurationObjC+Conversions.swift
                 // which uses #if canImport(SplunkCrashReports) to bridge config types.

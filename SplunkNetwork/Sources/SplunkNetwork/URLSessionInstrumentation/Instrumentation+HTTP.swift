@@ -31,10 +31,10 @@ import OpenTelemetryApi
 /// - Returns: The protocol version string (for example `"2"` for HTTP/2), or `nil` if unknown.
 func determineHTTPProtocolVersion(_ response: HTTPURLResponse) -> String? {
     // Check for HTTP/2 server indicators
-    if let serverHeader = response.value(forHTTPHeaderField: "Server") {
-        if serverHeader.lowercased().contains("http/2") || serverHeader.lowercased().contains("h2") {
-            return "2"
-        }
+    if let serverHeader = response.value(forHTTPHeaderField: "Server"),
+        serverHeader.lowercased().contains("http/2") || serverHeader.lowercased().contains("h2")
+    {
+        return "2"
     }
 
     // Check for HTTP/2 specific headers
@@ -53,17 +53,15 @@ func determineHTTPProtocolVersion(_ response: HTTPURLResponse) -> String? {
 /// - Returns: The IP address string if found and valid, `nil` otherwise.
 func getIPAddressFromResponse(_ response: HTTPURLResponse) -> String? {
     // Some proxies or load balancers add headers with IP information
-    if let forwardedFor = response.value(forHTTPHeaderField: "X-Forwarded-For") {
-        // X-Forwarded-For can contain multiple IPs, take the first one
-        let ips = forwardedFor.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespaces) }
-        if let firstIP = ips.first, isValidIPAddress(firstIP) {
-            return firstIP
-        }
+    // X-Forwarded-For can contain multiple IPs, take the first one
+    if let forwardedFor = response.value(forHTTPHeaderField: "X-Forwarded-For"),
+        let firstIP = forwardedFor.components(separatedBy: ",").first?.trimmingCharacters(in: .whitespaces),
+        isValidIPAddress(firstIP)
+    {
+        return firstIP
     }
-    if let realIP = response.value(forHTTPHeaderField: "X-Real-IP") {
-        if isValidIPAddress(realIP) {
-            return realIP
-        }
+    if let realIP = response.value(forHTTPHeaderField: "X-Real-IP"), isValidIPAddress(realIP) {
+        return realIP
     }
     return nil
 }

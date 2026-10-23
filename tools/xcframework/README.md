@@ -60,6 +60,7 @@ output/xcframeworks/
 ├── SplunkNetwork.xcframework
 ├── SplunkNetworkMonitor.xcframework
 ├── SplunkSlowFrameDetector.xcframework
+├── SplunkAppHangMonitor.xcframework
 ├── SplunkCrashReports.xcframework
 ├── SplunkOpenTelemetry.xcframework
 ├── SplunkOpenTelemetryBackgroundExporter.xcframework
@@ -247,6 +248,7 @@ Add these based on which instrumentation you need:
 | `SplunkAppState.xcframework` | Foreground/background transitions |
 | `SplunkWebView.xcframework` | WKWebView bridge |
 | `SplunkSlowFrameDetector.xcframework` | Slow/frozen frame detection |
+| `SplunkAppHangMonitor.xcframework` | Main-run-loop app hang detection |
 | `SplunkCustomTracking.xcframework` | Custom events and workflows |
 | `SplunkSessionReplayProxy.xcframework` | Session Replay (+ all `Cisco*.xcframework`) |
 

@@ -76,6 +76,7 @@ func generateMainTargets() -> [Target] {
                 "SplunkNetwork",
                 "SplunkNetworkMonitor",
                 "SplunkSlowFrameDetector",
+                "SplunkAppHangMonitor",
                 "SplunkOpenTelemetry",
                 "SplunkInteractions",
                 .product(name: "OpenTelemetryApi", package: "opentelemetry-swift-core"),
@@ -122,6 +123,7 @@ func generateMainTargets() -> [Target] {
                 "SplunkNavigation",
                 "SplunkNetworkMonitor",
                 "SplunkSlowFrameDetector",
+                "SplunkAppHangMonitor",
                 .target(
                     name: "SplunkCrashReports",
                     condition: .when(platforms: [.iOS, .tvOS, .macCatalyst])
@@ -264,6 +266,19 @@ func generateMainTargets() -> [Target] {
                 "SplunkCommon"
             ],
             path: "SplunkSlowFrameDetector/Tests",
+            plugins: lintTargetPlugins()
+        ),
+
+
+        // MARK: - Splunk App Hang Monitor (Instrumentation)
+
+        .target(
+            name: "SplunkAppHangMonitor",
+            dependencies: [
+                "SplunkCommon",
+                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift-core")
+            ],
+            path: "SplunkAppHangMonitor/Sources",
             plugins: lintTargetPlugins()
         ),
 
