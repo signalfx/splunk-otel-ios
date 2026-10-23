@@ -54,6 +54,7 @@ EXPECTED_FRAMEWORKS=(
     "SplunkNetwork"
     "SplunkNetworkMonitor"
     "SplunkSlowFrameDetector"
+    "SplunkAppHangMonitor"
     "SplunkCrashReports"
     "SplunkOpenTelemetryBackgroundExporter"
     "SplunkOpenTelemetry"

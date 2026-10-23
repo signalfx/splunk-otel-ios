@@ -93,6 +93,7 @@ BUILD_ORDER=(
     SplunkNetwork
     SplunkNetworkMonitor
     SplunkSlowFrameDetector
+    SplunkAppHangMonitor
     SplunkCrashReporter
     SplunkCrashReports
     SplunkOpenTelemetryBackgroundExporter

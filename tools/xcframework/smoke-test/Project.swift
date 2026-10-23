@@ -39,6 +39,7 @@ let agentFrameworks = [
     "SplunkNetwork",
     "SplunkNetworkMonitor",
     "SplunkSlowFrameDetector",
+    "SplunkAppHangMonitor",
     "SplunkCrashReporter",
     "SplunkCrashReports",
     "SplunkOpenTelemetry",
