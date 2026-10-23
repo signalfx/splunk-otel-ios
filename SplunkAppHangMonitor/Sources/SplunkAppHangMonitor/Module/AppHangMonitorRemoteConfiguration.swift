@@ -20,12 +20,36 @@ import SplunkCommon
 /// Remote configuration for app hang monitoring.
 public struct AppHangMonitorRemoteConfiguration: RemoteModuleConfiguration {
 
+    // MARK: - Internal decoding
+
+    struct AppHangMonitor: Decodable {
+        let enabled: Bool
+    }
+
+    struct MRUMRoot: Decodable {
+        let appHangMonitor: AppHangMonitor
+    }
+
+    struct Configuration: Decodable {
+        let mrum: MRUMRoot
+    }
+
+    struct Root: Decodable {
+        let configuration: Configuration
+    }
+
     // MARK: - Module management
 
-    public var enabled: Bool = true
+    public var enabled: Bool
 
 
     // MARK: - Initialization
 
-    public init?(from _: Data) {}
+    public init?(from data: Data) {
+        guard let root = try? JSONDecoder().decode(Root.self, from: data) else {
+            return nil
+        }
+
+        enabled = root.configuration.mrum.appHangMonitor.enabled
+    }
 }
