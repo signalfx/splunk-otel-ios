@@ -20,8 +20,9 @@ limitations under the License.
 import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
-import XCTest
 @_spi(SplunkTesting) import SplunkCommon
+import XCTest
+
 @_spi(SplunkInternal) @testable import SplunkNavigation
 
 // swiftlint:enable sorted_imports
