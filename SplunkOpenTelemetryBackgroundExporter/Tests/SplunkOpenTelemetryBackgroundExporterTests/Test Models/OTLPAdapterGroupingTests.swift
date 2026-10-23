@@ -235,11 +235,10 @@ struct OTLPAdapterGroupingTests {
 
         let scopeAttributeValues: Set<String> = Set(
             scopeLogs.compactMap { scopeLogs -> String? in
-                guard let scopeAttribute = scopeLogs.scope?.attributes?.first(where: { $0.key == "scope.attr" }) else {
-                    return nil
-                }
-
-                guard case let .stringValue(value) = scopeAttribute.value else {
+                guard
+                    let scopeAttribute = scopeLogs.scope?.attributes?.first(where: { $0.key == "scope.attr" }),
+                    case let .stringValue(value) = scopeAttribute.value
+                else {
                     return nil
                 }
 
