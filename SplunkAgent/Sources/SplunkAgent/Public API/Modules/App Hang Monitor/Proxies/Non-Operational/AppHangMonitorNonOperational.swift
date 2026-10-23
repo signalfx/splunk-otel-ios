@@ -18,10 +18,19 @@ private final class AppHangMonitorNonOperationalState: AppHangMonitorModuleState
 
     // MARK: - State
 
-    var isEnabled: Bool { false }
-    var isPaused: Bool { true }
-    var thresholdMilliseconds: Int { 250 }
+    var isEnabled: Bool {
+        false
+    }
+
+    var isPaused: Bool {
+        true
+    }
+
+    var thresholdMilliseconds: Int {
+        250
+    }
 }
+
 
 /// Non-operational public API proxy for app hang monitoring.
 final class AppHangMonitorNonOperational: AppHangMonitorModule {
