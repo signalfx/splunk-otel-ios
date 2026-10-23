@@ -327,7 +327,7 @@ final class MainRunLoopHangDetector {
             return
         }
 
-        openSpan(startingAt: busyStart, detectedAt: CACurrentMediaTime())
+        openSpan(startingAt: busyStart)
     }
 
     private func finishBusyInterval(at endTime: TimeInterval, complete: Bool) {
@@ -336,7 +336,7 @@ final class MainRunLoopHangDetector {
         }
 
         if activeSpan == nil, endTime - busyStart > threshold {
-            openSpan(startingAt: busyStart, detectedAt: endTime)
+            openSpan(startingAt: busyStart)
         }
 
         if let activeSpan {
@@ -360,7 +360,7 @@ final class MainRunLoopHangDetector {
         busyStartDate = nil
     }
 
-    private func openSpan(startingAt startTime: TimeInterval, detectedAt: TimeInterval) {
+    private func openSpan(startingAt startTime: TimeInterval) {
         guard let busyStartDate else {
             return
         }
@@ -378,8 +378,8 @@ final class MainRunLoopHangDetector {
 
         if interactionAssociationEnabled,
            let lastInteractionTime,
-           detectedAt - lastInteractionTime <= interactionAssociationWindow,
-           detectedAt >= lastInteractionTime
+           startTime - lastInteractionTime <= interactionAssociationWindow,
+           startTime >= lastInteractionTime
         {
             span.clearAndSetAttribute(key: AppHangMonitorConstants.interactionEvidence, value: "recent_observed")
             if let lastInteractionType {
@@ -387,7 +387,7 @@ final class MainRunLoopHangDetector {
             }
             span.clearAndSetAttribute(
                 key: AppHangMonitorConstants.interactionAgeMilliseconds,
-                value: (detectedAt - lastInteractionTime) * 1_000
+                value: (startTime - lastInteractionTime) * 1_000
             )
         }
 
