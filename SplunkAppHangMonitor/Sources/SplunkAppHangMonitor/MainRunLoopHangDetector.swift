@@ -70,7 +70,9 @@ final class MainRunLoopHangDetector {
             if let runLoopObserver {
                 CFRunLoopObserverInvalidate(runLoopObserver)
             }
-            lifecycleObservers.forEach { NotificationCenter.default.removeObserver($0) }
+            for observer in lifecycleObservers {
+                NotificationCenter.default.removeObserver(observer)
+            }
         }
     }
 
@@ -135,7 +137,9 @@ final class MainRunLoopHangDetector {
             hasStarted = false
             manuallyPaused = false
             endObserving(interrupted: true)
-            lifecycleObservers.forEach { NotificationCenter.default.removeObserver($0) }
+            for observer in lifecycleObservers {
+                NotificationCenter.default.removeObserver(observer)
+            }
             lifecycleObservers.removeAll()
         }
     }
@@ -221,23 +225,25 @@ final class MainRunLoopHangDetector {
             return
         }
 
-        let activities = CFRunLoopActivity.afterWaiting.rawValue
+        let activities =
+            CFRunLoopActivity.afterWaiting.rawValue
             | CFRunLoopActivity.beforeWaiting.rawValue
             | CFRunLoopActivity.exit.rawValue
+
         let observer = CFRunLoopObserverCreateWithHandler(
             kCFAllocatorDefault,
             activities,
             true,
             0,
             { [weak self] _, activity in
-            guard let self else {
-                return
-            }
+                guard let self else {
+                    return
+                }
 
-            let monotonicTime = CACurrentMediaTime()
-            workerQueue.async {
-                self.handleRunLoopActivity(activity, at: monotonicTime)
-            }
+                let monotonicTime = CACurrentMediaTime()
+                workerQueue.async {
+                    self.handleRunLoopActivity(activity, at: monotonicTime)
+                }
             }
         )
         guard let observer else {
@@ -377,9 +383,9 @@ final class MainRunLoopHangDetector {
         span.clearAndSetAttribute(key: AppHangMonitorConstants.thresholdMilliseconds, value: threshold * 1_000)
 
         if interactionAssociationEnabled,
-           let lastInteractionTime,
-           startTime - lastInteractionTime <= interactionAssociationWindow,
-           startTime >= lastInteractionTime
+            let lastInteractionTime,
+            startTime - lastInteractionTime <= interactionAssociationWindow,
+            startTime >= lastInteractionTime
         {
             span.clearAndSetAttribute(key: AppHangMonitorConstants.interactionEvidence, value: "recent_observed")
             if let lastInteractionType {

@@ -23,13 +23,19 @@ public final class AppHangMonitorConfigurationObjC: ModuleConfigurationObjC {
 
     // MARK: - Public
 
-    /// Main-run-loop busy duration required to report a hang, in milliseconds. Defaults to `250`.
+    /// Main-run-loop busy duration required to report a hang, in milliseconds.
+    ///
+    /// Defaults to `250`.
     public var thresholdMilliseconds: Int = 250
 
-    /// Whether recent interaction timing is attached when available. Defaults to `true`.
+    /// Whether recent interaction timing is attached when available.
+    ///
+    /// Defaults to `true`.
     public var interactionAssociationEnabled = true
 
-    /// Maximum age for interaction evidence, in milliseconds. Defaults to `5000`.
+    /// Maximum age for interaction evidence, in milliseconds.
+    ///
+    /// Defaults to `5000`.
     public var interactionAssociationWindowMilliseconds: Int = 5_000
 
 

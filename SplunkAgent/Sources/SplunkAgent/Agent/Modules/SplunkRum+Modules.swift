@@ -18,8 +18,8 @@ limitations under the License.
 internal import CiscoSessionReplay
 import Combine
 import Foundation
-internal import SplunkAppStart
 @_spi(SplunkInternal) internal import SplunkAppHangMonitor
+internal import SplunkAppStart
 internal import SplunkAppState
 internal import SplunkCustomTracking
 @_spi(SplunkInternal) internal import SplunkInteractions

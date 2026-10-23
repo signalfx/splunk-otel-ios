@@ -22,7 +22,9 @@ public struct AppHangMonitorConfiguration: ModuleConfiguration {
 
     // MARK: - Public
 
-    /// Whether app hang monitoring is enabled. It is disabled by default while its overhead is evaluated.
+    /// Whether app hang monitoring is enabled.
+    ///
+    /// Monitoring is disabled by default while its overhead is evaluated.
     public var isEnabled: Bool
 
     /// The minimum continuous main-run-loop busy duration, in milliseconds, that produces a hang span.
