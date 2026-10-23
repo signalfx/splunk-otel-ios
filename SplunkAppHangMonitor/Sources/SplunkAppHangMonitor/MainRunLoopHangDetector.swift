@@ -15,7 +15,6 @@ limitations under the License.
 */
 
 import Foundation
-import OpenTelemetryApi
 import QuartzCore
 @_spi(SplunkInternal) import SplunkCommon
 
@@ -41,14 +40,7 @@ final class MainRunLoopHangDetector {
     // State below is only accessed on workerQueue.
     private var isActive = false
     private var busyStart: TimeInterval?
-    private var busyStartDate: Date?
-    private var lastInteractionTime: TimeInterval?
-    private var lastInteractionType: String?
-    private var wallClockOffset: TimeInterval = 0
-    private var activeSpan: (span: any Span, start: TimeInterval)?
-    private var threshold: TimeInterval = 0.25
-    private var interactionAssociationEnabled = true
-    private var interactionAssociationWindow: TimeInterval = 5
+    private let spanRecorder = AppHangSpanRecorder()
 
     private var storedIsPaused = true
 
@@ -98,9 +90,11 @@ final class MainRunLoopHangDetector {
                 return
             }
 
-            threshold = TimeInterval(thresholdMilliseconds) / 1_000
-            self.interactionAssociationEnabled = interactionAssociationEnabled
-            interactionAssociationWindow = TimeInterval(interactionAssociationWindowMilliseconds) / 1_000
+            spanRecorder.configure(
+                thresholdMilliseconds: thresholdMilliseconds,
+                interactionAssociationEnabled: interactionAssociationEnabled,
+                interactionAssociationWindowMilliseconds: interactionAssociationWindowMilliseconds
+            )
         }
     }
 
@@ -108,7 +102,7 @@ final class MainRunLoopHangDetector {
     // MARK: - Lifecycle
 
     func start() {
-        onMain { [weak self] in
+        performOnMain { [weak self] in
             guard let self, !hasStarted else {
                 return
             }
@@ -129,7 +123,7 @@ final class MainRunLoopHangDetector {
     }
 
     func stop() {
-        onMain { [weak self] in
+        performOnMain { [weak self] in
             guard let self else {
                 return
             }
@@ -145,7 +139,7 @@ final class MainRunLoopHangDetector {
     }
 
     func pause() {
-        onMain { [weak self] in
+        performOnMain { [weak self] in
             guard let self else {
                 return
             }
@@ -156,7 +150,7 @@ final class MainRunLoopHangDetector {
     }
 
     func resume() {
-        onMain { [weak self] in
+        performOnMain { [weak self] in
             guard let self, hasStarted else {
                 return
             }
@@ -178,16 +172,11 @@ final class MainRunLoopHangDetector {
         let estimatedOccurrence = receivedAt - age
 
         workerQueue.async { [weak self] in
-            guard let self, interactionAssociationEnabled else {
+            guard let self else {
                 return
             }
 
-            if let lastInteractionTime, estimatedOccurrence < lastInteractionTime {
-                return
-            }
-
-            lastInteractionTime = estimatedOccurrence
-            lastInteractionType = type
+            spanRecorder.recordInteraction(at: estimatedOccurrence, type: type)
         }
     }
 
@@ -262,8 +251,7 @@ final class MainRunLoopHangDetector {
 
             isActive = true
             busyStart = nil
-            busyStartDate = nil
-            wallClockOffset = Date().timeIntervalSince1970 - CACurrentMediaTime()
+            spanRecorder.updateClockOffset(at: CACurrentMediaTime())
             timer.schedule(
                 deadline: .now() + AppHangMonitorConstants.watchdogInterval,
                 repeating: AppHangMonitorConstants.watchdogInterval,
@@ -291,7 +279,6 @@ final class MainRunLoopHangDetector {
 
             isActive = false
             busyStart = nil
-            busyStartDate = nil
             timer.schedule(deadline: .distantFuture)
         }
     }
@@ -302,16 +289,6 @@ final class MainRunLoopHangDetector {
         statusLock.unlock()
     }
 
-    private func onMain(_ action: @escaping () -> Void) {
-        if Thread.isMainThread {
-            action()
-        }
-        else {
-            DispatchQueue.main.async(execute: action)
-        }
-    }
-
-
     // MARK: - Detection
 
     private func handleRunLoopActivity(_ activity: CFRunLoopActivity, at timestamp: TimeInterval) {
@@ -321,7 +298,6 @@ final class MainRunLoopHangDetector {
 
         if activity == .afterWaiting {
             busyStart = timestamp
-            busyStartDate = Date(timeIntervalSince1970: timestamp + wallClockOffset)
         }
         else if activity == .beforeWaiting || activity == .exit {
             finishBusyInterval(at: timestamp, complete: true)
@@ -329,11 +305,16 @@ final class MainRunLoopHangDetector {
     }
 
     private func checkThreshold() {
-        guard isActive, activeSpan == nil, let busyStart, CACurrentMediaTime() - busyStart > threshold else {
+        guard
+            isActive,
+            !spanRecorder.hasActiveSpan,
+            let busyStart,
+            CACurrentMediaTime() - busyStart > spanRecorder.threshold
+        else {
             return
         }
 
-        openSpan(startingAt: busyStart)
+        spanRecorder.openSpan(startingAt: busyStart)
     }
 
     private func finishBusyInterval(at endTime: TimeInterval, complete: Bool) {
@@ -341,66 +322,21 @@ final class MainRunLoopHangDetector {
             return
         }
 
-        if activeSpan == nil, endTime - busyStart > threshold {
-            openSpan(startingAt: busyStart)
+        if !spanRecorder.hasActiveSpan, endTime - busyStart > spanRecorder.threshold {
+            spanRecorder.openSpan(startingAt: busyStart)
         }
 
-        if let activeSpan {
-            activeSpan.span.clearAndSetAttribute(
-                key: AppHangMonitorConstants.durationMilliseconds,
-                value: max(0, endTime - activeSpan.start) * 1_000
-            )
-            activeSpan.span.clearAndSetAttribute(
-                key: AppHangMonitorConstants.durationIsComplete,
-                value: complete
-            )
-            activeSpan.span.clearAndSetAttribute(
-                key: AppHangMonitorConstants.outcome,
-                value: complete ? "recovered" : "interrupted"
-            )
-            activeSpan.span.end(time: date(for: endTime))
-            self.activeSpan = nil
-        }
+        spanRecorder.finish(at: endTime, complete: complete)
 
         self.busyStart = nil
-        busyStartDate = nil
     }
+}
 
-    private func openSpan(startingAt startTime: TimeInterval) {
-        guard let busyStartDate else {
-            return
-        }
-
-        let tracer = OpenTelemetry.instance
-            .tracerProvider
-            .get(instrumentationName: AppHangMonitorConstants.instrumentationName)
-
-        let span = tracer.spanBuilder(spanName: AppHangMonitorConstants.spanName)
-            .setStartTime(time: busyStartDate)
-            .startSpan()
-
-        span.clearAndSetAttribute(key: "component", value: AppHangMonitorConstants.component)
-        span.clearAndSetAttribute(key: AppHangMonitorConstants.thresholdMilliseconds, value: threshold * 1_000)
-
-        if interactionAssociationEnabled,
-            let lastInteractionTime,
-            startTime - lastInteractionTime <= interactionAssociationWindow,
-            startTime >= lastInteractionTime
-        {
-            span.clearAndSetAttribute(key: AppHangMonitorConstants.interactionEvidence, value: "recent_observed")
-            if let lastInteractionType {
-                span.clearAndSetAttribute(key: AppHangMonitorConstants.interactionType, value: lastInteractionType)
-            }
-            span.clearAndSetAttribute(
-                key: AppHangMonitorConstants.interactionAgeMilliseconds,
-                value: (startTime - lastInteractionTime) * 1_000
-            )
-        }
-
-        activeSpan = (span, startTime)
+private func performOnMain(_ action: @escaping () -> Void) {
+    if Thread.isMainThread {
+        action()
     }
-
-    private func date(for monotonicTime: TimeInterval) -> Date {
-        Date(timeIntervalSince1970: monotonicTime + wallClockOffset)
+    else {
+        DispatchQueue.main.async(execute: action)
     }
 }

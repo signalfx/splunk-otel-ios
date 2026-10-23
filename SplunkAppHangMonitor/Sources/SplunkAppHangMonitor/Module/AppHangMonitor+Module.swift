@@ -29,7 +29,7 @@ public struct AppHangMonitorMetadata: ModuleEventMetadata {
 
     let id: UUID
 
-    public static func == (lhs: AppHangMonitorMetadata, rhs: AppHangMonitorMetadata) -> Bool {
+    public static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.id == rhs.id
     }
 }
