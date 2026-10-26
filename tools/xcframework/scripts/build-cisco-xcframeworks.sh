@@ -1,9 +1,9 @@
 #!/bin/bash
 # tools/xcframework/scripts/build-cisco-xcframeworks.sh
 #
-# Builds Cisco Session Replay xcframeworks as dynamic frameworks from a local
-# Session Replay repository checkout, preserving the distribution model used
-# to address package-resolution issues for T-Mobile integrations.
+# Builds Cisco Session Replay xcframeworks from a local Session Replay
+# repository checkout, using dynamic frameworks by default. Static archives
+# can be selected for hybrid integrations with CISCO_MACH_O_TYPE=staticlib.
 #
 # Usage:
 #   SESSION_REPLAY_LOCAL_PATH=/path/to/session-replay ./scripts/build-cisco-xcframeworks.sh

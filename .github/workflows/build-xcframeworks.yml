@@ -5,7 +5,7 @@ name: Build XCFrameworks
 # read-only repository token.
 #
 # Architecture:
-#   Job 1 (build): Build OTel + dynamic Session Replay + static Agent modules → upload artifact
+#   Job 1 (build): Build OTel + dynamic Session Replay and Agent modules by default → upload artifact
 #   Job 2 (sign-and-release): Optional signing, validation, and packaging
 
 on:
@@ -19,8 +19,16 @@ on:
       session-replay-ref:
         description: "Branch, tag, or commit of smartlook-ios-sdk-private"
         required: false
-        default: "develop"
+        default: "main"
         type: string
+      cisco-mach-o-type:
+        description: "Session Replay framework linkage"
+        required: false
+        default: "mh_dylib"
+        type: choice
+        options:
+          - mh_dylib
+          - staticlib
       skip-signing:
         description: "Skip code signing (for local testing)"
         required: false
@@ -79,13 +87,13 @@ jobs:
           persist-credentials: false
 
       # -----------------------------------------------------------------
-      # Step 2: Build the full distribution with dynamic Session Replay frameworks
+      # Step 2: Build the full distribution; Agent frameworks are dynamic by default.
       # -----------------------------------------------------------------
       - name: Build complete XCFramework distribution
         working-directory: tools/xcframework
         env:
           SESSION_REPLAY_LOCAL_PATH: ${{ github.workspace }}/tools/xcframework/session-replay
-          CISCO_MACH_O_TYPE: mh_dylib
+          CISCO_MACH_O_TYPE: ${{ inputs.cisco-mach-o-type || 'mh_dylib' }}
         run: make clean build
 
       # -----------------------------------------------------------------

@@ -146,22 +146,15 @@ JSONEOF
 
 # Filter product dependencies to the frameworks actually present in this
 # release artifact. This keeps legacy --run-id packages truthful when they
-# contain the previous nine-module Cisco set, and records separately shipped
-# resource bundles for static-framework consumers.
-python3 - "${MANIFEST_PATH}" "${XCFW_DIR}" "${OUTPUT_DIR}/resources" <<'PY'
+# contain the previous nine-module Cisco set.
+python3 - "${MANIFEST_PATH}" "${XCFW_DIR}" <<'PY'
 import json
 import pathlib
 import sys
 
 manifest_path = pathlib.Path(sys.argv[1])
 xcframework_dir = pathlib.Path(sys.argv[2])
-resource_dir = pathlib.Path(sys.argv[3])
 available = {path.name for path in xcframework_dir.glob("*.xcframework") if path.is_dir()}
-resources = sorted(
-    f"resources/{path.relative_to(resource_dir)}"
-    for path in resource_dir.rglob("*.bundle")
-    if path.is_dir()
-)
 
 manifest = json.loads(manifest_path.read_text())
 for product in manifest.get("products", {}).values():
@@ -173,7 +166,6 @@ manifest["platformRestrictions"] = {
     for framework, restriction in manifest.get("platformRestrictions", {}).items()
     if framework in available
 }
-manifest["resources"] = resources
 manifest_path.write_text(json.dumps(manifest, indent=2) + "\n")
 PY
 

@@ -72,12 +72,7 @@ let ciscoFrameworks = [
     "CiscoSnapshotManager",
     "CiscoSessionReplay",
     "CiscoInstanceManager",
-    "CiscoRuntimeCache",
-    "CiscoVideoEncoder",
-    "CiscoScreenshot",
-    "CiscoWireframe",
-    "CiscoDataExporter",
-    "CiscoSnapshotManager"
+    "CiscoRuntimeCache"
 ]
 
 /// All frameworks combined.
@@ -104,7 +99,6 @@ let project = Project(
             bundleId: "com.splunk.rum.xcframework-smoke-test",
             deploymentTargets: .iOS("15.0"),
             sources: ["Sources/**"],
-            resources: [.glob(pattern: "../output/resources/ios-simulator/*.bundle")],
             dependencies: allFrameworks.map { name in
                 .xcframework(path: "\(xcfwDir)/\(name).xcframework")
             }
