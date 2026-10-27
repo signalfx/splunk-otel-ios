@@ -320,6 +320,7 @@ create_all_xcframeworks() {
     for scheme in "${BUILD_ORDER[@]}"; do
         create_xcframework "${scheme}"
     done
+
 }
 
 

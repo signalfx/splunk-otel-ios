@@ -68,11 +68,7 @@ class PlatformSupport: PlatformSupporting {
     // MARK: - Platform support helpers
 
     private func iOSSupportScope() -> PlatformSupportScope {
-        guard !isiOSAppOnMac else {
-            return .compileOnly
-        }
-
-        guard !isiOSAppOnVision else {
+        guard !isiOSAppOnMac, !isiOSAppOnVision else {
             return .compileOnly
         }
 

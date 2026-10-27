@@ -14,10 +14,10 @@
 #   ./scripts/populate-dependencies.sh [options]
 #
 # Options:
-#   --cisco-path PATH     Legacy path to directory containing dynamic Cisco xcframeworks
+#   --cisco-path PATH     Legacy path to directory containing Cisco xcframeworks
 #   --skip-otel           Skip OTel (assumes already built in output/xcframeworks/)
 #   --skip-cisco          Skip Cisco staging
-#   --download-cisco      Legacy mode: download Cisco from Package.swift registry
+#   --download-cisco      Disabled: Package.swift registry lacks five current modules
 #
 # Environment variables:
 #   CISCO_XCFRAMEWORKS_PATH  Same as --cisco-path (legacy)
@@ -151,10 +151,9 @@ if [[ "${SKIP_CISCO}" == "false" ]]; then
             echo "  ✓ ${fw}.xcframework (symlinked)"
         done
     elif [[ "${DOWNLOAD_CISCO}" == "true" ]]; then
-        # Legacy mode only: Package.swift now intentionally points to static
-        # Cisco artifacts, so this must never be the default xcframework path.
-        log "Downloading Cisco xcframeworks from Package.swift registry (legacy mode)"
-        "${SCRIPT_DIR}/download-cisco-xcframeworks.sh" --output-dir "${DEPS_DIR}"
+        echo "ERROR: --download-cisco uses the legacy Package.swift registry, which does not include all 14 Session Replay modules."
+        echo "  Build from SESSION_REPLAY_LOCAL_PATH or pass --cisco-path with the complete set of Cisco xcframeworks."
+        exit 1
     else
         log "Using Cisco xcframeworks already staged in ${DEPS_DIR}"
 
@@ -164,7 +163,7 @@ if [[ "${SKIP_CISCO}" == "false" ]]; then
             if [[ ! -d "${dst}" ]]; then
                 echo "ERROR: Cisco xcframework not found: ${dst}"
                 echo "  Run build-cisco-xcframeworks.sh first with SESSION_REPLAY_LOCAL_PATH set,"
-                echo "  or pass --cisco-path with prebuilt dynamic Cisco xcframeworks."
+                echo "  or pass --cisco-path with prebuilt Cisco xcframeworks."
                 exit 1
             fi
         done
