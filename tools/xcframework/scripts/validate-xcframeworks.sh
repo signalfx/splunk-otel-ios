@@ -147,7 +147,7 @@ expected_linkage_for() {
             esac
             ;;
         Splunk*)
-            echo "static"
+            echo "dynamic"
             ;;
         *)
             return 1

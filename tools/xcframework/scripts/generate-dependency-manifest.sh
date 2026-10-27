@@ -107,12 +107,7 @@ cat > "${MANIFEST_PATH}" << JSONEOF
         "CiscoSnapshotManager.xcframework",
         "CiscoSessionReplay.xcframework",
         "CiscoInstanceManager.xcframework",
-        "CiscoRuntimeCache.xcframework",
-        "CiscoVideoEncoder.xcframework",
-        "CiscoScreenshot.xcframework",
-        "CiscoWireframe.xcframework",
-        "CiscoDataExporter.xcframework",
-        "CiscoSnapshotManager.xcframework"
+        "CiscoRuntimeCache.xcframework"
       ],
       "notes": [
         "All frameworks are required for full SplunkAgent functionality.",
