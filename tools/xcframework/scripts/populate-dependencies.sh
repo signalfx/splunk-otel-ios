@@ -7,8 +7,9 @@
 #
 # Sources:
 #   - OpenTelemetryApi/Sdk: Built by build-otel-xcframeworks.sh → output/xcframeworks/
-#   - Cisco modules: Built locally as dynamic xcframeworks by build-cisco-xcframeworks.sh
-#                    (or linked from a legacy local path via --cisco-path)
+#   - Cisco modules: Built locally by build-cisco-xcframeworks.sh, downloaded
+#                    from Package.swift with --download-cisco, or linked from a
+#                    local path via --cisco-path
 #
 # Usage:
 #   ./scripts/populate-dependencies.sh [options]
@@ -17,7 +18,7 @@
 #   --cisco-path PATH     Legacy path to directory containing Cisco xcframeworks
 #   --skip-otel           Skip OTel (assumes already built in output/xcframeworks/)
 #   --skip-cisco          Skip Cisco staging
-#   --download-cisco      Disabled: Package.swift registry lacks five current modules
+#   --download-cisco      Download Cisco xcframeworks from the Package.swift registry
 #
 # Environment variables:
 #   CISCO_XCFRAMEWORKS_PATH  Same as --cisco-path (legacy)
@@ -151,23 +152,22 @@ if [[ "${SKIP_CISCO}" == "false" ]]; then
             echo "  ✓ ${fw}.xcframework (symlinked)"
         done
     elif [[ "${DOWNLOAD_CISCO}" == "true" ]]; then
-        echo "ERROR: --download-cisco uses the legacy Package.swift registry, which does not include all 14 Session Replay modules."
-        echo "  Build from SESSION_REPLAY_LOCAL_PATH or pass --cisco-path with the complete set of Cisco xcframeworks."
-        exit 1
+        log "Downloading Cisco xcframeworks from the Package.swift registry"
+        bash "${SCRIPT_DIR}/download-cisco-xcframeworks.sh" --output-dir "${DEPS_DIR}"
     else
         log "Using Cisco xcframeworks already staged in ${DEPS_DIR}"
-
-        for fw in "${CISCO_FRAMEWORKS[@]}"; do
-            dst="${DEPS_DIR}/${fw}.xcframework"
-
-            if [[ ! -d "${dst}" ]]; then
-                echo "ERROR: Cisco xcframework not found: ${dst}"
-                echo "  Run build-cisco-xcframeworks.sh first with SESSION_REPLAY_LOCAL_PATH set,"
-                echo "  or pass --cisco-path with prebuilt Cisco xcframeworks."
-                exit 1
-            fi
-        done
     fi
+
+    for fw in "${CISCO_FRAMEWORKS[@]}"; do
+        dst="${DEPS_DIR}/${fw}.xcframework"
+
+        if [[ ! -d "${dst}" ]]; then
+            echo "ERROR: Cisco xcframework not found: ${dst}"
+            echo "  Run build-cisco-xcframeworks.sh first, use --download-cisco,"
+            echo "  or pass --cisco-path with prebuilt Cisco xcframeworks."
+            exit 1
+        fi
+    done
 fi
 
 

@@ -48,11 +48,6 @@ CISCO_FRAMEWORKS=(
     "CiscoSessionReplay"
     "CiscoInstanceManager"
     "CiscoRuntimeCache"
-    "CiscoVideoEncoder"
-    "CiscoScreenshot"
-    "CiscoWireframe"
-    "CiscoDataExporter"
-    "CiscoSnapshotManager"
 )
 
 while [[ $# -gt 0 ]]; do
