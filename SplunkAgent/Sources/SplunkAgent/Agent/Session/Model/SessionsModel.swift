@@ -15,7 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+internal import CiscoLogger
 import Foundation
+internal import SplunkCommon
 
 /// Stores and manages available sessions.
 class SessionsModel {
@@ -35,6 +37,7 @@ class SessionsModel {
 
     var storage: KeyValueStorage
     let storageKey: String
+    private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "Agent")
 
 
     // MARK: - Public
@@ -86,15 +89,22 @@ extension SessionsModel {
     // MARK: - Storage utils
 
     /// Reads model data from cache.
+    ///
+    /// A decode failure is logged and yields an empty history. The whole array is stored under one
+    /// key, so such a failure discards all of it.
     private func read() -> [SessionItem] {
-        // Read the sessions from the permanent cache
-        let cachedSessions: [SessionItem]? = try? storage.read(forKey: storageKey)
+        do {
+            let cachedSessions: [SessionItem]? = try storage.read(forKey: storageKey)
 
-        if let cachedSessions {
-            return cachedSessions
+            return cachedSessions ?? []
         }
+        catch {
+            logger.log(level: .error) {
+                "Could not decode stored sessions, so session history starts empty: \(error)"
+            }
 
-        return []
+            return []
+        }
     }
 
     /// Deletes all records that were created before the specified date.

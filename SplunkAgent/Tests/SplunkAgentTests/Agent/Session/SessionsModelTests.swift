@@ -57,6 +57,17 @@ final class SessionsModelTests: XCTestCase {
         XCTAssertTrue(sessions.isEmpty)
     }
 
+    func testUndecodableStorageYieldsEmptyHistory() throws {
+        let storage = UserDefaultsStorageTestBuilder.buildCleanStorage(named: "undecodableSessionsTest")
+
+        // Data that is not a session array, stored under the sessions key
+        try storage.update("not a session history", forKey: storageKey)
+
+        let sessionModel = SessionsModel(storage: storage)
+
+        XCTAssertTrue(sessionModel.sessions.isEmpty)
+    }
+
 
     // MARK: - Storage management
 
