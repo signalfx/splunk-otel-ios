@@ -18,6 +18,12 @@ OUTPUT_DIR="${TOOLS_ROOT}/output/xcframeworks"
 
 RELEASE="${RELEASE:-false}"
 IOS_ONLY="${IOS_ONLY:-false}"
+LEGACY_ARTIFACT=false
+CISCO_MACH_O_TYPE="${CISCO_MACH_O_TYPE:-}"
+if [[ -z "${CISCO_MACH_O_TYPE}" && -f "${OUTPUT_DIR}/cisco-release-manifest.txt" ]]; then
+    CISCO_MACH_O_TYPE="$(awk -F= '$1 == "mach_o_type" { print $2; exit }' "${OUTPUT_DIR}/cisco-release-manifest.txt")"
+fi
+CISCO_MACH_O_TYPE="${CISCO_MACH_O_TYPE:-mh_dylib}"
 
 TOTAL_CHECKS=0
 PASSED_CHECKS=0
@@ -30,7 +36,6 @@ EXPECTED_IOS_ONLY_SLICE_NAMES=(
     "ios-arm64"
     "ios-arm64_x86_64-simulator"
 )
-
 EXPECTED_FRAMEWORKS=(
     "OpenTelemetryApi"
     "OpenTelemetrySdk"
@@ -75,12 +80,24 @@ while [[ $# -gt 0 ]]; do
             IOS_ONLY=true
             shift
             ;;
+        --legacy-artifact)
+            LEGACY_ARTIFACT=true
+            shift
+            ;;
         *)
             echo "Unknown argument: $1"
             exit 1
             ;;
     esac
 done
+
+if [[ "${LEGACY_ARTIFACT}" == "true" ]]; then
+    # Artifacts from the previous pipeline contain only the original nine
+    # dynamic Cisco frameworks and dynamic Agent frameworks. Keep this
+    # compatibility path separate from current release validation.
+    EXPECTED_FRAMEWORKS=("${EXPECTED_FRAMEWORKS[@]:0:12}" "${EXPECTED_FRAMEWORKS[@]:17}")
+    CISCO_MACH_O_TYPE="mh_dylib"
+fi
 
 log() {
     echo "==> $*"
@@ -108,6 +125,34 @@ is_expected_framework() {
     done
 
     return 1
+}
+
+expected_linkage_for() {
+    local name="$1"
+
+    if [[ "${LEGACY_ARTIFACT}" == "true" ]]; then
+        echo "dynamic"
+        return
+    fi
+
+    case "${name}" in
+        OpenTelemetryApi|OpenTelemetrySdk|SplunkCrashReporter)
+            echo "dynamic"
+            ;;
+        Cisco*)
+            case "${CISCO_MACH_O_TYPE}" in
+                staticlib) echo "static" ;;
+                mh_dylib) echo "dynamic" ;;
+                *) return 1 ;;
+            esac
+            ;;
+        Splunk*)
+            echo "dynamic"
+            ;;
+        *)
+            return 1
+            ;;
+    esac
 }
 
 expected_slices_for() {
@@ -193,6 +238,19 @@ validate_dynamic_binary() {
                 sed 's/[[:space:]]*$//'
         )"
         check_fail "Slice ${slice_name}: binary is not MH_DYLIB for every architecture (${filetypes:-unknown})"
+    fi
+}
+
+validate_static_binary() {
+    local binary_path="$1"
+    local slice_name="$2"
+    local file_info
+
+    file_info="$(file "${binary_path}" 2>/dev/null || true)"
+    if [[ "${file_info}" == *archive* ]]; then
+        check_pass "Slice ${slice_name}: static library binary"
+    else
+        check_fail "Slice ${slice_name}: binary is not a static library (${file_info:-unknown})"
     fi
 }
 
@@ -345,7 +403,14 @@ validate_xcframework() {
 
         if [[ -f "${fw_binary}" ]]; then
             check_pass "Slice ${slice_name}: binary present"
-            validate_dynamic_binary "${fw_binary}" "${slice_name}"
+            local expected_linkage
+            if ! expected_linkage="$(expected_linkage_for "${name}")"; then
+                check_fail "Slice ${slice_name}: no expected linkage type for ${name}"
+            elif [[ "${expected_linkage}" == "static" ]]; then
+                validate_static_binary "${fw_binary}" "${slice_name}"
+            else
+                validate_dynamic_binary "${fw_binary}" "${slice_name}"
+            fi
 
             local arch_info
             arch_info="$(lipo -info "${fw_binary}" 2>/dev/null || echo "unknown")"
