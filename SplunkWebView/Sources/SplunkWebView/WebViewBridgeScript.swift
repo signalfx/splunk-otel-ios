@@ -24,22 +24,29 @@ enum WebViewBridgeScript {
 
     private static let scriptTemplate = loadScriptTemplate()
 
-    static func scriptResourceURL(in bundles: [Bundle], packageBundleName: String = resourceBundleName) -> URL? {
-        for bundle in bundles {
-            if let url = bundle.url(forResource: "WebViewBridgeScript", withExtension: "js") {
-                return url
+    static func scriptResourceURL(
+        in bundles: [Bundle],
+        searchDirectories: [URL] = [],
+        packageBundleName: String = resourceBundleName
+    ) -> URL? {
+        let bundleDirectories = bundles.flatMap { [$0.resourceURL, $0.bundleURL].compactMap(\.self) }
+        for directory in searchDirectories + bundleDirectories {
+            let packageBundleURL = directory.appendingPathComponent(packageBundleName + ".bundle")
+            guard let packageBundle = Bundle(url: packageBundleURL) else {
+                continue
             }
 
-            let bundleLocations = [bundle.resourceURL, bundle.bundleURL].compactMap(\.self)
-            for location in bundleLocations {
-                let packageBundleURL = location.appendingPathComponent(packageBundleName + ".bundle")
-                guard let packageBundle = Bundle(url: packageBundleURL) else {
-                    continue
-                }
+            if let url = packageBundle.url(forResource: "WebViewBridgeScript", withExtension: "js") {
+                return url
+            }
+        }
 
-                if let url = packageBundle.url(forResource: "WebViewBridgeScript", withExtension: "js") {
-                    return url
-                }
+        // Framework distributions may place the resource directly in the framework bundle.
+        // Keep this fallback after package bundles so a same-named host resource cannot win.
+        let fallbackBundles = searchDirectories.compactMap { Bundle(url: $0) } + bundles
+        for bundle in fallbackBundles {
+            if let url = bundle.url(forResource: "WebViewBridgeScript", withExtension: "js") {
+                return url
             }
         }
 
@@ -52,8 +59,7 @@ enum WebViewBridgeScript {
                 ProcessInfo.processInfo.environment["PACKAGE_RESOURCE_BUNDLE_PATH"]
                 ?? ProcessInfo.processInfo.environment["PACKAGE_RESOURCE_BUNDLE_URL"]
             if let resourceBundleOverride,
-                let bundle = Bundle(url: URL(fileURLWithPath: resourceBundleOverride)),
-                let url = scriptResourceURL(in: [bundle])
+                let url = scriptResourceURL(in: [], searchDirectories: [URL(fileURLWithPath: resourceBundleOverride)])
             {
                 return loadScript(from: url)
             }
