@@ -31,8 +31,7 @@ final class WebViewBridgeScriptTests: XCTestCase {
     }
 
     func testLoadScript_whenFileCannotBeRead_returnsNil() {
-        let missingURL = FileManager.default.temporaryDirectory
-            .appendingPathComponent(UUID().uuidString)
+        let missingURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
 
         XCTAssertNil(WebViewBridgeScript.loadScript(from: missingURL))
     }

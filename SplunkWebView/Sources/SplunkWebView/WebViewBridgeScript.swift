@@ -30,7 +30,7 @@ enum WebViewBridgeScript {
                 return url
             }
 
-            let bundleLocations = [bundle.resourceURL, bundle.bundleURL].compactMap { $0 }
+            let bundleLocations = [bundle.resourceURL, bundle.bundleURL].compactMap(\.self)
             for location in bundleLocations {
                 let packageBundleURL = location.appendingPathComponent(packageBundleName + ".bundle")
                 guard let packageBundle = Bundle(url: packageBundleURL) else {

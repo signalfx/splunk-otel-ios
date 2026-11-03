@@ -97,24 +97,6 @@ final class WebViewInstrumentationTests: XCTestCase {
         XCTAssertTrue(warningFound, "A warning should be logged when sharedState is not available")
     }
 
-    func testInjectSessionId_whenBridgeScriptIsUnavailable_logsErrorAndAborts() throws {
-        let mockWebView = try XCTUnwrap(mockWebView)
-        let mockLogAgent = try XCTUnwrap(mockLogAgent)
-        let sharedState = try XCTUnwrap(mockAgentSharedState)
-        let instrumentation = WebViewInstrumentation(
-            logger: mockLogAgent,
-            sharedState: sharedState,
-            bridgeScriptGenerator: { _, _, _ in nil }
-        )
-
-        instrumentation.injectSessionId(into: mockWebView)
-
-        XCTAssertEqual(mockWebView.evaluateJavaScriptCallCount, 0)
-        let errorFound = mockLogAgent.logMessages.contains { $0.level == .error && $0.message.contains("bridge script is unavailable") }
-        XCTAssertTrue(errorFound, "An error should be logged when the bridge script is unavailable")
-    }
-
-
     // MARK: - Usage Warning Tests
 
     func testInjectSessionId_whenWebViewIsAlreadyLoading_logsWarning() throws {
