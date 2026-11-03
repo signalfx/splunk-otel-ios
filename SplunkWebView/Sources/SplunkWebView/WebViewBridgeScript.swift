@@ -20,9 +20,52 @@ import Foundation
 /// A utility for generating the JavaScript bridge script injected into `WKWebView` instances.
 enum WebViewBridgeScript {
 
-    private static let scriptTemplate = loadScript(
-        from: Bundle.module.url(forResource: "WebViewBridgeScript", withExtension: "js")
-    )
+    private static let resourceBundleName = "SplunkAgent_SplunkWebView"
+
+    private static let scriptTemplate = loadScriptTemplate()
+
+    static func scriptResourceURL(in bundles: [Bundle], packageBundleName: String = resourceBundleName) -> URL? {
+        for bundle in bundles {
+            if let url = bundle.url(forResource: "WebViewBridgeScript", withExtension: "js") {
+                return url
+            }
+
+            let bundleLocations = [bundle.resourceURL, bundle.bundleURL].compactMap { $0 }
+            for location in bundleLocations {
+                let packageBundleURL = location.appendingPathComponent(packageBundleName + ".bundle")
+                guard let packageBundle = Bundle(url: packageBundleURL) else {
+                    continue
+                }
+
+                if let url = packageBundle.url(forResource: "WebViewBridgeScript", withExtension: "js") {
+                    return url
+                }
+            }
+        }
+
+        return nil
+    }
+
+    private static func loadScriptTemplate() -> String? {
+        #if DEBUG
+            let resourceBundleOverride =
+                ProcessInfo.processInfo.environment["PACKAGE_RESOURCE_BUNDLE_PATH"]
+                ?? ProcessInfo.processInfo.environment["PACKAGE_RESOURCE_BUNDLE_URL"]
+            if let resourceBundleOverride,
+                let bundle = Bundle(url: URL(fileURLWithPath: resourceBundleOverride)),
+                let url = scriptResourceURL(in: [bundle])
+            {
+                return loadScript(from: url)
+            }
+        #endif
+
+        let candidateBundles = [Bundle(for: WebViewInstrumentation.self), Bundle.main]
+        guard let url = scriptResourceURL(in: candidateBundles) else {
+            return nil
+        }
+
+        return loadScript(from: url)
+    }
 
     static func loadScript(from url: URL?) -> String? {
         guard let url else {
