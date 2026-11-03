@@ -108,11 +108,16 @@ public final class WebViewInstrumentation: NSObject {
                 return
             }
 
-            let javaScript = WebViewBridgeScript.generate(
+            guard let javaScript = WebViewBridgeScript.generate(
                 sessionId: currentState.sessionId,
                 sessionMetadata: currentState.sessionMetadata,
                 handlerName: Self.handlerName
-            )
+            ) else {
+                logger.log(level: .error, isPrivate: false) {
+                    "WebView bridge script is unavailable; skipping JavaScript injection."
+                }
+                return
+            }
 
             let userScript = WKUserScript(
                 source: javaScript,

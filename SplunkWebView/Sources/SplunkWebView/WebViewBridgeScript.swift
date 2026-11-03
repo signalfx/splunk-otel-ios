@@ -20,17 +20,17 @@ import Foundation
 /// A utility for generating the JavaScript bridge script injected into `WKWebView` instances.
 enum WebViewBridgeScript {
 
-    private static let scriptTemplate: String = {
-        guard let url = Bundle.module.url(forResource: "WebViewBridgeScript", withExtension: "js") else {
-            preconditionFailure("WebViewBridgeScript.js not found in bundle.")
+    private static let scriptTemplate = loadScript(
+        from: Bundle.module.url(forResource: "WebViewBridgeScript", withExtension: "js")
+    )
+
+    static func loadScript(from url: URL?) -> String? {
+        guard let url else {
+            return nil
         }
 
-        guard let script = try? String(contentsOf: url) else {
-            preconditionFailure("Could not read WebViewBridgeScript.js from bundle.")
-        }
-
-        return script
-    }()
+        return try? String(contentsOf: url, encoding: .utf8)
+    }
 
     /// Generates the complete JavaScript string to be injected into a web view.
     ///
@@ -42,8 +42,12 @@ enum WebViewBridgeScript {
     ///   - sessionMetadata: The initial Base64-encoded session metadata string, or `nil` if unavailable.
     ///   - handlerName: The name of the `WKScriptMessageHandler` used for asynchronous communication.
     ///
-    /// - Returns: A fully interpolated JavaScript string ready for injection.
-    static func generate(sessionId: String, sessionMetadata: String?, handlerName: String) -> String {
+    /// - Returns: A fully interpolated JavaScript string ready for injection, or `nil` if the resource is unavailable.
+    static func generate(sessionId: String, sessionMetadata: String?, handlerName: String) -> String? {
+        guard let scriptTemplate else {
+            return nil
+        }
+
         let metadataLiteral = sessionMetadata.map { "'\($0)'" } ?? "null"
         return
             scriptTemplate
