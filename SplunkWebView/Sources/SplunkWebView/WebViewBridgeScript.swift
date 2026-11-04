@@ -27,7 +27,8 @@ enum WebViewBridgeScript {
     static func scriptResourceURL(
         in bundles: [Bundle],
         searchDirectories: [URL] = [],
-        packageBundleName: String = resourceBundleName
+        packageBundleName: String = resourceBundleName,
+        frameworkBundles: [Bundle] = []
     ) -> URL? {
         let bundleDirectories = bundles.flatMap { [$0.resourceURL, $0.bundleURL].compactMap(\.self) }
         for directory in searchDirectories + bundleDirectories {
@@ -43,7 +44,7 @@ enum WebViewBridgeScript {
 
         // Framework distributions may place the resource directly in the framework bundle.
         // Keep this fallback after package bundles so a same-named host resource cannot win.
-        let fallbackBundles = searchDirectories.compactMap { Bundle(url: $0) } + bundles
+        let fallbackBundles = searchDirectories.compactMap { Bundle(url: $0) } + frameworkBundles
         for bundle in fallbackBundles {
             if let url = bundle.url(forResource: "WebViewBridgeScript", withExtension: "js") {
                 return url
@@ -65,8 +66,9 @@ enum WebViewBridgeScript {
             }
         #endif
 
-        let candidateBundles = [Bundle(for: WebViewInstrumentation.self), Bundle.main]
-        guard let url = scriptResourceURL(in: candidateBundles) else {
+        let frameworkBundle = Bundle(for: WebViewInstrumentation.self)
+        let candidateBundles = [frameworkBundle, Bundle.main]
+        guard let url = scriptResourceURL(in: candidateBundles, frameworkBundles: [frameworkBundle]) else {
             return nil
         }
 
