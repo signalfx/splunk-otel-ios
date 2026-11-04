@@ -21,27 +21,19 @@ extension DefaultSession {
 
     // MARK: - Session start event
 
-    /// Send initial session start evet explicitly.
-    ///
-    /// Initial session start event can't be sent by `DefaultSession` implicitly, because
-    /// there is no `eventManager` initialized yet at the time of an initial session creation.
-    func sendInitialSessionStartEvent() {
-        sendSessionStart()
-    }
-
     /// Sends a "session start" event.
     ///
-    /// Session start event is sent with every session start. If a session "transitions smoothly" into a new session,
-    /// parameter `previousSessionId` should be included.
+    /// A session's start event is sent when the session's first telemetry is accepted for export.
+    /// If a session "transitions smoothly" into a new session, parameter `previousSessionId` should be included.
     ///
-    /// - Parameter previousSessionId: A session id of the previous session, sent if the old session "transitions smoothly" into a new session.
-    func sendSessionStart(previousSessionId: String? = nil) {
-        let currentId = currentSession.id
-        let timestamp = currentSession.start
-
+    /// - Parameters:
+    ///   - sessionId: A session id of the started session.
+    ///   - timestamp: The moment the session started.
+    ///   - previousSessionId: A session id of the previous session, sent if the old session "transitions smoothly" into a new session.
+    func sendSessionStart(sessionId: String, timestamp: Date, previousSessionId: String?) {
         let event = SessionStartEvent(
             timestamp: timestamp,
-            sessionId: currentId,
+            sessionId: sessionId,
             previousSessionId: previousSessionId
         )
 

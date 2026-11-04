@@ -177,6 +177,9 @@ class DefaultEventManager: AgentEventManager {
             return
         }
 
+        // Recorded replay data is telemetry of this session
+        agent.currentSession.trackAcceptedTelemetry(forSessionId: sessionId)
+
         // Prepare and send `isRecording` event (if was not yet send)
         Task {
             if await sessionReplayMemorizer.isReady {
