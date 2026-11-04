@@ -40,7 +40,7 @@ class DefaultSession: AgentSession {
     /// The session whose start event is held back until it produces telemetry that is accepted for export.
     ///
     /// Accessed only on `accessQueue`.
-    private var pendingSessionStart: (session: SessionItem, previousSessionId: String?)?
+    private var pendingSessionStart: PendingSessionStart?
 
     let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "Agent")
 
@@ -134,7 +134,8 @@ class DefaultSession: AgentSession {
             sendSessionStart(
                 sessionId: pending.session.id,
                 timestamp: pending.session.start,
-                previousSessionId: pending.previousSessionId
+                previousSessionId: pending.previousSessionId,
+                screenName: pending.screenName
             )
         }
     }
@@ -145,8 +146,10 @@ class DefaultSession: AgentSession {
     /// zero-duration session start event. Sessions created by ``rotateSession(previousSessionId:)``
     /// hold their start event themselves.
     func scheduleSessionStart() {
+        let screenName = screenNameForSessionStart()
+
         accessQueue.sync {
-            pendingSessionStart = (currentSession, previousSessionId: nil)
+            pendingSessionStart = PendingSessionStart(session: currentSession, previousSessionId: nil, screenName: screenName)
         }
     }
 
@@ -289,7 +292,7 @@ class DefaultSession: AgentSession {
     /// Closes the current session and starts a new one.
     ///
     /// The new session holds its start event until it produces telemetry. A start event still held
-    /// for the closed session is dropped, because that session produced nothing to own it.
+    /// for the closed session is dropped, because none of that session's telemetry was exported yet.
     ///
     /// - Parameter previousSessionId: A session id of the previous session, if the old session
     ///   "transitions smoothly" into the new session.
@@ -304,10 +307,16 @@ class DefaultSession: AgentSession {
         closeSession()
         currentSession = createSession()
 
+        let screenName = screenNameForSessionStart()
+
         // Reset in-memory last-activity for the new session
         accessQueue.sync {
             lastActivity = nil
-            pendingSessionStart = (currentSession, previousSessionId)
+            pendingSessionStart = PendingSessionStart(
+                session: currentSession,
+                previousSessionId: previousSessionId,
+                screenName: screenName
+            )
         }
 
         // Save changes into cache

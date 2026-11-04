@@ -21,6 +21,13 @@ extension DefaultSession {
 
     // MARK: - Session start event
 
+    /// A session start event that is held until its session produces telemetry.
+    struct PendingSessionStart {
+        let session: SessionItem
+        let previousSessionId: String?
+        let screenName: String?
+    }
+
     /// Sends a "session start" event.
     ///
     /// A session's start event is sent when the session's first telemetry is accepted for export.
@@ -30,11 +37,13 @@ extension DefaultSession {
     ///   - sessionId: A session id of the started session.
     ///   - timestamp: The moment the session started.
     ///   - previousSessionId: A session id of the previous session, sent if the old session "transitions smoothly" into a new session.
-    func sendSessionStart(sessionId: String, timestamp: Date, previousSessionId: String?) {
+    ///   - screenName: The screen shown when the session started.
+    func sendSessionStart(sessionId: String, timestamp: Date, previousSessionId: String?, screenName: String?) {
         let event = SessionStartEvent(
             timestamp: timestamp,
             sessionId: sessionId,
-            previousSessionId: previousSessionId
+            previousSessionId: previousSessionId,
+            screenName: screenName
         )
 
         // Send session start event for a new session
@@ -46,5 +55,12 @@ extension DefaultSession {
                 "Could not send a session start event. Agent's event manager is not yet initialized."
             }
         }
+    }
+
+    /// The screen shown now, kept with a held session start, as the start may be sent later from another screen.
+    ///
+    /// Must not be called on `accessQueue`: reading the runtime attributes also reads the current session id.
+    func screenNameForSessionStart() -> String? {
+        owner?.runtimeAttributes.all[RuntimeAttributeKeys.screenName] as? String
     }
 }

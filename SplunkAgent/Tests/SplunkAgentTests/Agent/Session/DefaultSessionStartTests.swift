@@ -97,7 +97,10 @@ final class DefaultSessionStartTests: XCTestCase {
         defaultSession.scheduleSessionStart()
         let abandonedSessionId = defaultSession.currentSessionId
 
+        // The new session starts on screen A, and its first telemetry comes from screen B
+        defaultSession.owner?.runtimeAttributes.updateScreenName("ScreenA")
         defaultSession.rotateSession()
+        defaultSession.owner?.runtimeAttributes.updateScreenName("ScreenB")
 
         // The abandoned session produced nothing, so its start is dropped
         let notSent = expectSessionStart(from: eventManager, isInverted: true)
@@ -112,6 +115,7 @@ final class DefaultSessionStartTests: XCTestCase {
         let event = try XCTUnwrap(eventManager.sentEvents.first)
         XCTAssertEqual(event.sessionId, defaultSession.currentSessionId)
         XCTAssertNil(event.attributes?["session.previous_id"])
+        XCTAssertEqual(event.attributes?["screen.name"], .string("ScreenA"))
     }
 
     func testSessionTooLongRotatesWithLinkedPreviousSession() throws {
@@ -177,7 +181,9 @@ final class DefaultSessionStartTests: XCTestCase {
         eventManager.publish(data: Data([0]), metadata: metadata) { _ in }
         wait(for: [sent], timeout: 1)
 
-        XCTAssertEqual(eventManager.sentEvents.first?.sessionId, defaultSession.currentSessionId)
+        // Replay data also sends an isRecording event, so find the start event by name
+        let event = try XCTUnwrap(eventManager.sentEvents.first { $0.name == "session.start" })
+        XCTAssertEqual(event.sessionId, defaultSession.currentSessionId)
     }
 
 
