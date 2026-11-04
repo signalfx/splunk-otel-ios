@@ -50,10 +50,10 @@ final class DefaultRuntimeAttributes: AgentRuntimeAttributes {
         // Attributes added directly should come from sources
         // that are thread-safe themselves
         var systemAttributes: [String: Any] = [:]
-        systemAttributes["user.anonymous_id"] = userIdentifier()
-        systemAttributes["session.id"] = sessionIdentifier()
-        systemAttributes["app.installation.id"] = installationIdentifier()
-        systemAttributes["screen.name"] = currentScreenName.get()
+        systemAttributes[RuntimeAttributeKeys.userAnonymousId] = userIdentifier()
+        systemAttributes[RuntimeAttributeKeys.sessionId] = sessionIdentifier()
+        systemAttributes[RuntimeAttributeKeys.appInstallationId] = installationIdentifier()
+        systemAttributes[RuntimeAttributeKeys.screenName] = currentScreenName.get()
         allAttributes = systemAttributes
 
 
