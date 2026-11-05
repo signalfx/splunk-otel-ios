@@ -7,6 +7,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.5.0] - 2026-11-05
+
 ### Added
 
 * Session Replay now captures text content in wireframes for SwiftUI applications.
