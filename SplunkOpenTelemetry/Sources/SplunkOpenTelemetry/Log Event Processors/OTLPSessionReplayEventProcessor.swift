@@ -31,12 +31,23 @@ import SplunkOpenTelemetryBackgroundExporter
 /// In case the binary body is supported in the future in the upstream, we can revert back to the processors-exporters chain.
 public class OTLPSessionReplayEventProcessor: LogEventProcessor {
 
+    // MARK: - Inline types
+
+    private enum AttributeName {
+        static let segmentMetadata = "segmentMetadata"
+        static let displayWireframe = "displayWireframe"
+    }
+
+
     // MARK: - Private properties
 
     private let backgroundLogExporter: OTLPBackgroundHTTPLogExporterBinary
 
     /// Runtime attributes added manually to each exported log record.
     private unowned let runtimeAttributes: any RuntimeAttributes
+
+    /// Global attributes used for Session Replay-specific metadata decisions.
+    private let globalAttributes: () -> [String: AttributeValue]
 
     /// Resource object, added to all exported logs manually.
     private let resource: Resource
@@ -57,6 +68,7 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
     #if DEBUG
         public var storedLastProcessedEvent: (any AgentEvent)?
         public var storedLastSentEvent: (any AgentEvent)?
+        public var storedLastSentLogRecord: SplunkReadableLogRecord?
     #endif
 
 
@@ -66,7 +78,7 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
         with sessionReplayEndpoint: URL?,
         resources: AgentResources,
         runtimeAttributes: RuntimeAttributes,
-        globalAttributes _: @escaping () -> [String: AttributeValue],
+        globalAttributes: @escaping () -> [String: AttributeValue],
         debugEnabled: Bool,
         accessToken: String? = nil
     ) {
@@ -90,6 +102,7 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
         )
 
         self.runtimeAttributes = runtimeAttributes
+        self.globalAttributes = globalAttributes
         self.debugEnabled = debugEnabled
 
         // Session replay specific resource
@@ -239,12 +252,64 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
         // Merge with provided attributes
         if let providedAttributes = event.attributes {
             for (attributeName, eventAttributeValue) in providedAttributes {
-                let splunkAttributeValue = SplunkAttributeValue(eventAttributeValue: eventAttributeValue)
+                let processedAttributeValue = processedEventAttributeValue(
+                    eventAttributeValue,
+                    forAttributeNamed: attributeName
+                )
+
+                let splunkAttributeValue = SplunkAttributeValue(eventAttributeValue: processedAttributeValue)
                 attributes[attributeName] = splunkAttributeValue
             }
         }
 
         return attributes
+    }
+
+    private func processedEventAttributeValue(
+        _ attributeValue: EventAttributeValue,
+        forAttributeNamed attributeName: String
+    ) -> EventAttributeValue {
+        guard attributeName == AttributeName.segmentMetadata else {
+            return attributeValue
+        }
+
+        return segmentMetadataAttributeValue(attributeValue)
+    }
+
+    private func segmentMetadataAttributeValue(_ attributeValue: EventAttributeValue) -> EventAttributeValue {
+        guard case let .string(metadata) = attributeValue else {
+            return attributeValue
+        }
+
+        guard let updatedMetadata = metadataByAddingDisplayWireframe(to: metadata) else {
+            return attributeValue
+        }
+
+        return .string(updatedMetadata)
+    }
+
+    private func metadataByAddingDisplayWireframe(to metadata: String) -> String? {
+        guard
+            let metadataData = metadata.data(using: .utf8),
+            var metadataObject = try? JSONSerialization.jsonObject(with: metadataData) as? [String: Any]
+        else {
+            return nil
+        }
+
+        metadataObject[AttributeName.displayWireframe] =
+            OTLPInternalGlobalAttributes.shouldDisplaySessionReplayWireframe(
+                globalAttributes: globalAttributes()
+            )
+
+        guard
+            JSONSerialization.isValidJSONObject(metadataObject),
+            let updatedMetadataData = try? JSONSerialization.data(withJSONObject: metadataObject),
+            let updatedMetadata = String(data: updatedMetadataData, encoding: .utf8)
+        else {
+            return nil
+        }
+
+        return updatedMetadata
     }
 }
 
