@@ -169,21 +169,29 @@ final class DefaultSessionStartTests: XCTestCase {
         wait(for: [notSent], timeout: absenceTimeout)
     }
 
-    func testRecordedReplayDataReleasesSessionStart() throws {
+    func testIndexedReplayDataReleasesSessionStart() throws {
         let (defaultSession, eventManager) = try buildSession(named: "replayReleaseTest")
+        eventManager.sessionReplayIndexer = MockEventIndexer(isReady: true)
         defaultSession.scheduleSessionStart()
 
-        // Replay data is matched to a session by time, so it starts just after the session did
-        let startMs = Int((defaultSession.currentSessionStart.timeIntervalSince1970 + 0.01) * 1_000.0)
-        let metadata = Metadata(startUnixMs: startMs, endUnixMs: startMs + 1)
-
         let sent = expectSessionStart(from: eventManager)
-        eventManager.publish(data: Data([0]), metadata: metadata) { _ in }
+        publishReplayData(through: eventManager, after: defaultSession.currentSessionStart)
         wait(for: [sent], timeout: 1)
 
         // Replay data also sends an isRecording event, so find the start event by name
         let event = try XCTUnwrap(eventManager.sentEvents.first { $0.name == "session.start" })
         XCTAssertEqual(event.sessionId, defaultSession.currentSessionId)
+    }
+
+    func testReplayDataNotIndexedDoesNotReleaseSessionStart() throws {
+        let (defaultSession, eventManager) = try buildSession(named: "replayNotIndexedTest")
+        eventManager.sessionReplayIndexer = MockEventIndexer(isReady: false)
+        defaultSession.scheduleSessionStart()
+
+        let notSent = expectSessionStart(from: eventManager, isInverted: true)
+        publishReplayData(through: eventManager, after: defaultSession.currentSessionStart)
+
+        wait(for: [notSent], timeout: absenceTimeout)
     }
 
 
@@ -227,5 +235,14 @@ final class DefaultSessionStartTests: XCTestCase {
 
         tracer.spanBuilder(spanName: "span").startSpan().end()
         _ = traceProcessor.forceFlushBufferedSpans(timeout: 5)
+    }
+
+    /// Publishes Session Replay data recorded just after the session started.
+    private func publishReplayData(through eventManager: DefaultEventManager, after sessionStart: Date) {
+        // Replay data is matched to a session by time, so it starts just after the session did
+        let startMs = Int((sessionStart.timeIntervalSince1970 + 0.01) * 1_000.0)
+        let metadata = Metadata(startUnixMs: startMs, endUnixMs: startMs + 1)
+
+        eventManager.publish(data: Data([0]), metadata: metadata) { _ in }
     }
 }
