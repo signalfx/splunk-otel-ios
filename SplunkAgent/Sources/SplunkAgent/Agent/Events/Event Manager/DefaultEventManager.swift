@@ -209,6 +209,9 @@ class DefaultEventManager: AgentEventManager {
                 userActivity: flush.timestamps
             )
 
+            // Indexed replay data handed to its processor is telemetry of this session
+            agent.currentSession.trackAcceptedTelemetry(forSessionId: sessionId)
+
             sessionReplayProcessor.sendEvent(event: event, immediateProcessing: false) { [weak self] processed in
                 if processed {
                     self?.removeSessionReplayIndex(sessionId: sessionId, timestamp: metadata.timestamp)

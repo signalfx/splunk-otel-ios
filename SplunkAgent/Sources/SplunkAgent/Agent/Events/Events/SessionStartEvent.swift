@@ -48,15 +48,23 @@ struct SessionStartEvent: AgentEvent {
     ///   - timestamp: Session start timestamp.
     ///   - sessionId: A session id of the started session.
     ///   - previousSessionId: An optional previous session's id. Sent when the new session follows up the previous session.
-    init(timestamp: Date, sessionId: String, previousSessionId: String?) {
+    ///   - screenName: An optional name of the screen shown when the session started. It is sent instead of
+    ///     the screen shown when the event is sent, which can be later.
+    init(timestamp: Date, sessionId: String, previousSessionId: String?, screenName: String?) {
         self.timestamp = timestamp
         self.sessionId = sessionId
 
+        var attributes: [String: EventAttributeValue] = [:]
+
         // Add optional previous session id
         if let previousSessionId {
-            attributes = [
-                "session.previous_id": .string(previousSessionId)
-            ]
+            attributes["session.previous_id"] = .string(previousSessionId)
         }
+
+        if let screenName {
+            attributes[RuntimeAttributeKeys.screenName] = .string(screenName)
+        }
+
+        self.attributes = attributes.isEmpty ? nil : attributes
     }
 }

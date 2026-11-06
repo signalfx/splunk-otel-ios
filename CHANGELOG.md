@@ -18,6 +18,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 * Updated Cisco Session Replay binaries to 2.0.0.300.
 * The XCFramework release pipeline now includes all 14 Cisco Session Replay modules and an SDK size report for the five added modules. All frameworks are dynamic by default; Cisco Session Replay frameworks can be built as static archives with `CISCO_MACH_O_TYPE=staticlib`.
 
+### Fixed
+
+* A session that produces no telemetry no longer shows up as an empty session with zero duration. The `session.start` event is now sent with the session's first exported telemetry instead of when the session is created. Spans dropped by a `spanInterceptor` do not count as exported telemetry.
+
 ## [2.4.3] - 2026-10-14
 
 ### Changed
