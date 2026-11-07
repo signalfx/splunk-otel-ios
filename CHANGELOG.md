@@ -7,6 +7,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.5.0] - 2026-11-05
+
 ### Added
 
 * Session Replay now captures text content in wireframes for SwiftUI applications.
@@ -14,6 +16,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 * Updated Cisco Session Replay binaries to 2.0.0.300.
+* The XCFramework release pipeline now includes all 14 Cisco Session Replay modules and an SDK size report for the five added modules. All frameworks are dynamic by default; Cisco Session Replay frameworks can be built as static archives with `CISCO_MACH_O_TYPE=staticlib`.
 
 ## [2.4.3] - 2026-10-14
 

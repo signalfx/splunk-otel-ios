@@ -18,6 +18,12 @@ limitations under the License.
 #if canImport(WebKit)
     import WebKit
 
+    @available(
+        *,
+        deprecated,
+        renamed: "SplunkRum.shared.webView.integrateWithBrowserRum(_:)",
+        message: "This method will be removed in a later version."
+    )
     extension SplunkRum {
 
         // MARK: - WebView
@@ -26,12 +32,6 @@ limitations under the License.
         ///
         /// - Parameter webView: The `WKWebView` instance into which the JavaScript
         /// `getNativeSessionId()` and `getNativeSessionIdAsync()` APIs will be injected.
-        @available(
-            *,
-            deprecated,
-            renamed: "SplunkRum.shared.webView.integrateWithBrowserRum(_:)",
-            message: "This method will be removed in a later version."
-        )
         public static func integrateWithBrowserRum(_ webView: WKWebView) {
             shared.webViewNativeBridge.integrateWithBrowserRum(webView)
         }
