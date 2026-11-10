@@ -209,6 +209,8 @@ final class DefaultSessionStartTests: XCTestCase {
         eventManager.sessionReplayIndexer = MockEventIndexer(isReady: false)
         defaultSession.scheduleSessionStart()
 
+        // This covers the replay data only. Its isRecording event is a span too, and in the agent it can
+        // release the start even when indexing fails; MockEventManager records that event instead of sending it.
         let notSent = expectSessionStart(from: eventManager, isInverted: true)
         publishReplayData(through: eventManager, after: defaultSession.currentSessionStart)
 
@@ -258,13 +260,19 @@ final class DefaultSessionStartTests: XCTestCase {
         return sessionStart
     }
 
-    /// Ends one span on the event manager's tracer and exports it.
+    /// Ends one span on the event manager's tracer and waits until it is exported.
     private func exportSpan(through eventManager: DefaultEventManager) throws {
         let traceProcessor = eventManager.concreteTraceProcessor
         let tracer = traceProcessor.tracerProvider.get(instrumentationName: "test")
 
         tracer.spanBuilder(spanName: "span").startSpan().end()
-        _ = traceProcessor.forceFlushBufferedSpans(timeout: 5)
+
+        // A force flush from the main thread doesn't wait, so wait for the write to finish
+        let exported = expectation(description: "span exported")
+        traceProcessor.persistBufferedSpans(timeout: 5) { _ in
+            exported.fulfill()
+        }
+        wait(for: [exported], timeout: 5)
     }
 
     /// Publishes Session Replay data recorded just after the session started.

@@ -33,6 +33,9 @@ extension DefaultSession {
     /// A session's start event is sent when the session's first telemetry is accepted for export.
     /// If a session "transitions smoothly" into a new session, parameter `previousSessionId` should be included.
     ///
+    /// Runs on `accessQueue`, so the event must be sent asynchronously: creating its span reads the current
+    /// session id through `accessQueue`.
+    ///
     /// - Parameters:
     ///   - sessionId: A session id of the started session.
     ///   - timestamp: The moment the session started.

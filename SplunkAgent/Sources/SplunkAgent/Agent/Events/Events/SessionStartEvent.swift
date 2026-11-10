@@ -20,7 +20,7 @@ internal import SplunkCommon
 
 /// Session start event.
 ///
-/// Session start event is sent at each session's start. It optionally contains information  about a previous session
+/// Session start event is sent with the session's first exported telemetry. It optionally contains information  about a previous session
 /// in case the new session follows the previous session.
 struct SessionStartEvent: AgentEvent {
 

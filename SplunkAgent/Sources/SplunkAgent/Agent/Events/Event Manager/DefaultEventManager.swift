@@ -281,7 +281,8 @@ class DefaultEventManager: AgentEventManager {
             event: event,
             immediateProcessing: false
         ) { [weak self] _ in
-            // The event's span is in the batch now
+            // The event's span is in the batch now. This callback runs on the main queue,
+            // so the write does not run once the app is terminating.
             guard persistImmediately, let self else {
                 return
             }
