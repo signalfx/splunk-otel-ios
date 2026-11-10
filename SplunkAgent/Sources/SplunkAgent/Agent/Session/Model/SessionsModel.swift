@@ -91,7 +91,7 @@ extension SessionsModel {
     /// Reads model data from cache.
     ///
     /// A decode failure is logged and yields an empty history. The whole array is stored under one
-    /// key, so such a failure discards all of it.
+    /// key, so the bad value stays there until the next save replaces it.
     private func read() -> [SessionItem] {
         do {
             let cachedSessions: [SessionItem]? = try storage.read(forKey: storageKey)

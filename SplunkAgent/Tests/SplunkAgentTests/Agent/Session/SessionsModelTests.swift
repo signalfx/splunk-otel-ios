@@ -63,6 +63,10 @@ final class SessionsModelTests: XCTestCase {
         // Data that is not a session array, stored under the sessions key
         try storage.update("not a session history", forKey: storageKey)
 
+        // Precondition: reading the stored value as sessions must throw, so the model takes its
+        // decode-failure path
+        XCTAssertThrowsError(try storage.read(forKey: storageKey) as [SessionItem]?)
+
         let sessionModel = SessionsModel(storage: storage)
 
         XCTAssertTrue(sessionModel.sessions.isEmpty)
