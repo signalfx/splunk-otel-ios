@@ -7,6 +7,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+* Renamed the span that reports the agent installation from `SplunkRum.initialize` to `SplunkRum.install`, to match the `SplunkRum.install(with:moduleConfigurations:)` method and the Android agent 2.4.0 and later. The span keeps its parent, attributes and events. Apps on earlier agent versions still send `SplunkRum.initialize`, so dashboards, detectors and queries that filter on the span name must match both names. A `spanInterceptor` that matches this span by name must use the new name. DEMRUM-7220
+
 ## [2.5.0] - 2026-11-05
 
 ### Added
