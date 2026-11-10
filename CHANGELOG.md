@@ -7,6 +7,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+* A session that produces no telemetry no longer shows up as an empty session with zero duration. The `session.start` event is now sent with the session's first exported telemetry instead of when the session is created. Spans dropped by a `spanInterceptor` do not count as exported telemetry.
+
+## [2.5.0] - 2026-11-05
+
 ### Added
 
 * Session Replay now captures text content in wireframes for SwiftUI applications.
@@ -18,7 +24,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
-* A session that produces no telemetry no longer shows up as an empty session with zero duration. The `session.start` event is now sent with the session's first exported telemetry instead of when the session is created. Spans dropped by a `spanInterceptor` do not count as exported telemetry.
+* WebView instrumentation now skips bridge injection instead of crashing if the JavaScript bridge resource is missing or unreadable.
 
 ## [2.4.3] - 2026-10-14
 

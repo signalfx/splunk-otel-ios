@@ -27,6 +27,8 @@ import SplunkCommon
 /// Provides the ability to inject a JavaScript bridge into `WKWebView` instances for Browser RUM correlation.
 public final class WebViewInstrumentation: NSObject {
 
+    typealias BridgeScriptGenerator = (String, String?, String) -> String?
+
     // MARK: - Static constants
 
     private static let handlerName = "SplunkRumNativeUpdate"
@@ -35,6 +37,7 @@ public final class WebViewInstrumentation: NSObject {
     // MARK: - Private
 
     private let logger: LogAgent
+    private let bridgeScriptGenerator: BridgeScriptGenerator
 
     #if canImport(WebKit)
         /// Tracks which web views have had the user script installed to prevent duplication.
@@ -55,6 +58,9 @@ public final class WebViewInstrumentation: NSObject {
     /// This is the default public initializer.
     override public init() {
         logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "SplunkWebView")
+        bridgeScriptGenerator = { sessionId, sessionMetadata, handlerName in
+            WebViewBridgeScript.generate(sessionId: sessionId, sessionMetadata: sessionMetadata, handlerName: handlerName)
+        }
     }
 
     /// Initializes the `WebViewInstrumentation` module for testing purposes.
@@ -62,9 +68,17 @@ public final class WebViewInstrumentation: NSObject {
     /// - Parameters:
     ///   - logger: A `LogAgent` for logging messages.
     ///   - sharedState: An `AgentSharedState` for accessing the session ID.
-    init(logger: LogAgent, sharedState: AgentSharedState? = nil) {
+    ///   - bridgeScriptGenerator: A closure that creates the JavaScript bridge script.
+    init(
+        logger: LogAgent,
+        sharedState: AgentSharedState? = nil,
+        bridgeScriptGenerator: @escaping BridgeScriptGenerator = { sessionId, sessionMetadata, handlerName in
+            WebViewBridgeScript.generate(sessionId: sessionId, sessionMetadata: sessionMetadata, handlerName: handlerName)
+        }
+    ) {
         self.logger = logger
         self.sharedState = sharedState
+        self.bridgeScriptGenerator = bridgeScriptGenerator
     }
 
 
@@ -108,11 +122,12 @@ public final class WebViewInstrumentation: NSObject {
                 return
             }
 
-            let javaScript = WebViewBridgeScript.generate(
-                sessionId: currentState.sessionId,
-                sessionMetadata: currentState.sessionMetadata,
-                handlerName: Self.handlerName
-            )
+            guard let javaScript = bridgeScriptGenerator(currentState.sessionId, currentState.sessionMetadata, Self.handlerName) else {
+                logger.log(level: .error, isPrivate: false) {
+                    "WebView bridge script is unavailable; skipping JavaScript injection."
+                }
+                return
+            }
 
             let userScript = WKUserScript(
                 source: javaScript,
