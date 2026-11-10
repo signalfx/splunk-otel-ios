@@ -169,6 +169,27 @@ final class DefaultSessionStartTests: XCTestCase {
         wait(for: [notSent], timeout: absenceTimeout)
     }
 
+    func testReleasedSessionStartIsSavedBeforeNextBatchExport() throws {
+        let saved = expectation(description: "session.start exported")
+        let (defaultSession, eventManager) = try buildSession(
+            named: "persistedReleaseTest",
+            interceptor: { span in
+                if span.name == "session.start" {
+                    saved.fulfill()
+                }
+
+                return span
+            },
+            eventManagerType: DefaultEventManager.self
+        )
+        defaultSession.scheduleSessionStart()
+
+        try exportSpan(through: eventManager)
+
+        // Batches are exported once a second, so the start arrives sooner only if it was saved right away
+        wait(for: [saved], timeout: 0.5)
+    }
+
     func testIndexedReplayDataReleasesSessionStart() throws {
         let (defaultSession, eventManager) = try buildSession(named: "replayReleaseTest")
         eventManager.sessionReplayIndexer = MockEventIndexer(isReady: true)
@@ -202,12 +223,21 @@ final class DefaultSessionStartTests: XCTestCase {
         named name: String,
         interceptor: ((SpanData) -> SpanData?)? = nil
     ) throws -> (DefaultSession, MockEventManager) {
+        try buildSession(named: name, interceptor: interceptor, eventManagerType: MockEventManager.self)
+    }
+
+    /// Builds a session linked to an agent with an event manager of the given type.
+    private func buildSession<Manager: DefaultEventManager>(
+        named name: String,
+        interceptor: ((SpanData) -> SpanData?)?,
+        eventManagerType _: Manager.Type
+    ) throws -> (DefaultSession, Manager) {
         let configuration = try ConfigurationTestBuilder.buildDefault().spanInterceptor(interceptor)
         let defaultSession = try DefaultSessionTestBuilder.build(named: name)
         let agent = try AgentTestBuilder.build(with: configuration, session: defaultSession)
         defaultSession.owner = agent
 
-        let eventManager = try MockEventManager(with: configuration, agent: agent)
+        let eventManager = try Manager(with: configuration, agent: agent)
         agent.eventManager = eventManager
         retainedAgents.append(agent)
 

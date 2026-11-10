@@ -46,9 +46,11 @@ extension DefaultSession {
             screenName: screenName
         )
 
-        // Send session start event for a new session
+        // Send session start event for a new session. It goes to disk right away, because the
+        // session's first data may have been saved when the app went to the background, and the
+        // app can be killed before the next batch export.
         if let eventManager = owner?.eventManager {
-            eventManager.sendEvent(event)
+            eventManager.sendEvent(event, persistImmediately: true)
         }
         else {
             logger.log(level: .error) {

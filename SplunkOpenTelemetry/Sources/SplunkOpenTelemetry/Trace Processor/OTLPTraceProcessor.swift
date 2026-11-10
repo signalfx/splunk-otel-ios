@@ -207,6 +207,11 @@ public class OTLPTraceProcessor: TraceProcessor {
         batchSpanProcessor.forceFlushResult(timeout: timeout) ? .success : .failure
     }
 
+    /// Writes the buffered spans to disk without waiting for the next batch export and without blocking the caller.
+    package func persistBufferedSpans(timeout: TimeInterval, completion: @escaping (Bool) -> Void) {
+        batchSpanProcessor.persistBufferedSpans(timeout: timeout, completion: completion)
+    }
+
 
     // MARK: - Endpoint Management
 

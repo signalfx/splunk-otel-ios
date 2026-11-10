@@ -48,7 +48,7 @@ final class MockEventManager: DefaultEventManager {
 
     // MARK: - Internal events
 
-    override func sendEvent(_ event: AgentEvent) {
+    override func sendEvent(_ event: AgentEvent, persistImmediately _: Bool) {
         let handler = lock.withLock {
             events.append(event)
 
