@@ -7,6 +7,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+* Fixed the default Session Replay sampling rate after agent installation. When no sampling rate is configured, the effective rate is now 0.2 (20%) as intended.
+
 ## [2.5.0] - 2026-11-05
 
 ### Added
