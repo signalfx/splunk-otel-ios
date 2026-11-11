@@ -133,7 +133,7 @@ extension SplunkRum {
     }
 
     private func resolvedSamplingRate(from config: SessionReplayConfiguration) -> Double {
-        let configured = config.samplingRate ?? 1.0
+        let configured = config.samplingRate ?? 0.2
         let sanitized = configured.isFinite ? configured : 1.0
         let effective = min(max(sanitized, 0.0), 1.0)
         if !configured.isFinite || configured < 0.0 || configured > 1.0 {

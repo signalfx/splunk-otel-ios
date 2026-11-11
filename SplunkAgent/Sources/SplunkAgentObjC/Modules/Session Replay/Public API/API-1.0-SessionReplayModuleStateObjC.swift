@@ -77,7 +77,7 @@ public final class SessionReplayModuleStateObjC: NSObject {
     /// The sampling decision is made once per Agent lifecycle and is not
     /// re-evaluated on session rotation.
     ///
-    /// A value in the `<0, 1>` range. Defaults to `1.0`.
+    /// A value in the `<0, 1>` range. Defaults to `0.2`.
     @objc
     public var samplingRate: Double {
         owner.agent.sessionReplay.state.samplingRate

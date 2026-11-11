@@ -56,8 +56,9 @@ let agent = try SplunkRum.install(
 ```
 
 Sampling is decided once per agent lifecycle and is not re-evaluated on session
-rotation. `nil` is equivalent to `1.0`; values below `0` or above `1` are
-clamped. If `enabled` is `false`, `start()` does nothing. If the launch is
+rotation. Omitting the sampling rate or setting it to `nil` uses the default
+`0.2` (20%); values below `0` or above `1` are clamped.
+If `enabled` is `false`, `start()` does nothing. If the launch is
 sampled out, state should report `.notRecording(.disabledBySampling)`.
 
 Swift deferred endpoint setup can still leave Session Replay operational at
