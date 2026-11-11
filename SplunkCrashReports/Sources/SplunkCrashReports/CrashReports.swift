@@ -135,6 +135,15 @@ public class CrashReports {
             // Retrieving crash reporter data.
             let report = try SPLKPLCrashReport(data: data)
 
+            if shouldSuppressReactNativeFatalCrash(report: report) {
+                crashReporter?.purgePendingCrashReport()
+                finishPersistenceAttempt()
+                logger.log(level: .info) {
+                    "Suppressed native duplicate of a durably persisted React Native fatal crash."
+                }
+                return
+            }
+
             // Process the report
             let reportPayload = formatCrashReport(report: report)
 
@@ -272,10 +281,10 @@ public class CrashReports {
                     requiringSecureCoding: false
                 )
 
-                // Update crash reporter on main queue since it might touch UI-related properties
-                DispatchQueue.main.async {
-                    self.crashReporter?.customData = customData
-                }
+                // PLCrashReporter synchronizes this setter with its crash writer.
+                // Publish on the same serial queue that owns the dictionary so an
+                // older asynchronous snapshot cannot overwrite a newly armed RN marker.
+                self.crashReporter?.customData = customData
             }
             catch {
                 // We have failed to archive the custom data dictionary.
@@ -283,6 +292,69 @@ public class CrashReports {
                     "Failed to add the device stats to the crash reports data."
                 }
             }
+        }
+    }
+
+    /// Embeds a marker for an exactly persisted React Native fatal span into the custom data that
+    /// PLCrashReporter snapshots into a subsequent native crash report.
+    package func armReactNativeFatalMarker(spanId: String, armedAt: Date = Date()) -> Bool {
+        guard isValidReactNativeFatalSpanId(spanId), crashReporter != nil else {
+            return false
+        }
+
+        var archivedData: Data?
+        deviceDataQueue.sync {
+            deviceDataDictionary[CrashReportCustomDataKeys.reactNativeFatalSchema.rawValue] =
+                ReactNativeFatalMarkerConstants.schema
+            deviceDataDictionary[CrashReportCustomDataKeys.reactNativeFatalSpanId.rawValue] = spanId
+            deviceDataDictionary[CrashReportCustomDataKeys.reactNativeFatalArmedAtEpochMs.rawValue] =
+                String(Int64(armedAt.timeIntervalSince1970 * 1_000))
+            archivedData = try? NSKeyedArchiver.archivedData(
+                withRootObject: deviceDataDictionary,
+                requiringSecureCoding: false
+            )
+        }
+
+        guard let archivedData else {
+            return false
+        }
+
+        // PLCrashReporter synchronizes this setter with its crash writer. Publishing here, before
+        // returning to the React Native bridge, establishes the required happens-before ordering.
+        crashReporter?.customData = archivedData
+
+        DispatchQueue.global(qos: .utility).asyncAfter(
+            deadline: .now() + ReactNativeFatalMarkerConstants.validityInterval
+        ) { [weak self] in
+            self?.clearReactNativeFatalMarker(ifMatching: spanId)
+        }
+
+        return true
+    }
+
+    private func clearReactNativeFatalMarker(ifMatching spanId: String) {
+        deviceDataQueue.async { [weak self] in
+            guard
+                let self,
+                deviceDataDictionary[CrashReportCustomDataKeys.reactNativeFatalSpanId.rawValue] == spanId
+            else {
+                return
+            }
+
+            deviceDataDictionary.removeValue(forKey: CrashReportCustomDataKeys.reactNativeFatalSchema.rawValue)
+            deviceDataDictionary.removeValue(forKey: CrashReportCustomDataKeys.reactNativeFatalSpanId.rawValue)
+            deviceDataDictionary.removeValue(forKey: CrashReportCustomDataKeys.reactNativeFatalArmedAtEpochMs.rawValue)
+
+            guard
+                let archivedData = try? NSKeyedArchiver.archivedData(
+                    withRootObject: deviceDataDictionary,
+                    requiringSecureCoding: false
+                )
+            else {
+                return
+            }
+
+            crashReporter?.customData = archivedData
         }
     }
 
