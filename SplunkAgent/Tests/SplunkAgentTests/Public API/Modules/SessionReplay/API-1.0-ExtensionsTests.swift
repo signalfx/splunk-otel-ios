@@ -15,11 +15,27 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import SplunkSessionReplayProxy
 import XCTest
 
 @testable import SplunkAgent
 
 final class SessionReplayAPI10ExtensionsTests: XCTestCase {
+
+    // MARK: - Tests lifecycle
+
+    override func setUp() {
+        super.setUp()
+
+        SplunkRum.resetSharedInstance()
+    }
+
+    override func tearDown() {
+        SplunkRum.resetSharedInstance()
+
+        super.tearDown()
+    }
+
 
     // MARK: - Sensitivity extension
 
@@ -29,15 +45,18 @@ final class SessionReplayAPI10ExtensionsTests: XCTestCase {
         // by forced access via a singleton instance in the agent and its equivalent
         // in the Session Replay module.
 
-        // Agent install with initialized Session Replay module (by default)
+        // Install with Session Replay always sampled in for sensitivity assertions.
         let configuration = try ConfigurationTestBuilder.buildDefault()
-        let agent = try SplunkRum.install(with: configuration)
+        let agent = try SplunkRum.install(
+            with: configuration,
+            moduleConfigurations: [SessionReplayConfiguration(samplingRate: 1.0)]
+        )
 
         // Stop recording immediately (we don't need it)
         agent.sessionReplay.stop()
 
 
-        /* Operational Proxy (by default) */
+        /* Operational Proxy */
         let view = UIView()
         view.srSensitive = true
         XCTAssertTrue(try XCTUnwrap(agent.sessionReplay.sensitivity[view]))
