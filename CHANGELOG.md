@@ -11,10 +11,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 * Reduced disk reads and memory use when detecting the payload format of recovered uploads by reading only the first byte instead of loading and parsing the entire file.
 * Renamed the span that reports the agent installation from `SplunkRum.initialize` to `SplunkRum.install`, to match the `SplunkRum.install(with:moduleConfigurations:)` method and the Android agent 2.4.0 and later. The span keeps its parent, attributes and events. Apps on earlier agent versions still send `SplunkRum.initialize`, so dashboards, detectors and queries that filter on the span name must match both names. A `spanInterceptor` that matches this span by name must use the new name. DEMRUM-7220
+* Calling `integrateWithBrowserRum(_:)` again on an instrumented web view now gives the open page the current session and replaces the bridge script with one built from the current session. The new script applies from the page's next load. The SDK removes and re-adds all of the web view's user scripts in the same order; the other scripts are the same objects, and the bridge script is a new object.
 
 ### Fixed
 
 * A session that produces no telemetry no longer shows up as an empty session with zero duration. The `session.start` event is now sent with the session's first exported telemetry instead of when the session is created. Spans dropped by a `spanInterceptor` do not count as exported telemetry.
+* WebView instrumentation now skips bridge injection instead of crashing if the JavaScript bridge resource is missing or unreadable.
 
 ## [2.5.0] - 2026-11-05
 
@@ -26,10 +28,6 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 * Updated Cisco Session Replay binaries to 2.0.0.300.
 * The XCFramework release pipeline now includes all 14 Cisco Session Replay modules and an SDK size report for the five added modules. All frameworks are dynamic by default; Cisco Session Replay frameworks can be built as static archives with `CISCO_MACH_O_TYPE=staticlib`.
-
-### Fixed
-
-* WebView instrumentation now skips bridge injection instead of crashing if the JavaScript bridge resource is missing or unreadable.
 
 ## [2.4.3] - 2026-10-14
 
