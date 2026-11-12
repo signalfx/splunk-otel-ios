@@ -21,9 +21,10 @@ import OpenTelemetryApi
 extension BatchSpanProcessorCore {
     /// Drains a snapshot to the exporter without waiting for background URLSession activity.
     ///
-    /// The configured exporter reports success only after the batch has been written to disk. This
-    /// operation is therefore suitable for protecting a source payload that must not be deleted
-    /// until the span has a durable copy.
+    /// The configured exporter reports success after it writes the batch to disk. In an agent's
+    /// pipeline, success also covers a span that the session policy dropped, which has no durable
+    /// copy. For a caller that keeps a source payload until success, success means that the span was
+    /// stored or dropped on purpose.
     func persistBufferedSpans(timeout: TimeInterval, completion: @escaping (Bool) -> Void) {
         let boundedTimeout = timeout.isFinite ? max(0, timeout) : 0
         let deadline = Date().addingTimeInterval(boundedTimeout)
