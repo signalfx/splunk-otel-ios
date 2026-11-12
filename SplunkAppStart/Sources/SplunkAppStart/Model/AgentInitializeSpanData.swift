@@ -16,6 +16,7 @@ limitations under the License.
 */
 
 import Foundation
+@_spi(SplunkInternal) import SplunkCommon
 
 /// Represents Initialize span's data.
 struct AgentInitializeSpanData {
@@ -25,22 +26,6 @@ struct AgentInitializeSpanData {
     let configurationSettings: [String: String]
 
     var formattedConfigurationSettings: String? {
-        if configurationSettings.isEmpty {
-            return nil
-        }
-
-        var formatted = "["
-
-        for (key, value) in configurationSettings {
-            if formatted.count > 1 {
-                formatted += ", "
-            }
-
-            formatted += "\(key):\(value)"
-        }
-
-        formatted += "]"
-
-        return formatted
+        AgentInitializeFormatting.configurationSettings(configurationSettings)
     }
 }
