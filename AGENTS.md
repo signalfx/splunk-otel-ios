@@ -50,7 +50,7 @@ This repo is a modular Swift Package for the Splunk RUM iOS agent. It instrument
 
 ## Telemetry Model
 
-- Direct spans: Navigation, Network, AppStart, AppState, NetworkMonitor, SlowFrameDetector, and CustomTracking workflows use `Tracer.spanBuilder` -> `OTLPBatchSpanProcessor` -> `OTLPBackgroundHTTPTraceExporter`.
+- Direct spans: Navigation, Network, AppStart, AppState, NetworkMonitor, SlowFrameDetector, and CustomTracking workflows use `Tracer.spanBuilder` -> `OTLPBatchSpanProcessor` -> `SessionPolicySpanExporter` -> `SpanInterceptorExporter` -> `OTLPBackgroundHTTPTraceExporter`. `SessionPolicySpanExporter` runs only in the agent's pipeline: it drops spans whose `session.id` does not have the shape of an ID the agent generates, before the customer `spanInterceptor` sees them. Log-derived spans share this batch and these stages.
 - Log-as-span: CrashReports crash payloads, CustomTracking events/errors, Interactions, internal agent events, and agent events published through `DefaultEventManager` emit log records that `OTLPLogToSpanExporter` converts to spans and sends to the trace endpoint.
 - Binary logs: Session Replay is the exception; it uses `OTLPSessionReplayEventProcessor` -> `OTLPBackgroundHTTPLogExporterBinary`.
 - Direct spans use the custom in-memory `OTLPBatchSpanProcessor`, which pools ended spans and flushes a batch to the disk-backed exporter every 1s or when 100 spans accumulate (whichever is first). App background and normal termination notifications trigger asynchronous, best-effort drains without blocking the lifecycle notification thread; shutdown is fire-and-forget on the main thread and uses a bounded wait off-main. Spans still buffered in memory when the process exits are lost by design. This is distinct from the upstream `BatchSpanProcessor`, which is not used. There is no production `BatchLogRecordProcessor`. Durable buffering remains disk-backed in the background exporters.
@@ -147,7 +147,7 @@ Block changes that can crash the host app. Block or request measurement for chan
 
 Call these out as design choices when a PR relies on or changes them:
 
-1. Direct-span export uses two buffering stages: a bounded in-memory batch followed by the disk-backed background exporter (`span creation` -> `bounded in-memory batch` -> `disk-backed exporter` -> `background upload`).
+1. Direct-span export uses two buffering stages: a bounded in-memory batch followed by the disk-backed background exporter (`span creation` -> `bounded in-memory batch` -> `session policy` -> `spanInterceptor` -> `disk-backed exporter` -> `background upload`). In the agent's pipeline, the session policy drops spans whose `session.id` does not have the shape of an agent-generated ID before the `spanInterceptor`, so they are never stored.
 2. Background `URLSession` scheduling, retry count, and disk caps define when data is delayed or dropped.
 3. `SplunkRum.shared` and session state assume a mostly singleton, install-once lifecycle.
 4. Sampling is chosen at session start; switching mid-session is a behavior/API change.
