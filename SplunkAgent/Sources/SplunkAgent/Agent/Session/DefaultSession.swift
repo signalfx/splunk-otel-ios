@@ -37,10 +37,11 @@ class DefaultSession: AgentSession {
 
     var enterBackground: Date?
 
-    /// The session whose start event is held back until it produces telemetry that is accepted for export.
+    /// Start events held back until their sessions produce telemetry that is accepted for export, oldest first.
     ///
-    /// Accessed only on `accessQueue`.
-    private var pendingSessionStart: PendingSessionStart?
+    /// Holds the current session and the sessions it replaced, as their late telemetry still carries their
+    /// ids. Bounded by ``maxHeldSessionStarts``. Accessed only on `accessQueue`.
+    var pendingSessionStarts: [PendingSessionStart] = []
 
     let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "Agent")
 
@@ -125,11 +126,11 @@ class DefaultSession: AgentSession {
     func trackAcceptedTelemetry(forSessionId sessionId: String) {
         accessQueue.async { [weak self] in
             // The pending state is cleared first, as sending the event produces telemetry itself.
-            guard let self, let pending = pendingSessionStart, pending.session.id == sessionId else {
+            guard let self, let index = pendingSessionStarts.firstIndex(where: { $0.session.id == sessionId }) else {
                 return
             }
 
-            pendingSessionStart = nil
+            let pending = pendingSessionStarts.remove(at: index)
 
             sendSessionStart(
                 sessionId: pending.session.id,
@@ -149,7 +150,7 @@ class DefaultSession: AgentSession {
         let screenName = screenNameForSessionStart()
 
         accessQueue.sync {
-            pendingSessionStart = PendingSessionStart(session: currentSession, previousSessionId: nil, screenName: screenName)
+            holdSessionStart(PendingSessionStart(session: currentSession, previousSessionId: nil, screenName: screenName))
         }
     }
 
@@ -292,7 +293,8 @@ class DefaultSession: AgentSession {
     /// Closes the current session and starts a new one.
     ///
     /// The new session holds its start event until it produces telemetry. A start event still held
-    /// for the closed session is dropped, because none of that session's telemetry was exported yet.
+    /// for the closed session is kept, as telemetry of that session can still be
+    /// buffered, in flight or still running. It is dropped once newer sessions push it out of the held starts.
     ///
     /// - Parameter previousSessionId: A session id of the previous session, if the old session
     ///   "transitions smoothly" into the new session.
@@ -312,10 +314,10 @@ class DefaultSession: AgentSession {
         // Reset in-memory last-activity for the new session
         accessQueue.sync {
             lastActivity = nil
-            pendingSessionStart = PendingSessionStart(
-                session: currentSession,
-                previousSessionId: previousSessionId,
-                screenName: screenName
+
+            // The replaced session's start stays held, as its late telemetry can still release it
+            holdSessionStart(
+                PendingSessionStart(session: currentSession, previousSessionId: previousSessionId, screenName: screenName)
             )
         }
 

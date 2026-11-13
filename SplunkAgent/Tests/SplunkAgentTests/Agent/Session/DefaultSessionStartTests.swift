@@ -92,22 +92,18 @@ final class DefaultSessionStartTests: XCTestCase {
 
     // MARK: - Rotation
 
-    func testRotationDropsStartOfSessionWithoutTelemetry() throws {
-        let (defaultSession, eventManager) = try buildSession(named: "rotationDropTest")
+    func testRotationKeepsStartOfReplacedSessionForLateTelemetry() throws {
+        let (defaultSession, eventManager) = try buildSession(named: "rotationKeepTest")
         defaultSession.scheduleSessionStart()
-        let abandonedSessionId = defaultSession.currentSessionId
+        let replacedSessionId = defaultSession.currentSessionId
 
         // The new session starts on screen A, and its first telemetry comes from screen B
         defaultSession.owner?.runtimeAttributes.updateScreenName("ScreenA")
         defaultSession.rotateSession()
         defaultSession.owner?.runtimeAttributes.updateScreenName("ScreenB")
 
-        // The abandoned session produced nothing, so its start is dropped
-        let notSent = expectSessionStart(from: eventManager, isInverted: true)
-        defaultSession.trackAcceptedTelemetry(forSessionId: abandonedSessionId)
-        wait(for: [notSent], timeout: absenceTimeout)
-
-        // The new session sends its own start, not linked to the abandoned session
+        // The new session sends its own start first, not linked to the replaced session,
+        // and with the screen shown when it started
         let sent = expectSessionStart(from: eventManager)
         defaultSession.trackAcceptedTelemetry(forSessionId: defaultSession.currentSessionId)
         wait(for: [sent], timeout: 1)
@@ -116,6 +112,66 @@ final class DefaultSessionStartTests: XCTestCase {
         XCTAssertEqual(event.sessionId, defaultSession.currentSessionId)
         XCTAssertNil(event.attributes?["session.previous_id"])
         XCTAssertEqual(event.attributes?["screen.name"], .string("ScreenA"))
+
+        // A long-running span of the replaced session ends later, whatever time has passed,
+        // and still releases the replaced session's start
+        Thread.sleep(forTimeInterval: 0.3)
+
+        let sentForReplaced = expectSessionStart(from: eventManager)
+        defaultSession.trackAcceptedTelemetry(forSessionId: replacedSessionId)
+        wait(for: [sentForReplaced], timeout: 1)
+
+        XCTAssertEqual(eventManager.sentEvents.last?.sessionId, replacedSessionId)
+    }
+
+    func testOldestHeldSessionStartIsDroppedBeyondLimit() throws {
+        let (defaultSession, eventManager) = try buildSession(named: "heldLimitTest")
+        defaultSession.scheduleSessionStart()
+        let oldestSessionId = defaultSession.currentSessionId
+
+        // Rotate until the oldest start is pushed out, none of the sessions producing telemetry
+        for _ in 0 ..< DefaultSession.maxHeldSessionStarts {
+            defaultSession.rotateSession()
+        }
+
+        let notSent = expectSessionStart(from: eventManager, isInverted: true)
+        defaultSession.trackAcceptedTelemetry(forSessionId: oldestSessionId)
+        wait(for: [notSent], timeout: absenceTimeout)
+
+        // The newest held start is still released
+        let sent = expectSessionStart(from: eventManager)
+        defaultSession.trackAcceptedTelemetry(forSessionId: defaultSession.currentSessionId)
+        wait(for: [sent], timeout: 1)
+
+        XCTAssertEqual(eventManager.sentEvents.first?.sessionId, defaultSession.currentSessionId)
+    }
+
+    func testTelemetryExportedAfterRotationReleasesStartOfReplacedSession() throws {
+        let (defaultSession, eventManager) = try buildSession(named: "rotationLateTelemetryTest")
+        defaultSession.scheduleSessionStart()
+
+        let replacedSessionId = defaultSession.currentSessionId
+        let replacedSessionStart = defaultSession.currentSessionStart
+
+        defaultSession.owner?.runtimeAttributes.updateScreenName("ScreenA")
+        defaultSession.rotateSession()
+
+        // Telemetry of the replaced session, buffered before the rotation, is exported afterwards
+        let sentForReplaced = expectSessionStart(from: eventManager)
+        defaultSession.trackAcceptedTelemetry(forSessionId: replacedSessionId)
+        wait(for: [sentForReplaced], timeout: 1)
+
+        let replacedEvent = try XCTUnwrap(eventManager.sentEvents.first)
+        XCTAssertEqual(replacedEvent.sessionId, replacedSessionId)
+        XCTAssertEqual(replacedEvent.timestamp, replacedSessionStart)
+
+        // The new session still sends its own start
+        let sentForCurrent = expectSessionStart(from: eventManager)
+        defaultSession.trackAcceptedTelemetry(forSessionId: defaultSession.currentSessionId)
+        wait(for: [sentForCurrent], timeout: 1)
+
+        XCTAssertEqual(eventManager.sentEvents.count, 2)
+        XCTAssertEqual(eventManager.sentEvents.last?.sessionId, defaultSession.currentSessionId)
     }
 
     func testSessionTooLongRotatesWithLinkedPreviousSession() throws {

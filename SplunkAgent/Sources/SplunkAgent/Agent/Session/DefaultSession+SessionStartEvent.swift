@@ -28,6 +28,27 @@ extension DefaultSession {
         let screenName: String?
     }
 
+    /// The most start events held at once: the current session and the two sessions it replaced.
+    ///
+    /// Held starts are small and sessions rotate rarely (every 4 hours by default), so keeping the
+    /// two latest replaced sessions covers buffered or long-running telemetry of those sessions.
+    /// When the limit is exceeded, the oldest start is dropped.
+    static let maxHeldSessionStarts = 3
+
+    /// Holds a session's start event, dropping the oldest held starts beyond ``maxHeldSessionStarts``.
+    ///
+    /// Must run on `accessQueue`.
+    func holdSessionStart(_ pending: PendingSessionStart) {
+        pendingSessionStarts.removeAll { $0.session.id == pending.session.id }
+        pendingSessionStarts.append(pending)
+
+        let excess = pendingSessionStarts.count - Self.maxHeldSessionStarts
+
+        if excess > 0 {
+            pendingSessionStarts.removeFirst(excess)
+        }
+    }
+
     /// Sends a "session start" event.
     ///
     /// A session's start event is sent when the session's first telemetry is accepted for export.
