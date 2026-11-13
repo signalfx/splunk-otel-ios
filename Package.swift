@@ -425,7 +425,9 @@ func generateMainTargets() -> [Target] {
         .testTarget(
             name: "SplunkAppStartTests",
             dependencies: [
-                "SplunkAppStart"
+                "SplunkAppStart",
+                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift-core"),
+                .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift-core")
             ],
             path: "SplunkAppStart/Tests",
             plugins: lintTargetPlugins()
