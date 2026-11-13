@@ -20,17 +20,68 @@ import Foundation
 /// A utility for generating the JavaScript bridge script injected into `WKWebView` instances.
 enum WebViewBridgeScript {
 
-    private static let scriptTemplate: String = {
-        guard let url = Bundle.module.url(forResource: "WebViewBridgeScript", withExtension: "js") else {
-            preconditionFailure("WebViewBridgeScript.js not found in bundle.")
+    private static let resourceBundleName = "SplunkAgent_SplunkWebView"
+
+    private static let scriptTemplate = loadScriptTemplate()
+
+    static func scriptResourceURL(
+        in bundles: [Bundle],
+        searchDirectories: [URL] = [],
+        packageBundleName: String = resourceBundleName,
+        frameworkBundles: [Bundle] = []
+    ) -> URL? {
+        let bundleDirectories = bundles.flatMap { [$0.resourceURL, $0.bundleURL].compactMap(\.self) }
+        for directory in searchDirectories + bundleDirectories {
+            let packageBundleURL = directory.appendingPathComponent(packageBundleName + ".bundle")
+            guard let packageBundle = Bundle(url: packageBundleURL) else {
+                continue
+            }
+
+            if let url = packageBundle.url(forResource: "WebViewBridgeScript", withExtension: "js") {
+                return url
+            }
         }
 
-        guard let script = try? String(contentsOf: url) else {
-            preconditionFailure("Could not read WebViewBridgeScript.js from bundle.")
+        // Framework distributions may place the resource directly in the framework bundle.
+        // Keep this fallback after package bundles so a same-named host resource cannot win.
+        let fallbackBundles = searchDirectories.compactMap { Bundle(url: $0) } + frameworkBundles
+        for bundle in fallbackBundles {
+            if let url = bundle.url(forResource: "WebViewBridgeScript", withExtension: "js") {
+                return url
+            }
         }
 
-        return script
-    }()
+        return nil
+    }
+
+    private static func loadScriptTemplate() -> String? {
+        #if DEBUG
+            let resourceBundleOverride =
+                ProcessInfo.processInfo.environment["PACKAGE_RESOURCE_BUNDLE_PATH"]
+                ?? ProcessInfo.processInfo.environment["PACKAGE_RESOURCE_BUNDLE_URL"]
+            if let resourceBundleOverride,
+                let url = scriptResourceURL(in: [], searchDirectories: [URL(fileURLWithPath: resourceBundleOverride)])
+            {
+                return loadScript(from: url)
+            }
+        #endif
+
+        let frameworkBundle = Bundle(for: WebViewInstrumentation.self)
+        let candidateBundles = [frameworkBundle, Bundle.main]
+        guard let url = scriptResourceURL(in: candidateBundles, frameworkBundles: [frameworkBundle]) else {
+            return nil
+        }
+
+        return loadScript(from: url)
+    }
+
+    static func loadScript(from url: URL?) -> String? {
+        guard let url else {
+            return nil
+        }
+
+        return try? String(contentsOf: url, encoding: .utf8)
+    }
 
     /// Generates the complete JavaScript string to be injected into a web view.
     ///
@@ -42,8 +93,12 @@ enum WebViewBridgeScript {
     ///   - sessionMetadata: The initial Base64-encoded session metadata string, or `nil` if unavailable.
     ///   - handlerName: The name of the `WKScriptMessageHandler` used for asynchronous communication.
     ///
-    /// - Returns: A fully interpolated JavaScript string ready for injection.
-    static func generate(sessionId: String, sessionMetadata: String?, handlerName: String) -> String {
+    /// - Returns: A fully interpolated JavaScript string ready for injection, or `nil` if the resource is unavailable.
+    static func generate(sessionId: String, sessionMetadata: String?, handlerName: String) -> String? {
+        guard let scriptTemplate else {
+            return nil
+        }
+
         let metadataLiteral = sessionMetadata.map { "'\($0)'" } ?? "null"
         return
             scriptTemplate
