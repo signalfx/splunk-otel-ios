@@ -46,9 +46,9 @@ struct OTelDestination: AppStartDestination {
 
         appStartSpan.end(time: appStart.end)
 
-        // Create and send the Initialize span as a app start span's child
+        // Create and send the install span as a child of the app start span
         if let agentInitialize {
-            let initializeSpan = tracer.spanBuilder(spanName: "SplunkRum.initialize")
+            let initializeSpan = tracer.spanBuilder(spanName: AgentInstallSpanConstants.spanName)
                 .setStartTime(time: agentInitialize.start)
                 .setParent(appStartSpan)
                 .startSpan()
