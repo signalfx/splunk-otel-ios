@@ -58,12 +58,27 @@ class SpanInterceptorExporter: SpanExporter {
 
     private let proxyExporter: SpanExporter
 
+    private let didIntercept: (([SpanData]) -> Void)?
+
 
     // MARK: - Initialization
 
-    init(with interceptor: SplunkSpanInterceptor?, proxy: SpanExporter) {
+    /// Initializes the exporter.
+    ///
+    /// - Parameters:
+    ///   - interceptor: An optional customer interceptor that can modify or drop spans.
+    ///   - proxy: The exporter that receives the spans.
+    ///   - didIntercept: An optional closure called with the spans that remain after interception,
+    ///     right before they are passed on to `proxy`. It is called on the export thread for every
+    ///     exported batch, so it must return quickly and must not block.
+    init(
+        with interceptor: SplunkSpanInterceptor?,
+        proxy: SpanExporter,
+        didIntercept: (([SpanData]) -> Void)? = nil
+    ) {
         spanInterceptor = interceptor
         proxyExporter = proxy
+        self.didIntercept = didIntercept
     }
 
 
@@ -92,6 +107,8 @@ class SpanInterceptorExporter: SpanExporter {
 
         // Simply re-export the spans if no interceptor was set.
         guard let spanInterceptor else {
+            didIntercept?(isolatedSpans)
+
             return proxyExporter.export(spans: isolatedSpans, explicitTimeout: explicitTimeout)
         }
 
@@ -122,6 +139,8 @@ class SpanInterceptorExporter: SpanExporter {
 
             return span
         }
+
+        didIntercept?(recalculatedSpans)
 
         return proxyExporter.export(spans: recalculatedSpans, explicitTimeout: explicitTimeout)
     }
