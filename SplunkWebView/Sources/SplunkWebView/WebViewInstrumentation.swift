@@ -188,7 +188,7 @@ public final class WebViewInstrumentation: NSObject {
         ///
         /// - replyHandler: A block to be called with the reply data (containing `sessionId` and `sessionMetadata`) or an error string.
         public func userContentController(
-            _ _: WKUserContentController,
+            _: WKUserContentController,
             didReceive _: WKScriptMessage,
             replyHandler: @escaping @MainActor @Sendable (Any?, String?) -> Void
         ) {
