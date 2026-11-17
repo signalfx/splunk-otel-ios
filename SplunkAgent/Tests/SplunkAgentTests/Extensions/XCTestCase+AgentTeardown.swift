@@ -36,6 +36,24 @@ extension XCTestCase {
         }
     }
 
+    /// Resets `SplunkRum.shared` now, and stops the agent in it when the current test ends.
+    ///
+    /// Call it in `setUp()` of a test case that installs agents with `SplunkRum.install(with:)`, in
+    /// place of `SplunkRum.resetSharedInstance()`. Each full install becomes `SplunkRum.shared`, and the
+    /// teardown block reads `SplunkRum.shared` when it runs, so it stops the agent that the test
+    /// installed last. Teardown blocks run before `tearDown()`, so the agent stops before a
+    /// `tearDown()` that resets the shared instance. The global OpenTelemetry providers are saved
+    /// after the reset and restored after the stop.
+    func resetSharedAgentForTest() {
+        SplunkRum.resetSharedInstance()
+        restoreOpenTelemetryGlobalsAtTeardown()
+
+        // Teardown blocks run in reverse order, so the agent stops before the providers are restored
+        addTeardownBlock { @MainActor in
+            await AgentTeardown.stop(SplunkRum.shared)
+        }
+    }
+
     /// Shuts down the pipeline of an event manager when the current test ends.
     ///
     /// Use it for an event manager that the test builds without installing the agent.

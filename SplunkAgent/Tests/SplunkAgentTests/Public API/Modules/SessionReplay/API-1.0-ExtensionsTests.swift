@@ -21,6 +21,21 @@ import XCTest
 
 final class SessionReplayAPI10ExtensionsTests: XCTestCase {
 
+    // MARK: - Tests lifecycle
+
+    override func setUp() {
+        super.setUp()
+
+        resetSharedAgentForTest()
+    }
+
+    override func tearDown() {
+        SplunkRum.resetSharedInstance()
+
+        super.tearDown()
+    }
+
+
     // MARK: - Sensitivity extension
 
     func testUIViewSensitivityExtension() throws {

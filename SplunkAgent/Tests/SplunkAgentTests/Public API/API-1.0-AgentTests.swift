@@ -34,6 +34,7 @@ final class API10AgentTests: XCTestCase {
         super.setUp()
 
         agent = nil
+        resetSharedAgentForTest()
     }
 
     override func tearDown() {
