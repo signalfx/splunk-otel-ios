@@ -29,7 +29,10 @@ class UserModel {
 
     // MARK: - Private
 
+    private static let identifierKey = "userIdentifier"
+
     private var trackingModeValue: UserTrackingMode = .default
+    private var identifierValue: String?
 
 
     // MARK: - Public
@@ -46,6 +49,35 @@ class UserModel {
                 self.trackingModeValue = newValue
             }
         }
+    }
+
+    /// The anonymous identifier for the user.
+    ///
+    /// The first read takes the identifier from the permanent cache. If there is none,
+    /// it generates a new identifier and stores it in the permanent cache.
+    /// Later reads return the same value from memory.
+    ///
+    /// It is safe to read from several threads at once; all of them get the same identifier.
+    var identifier: String {
+        let result = accessQueue.sync { () -> (identifier: String, isNew: Bool) in
+            if let identifierValue {
+                return (identifierValue, false)
+            }
+
+            let prepared = prepareIdentifier()
+            identifierValue = prepared.identifier
+
+            return prepared
+        }
+
+        // We store a new identifier only after we leave the access queue.
+        // `UserDefaults` posts its change notification synchronously on this thread,
+        // so app code can run here and read the identifier or the tracking mode again.
+        if result.isNew {
+            try? storage.insert(result.identifier, forKey: Self.identifierKey)
+        }
+
+        return result.identifier
     }
 
 
@@ -67,23 +99,21 @@ extension UserModel {
 
     // MARK: - Business logic
 
-    /// Reads or generates an anonymous identifier for the user.
+    /// Reads the stored anonymous identifier, or generates a new one.
     ///
-    /// - Returns: A string with the anonymous identifier.
-    func prepareIdentifier() -> String {
-        let key = "userIdentifier"
-
+    /// - Note: Call this method only on `accessQueue`. It does not store a new
+    ///         identifier. The caller stores it after it leaves the queue.
+    ///
+    /// - Returns: The identifier, and `isNew` set to `true` if the caller must store it.
+    private func prepareIdentifier() -> (identifier: String, isNew: Bool) {
         // At first, we try to read the identifier from the permanent cache
-        let identifier: String? = try? storage.read(forKey: key)
+        let storedIdentifier: String? = try? storage.read(forKey: Self.identifierKey)
 
-        if let identifier {
-            return identifier
+        if let storedIdentifier {
+            return (storedIdentifier, false)
         }
 
-        // No cached identifier. We need to create a new one and cache it.
-        let newIdentifier = String.uniqueHexIdentifier(ofLength: 32)
-        try? storage.insert(newIdentifier, forKey: key)
-
-        return newIdentifier
+        // No cached identifier. We create a new one, and the caller stores it.
+        return (String.uniqueHexIdentifier(ofLength: 32), true)
     }
 }
