@@ -172,6 +172,7 @@ check_deployment_targets() {
 
     require_grep_in_settings "sharedSettings" '"XROS_DEPLOYMENT_TARGET": "1.0"' "${AGENT_PROJECT}" "Project.swift sharedSettings visionOS 1.0"
     require_grep_in_settings "crashReporterSettings" '"IPHONEOS_DEPLOYMENT_TARGET": "15.0"' "${AGENT_PROJECT}" "Project.swift crashReporterSettings iOS 15.0"
+    require_grep_in_settings "crashReporterSettings" '"ARCHS": "\$\(ARCHS_STANDARD_64_BIT\)"' "${AGENT_PROJECT}" "Project.swift crash reporter 64-bit architectures"
     require_grep_in_settings "sharedSettings" '"XROS_DEPLOYMENT_TARGET": "1.0"' "${OTEL_PROJECT}" "otel/Project.swift sharedSettings visionOS 1.0"
     
     require_grep 'deploymentTargets:[[:space:]]*\.iOS\("15\.0"\)' "${SMOKE_PROJECT}" "smoke-test iOS 15.0"

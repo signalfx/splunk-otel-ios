@@ -40,6 +40,7 @@ public class OTLPTraceProcessor: TraceProcessor {
         let debugEnabled: Bool
         let spanInterceptor: SplunkSpanInterceptor?
         let activityTracker: ActivityTracker
+        let didIntercept: (([SpanData]) -> Void)?
     }
 
     // MARK: - Internal properties
@@ -66,7 +67,8 @@ public class OTLPTraceProcessor: TraceProcessor {
         debugEnabled: Bool,
         spanInterceptor: SplunkSpanInterceptor?,
         accessToken: String? = nil,
-        activityTracker: ActivityTracker
+        activityTracker: ActivityTracker,
+        didIntercept: (([SpanData]) -> Void)? = nil
     ) {
         let exporterConfiguration = OTLPExporterConfiguration(agentVersion: resources.agentVersion)
         let envVarHeaders: [(String, String)] = []
@@ -89,7 +91,8 @@ public class OTLPTraceProcessor: TraceProcessor {
             globalAttributes: globalAttributes,
             debugEnabled: debugEnabled,
             spanInterceptor: spanInterceptor,
-            activityTracker: activityTracker
+            activityTracker: activityTracker,
+            didIntercept: didIntercept
         )
 
         let state = Self.makeInitializationState(
@@ -109,7 +112,8 @@ public class OTLPTraceProcessor: TraceProcessor {
         globalAttributes: @escaping () -> [String: AttributeValue],
         debugEnabled: Bool,
         spanInterceptor: SplunkSpanInterceptor?,
-        activityTracker: ActivityTracker
+        activityTracker: ActivityTracker,
+        didIntercept: (([SpanData]) -> Void)? = nil
     ) {
         let pipelineConfiguration = PipelineConfiguration(
             resources: resources,
@@ -117,7 +121,8 @@ public class OTLPTraceProcessor: TraceProcessor {
             globalAttributes: globalAttributes,
             debugEnabled: debugEnabled,
             spanInterceptor: spanInterceptor,
-            activityTracker: activityTracker
+            activityTracker: activityTracker,
+            didIntercept: didIntercept
         )
         let state = Self.makeInitializationState(
             backgroundTraceExporter: backgroundTraceExporter,
@@ -145,7 +150,8 @@ public class OTLPTraceProcessor: TraceProcessor {
         // Initialize span interceptor proxy exporter
         let spanInterceptorExporter = SpanInterceptorExporter(
             with: configuration.spanInterceptor,
-            proxy: attributeCheckerExporter
+            proxy: attributeCheckerExporter,
+            didIntercept: configuration.didIntercept
         )
 
         // Build Resources
@@ -199,6 +205,11 @@ public class OTLPTraceProcessor: TraceProcessor {
     /// Flushes the shared direct and log-derived span batch and reports durable completion.
     package func forceFlushBufferedSpans(timeout: TimeInterval?) -> ExportResult {
         batchSpanProcessor.forceFlushResult(timeout: timeout) ? .success : .failure
+    }
+
+    /// Writes the buffered spans to disk without waiting for the next batch export and without blocking the caller.
+    package func persistBufferedSpans(timeout: TimeInterval, completion: @escaping (Bool) -> Void) {
+        batchSpanProcessor.persistBufferedSpans(timeout: timeout, completion: completion)
     }
 
 

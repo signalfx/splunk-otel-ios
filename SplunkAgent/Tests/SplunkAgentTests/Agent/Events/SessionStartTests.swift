@@ -30,7 +30,8 @@ final class SessionStartTests: XCTestCase {
         let event = SessionStartEvent(
             timestamp: timestamp,
             sessionId: sessionId,
-            previousSessionId: previousSessionId
+            previousSessionId: previousSessionId,
+            screenName: nil
         )
 
         XCTAssertEqual(event.name, "session.start")

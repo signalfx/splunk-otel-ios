@@ -93,6 +93,10 @@ let sharedSettings: SettingsDictionary = [
 let crashReporterSettings: SettingsDictionary = [
     // SplunkCrashReporter follows the agent's iOS/iPadOS 15 baseline.
     "IPHONEOS_DEPLOYMENT_TARGET": "15.0",
+    // The crash reporter is shipped only for 64-bit Apple platforms. Keep this
+    // explicit so legacy 32-bit architecture support in its source cannot
+    // produce a 32-bit distribution slice.
+    "ARCHS": "$(ARCHS_STANDARD_64_BIT)",
     "MACH_O_TYPE": "mh_dylib",
     "SKIP_INSTALL": "NO",
     "DEFINES_MODULE": "YES",

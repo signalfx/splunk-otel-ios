@@ -16,6 +16,7 @@ limitations under the License.
 */
 
 import Foundation
+import OpenTelemetrySdk
 internal import SplunkOpenTelemetry
 
 // MARK: - Endpoint Management
@@ -118,7 +119,24 @@ extension DefaultEventManager {
             debugEnabled: configuration.enableDebugLogging,
             spanInterceptor: configuration.spanInterceptor,
             accessToken: accessToken,
-            activityTracker: agent.currentSession
+            activityTracker: agent.currentSession,
+            didIntercept: { [weak agent] spans in
+                // Spans that survived interception are about to be exported, which makes
+                // them the telemetry that releases a held session start event.
+                guard let session = agent?.currentSession else {
+                    return
+                }
+
+                var reportedSessionIds = Set<String>()
+
+                for span in spans {
+                    if case let .string(sessionId) = span.attributes[RuntimeAttributeKeys.sessionId],
+                        reportedSessionIds.insert(sessionId).inserted
+                    {
+                        session.trackAcceptedTelemetry(forSessionId: sessionId)
+                    }
+                }
+            }
         )
 
         // Initialize the log event processor. Converted spans share the direct-span batch and its
