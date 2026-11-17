@@ -41,6 +41,7 @@ final class DefaultSessionStartTests: XCTestCase {
         super.setUp()
 
         retainedAgents = []
+        restoreOpenTelemetryGlobalsAtTeardown()
     }
 
     override func tearDown() {
@@ -298,6 +299,7 @@ final class DefaultSessionStartTests: XCTestCase {
         let eventManager = try Manager(with: configuration, agent: agent)
         agent.eventManager = eventManager
         retainedAgents.append(agent)
+        stopAtTeardown(agent)
 
         return (defaultSession, eventManager)
     }

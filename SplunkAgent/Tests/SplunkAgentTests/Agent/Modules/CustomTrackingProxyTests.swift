@@ -25,6 +25,8 @@ final class CustomTrackingProxyTests: XCTestCase {
     // MARK: - Configuration
 
     func testDisabledConfigurationUsesNonOperationalProxy() throws {
+        restoreOpenTelemetryGlobalsAtTeardown()
+
         let configuration = try ConfigurationTestBuilder.buildDefault()
         let agent = try SplunkRum(
             with: configuration,
@@ -32,6 +34,7 @@ final class CustomTrackingProxyTests: XCTestCase {
                 CustomTrackingConfiguration(isEnabled: false)
             ]
         )
+        stopAtTeardown(agent)
 
         XCTAssertTrue(agent.customTrackingProxy is CustomTrackingNonOperational)
         XCTAssertTrue(agent.customTracking is CustomTrackingNonOperational)
