@@ -27,7 +27,10 @@ class DefaultUser: AgentUser {
 
     // MARK: - Public
 
-    private(set) lazy var userIdentifier: String = userModel.prepareIdentifier()
+    var userIdentifier: String {
+        // The user model reads or creates the identifier once, on its access queue
+        userModel.identifier
+    }
 
     var trackingMode: UserTrackingMode {
         get {
