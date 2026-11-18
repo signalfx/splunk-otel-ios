@@ -16,17 +16,15 @@ limitations under the License.
 */
 
 import CiscoLogger
-import OpenTelemetrySdk
 import SplunkAppStart
 import SplunkNetwork
 import SplunkNetworkMonitor
 
 @testable import SplunkAgent
 @testable import SplunkAppState
-@testable import SplunkOpenTelemetry
 @testable import SplunkSlowFrameDetector
 
-/// Stops agents and pipelines that tests build, so that they cannot affect later tests.
+/// Stops agents that tests build, so that they cannot affect later tests.
 ///
 /// An installed agent is never freed: its modules manager and its modules keep it alive. So after a
 /// test ends, the agent still observes lifecycle notifications on `NotificationCenter.default` and
@@ -40,12 +38,17 @@ enum AgentTeardown {
 
     // MARK: - Agents
 
-    /// Stops the modules, the pipeline, the remote configuration updates and the logging of an agent.
+    /// Stops the modules, the remote configuration updates and the logging of an agent.
     ///
     /// The agent stays allocated but no longer reacts to notifications. Modules that have no stop API
     /// (for example Navigation, Interactions, WebView, Crash Reports and Session Replay) keep running.
     /// Lifecycle observers of `DefaultSession` and `AppStateManager` also stay registered, as the
     /// agent does not keep their tokens.
+    ///
+    /// The pipeline is left as it is. Shutting it down drains the buffered spans of the test through
+    /// the agent's span interceptor while the agent is still alive, which can release held session
+    /// starts and fulfill the test's expectations again after the test ends. With the modules stopped
+    /// and the global providers restored, nothing feeds the pipeline any more.
     ///
     /// This method does not restore the global OpenTelemetry providers; use ``OpenTelemetryGlobals``
     /// for that.
@@ -62,26 +65,8 @@ enum AgentTeardown {
 
         (agent.currentSession as? DefaultSession)?.refreshJob?.suspend()
 
-        if let eventManager = agent.eventManager as? DefaultEventManager {
-            stopPipeline(of: eventManager)
-        }
-
         // Each agent adds a log processor to the shared log pool, and every processor prints every line
         _ = agent.logProcessor.verbosity(.silent)
-    }
-
-
-    // MARK: - Pipelines
-
-    /// Shuts down the tracer provider of an event manager.
-    ///
-    /// The shutdown drains the in-memory span batch and removes the lifecycle observers of the batch
-    /// span processor. Use it on its own for an event manager that a test builds without installing
-    /// the agent.
-    ///
-    /// - Parameter eventManager: The event manager whose pipeline is shut down.
-    static func stopPipeline(of eventManager: DefaultEventManager) {
-        (eventManager.concreteTraceProcessor.tracerProvider as? TracerProviderSdk)?.shutdown()
     }
 
 

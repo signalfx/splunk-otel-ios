@@ -54,17 +54,6 @@ extension XCTestCase {
         }
     }
 
-    /// Shuts down the pipeline of an event manager when the current test ends.
-    ///
-    /// Use it for an event manager that the test builds without installing the agent.
-    ///
-    /// - Parameter eventManager: The event manager to stop with ``AgentTeardown/stopPipeline(of:)``.
-    func stopPipelineAtTeardown(_ eventManager: DefaultEventManager) {
-        addTeardownBlock {
-            AgentTeardown.stopPipeline(of: eventManager)
-        }
-    }
-
     /// Saves the global OpenTelemetry providers now and restores them when the current test ends.
     func restoreOpenTelemetryGlobalsAtTeardown() {
         let globals = OpenTelemetryGlobals()

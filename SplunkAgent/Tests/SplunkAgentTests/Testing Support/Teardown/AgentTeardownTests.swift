@@ -34,7 +34,7 @@ final class AgentTeardownTests: XCTestCase {
     #if os(iOS) || os(tvOS) || os(visionOS)
 
         @MainActor
-        func testStopEndsLifecycleEventsAndPipelineOfInstalledAgent() async throws {
+        func testStopEndsLifecycleEventsOfInstalledAgent() async throws {
             addTeardownBlock {
                 SplunkRum.resetSharedInstance()
             }
@@ -49,13 +49,9 @@ final class AgentTeardownTests: XCTestCase {
             let destination = RecordingAppStateDestination()
             appState.destination = destination
 
-            let eventManager = try XCTUnwrap(agent.eventManager as? DefaultEventManager)
-            let tracerProvider = eventManager.concreteTraceProcessor.tracerProvider
-
             // Before the stop, the agent reacts to lifecycle notifications
             NotificationCenter.default.post(name: UIApplication.didBecomeActiveNotification, object: nil)
             XCTAssertEqual(destination.states, [.active])
-            XCTAssertTrue(isRecording(tracerProvider))
 
             await AgentTeardown.stop(agent)
 
@@ -63,7 +59,6 @@ final class AgentTeardownTests: XCTestCase {
             NotificationCenter.default.post(name: UIApplication.didBecomeActiveNotification, object: nil)
             XCTAssertEqual(destination.states, [.active])
             XCTAssertTrue(appState.notificationObservers.isEmpty)
-            XCTAssertFalse(isRecording(tracerProvider))
         }
 
     #endif
@@ -87,9 +82,10 @@ final class AgentTeardownTests: XCTestCase {
     }
 
 
-    // MARK: - Pipeline without install
+    // MARK: - Pipeline
 
-    func testStopPipelineShutsDownTracerProvider() throws {
+    @MainActor
+    func testStopLeavesPipelineRunning() async throws {
         restoreOpenTelemetryGlobalsAtTeardown()
 
         let configuration = try ConfigurationTestBuilder.buildDefault()
@@ -97,12 +93,10 @@ final class AgentTeardownTests: XCTestCase {
         let eventManager = try DefaultEventManager(with: configuration, agent: agent)
         agent.eventManager = eventManager
 
-        let tracerProvider = eventManager.concreteTraceProcessor.tracerProvider
-        XCTAssertTrue(isRecording(tracerProvider))
+        await AgentTeardown.stop(agent)
 
-        AgentTeardown.stopPipeline(of: eventManager)
-
-        XCTAssertFalse(isRecording(tracerProvider))
+        // A shutdown would drain the test's buffered spans while the agent is still alive
+        XCTAssertTrue(isRecording(eventManager.concreteTraceProcessor.tracerProvider))
     }
 
 
@@ -118,9 +112,6 @@ final class AgentTeardownTests: XCTestCase {
         let agent = try AgentTestBuilder.build(with: configuration)
         let eventManager = try DefaultEventManager(with: configuration, agent: agent)
         agent.eventManager = eventManager
-        defer {
-            AgentTeardown.stopPipeline(of: eventManager)
-        }
 
         // Building a pipeline replaces both global providers
         XCTAssertFalse(isSame(OpenTelemetry.instance.tracerProvider, globals.tracerProvider))

@@ -296,7 +296,12 @@ final class DefaultSessionStartTests: XCTestCase {
         let agent = try AgentTestBuilder.build(with: configuration, session: defaultSession)
         defaultSession.owner = agent
 
+        // The event manager registers its pipeline as the global one. Instrumentation that other tests
+        // left running (for example their remote configuration requests) would then end spans in this
+        // pipeline, with this session's ID, and release its held starts. So the globals are put back.
+        let globals = OpenTelemetryGlobals()
         let eventManager = try Manager(with: configuration, agent: agent)
+        globals.restore()
         agent.eventManager = eventManager
         retainedAgents.append(agent)
         stopAtTeardown(agent)
