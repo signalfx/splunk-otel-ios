@@ -15,6 +15,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+* Fixed the default Session Replay sampling rate after agent installation. When no sampling rate is configured, the effective rate is now 0.2 (20%) as intended.
 * A session that produces no telemetry no longer shows up as an empty session with zero duration. The `session.start` event is now sent with the session's first exported telemetry instead of when the session is created. Spans dropped by a `spanInterceptor` do not count as exported telemetry.
 * Fixed a data race when several threads read the anonymous user ID for the first time at the same moment. The race could crash the app soon after the agent was installed. On the first launch of an app, it could also give some early signals a `user.anonymous_id` that differs from the stored one.
 * WebView instrumentation now skips bridge injection instead of crashing if the JavaScript bridge resource is missing or unreadable.
