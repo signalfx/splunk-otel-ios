@@ -30,7 +30,7 @@ public final class SessionReplayConfigurationObjC: ModuleConfigurationObjC {
     /// is enabled for the current app launch. The sampling decision is made
     /// once per Agent lifecycle and is not re-evaluated on session rotation.
     ///
-    /// - `nil` means the sampling rate is ignored (equivalent to `1`).
+    /// - `nil` uses the default sampling rate of `0.2` (20%).
     /// - Values outside the `<0, 1>` range are clamped.
     /// - If `isEnabled` is set to `NO`, the sampling rate is ignored.
     ///
@@ -61,7 +61,7 @@ public final class SessionReplayConfigurationObjC: ModuleConfigurationObjC {
     ///   - isEnabled: A `BOOL` value sets whether the module is enabled.
     ///   - samplingRate: An optional probability value in the `<0, 1>` range
     ///     that controls whether session replay recording is enabled for the
-    ///     current app launch. Pass `nil` to ignore sampling (equivalent to `1`).
+    ///     current app launch. Pass `nil` to use the default rate of `0.2`.
     @objc(initWithEnabled:samplingRate:)
     public init(isEnabled: Bool, samplingRate: NSNumber?) {
         super.init()

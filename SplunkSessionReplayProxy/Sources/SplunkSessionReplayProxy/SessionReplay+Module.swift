@@ -69,7 +69,7 @@ public struct SessionReplayConfiguration: ModuleConfiguration {
     /// - `0` means session replay recording cannot be effectively enabled.
     /// - `0.5` means only half of app launches will have recording enabled.
     /// - `1` means all app launches will have recording enabled.
-    /// - `nil` means the sampling rate is ignored (equivalent to `1`).
+    /// - `nil` uses the default sampling rate of `0.2` (20%).
     ///
     /// Values outside the `<0, 1>` range are clamped.
     ///
@@ -84,8 +84,7 @@ public struct SessionReplayConfiguration: ModuleConfiguration {
     ///     is enabled. Defaults to `true`.
     ///   - samplingRate: An optional probability value in the `<0, 1>` range
     ///     that controls whether session replay recording is enabled for the
-    ///     current app launch. Defaults to `nil` (equivalent to `1`, meaning
-    ///     all app launches will have recording enabled).
+    ///     current app launch. Defaults to `nil` (equivalent to `0.2`).
     public init(enabled: Bool = true, samplingRate: Double? = nil) {
         self.enabled = enabled
         self.samplingRate = samplingRate
