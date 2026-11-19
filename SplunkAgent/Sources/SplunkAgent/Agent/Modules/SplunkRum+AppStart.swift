@@ -22,8 +22,28 @@ extension SplunkRum {
 
     /// Reports agent initialization metrics.
     func reportAgentInitialization(start: Date, initializeEvents: [String: Date]) {
-        guard let modulesManager else {
+        guard let initialization = makeAgentInitialization(start: start, initializeEvents: initializeEvents) else {
             return
+        }
+
+        // Report initialize events to App Start module
+        if let appStartModule = modulesManager?.module(ofType: SplunkAppStart.AppStart.self) {
+            appStartModule.reportAgentInitialize(
+                start: initialization.start,
+                end: initialization.end,
+                events: initialization.events,
+                configurationSettings: initialization.configurationSettings
+            )
+        }
+    }
+
+    /// Collects the agent initialization interval, its events and configuration settings.
+    ///
+    /// Module initialization times are added as `<module>_initialized` events. Returns `nil`
+    /// before the modules manager exists.
+    func makeAgentInitialization(start: Date, initializeEvents: [String: Date]) -> AgentInitialization? {
+        guard let modulesManager else {
+            return nil
         }
 
         var initializeEvents = initializeEvents
@@ -34,15 +54,12 @@ extension SplunkRum {
             initializeEvents[moduleName] = time
         }
 
-        // Report initialize events to App Start module
-        if let appStartModule = modulesManager.module(ofType: SplunkAppStart.AppStart.self) {
-            appStartModule.reportAgentInitialize(
-                start: start,
-                end: Date(),
-                events: initializeEvents,
-                configurationSettings: configurationSettings
-            )
-        }
+        return AgentInitialization(
+            start: start,
+            end: Date(),
+            events: initializeEvents,
+            configurationSettings: configurationSettings
+        )
     }
 
     private var configurationSettings: [String: String] {
