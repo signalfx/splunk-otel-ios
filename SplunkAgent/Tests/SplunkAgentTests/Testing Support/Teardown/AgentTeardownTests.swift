@@ -112,6 +112,7 @@ final class AgentTeardownTests: XCTestCase {
         let agent = try AgentTestBuilder.build(with: configuration)
         let eventManager = try DefaultEventManager(with: configuration, agent: agent)
         agent.eventManager = eventManager
+        stopAtTeardown(agent)
 
         // Building a pipeline replaces both global providers
         XCTAssertFalse(isSame(OpenTelemetry.instance.tracerProvider, globals.tracerProvider))
