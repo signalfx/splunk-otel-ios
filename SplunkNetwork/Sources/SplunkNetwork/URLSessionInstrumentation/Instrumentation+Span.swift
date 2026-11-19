@@ -117,12 +117,7 @@ func endHttpSpan(
             }
         }
 
-        let length = httpResponse.expectedContentLength
-        // URLResponse uses a negative value when the expected response length is unknown.
-        // Do not emit that sentinel as a body size; the attribute represents bytes.
-        if length >= 0 {
-            span.clearAndSetAttribute(key: SemanticConventions.Http.responseBodySize, value: Int(length))
-        }
+        setResponseBodySize(httpResponse.expectedContentLength, on: span)
 
         // Try to capture IP address from the response/connection
         // Update network.peer.address with actual IP if we can get it
@@ -167,6 +162,16 @@ func endHttpSpan(
     else {
         span.end()
     }
+}
+
+private func setResponseBodySize(_ expectedLength: Int64, on span: Span) {
+    // URLResponse uses a negative value when the expected response length is unknown.
+    // Do not emit that sentinel as a body size; the attribute represents bytes.
+    guard expectedLength >= 0 else {
+        return
+    }
+
+    span.clearAndSetAttribute(key: SemanticConventions.Http.responseBodySize, value: Int(expectedLength))
 }
 
 /// Adds HTTP request data as attributes to a span.
