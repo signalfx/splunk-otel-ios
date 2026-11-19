@@ -15,6 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import UIKit
 import WebKit
 import XCTest
 
@@ -27,7 +28,7 @@ final class WebViewBridgeJavaScriptTests: XCTestCase {
     func testBridgeGettersFollowNativeChanges() async throws {
         let sharedState = MockAgentSharedState(sessionId: "")
         let instrumentation = WebViewInstrumentation(logger: MockLogAgent(), sharedState: sharedState)
-        let webView = WKWebView()
+        let webView = makeWindowedWebView()
         let navigation = NavigationWaiter()
         webView.navigationDelegate = navigation
 
@@ -64,7 +65,7 @@ final class WebViewBridgeJavaScriptTests: XCTestCase {
     func testPushedMetadataBase64ReadableInPage() async throws {
         let sharedState = MockAgentSharedState(sessionId: "first-session")
         let instrumentation = WebViewInstrumentation(logger: MockLogAgent(), sharedState: sharedState)
-        let webView = WKWebView()
+        let webView = makeWindowedWebView()
         let navigation = NavigationWaiter()
         webView.navigationDelegate = navigation
         let metadata = "eyJ1c2VyIjoiYWJj+/Zm9vYmFy/+8=="
@@ -92,7 +93,7 @@ final class WebViewBridgeJavaScriptTests: XCTestCase {
     func testRepeatedInjectionUpdatesOpenPage() async throws {
         let sharedState = MockAgentSharedState(sessionId: "first-session")
         let instrumentation = WebViewInstrumentation(logger: MockLogAgent(), sharedState: sharedState)
-        let webView = WKWebView()
+        let webView = makeWindowedWebView()
         let navigation = NavigationWaiter()
         webView.navigationDelegate = navigation
 
@@ -123,6 +124,23 @@ final class WebViewBridgeJavaScriptTests: XCTestCase {
 
 
     // MARK: - Helpers
+
+    /// Returns a web view in a visible window, which stays alive until the test ends.
+    ///
+    /// On iOS 26 the first page load of the test process does not start in a web view that has no
+    /// window, so the tests host their web views in one.
+    private func makeWindowedWebView() -> WKWebView {
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 390, height: 844))
+        let webView = WKWebView(frame: window.bounds)
+        window.addSubview(webView)
+        window.isHidden = false
+
+        addTeardownBlock { @MainActor in
+            window.isHidden = true
+        }
+
+        return webView
+    }
 
     private func synchronousSessionId(in webView: WKWebView) async throws -> String? {
         try await webView.evaluateJavaScript("window.SplunkRumNative.getNativeSessionId()") as? String
