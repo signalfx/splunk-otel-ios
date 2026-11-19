@@ -7,6 +7,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.6.0] - 2026-11-19
+
 ### Changed
 
 * Reduced disk reads and memory use when detecting the payload format of recovered uploads by reading only the first byte instead of loading and parsing the entire file.
