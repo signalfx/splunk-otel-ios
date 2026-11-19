@@ -52,6 +52,7 @@ func startHttpSpan(request: URLRequest?) -> Span? {
         manager.logger.log(level: .debug) {
             "Should Not Instrument Backend URL \(url.absoluteString)"
         }
+
         return nil
     }
 
@@ -62,6 +63,7 @@ func startHttpSpan(request: URLRequest?) -> Span? {
         manager.logger.log(level: .debug) {
             "URL excluded via IgnoreURLs API \(url.absoluteString)"
         }
+
         return nil
     }
 

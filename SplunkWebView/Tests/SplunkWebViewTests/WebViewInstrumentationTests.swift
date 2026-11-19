@@ -97,7 +97,6 @@ final class WebViewInstrumentationTests: XCTestCase {
         XCTAssertTrue(warningFound, "A warning should be logged when sharedState is not available")
     }
 
-
     // MARK: - Usage Warning Tests
 
     func testInjectSessionId_whenWebViewIsAlreadyLoading_logsWarning() throws {

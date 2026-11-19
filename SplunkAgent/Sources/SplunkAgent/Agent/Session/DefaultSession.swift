@@ -37,6 +37,12 @@ class DefaultSession: AgentSession {
 
     var enterBackground: Date?
 
+    /// Start events held back until their sessions produce telemetry that is accepted for export, oldest first.
+    ///
+    /// Holds the current session and the sessions it replaced, as their late telemetry still carries their
+    /// ids. Bounded by ``maxHeldSessionStarts``. Accessed only on `accessQueue`.
+    var pendingSessionStarts: [PendingSessionStart] = []
+
     let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "Agent")
 
 
@@ -114,6 +120,37 @@ class DefaultSession: AgentSession {
             let baseline = lastActivity ?? currentSession.start
 
             lastActivity = max(baseline, date)
+        }
+    }
+
+    func trackAcceptedTelemetry(forSessionId sessionId: String) {
+        accessQueue.async { [weak self] in
+            // The pending state is cleared first, as sending the event produces telemetry itself.
+            guard let self, let index = pendingSessionStarts.firstIndex(where: { $0.session.id == sessionId }) else {
+                return
+            }
+
+            let pending = pendingSessionStarts.remove(at: index)
+
+            sendSessionStart(
+                sessionId: pending.session.id,
+                timestamp: pending.session.start,
+                previousSessionId: pending.previousSessionId,
+                screenName: pending.screenName
+            )
+        }
+    }
+
+    /// Holds the start event of the initial session until the session produces telemetry.
+    ///
+    /// A session without telemetry then contains no events at all, instead of a lone
+    /// zero-duration session start event. Sessions created by ``rotateSession(previousSessionId:)``
+    /// hold their start event themselves.
+    func scheduleSessionStart() {
+        let screenName = screenNameForSessionStart()
+
+        accessQueue.sync {
+            holdSessionStart(PendingSessionStart(session: currentSession, previousSessionId: nil, screenName: screenName))
         }
     }
 
@@ -232,11 +269,9 @@ class DefaultSession: AgentSession {
 
             enterBackground = nil
 
+            // No "previous session id" is linked, as the old "background" session
+            // does not transition to the new session smoothly.
             rotateSession()
-
-            // Send session start event, however with no "previous session id",
-            // as the old "background" session does not transition to the new session smoothly.
-            sendSessionStart()
 
             return
         }
@@ -247,19 +282,23 @@ class DefaultSession: AgentSession {
                 "Current session length exceeded the length limit."
             }
 
-            let previousSessionId = currentSessionId
-
-            rotateSession()
-
-            // Send session start with a previous session id, as the old session
-            // transitions to the new session smoothly.
-            sendSessionStart(previousSessionId: previousSessionId)
+            // The old session transitions to the new session smoothly,
+            // so it is linked as the previous session.
+            rotateSession(previousSessionId: currentSessionId)
 
             return
         }
     }
 
-    func rotateSession() {
+    /// Closes the current session and starts a new one.
+    ///
+    /// The new session holds its start event until it produces telemetry. A start event still held
+    /// for the closed session is kept, as telemetry of that session can still be
+    /// buffered, in flight or still running. It is dropped once newer sessions push it out of the held starts.
+    ///
+    /// - Parameter previousSessionId: A session id of the previous session, if the old session
+    ///   "transitions smoothly" into the new session.
+    func rotateSession(previousSessionId: String? = nil) {
         // We will announce our intention to close the session
         NotificationCenter.default.post(
             name: Self.sessionWillResetNotification,
@@ -270,9 +309,16 @@ class DefaultSession: AgentSession {
         closeSession()
         currentSession = createSession()
 
+        let screenName = screenNameForSessionStart()
+
         // Reset in-memory last-activity for the new session
         accessQueue.sync {
             lastActivity = nil
+
+            // The replaced session's start stays held, as its late telemetry can still release it
+            holdSessionStart(
+                PendingSessionStart(session: currentSession, previousSessionId: previousSessionId, screenName: screenName)
+            )
         }
 
         // Save changes into cache

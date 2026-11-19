@@ -7,6 +7,19 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+* Reduced disk reads and memory use when detecting the payload format of recovered uploads by reading only the first byte instead of loading and parsing the entire file.
+* Renamed the span that reports the agent installation from `SplunkRum.initialize` to `SplunkRum.install`, to match the `SplunkRum.install(with:moduleConfigurations:)` method and the Android agent 2.4.0 and later. The span keeps its parent, attributes and events. Apps on earlier agent versions still send `SplunkRum.initialize`, so dashboards, detectors and queries that filter on the span name must match both names. A `spanInterceptor` that matches this span by name must use the new name. DEMRUM-7220
+
+### Fixed
+
+* Fixed the default Session Replay sampling rate after agent installation. When no sampling rate is configured, the effective rate is now 0.2 (20%) as intended.
+* A session that produces no telemetry no longer shows up as an empty session with zero duration. The `session.start` event is now sent with the session's first exported telemetry instead of when the session is created. Spans dropped by a `spanInterceptor` do not count as exported telemetry.
+* Fixed a data race when several threads read the anonymous user ID for the first time at the same moment. The race could crash the app soon after the agent was installed. On the first launch of an app, it could also give some early signals a `user.anonymous_id` that differs from the stored one.
+
+## [2.5.0] - 2026-11-05
+
 ### Added
 
 * Added Swift and Objective-C runtime controls under `sessionReplay.preferences.interactionCapture` for enabling or disabling keyboard, touch, gesture, focus, and rage tap interactions in Session Replay.
@@ -15,6 +28,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 * Updated Cisco Session Replay binaries to 2.0.0.300.
+* The XCFramework release pipeline now includes all 14 Cisco Session Replay modules and an SDK size report for the five added modules. All frameworks are dynamic by default; Cisco Session Replay frameworks can be built as static archives with `CISCO_MACH_O_TYPE=staticlib`.
+
+### Fixed
+
+* WebView instrumentation now skips bridge injection instead of crashing if the JavaScript bridge resource is missing or unreadable.
 
 ## [2.4.3] - 2026-10-14
 

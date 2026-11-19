@@ -48,6 +48,14 @@ protocol AgentSession: ActivityTracker {
     /// - Parameter date: The timestamp of the activity.
     func trackActivity(at date: Date)
 
+    /// Reports that telemetry of a session is accepted for export.
+    ///
+    /// A session start event held back for that session is sent in response.
+    /// Safe to call from any thread; the event is sent asynchronously.
+    ///
+    /// - Parameter sessionId: The identifier of the session the telemetry belongs to.
+    func trackAcceptedTelemetry(forSessionId sessionId: String)
+
 
     // MARK: - Session change notifications
 

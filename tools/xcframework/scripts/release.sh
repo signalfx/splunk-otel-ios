@@ -89,6 +89,9 @@ rm -f "${OUTPUT_DIR}"/SplunkAgent-XCFrameworks*.zip
 cd "${OUTPUT_DIR}"
 
 ZIP_INPUTS=(xcframeworks/*.xcframework dependency-manifest.json)
+if [[ -f "size-report.md" ]]; then
+    ZIP_INPUTS+=(size-report.md)
+fi
 if [[ -f "xcframeworks/cisco-release-manifest.txt" ]]; then
     ZIP_INPUTS+=(xcframeworks/cisco-release-manifest.txt)
 fi

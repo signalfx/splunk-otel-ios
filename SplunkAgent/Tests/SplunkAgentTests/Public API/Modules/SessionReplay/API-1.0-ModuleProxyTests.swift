@@ -331,11 +331,13 @@ final class SessionReplayAPI10ModuleProxyTests: XCTestCase {
 
     // MARK: - Agent session lifecycle
 
-    func testSessionRotation() async {
+    func testSessionRotation() {
         let initialCount = moduleProxy.newSessionsCount
 
-        await sendSimulatedNotification(DefaultSession.sessionDidResetNotification)
-        simulateMainThreadWait(duration: 0.5)
+        // The proxy observes with `queue: nil`, so its handler runs on this thread before
+        // `post` returns. No wait is needed, and none should be added: during a wait,
+        // agents left running by other tests can post their own session changes.
+        NotificationCenter.default.post(name: DefaultSession.sessionDidResetNotification, object: nil)
 
         // There should be processed one request to rotate session in module
         XCTAssertEqual(moduleProxy.newSessionsCount, initialCount + 1)
