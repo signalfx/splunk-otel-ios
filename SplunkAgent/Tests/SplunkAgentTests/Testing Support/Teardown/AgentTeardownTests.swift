@@ -17,6 +17,7 @@ limitations under the License.
 
 import OpenTelemetryApi
 import SplunkCommon
+import SplunkSessionReplayProxy
 import XCTest
 
 @testable import SplunkAgent
@@ -79,6 +80,32 @@ final class AgentTeardownTests: XCTestCase {
 
         XCTAssertTrue(configurationHandler.cancellables.isEmpty)
         XCTAssertNil(configurationHandler.reloadSessionTimer)
+    }
+
+
+    // MARK: - Session Replay
+
+    @MainActor
+    func testStopEndsSessionReplayRecording() async throws {
+        addTeardownBlock {
+            SplunkRum.resetSharedInstance()
+        }
+        restoreOpenTelemetryGlobalsAtTeardown()
+
+        let configuration = try ConfigurationTestBuilder.buildDefault()
+        let agent = try SplunkRum.install(
+            with: configuration,
+            moduleConfigurations: [SessionReplayConfiguration(samplingRate: 1.0)]
+        )
+        stopAtTeardown(agent)
+
+        agent.sessionReplay.start()
+        XCTAssertTrue(agent.sessionReplay.state.isRecording)
+
+        await AgentTeardown.stop(agent)
+
+        XCTAssertFalse(agent.sessionReplay.state.isRecording)
+        XCTAssertEqual(agent.sessionReplay.state.status, .notRecording(.stopped))
     }
 
 

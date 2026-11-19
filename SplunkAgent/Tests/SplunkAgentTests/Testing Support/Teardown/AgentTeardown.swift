@@ -40,8 +40,10 @@ enum AgentTeardown {
 
     /// Stops the modules, the remote configuration updates and the logging of an agent.
     ///
-    /// The agent stays allocated but no longer reacts to notifications. Modules that have no stop API
-    /// (for example Navigation, Interactions, WebView, Crash Reports and Session Replay) keep running.
+    /// The agent stays allocated but no longer reacts to notifications. Session Replay recording is
+    /// stopped through the agent's public proxy. The Session Replay module is one instance for the
+    /// whole process, so a later test that needs recording must start it again. Modules that have no
+    /// stop API (for example Navigation, Interactions, WebView and Crash Reports) keep running.
     /// Lifecycle observers of `DefaultSession` and `AppStateManager` also stay registered, as the
     /// agent does not keep their tokens.
     ///
@@ -57,6 +59,9 @@ enum AgentTeardown {
     @MainActor
     static func stop(_ agent: SplunkRum) async {
         await stopModules(of: agent)
+
+        // The public proxy does nothing when Session Replay is disabled or sampled out
+        agent.sessionReplay.stop()
 
         if let configurationHandler = agent.agentConfigurationHandler as? ConfigurationHandler {
             configurationHandler.cancellables.removeAll()
