@@ -15,6 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import Foundation
 import XCTest
 
 @testable import SplunkAgent
@@ -52,6 +53,60 @@ final class SessionReplayAPI10NoOpProxyTests: XCTestCase {
         if let encodedPreferences {
             XCTAssertNoThrow(try JSONDecoder().decode(SessionReplayPreferences.self, from: encodedPreferences))
         }
+    }
+
+
+    // MARK: - Interaction capture
+
+    func testInteractionCapture() {
+        let capture = moduleProxy.preferences.interactionCapture
+
+        capture.disableAll()
+
+        XCTAssertFalse(capture.isKeyboardEnabled)
+        XCTAssertFalse(capture.isTouchEnabled)
+        XCTAssertFalse(capture.isGestureEnabled)
+        XCTAssertFalse(capture.isFocusEnabled)
+        XCTAssertFalse(capture.isRageTapEnabled)
+
+        capture.enableAll()
+
+        XCTAssertFalse(capture.isKeyboardEnabled)
+        XCTAssertFalse(capture.isTouchEnabled)
+        XCTAssertFalse(capture.isGestureEnabled)
+        XCTAssertFalse(capture.isFocusEnabled)
+        XCTAssertFalse(capture.isRageTapEnabled)
+    }
+
+    func testInteractionCaptureOutlivesModule() {
+        weak var moduleReference: SessionReplayNonOperational?
+        let capture: any SessionReplayModuleInteractionCapture
+
+        do {
+            let module = SessionReplayTestBuilder.buildNonOperational()
+            moduleReference = module
+            capture = module.preferences.interactionCapture
+        }
+
+        XCTAssertNil(moduleReference)
+        XCTAssertFalse(capture.isKeyboardEnabled)
+    }
+
+    func testInteractionCaptureIsNotEncoded() throws {
+        let preferences = try XCTUnwrap(moduleProxy.preferences as? SessionReplayPreferences)
+        let data = try JSONEncoder().encode(preferences)
+        let json = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+
+        XCTAssertNil(json["interactionCapture"])
+
+        let decodedPreferences = try JSONDecoder().decode(SessionReplayPreferences.self, from: data)
+        let decodedCapture = decodedPreferences.interactionCapture
+
+        XCTAssertTrue(decodedCapture.isKeyboardEnabled)
+        XCTAssertTrue(decodedCapture.isTouchEnabled)
+        XCTAssertTrue(decodedCapture.isGestureEnabled)
+        XCTAssertTrue(decodedCapture.isFocusEnabled)
+        XCTAssertTrue(decodedCapture.isRageTapEnabled)
     }
 
 

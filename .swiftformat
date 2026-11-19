@@ -51,7 +51,9 @@
 --enable sortSwitchCases
 --enable noForceTryInTests
 --enable unusedPrivateDeclarations
---enable wrapConditionalBodies
+--enable wrapIfStatementBodies
+--enable wrapGuardStatementBodies
+--enable wrapIfExpressionBodies
 --enable wrapEnumCases
 --enable wrapMultilineConditionalAssignment
 --enable wrapMultilineFunctionChains

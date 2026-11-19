@@ -82,6 +82,12 @@ final class SplunkInteractionsTests: XCTestCase {
         XCTAssertEqual(destination.didReceiveInteractionCallCount, 0)
     }
 
+    func testSequenceCompletionIsIgnored() {
+        let interactions = Interactions()
+
+        XCTAssertFalse(interactions.shouldHandleEvent(ofType: .sequenceCompleted))
+    }
+
     func testOnActivityIsThreadSafeAcrossConcurrentReadsAndWrites() {
         // Regression test for the P1 race between the detector task reading
         // `onActivity` and the host-app install path writing it: the property

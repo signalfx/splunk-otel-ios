@@ -23,6 +23,24 @@ Session Replay must be started manually.
 agent?.sessionReplay.start()
 ```
 
+## Interaction Capture
+
+Use ``SessionReplayModulePreferences/interactionCapture`` to control which categories of user interactions
+are included in Session Replay. All categories are enabled by default, and changes affect only interactions
+captured after the setting is updated.
+
+```swift
+let capture = agent?.sessionReplay.preferences.interactionCapture
+capture?.isKeyboardEnabled = false
+capture?.isRageTapEnabled = false
+```
+
+Use ``SessionReplayModuleInteractionCapture/enableAll()`` or
+``SessionReplayModuleInteractionCapture/disableAll()`` to update every configurable category at once.
+
+Interaction capture preferences are included when ``SessionReplayPreferences`` is encoded. When decoding
+older or partial data, missing interaction categories remain enabled by default.
+
 ## Privacy and Sensitivity
 
 By default, common sensitive views like `UITextField` and `UITextView` are masked. You can mark any `UIView` as sensitive to ensure it is redacted from the recording.
