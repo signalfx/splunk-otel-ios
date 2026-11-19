@@ -38,4 +38,6 @@ struct NoOpSession: AgentSession {
     }
 
     func trackActivity(at _: Date) {}
+
+    func trackAcceptedTelemetry(forSessionId _: String) {}
 }

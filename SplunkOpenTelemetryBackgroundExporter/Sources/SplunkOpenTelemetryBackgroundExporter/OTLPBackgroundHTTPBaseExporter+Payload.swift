@@ -59,15 +59,30 @@ extension OTLPBackgroundHTTPBaseExporter {
     func inferPayloadFormat(forFileKey fileKey: String) -> RequestPayloadFormat {
         guard
             let fileURL = try? diskStorage.finalDestination(forKey: getStorageKey().append(fileKey)),
-            let payloadData = try? Data(contentsOf: fileURL)
+            let fileHandle = try? FileHandle(forReadingFrom: fileURL)
         else {
             return .json
         }
 
-        if (try? JSONSerialization.jsonObject(with: payloadData)) != nil {
+        return inferPayloadFormat(from: fileHandle)
+    }
+
+    /// Inspects the first byte and closes the supplied handle on every exit path.
+    func inferPayloadFormat(from fileHandle: FileHandle) -> RequestPayloadFormat {
+        defer { try? fileHandle.close() }
+
+        do {
+            // Persisted JSONEncoder output starts with an object or array delimiter.
+            // Do not skip whitespace: legacy protobuf starts with 0x0A (also a newline).
+            let firstByte = try fileHandle.read(upToCount: 1)?.first
+            if firstByte == 0x7B || firstByte == 0x5B { // { or [
+                return .json
+            }
+
+            return .protobuf
+        }
+        catch {
             return .json
         }
-
-        return .protobuf
     }
 }

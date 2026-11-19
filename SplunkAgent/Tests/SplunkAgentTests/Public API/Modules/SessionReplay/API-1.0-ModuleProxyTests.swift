@@ -66,6 +66,126 @@ final class SessionReplayAPI10ModuleProxyTests: XCTestCase {
         _ = SessionReplayPreferences(renderingMode: .native)
     }
 
+    func testDetachedPreferencesHaveNoRenderingMode() {
+        XCTAssertNil(SessionReplayPreferences().renderingMode)
+    }
+
+
+    // MARK: - Interaction capture
+
+    func testAssignedPreferencesPreserveInteractionCapture() {
+        let preferences = SessionReplayPreferences()
+        preferences.interactionCapture.isKeyboardEnabled = false
+        preferences.interactionCapture.isTouchEnabled = true
+        preferences.interactionCapture.isGestureEnabled = false
+        preferences.interactionCapture.isFocusEnabled = true
+        preferences.interactionCapture.isRageTapEnabled = false
+
+        moduleProxy.preferences = preferences
+
+        let moduleCapture = moduleProxy.module.preferences.interactionCapture
+        XCTAssertFalse(moduleCapture.isKeyboardEnabled)
+        XCTAssertTrue(moduleCapture.isTouchEnabled)
+        XCTAssertFalse(moduleCapture.isGestureEnabled)
+        XCTAssertTrue(moduleCapture.isFocusEnabled)
+        XCTAssertFalse(moduleCapture.isRageTapEnabled)
+
+        preferences.interactionCapture.enableAll()
+
+        XCTAssertTrue(moduleCapture.isKeyboardEnabled)
+        XCTAssertTrue(moduleCapture.isTouchEnabled)
+        XCTAssertTrue(moduleCapture.isGestureEnabled)
+        XCTAssertTrue(moduleCapture.isFocusEnabled)
+        XCTAssertTrue(moduleCapture.isRageTapEnabled)
+    }
+
+    func testInteractionCaptureReferenceUsesCurrentModulePreferences() {
+        let capture = moduleProxy.preferences.interactionCapture
+        moduleProxy.preferences = SessionReplayPreferences(renderingMode: .native)
+
+        capture.disableAll()
+
+        let moduleCapture = moduleProxy.module.preferences.interactionCapture
+        XCTAssertFalse(moduleCapture.isKeyboardEnabled)
+        XCTAssertFalse(moduleCapture.isTouchEnabled)
+        XCTAssertFalse(moduleCapture.isGestureEnabled)
+        XCTAssertFalse(moduleCapture.isFocusEnabled)
+        XCTAssertFalse(moduleCapture.isRageTapEnabled)
+
+        moduleCapture.enableAll()
+    }
+
+    func testRelinkingPreservesCaptureState() {
+        let preferences = SessionReplayPreferences()
+        let capture = preferences.interactionCapture
+
+        capture.disableAll()
+        preferences.module = moduleProxy.module
+        capture.isKeyboardEnabled = true
+        preferences.module = nil
+
+        XCTAssertTrue(capture.isKeyboardEnabled)
+        XCTAssertFalse(capture.isTouchEnabled)
+        XCTAssertFalse(capture.isGestureEnabled)
+        XCTAssertFalse(capture.isFocusEnabled)
+        XCTAssertFalse(capture.isRageTapEnabled)
+
+        preferences.module = moduleProxy.module
+
+        let moduleCapture = moduleProxy.module.preferences.interactionCapture
+        XCTAssertTrue(moduleCapture.isKeyboardEnabled)
+        XCTAssertFalse(moduleCapture.isTouchEnabled)
+        XCTAssertFalse(moduleCapture.isGestureEnabled)
+        XCTAssertFalse(moduleCapture.isFocusEnabled)
+        XCTAssertFalse(moduleCapture.isRageTapEnabled)
+
+        moduleCapture.enableAll()
+    }
+
+    func testCaptureUseDuringRelinking() {
+        let preferences = SessionReplayPreferences()
+        let capture = preferences.interactionCapture
+        let module = moduleProxy.module
+        let queue = DispatchQueue(label: "sessionReplayInteractionCapture", attributes: .concurrent)
+        let group = DispatchGroup()
+
+        group.enter()
+        queue.async {
+            for _ in 0 ..< 1_000 {
+                preferences.module = module
+                preferences.module = nil
+            }
+
+            group.leave()
+        }
+
+        for index in 0 ..< 4 {
+            group.enter()
+            queue.async {
+                for iteration in 0 ..< 1_000 {
+                    capture.isGestureEnabled = (index + iteration).isMultiple(of: 2)
+                    _ = capture.isGestureEnabled
+                }
+
+                group.leave()
+            }
+        }
+
+        XCTAssertEqual(group.wait(timeout: .now() + 10), .success)
+
+        preferences.module = module
+        capture.disableAll()
+
+        let moduleCapture = module.preferences.interactionCapture
+        XCTAssertFalse(moduleCapture.isKeyboardEnabled)
+        XCTAssertFalse(moduleCapture.isTouchEnabled)
+        XCTAssertFalse(moduleCapture.isGestureEnabled)
+        XCTAssertFalse(moduleCapture.isFocusEnabled)
+        XCTAssertFalse(moduleCapture.isRageTapEnabled)
+
+        moduleCapture.enableAll()
+    }
+
 
     // MARK: - State
 
@@ -211,11 +331,13 @@ final class SessionReplayAPI10ModuleProxyTests: XCTestCase {
 
     // MARK: - Agent session lifecycle
 
-    func testSessionRotation() async {
+    func testSessionRotation() {
         let initialCount = moduleProxy.newSessionsCount
 
-        await sendSimulatedNotification(DefaultSession.sessionDidResetNotification)
-        simulateMainThreadWait(duration: 0.5)
+        // The proxy observes with `queue: nil`, so its handler runs on this thread before
+        // `post` returns. No wait is needed, and none should be added: during a wait,
+        // agents left running by other tests can post their own session changes.
+        NotificationCenter.default.post(name: DefaultSession.sessionDidResetNotification, object: nil)
 
         // There should be processed one request to rotate session in module
         XCTAssertEqual(moduleProxy.newSessionsCount, initialCount + 1)

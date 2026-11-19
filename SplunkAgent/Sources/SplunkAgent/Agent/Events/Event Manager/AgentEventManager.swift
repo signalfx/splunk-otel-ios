@@ -61,6 +61,9 @@ protocol AgentEventManager {
 
     /// Sends a custom `AgentEvent`.
     ///
-    ///  - Parameter event: A custom `AgentEvent` to be sent.
-    func sendEvent(_ event: AgentEvent)
+    ///  - Parameters:
+    ///    - event: A custom `AgentEvent` to be sent.
+    ///    - persistImmediately: If `true`, the event's span is written to disk soon after it is created,
+    ///      instead of with the next batch export.
+    func sendEvent(_ event: AgentEvent, persistImmediately: Bool)
 }

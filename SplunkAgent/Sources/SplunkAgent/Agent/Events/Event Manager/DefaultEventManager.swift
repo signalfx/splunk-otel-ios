@@ -45,6 +45,9 @@ class DefaultEventManager: AgentEventManager {
     /// Interval for sending pulse events (5 minutes).
     let pulseEventInterval: TimeInterval = 300
 
+    /// Time limit for writing an event's span to disk when it is sent with `persistImmediately`.
+    static let immediatePersistenceTimeout: TimeInterval = 2
+
     // MARK: - Private properties (concrete types for endpoint updates)
 
     /// Event processor (internal for endpoint updates).
@@ -209,6 +212,9 @@ class DefaultEventManager: AgentEventManager {
                 userActivity: flush.timestamps
             )
 
+            // Indexed replay data handed to its processor is telemetry of this session
+            agent.currentSession.trackAcceptedTelemetry(forSessionId: sessionId)
+
             sessionReplayProcessor.sendEvent(event: event, immediateProcessing: false) { [weak self] processed in
                 if processed {
                     self?.removeSessionReplayIndex(sessionId: sessionId, timestamp: metadata.timestamp)
@@ -257,7 +263,7 @@ class DefaultEventManager: AgentEventManager {
                     sessionId: sessionId
                 )
 
-                agent.eventManager?.sendEvent(event)
+                agent.eventManager?.sendEvent(event, persistImmediately: false)
             }
         }
         catch {
@@ -270,11 +276,19 @@ class DefaultEventManager: AgentEventManager {
 
     // MARK: - Internal events
 
-    func sendEvent(_ event: AgentEvent) {
+    func sendEvent(_ event: AgentEvent, persistImmediately: Bool) {
         logEventProcessor.sendEvent(
             event: event,
             immediateProcessing: false
-        ) { _ in }
+        ) { [weak self] _ in
+            // The event's span is in the batch now. This callback runs on the main queue,
+            // so the write does not run once the app is terminating.
+            guard persistImmediately, let self else {
+                return
+            }
+
+            concreteTraceProcessor.persistBufferedSpans(timeout: Self.immediatePersistenceTimeout) { _ in }
+        }
     }
 }
 
