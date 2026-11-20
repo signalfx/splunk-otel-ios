@@ -276,11 +276,10 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
     }
 
     private func segmentMetadataAttributeValue(_ attributeValue: EventAttributeValue) -> EventAttributeValue {
-        guard case let .string(metadata) = attributeValue else {
-            return attributeValue
-        }
-
-        guard let updatedMetadata = metadataByAddingDisplayWireframe(to: metadata) else {
+        guard
+            case let .string(metadata) = attributeValue,
+            let updatedMetadata = metadataByAddingDisplayWireframe(to: metadata)
+        else {
             return attributeValue
         }
 
@@ -289,11 +288,8 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
 
     private func metadataByAddingDisplayWireframe(to metadata: String) -> String? {
         let attributes = globalAttributes()
-        guard OTLPSessionReplayMetadata.isHybridFramework(attributes) else {
-            return nil
-        }
-
         guard
+            OTLPSessionReplayMetadata.isHybridFramework(attributes),
             let metadataData = metadata.data(using: .utf8),
             var metadataObject = try? JSONSerialization.jsonObject(with: metadataData) as? [String: Any]
         else {
