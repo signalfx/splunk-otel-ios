@@ -51,17 +51,23 @@ public class CrashReports {
 
     var crashReporter: SPLKPLCrashReporter?
 
+    /// Whether ``initializeCrashReporter()`` enabled PLCrashReporter.
+    ///
+    /// Set once during installation, before the agent first refreshes the session ID. Tests set it
+    /// to check the custom data without enabling a crash reporter.
+    var isCrashReportingEnabled = false
+
     let persistenceLock = NSLock()
     var isAwaitingPersistence = false
 
     var crashSpanName: String = CrashReportConstants.defaultSpanName
 
-    /// Storage of periodically sampled device data.
+    /// Data for a future crash report, accessed on the main thread, which serializes the writes to PLCrashReporter.
     private var deviceDataDictionary: [String: String] = [:]
     private var dataUpdateTimer: Timer?
 
-    /// Serial queue for thread-safe access to deviceDataDictionary.
-    private let deviceDataQueue = DispatchQueue(label: "com.splunk.crashreports.devicedata", qos: .utility)
+    /// Serial queue that samples the device stats off the main thread.
+    let deviceDataQueue = DispatchQueue(label: "com.splunk.crashreports.devicedata", qos: .utility)
 
 
     // MARK: - Module methods
@@ -203,10 +209,12 @@ public class CrashReports {
             return false
         }
 
-        // Load CFBundleVersion. Only need to do this at install
-        // as it cannot change without reloading the app
+        // Load CFBundleVersion. Only need to do this at install as it cannot change
+        // without reloading the app. Written before any main-thread update is scheduled.
         deviceDataDictionary[CrashReportCustomDataKeys.buildId.rawValue] =
             Bundle.main.infoDictionary?["CFBundleVersion"] as? String
+
+        isCrashReportingEnabled = true
 
         // async in order to load session.id
         DispatchQueue.main.async { [weak self] in
@@ -256,38 +264,47 @@ public class CrashReports {
 
     /// Device stats handler.
     ///
-    /// This added device stats and Session ID to PLCrashReporter
-    /// so that it will be included in a future crash report.
+    /// Samples the device stats off the main thread, then adds them to PLCrashReporter
+    /// with the session ID, so that they are included in a future crash report.
     private func updateDeviceStats() {
         deviceDataQueue.async {
-            do {
-                if let sessionId = self.sharedState?.sessionId {
-                    self.deviceDataDictionary[CrashReportCustomDataKeys.sessionId.rawValue] = sessionId
-                }
-                self.deviceDataDictionary[CrashReportCustomDataKeys.battery.rawValue] = CrashReportDeviceStats.batteryLevel
-                self.deviceDataDictionary[CrashReportCustomDataKeys.disk.rawValue] = CrashReportDeviceStats.freeDiskSpace
-                self.deviceDataDictionary[CrashReportCustomDataKeys.memory.rawValue] = CrashReportDeviceStats.freeMemory
-                let customData = try NSKeyedArchiver.archivedData(
-                    withRootObject: self.deviceDataDictionary,
-                    requiringSecureCoding: false
-                )
+            let batteryLevel = CrashReportDeviceStats.batteryLevel
+            let freeDiskSpace = CrashReportDeviceStats.freeDiskSpace
+            let freeMemory = CrashReportDeviceStats.freeMemory
 
-                // Update crash reporter on main queue since it might touch UI-related properties
-                DispatchQueue.main.async {
-                    self.crashReporter?.customData = customData
-                }
+            DispatchQueue.main.async {
+                self.deviceDataDictionary[CrashReportCustomDataKeys.battery.rawValue] = batteryLevel
+                self.deviceDataDictionary[CrashReportCustomDataKeys.disk.rawValue] = freeDiskSpace
+                self.deviceDataDictionary[CrashReportCustomDataKeys.memory.rawValue] = freeMemory
+                self.updateCustomData()
             }
-            catch {
-                // We have failed to archive the custom data dictionary.
-                self.logger.log(level: .warn) {
-                    "Failed to add the device stats to the crash reports data."
-                }
+        }
+    }
+
+    /// Adds the current session ID and the collected data to PLCrashReporter.
+    ///
+    /// Runs on the main thread and reads the session ID at the write, so an earlier queued write cannot restore a previous ID.
+    func updateCustomData() {
+        assert(Thread.isMainThread, "The crash report custom data is written on the main thread only.")
+
+        deviceDataDictionary[CrashReportCustomDataKeys.sessionId.rawValue] = sharedState?.sessionId
+
+        do {
+            crashReporter?.customData = try NSKeyedArchiver.archivedData(
+                withRootObject: deviceDataDictionary,
+                requiringSecureCoding: false
+            )
+        }
+        catch {
+            // We have failed to archive the custom data dictionary.
+            logger.log(level: .warn) {
+                "Failed to add the device stats to the crash reports data."
             }
         }
     }
 
     public func crashReportUpdateScreenName(_ screenName: String) {
-        deviceDataQueue.async {
+        DispatchQueue.main.async {
             self.deviceDataDictionary[CrashReportCustomDataKeys.screenName.rawValue] = screenName
         }
         updateDeviceStats()

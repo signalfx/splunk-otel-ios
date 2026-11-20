@@ -30,7 +30,7 @@ internal import SplunkSlowFrameDetector
 internal import SplunkWebView
 
 #if canImport(SplunkCrashReports)
-    internal import SplunkCrashReports
+    @_spi(SplunkInternal) internal import SplunkCrashReports
 #endif
 
 #if canImport(WebKit)
@@ -257,6 +257,10 @@ extension SplunkRum {
 
             // Check if a crash ended the previous run of the app
             crashReportsModule?.reportCrashIfPresent()
+
+            if let crashReportsModule {
+                cacheSessionIds(in: crashReportsModule)
+            }
         #endif
     }
 

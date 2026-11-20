@@ -53,6 +53,9 @@ public class SplunkRum: ObservableObject {
     var screenNameChangeCallback: ((String) -> Void)?
     var sessionReplayDecisionMade = false
 
+    /// The crash reporter's session change observer, removed when the agent is released.
+    var crashReportsSessionObserver: NSObjectProtocol?
+
     // MARK: - Internal (Modules Proxy)
 
     lazy var sessionReplayProxy: any SessionReplayModule = SessionReplayNonOperational()
@@ -325,6 +328,12 @@ public class SplunkRum: ObservableObject {
 
         logger.log(level: .notice, isPrivate: false) {
             "Splunk RUM Agent v\(Self.version)."
+        }
+    }
+
+    deinit {
+        if let crashReportsSessionObserver {
+            NotificationCenter.default.removeObserver(crashReportsSessionObserver)
         }
     }
 

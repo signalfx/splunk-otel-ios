@@ -1,0 +1,46 @@
+//
+/*
+Copyright 2026 Splunk Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+import Foundation
+
+extension CrashReports {
+
+    // MARK: - Session ID
+
+    /// Refreshes the session ID cached for a future crash report.
+    ///
+    /// The agent calls this at installation and on every session change, so that a crash right
+    /// after either one carries the current session ID. On the main thread the ID is stored before
+    /// this method returns; from another thread, on the main queue.
+    /// While crash reporting is not enabled, it does nothing.
+    @_spi(SplunkInternal)
+    public func refreshCachedSessionId() {
+        // A crash reporter that is not enabled records no crash, so it needs no session ID.
+        guard isCrashReportingEnabled else {
+            return
+        }
+
+        guard Thread.isMainThread else {
+            DispatchQueue.main.async {
+                self.updateCustomData()
+            }
+            return
+        }
+
+        updateCustomData()
+    }
+}
