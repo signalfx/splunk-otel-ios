@@ -17,21 +17,18 @@ limitations under the License.
 
 import OpenTelemetryApi
 
-enum OTLPInternalGlobalAttributes {
+enum OTLPSessionReplayMetadata {
 
     // MARK: - Constants
 
-    static let prefix = "splunk.agent.internal."
-    static let sessionReplayHideWireframe = "\(prefix)sessionReplay.hideWireframe"
+    static let displayWireframe = "displayWireframe"
+    private static let reactNativeVersion = "app.framework.rn.version"
+    private static let flutterVersion = "app.framework.flutter.version"
 
 
     // MARK: - Utilities
 
-    static func shouldExport(key: String) -> Bool {
-        !key.hasPrefix(prefix)
-    }
-
-    static func shouldDisplaySessionReplayWireframe(globalAttributes: [String: AttributeValue]) -> Bool {
-        !globalAttributes.keys.contains(sessionReplayHideWireframe)
+    static func isHybridFramework(_ globalAttributes: [String: AttributeValue]) -> Bool {
+        globalAttributes[reactNativeVersion] != nil || globalAttributes[flutterVersion] != nil
     }
 }

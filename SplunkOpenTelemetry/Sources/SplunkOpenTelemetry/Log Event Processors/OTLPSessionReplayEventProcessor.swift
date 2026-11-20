@@ -35,7 +35,6 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
 
     private enum AttributeName {
         static let segmentMetadata = "segmentMetadata"
-        static let displayWireframe = "displayWireframe"
     }
 
 
@@ -289,6 +288,11 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
     }
 
     private func metadataByAddingDisplayWireframe(to metadata: String) -> String? {
+        let attributes = globalAttributes()
+        guard OTLPSessionReplayMetadata.isHybridFramework(attributes) else {
+            return nil
+        }
+
         guard
             let metadataData = metadata.data(using: .utf8),
             var metadataObject = try? JSONSerialization.jsonObject(with: metadataData) as? [String: Any]
@@ -296,10 +300,7 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
             return nil
         }
 
-        metadataObject[AttributeName.displayWireframe] =
-            OTLPInternalGlobalAttributes.shouldDisplaySessionReplayWireframe(
-                globalAttributes: globalAttributes()
-            )
+        metadataObject[OTLPSessionReplayMetadata.displayWireframe] = false
 
         guard
             JSONSerialization.isValidJSONObject(metadataObject),

@@ -35,19 +35,6 @@ final class OTLPGlobalAttributesSpanProcessorTests: XCTestCase {
         XCTAssertEqual(exportedSpan.attributes["app.version"]?.description, "1.0")
     }
 
-    func testSpanSkipsInternalGlobalAttributes() throws {
-        let exportedSpan = try recordedSpan(
-            globalAttributes: [
-                "app.version": .string("1.0"),
-                OTLPInternalGlobalAttributes.sessionReplayHideWireframe: .bool(true)
-            ]
-        )
-
-        XCTAssertEqual(exportedSpan.attributes["app.version"]?.description, "1.0")
-        XCTAssertNil(exportedSpan.attributes[OTLPInternalGlobalAttributes.sessionReplayHideWireframe])
-    }
-
-
     // MARK: - Private
 
     private func recordedSpan(globalAttributes: [String: AttributeValue]) throws -> SpanData {
