@@ -40,8 +40,10 @@ public final class WebViewInstrumentation: NSObject {
     private let bridgeScriptGenerator: BridgeScriptGenerator
 
     #if canImport(WebKit)
-        /// Tracks which web views have had the user script installed to prevent duplication.
-        private let instrumentedWebViews = NSHashTable<WKWebView>.weakObjects()
+        /// The bridge user script installed in each instrumented web view.
+        ///
+        /// Read and written on the main thread only.
+        private var bridgeScripts = WebViewInstrumentation.makeBridgeScriptTable()
     #endif
 
 
@@ -87,7 +89,9 @@ public final class WebViewInstrumentation: NSObject {
     #if canImport(WebKit)
         /// Internal implementation of WebView bridge injection.
         ///
-        /// Handler registration is idempotent; user scripts are installed once per view.
+        /// Handler registration is idempotent. Keeps one bridge script per view; a repeated call replaces it
+        /// with one built from the current session. The new script applies from the page's next load; the
+        /// open page gets the current session through an update statement.
         ///
         /// - Parameter webView: The `WKWebView` instance to instrument.
         public func injectSessionId(into webView: WKWebView) {
@@ -122,40 +126,172 @@ public final class WebViewInstrumentation: NSObject {
                 return
             }
 
-            guard let javaScript = bridgeScriptGenerator(currentState.sessionId, currentState.sessionMetadata, Self.handlerName) else {
+            let sessionId = currentState.sessionId
+            let sessionMetadata = currentState.sessionMetadata
+
+            guard let javaScript = bridgeScriptGenerator(sessionId, sessionMetadata, Self.handlerName) else {
                 logger.log(level: .error, isPrivate: false) {
                     "WebView bridge script is unavailable; skipping JavaScript injection."
                 }
                 return
             }
 
-            let userScript = WKUserScript(
-                source: javaScript,
-                injectionTime: .atDocumentStart, // expected by legacy BRUM
-                forMainFrameOnly: false // expected by legacy BRUM
-            )
+            let userScript = Self.makeBridgeUserScript(source: javaScript)
 
             let controller = contentController(
                 forName: Self.handlerName,
                 forWebView: webView
             )
 
-            // Add the user script only once per web view to avoid duplication.
-            if instrumentedWebViews.allObjects.contains(where: { $0 === webView }) == false {
-                controller.addUserScript(userScript)
-                instrumentedWebViews.add(webView)
+            dropReleasedWebViews()
+
+            // Keep one bridge script per web view: replace an earlier one instead of adding another.
+            if let existingScript = bridgeScripts.object(forKey: webView) {
+                replaceBridgeScripts([ObjectIdentifier(existingScript): userScript], in: controller)
             }
+            else {
+                controller.addUserScript(userScript)
+            }
+
+            bridgeScripts.setObject(userScript, forKey: webView)
 
             // Needed at first load only; user script will persist across reloads and navigation.
             // Re-evaluating is safe and idempotent due to the JS guard.
             webView.evaluateJavaScript(javaScript)
+
+            // A page that already has the bridge skips the full script, so it keeps its old session.
+            // The update reaches that page; it does nothing in a page without a bridge.
+            webView.evaluateJavaScript(WebViewBridgeScript.update(sessionId: sessionId, sessionMetadata: sessionMetadata))
         }
     #endif
+
+
+    // MARK: - Session changes
+
+    /// Pushes the current native session into the main frame of every instrumented web view.
+    ///
+    /// The bridge user script of each view is regenerated too, so a reload starts from the
+    /// current value. The scripts are replaced first, then the push is evaluated in each view.
+    /// The push does not reach iframes; an iframe's bridge gets the new ID when it next asks
+    /// native: the async getter asks at once. The sync getter starts a refresh when more than
+    /// 5 seconds have passed since the bridge script loaded or since the last fetch that the sync
+    /// getter started; later calls return the new ID.
+    ///
+    /// Off the main thread the method hops to the main thread and returns before the push is done.
+    /// It does nothing when no web view is instrumented, when there is no shared state, or when
+    /// the bridge script is unavailable.
+    @_spi(SplunkInternal)
+    public func nativeSessionDidChange() {
+        #if canImport(WebKit)
+            guard Thread.isMainThread else {
+                Task { @MainActor [weak self] in
+                    self?.nativeSessionDidChange()
+                }
+                return
+            }
+
+            dropReleasedWebViews()
+
+            // Most apps have no web view: skip the state reads and the script build.
+            guard bridgeScripts.keyEnumerator().nextObject() != nil, let currentState = sharedState else {
+                return
+            }
+
+            let sessionId = currentState.sessionId
+            let sessionMetadata = currentState.sessionMetadata
+            guard let javaScript = bridgeScriptGenerator(sessionId, sessionMetadata, Self.handlerName) else {
+                return
+            }
+
+            let update = WebViewBridgeScript.update(sessionId: sessionId, sessionMetadata: sessionMetadata)
+
+            var webViews: [WKWebView] = []
+            var replacements: [(controller: WKUserContentController, scripts: [ObjectIdentifier: WKUserScript])] = []
+
+            for case let webView as WKWebView in bridgeScripts.keyEnumerator().allObjects {
+                guard let previousScript = bridgeScripts.object(forKey: webView) else {
+                    continue
+                }
+
+                let userScript = Self.makeBridgeUserScript(source: javaScript)
+                bridgeScripts.setObject(userScript, forKey: webView)
+                webViews.append(webView)
+
+                let controller = webView.configuration.userContentController
+                if let index = replacements.firstIndex(where: { $0.controller === controller }) {
+                    replacements[index].scripts[ObjectIdentifier(previousScript)] = userScript
+                }
+                else {
+                    replacements.append((controller, [ObjectIdentifier(previousScript): userScript]))
+                }
+            }
+
+            // Swap the scripts before the push, so a page that commits in between runs the new script.
+            for replacement in replacements {
+                replaceBridgeScripts(replacement.scripts, in: replacement.controller)
+            }
+
+            for webView in webViews {
+                webView.evaluateJavaScript(update)
+            }
+        #endif
+    }
 
 
     // MARK: - Private Methods
 
     #if canImport(WebKit)
+        private static func makeBridgeUserScript(source: String) -> WKUserScript {
+            WKUserScript(
+                source: source,
+                injectionTime: .atDocumentStart, // expected by legacy BRUM
+                forMainFrameOnly: false // expected by legacy BRUM
+            )
+        }
+
+        /// Replaces bridge scripts in place, keeping every other script and the script order.
+        ///
+        /// WebKit cannot remove a single user script, so all scripts are removed and the same
+        /// objects are added back, which also keeps their content worlds.
+        private func replaceBridgeScripts(
+            _ replacements: [ObjectIdentifier: WKUserScript],
+            in controller: WKUserContentController
+        ) {
+            let scripts = controller.userScripts.map { replacements[ObjectIdentifier($0)] ?? $0 }
+
+            controller.removeAllUserScripts()
+
+            for script in scripts {
+                controller.addUserScript(script)
+            }
+        }
+
+        /// Creates a table that keys web views by identity, so a `WKWebView` subclass that overrides
+        /// `isEqual:` cannot share an entry with another view.
+        private static func makeBridgeScriptTable() -> NSMapTable<WKWebView, WKUserScript> {
+            NSMapTable<WKWebView, WKUserScript>(
+                keyOptions: [.weakMemory, .objectPointerPersonality],
+                valueOptions: .strongMemory
+            )
+        }
+
+        /// Rebuilds `bridgeScripts` from the live web views, so it holds no script of a released view.
+        ///
+        /// A weak-keyed `NSMapTable` releases the value of a released key only when the table resizes.
+        private func dropReleasedWebViews() {
+            let liveScripts = Self.makeBridgeScriptTable()
+
+            for case let webView as WKWebView in bridgeScripts.keyEnumerator().allObjects {
+                guard let script = bridgeScripts.object(forKey: webView) else {
+                    continue
+                }
+
+                liveScripts.setObject(script, forKey: webView)
+            }
+
+            bridgeScripts = liveScripts
+        }
+
         private func contentController(forName name: String, forWebView webView: WKWebView) -> WKUserContentController {
             let contentController = webView.configuration.userContentController
             contentController.removeScriptMessageHandler(forName: name)
@@ -215,7 +351,8 @@ public final class WebViewInstrumentation: NSObject {
     /// - iOS 14+ behavior:
     ///   - `postMessage` returns a Promise backed by the native `replyHandler`; async calls resolve with `sessionId` when native responds.
     /// - Callers should wrap `getNativeSessionIdAsync()` with their own timeout if they require bounded waits, and fall back to the synchronous API.
-    /// - Injection occurs only when a native session ID is available (`sharedState?.sessionId` non-nil); otherwise `SplunkRumNative` is not injected.
+    /// - Injection occurs only when `sharedState` is set; otherwise `SplunkRumNative` is not injected.
+    /// - With no session, the bridge returns an empty string.
     extension WebViewInstrumentation: WKScriptMessageHandler {
         public func userContentController(_: WKUserContentController, didReceive _: WKScriptMessage) {
             // No-op: iOS 13 cannot reply, so JS sees the rejected Promise described above.

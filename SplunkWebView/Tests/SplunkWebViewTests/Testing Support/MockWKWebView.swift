@@ -21,6 +21,10 @@ import WebKit
 final class MockWKWebView: WKWebView {
     var evaluateJavaScriptCallCount = 0
     var lastEvaluatedJavaScript: String?
+    var evaluatedJavaScripts: [String] = []
+
+    /// Called with each script just before the mock records it.
+    var onEvaluateJavaScript: ((String) -> Void)?
 
     /// Add properties to control the mock's state for testing the warning logic.
     override var isLoading: Bool {
@@ -60,8 +64,10 @@ final class MockWKWebView: WKWebView {
 
     @MainActor
     override func evaluateJavaScript(_ javaScriptString: String, completionHandler: (@MainActor (Any?, Error?) -> Void)? = nil) {
+        onEvaluateJavaScript?(javaScriptString)
         evaluateJavaScriptCallCount += 1
         lastEvaluatedJavaScript = javaScriptString
+        evaluatedJavaScripts.append(javaScriptString)
         completionHandler?(nil, nil) // Simulate success
     }
 }

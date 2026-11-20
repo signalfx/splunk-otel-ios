@@ -7,6 +7,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+* Calling `integrateWithBrowserRum(_:)` again on an instrumented web view now gives the open page the current session and replaces the bridge script with one built from the current session. The new script applies from the page's next load. The SDK removes and re-adds all of the web view's user scripts in the same order; the other scripts are the same objects, and the bridge script is a new object.
+
 ### Fixed
 
 * HTTP spans no longer emit a negative response body size when the response length is unknown.
