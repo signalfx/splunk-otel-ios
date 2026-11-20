@@ -67,7 +67,6 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
     #if DEBUG
         public var storedLastProcessedEvent: (any AgentEvent)?
         public var storedLastSentEvent: (any AgentEvent)?
-        public var storedLastSentLogRecord: SplunkReadableLogRecord?
     #endif
 
 
@@ -276,6 +275,7 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
     }
 
     private func segmentMetadataAttributeValue(_ attributeValue: EventAttributeValue) -> EventAttributeValue {
+        // Segment metadata is emitted as a JSON string; preserve unexpected value types unchanged.
         guard
             case let .string(metadata) = attributeValue,
             let updatedMetadata = metadataByAddingDisplayWireframe(to: metadata)

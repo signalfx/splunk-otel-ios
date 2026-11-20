@@ -24,13 +24,18 @@ enum OTLPSessionReplayMetadata {
 
     static let displayWireframe = "displayWireframe"
     private static let reactNativeVersion = "app.framework.rn.version"
+    private static let splunkReactNativeVersion = "splunk.app.framework.rn.version"
     private static let flutterVersion = "app.framework.flutter.version"
+    private static let splunkFlutterVersion = "splunk.app.framework.flutter.version"
 
 
     // MARK: - Utilities
 
     static func isHybridFramework(_ globalAttributes: [String: AttributeValue]) -> Bool {
-        globalAttributes[reactNativeVersion] != nil || globalAttributes[flutterVersion] != nil
+        globalAttributes[reactNativeVersion] != nil
+            || globalAttributes[splunkReactNativeVersion] != nil
+            || globalAttributes[flutterVersion] != nil
+            || globalAttributes[splunkFlutterVersion] != nil
     }
 
     static func metadataByAddingDisplayWireframe(

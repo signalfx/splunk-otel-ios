@@ -41,10 +41,35 @@ final class OTLPSessionReplayMetadataTests: XCTestCase {
         XCTAssertEqual(metadata["displayWireframe"] as? Bool, false)
     }
 
-    func testNonHybridMetadataIsUnchanged() {
+    func testSplunkReactNativeVersionDisablesWireframe() throws {
+        let metadata = try updatedMetadata(globalAttributes: [
+            "splunk.app.framework.rn.version": .string("1.0")
+        ])
+
+        XCTAssertEqual(metadata["displayWireframe"] as? Bool, false)
+    }
+
+    func testSplunkFlutterVersionDisablesWireframe() throws {
+        let metadata = try updatedMetadata(globalAttributes: [
+            "splunk.app.framework.flutter.version": .string("1.0")
+        ])
+
+        XCTAssertEqual(metadata["displayWireframe"] as? Bool, false)
+    }
+
+    func testNonHybridMetadataDoesNotProduceReplacement() {
         let result = OTLPSessionReplayMetadata.metadataByAddingDisplayWireframe(
             to: #"{"source":"native"}"#,
             globalAttributes: ["app.version": .string("1.0")]
+        )
+
+        XCTAssertNil(result)
+    }
+
+    func testInvalidMetadataIsUnchanged() {
+        let result = OTLPSessionReplayMetadata.metadataByAddingDisplayWireframe(
+            to: "not-json",
+            globalAttributes: ["splunk.app.framework.rn.version": .string("1.0")]
         )
 
         XCTAssertNil(result)
@@ -57,6 +82,15 @@ final class OTLPSessionReplayMetadataTests: XCTestCase {
         )
 
         XCTAssertEqual(metadata["source"] as? String, "native")
+        XCTAssertEqual(metadata["displayWireframe"] as? Bool, false)
+    }
+
+    func testExistingFalseDisplayWireframeRemainsFalse() throws {
+        let metadata = try updatedMetadata(
+            from: #"{"source":"native","displayWireframe":false}"#,
+            globalAttributes: ["splunk.app.framework.flutter.version": .string("1.0")]
+        )
+
         XCTAssertEqual(metadata["displayWireframe"] as? Bool, false)
     }
 
