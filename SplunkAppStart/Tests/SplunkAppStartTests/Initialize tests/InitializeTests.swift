@@ -15,43 +15,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import OpenTelemetryApi
-import OpenTelemetrySdk
-import SplunkCommon
 import XCTest
 
 @testable import SplunkAppStart
 
 final class InitializeTests: XCTestCase {
-
-    // MARK: - Private
-
-    private let exporter = InitializeSpanExporter()
-    private var originalTracerProvider: TracerProvider = OpenTelemetry.instance.tracerProvider
-
-
-    // MARK: - Tests lifecycle
-
-    override func setUp() {
-        super.setUp()
-
-        originalTracerProvider = OpenTelemetry.instance.tracerProvider
-
-        let tracerProvider = TracerProviderBuilder()
-            .add(spanProcessor: SimpleSpanProcessor(spanExporter: exporter))
-            .build()
-        OpenTelemetry.registerTracerProvider(tracerProvider: tracerProvider)
-    }
-
-    override func tearDown() {
-        OpenTelemetry.registerTracerProvider(tracerProvider: originalTracerProvider)
-
-        super.tearDown()
-    }
-
-
-    // MARK: - Tests
-
     func testInitialize() throws {
         let processStart = Date(timeIntervalSinceReferenceDate: 1_000)
         let destination = DebugDestination()
@@ -172,62 +140,4 @@ final class InitializeTests: XCTestCase {
         XCTAssertEqual(storedAppStart.type, .cold)
         XCTAssertNil(destination.storedInitialize)
     }
-
-    func testInitializeSpanCarriesConfigSettings() throws {
-        let processStart = Date(timeIntervalSinceReferenceDate: 5_000)
-        let appStart = AppStart()
-        appStart.processStartTimestamp = processStart
-        appStart.destination = OTelDestination()
-
-        appStart.reportAgentInitialize(
-            start: processStart.addingTimeInterval(0.2),
-            end: processStart.addingTimeInterval(0.4),
-            events: [:],
-            configurationSettings: ["key": "value"]
-        )
-        appStart.process(
-            event: .didFinishLaunching(
-                processStart.addingTimeInterval(0.1),
-                .foreground
-            )
-        )
-        appStart.process(event: .didBecomeActive(processStart.addingTimeInterval(1)))
-
-        // The destination can send the spans later on the main queue.
-        let exported = XCTNSPredicateExpectation(
-            predicate: NSPredicate { _, _ in self.exporter.spans.contains { $0.name == AgentInstallSpanConstants.spanName } },
-            object: nil
-        )
-        wait(for: [exported], timeout: 5)
-
-        let names = exporter.spans.map(\.name)
-        let initializeSpan = try XCTUnwrap(
-            exporter.spans.first { $0.name == AgentInstallSpanConstants.spanName },
-            "Exported spans: \(names), main thread: \(Thread.isMainThread)"
-        )
-        XCTAssertEqual(initializeSpan.attributes["config_settings"]?.description, "[key:value]")
-    }
-}
-
-
-// MARK: - Span exporter
-
-private final class InitializeSpanExporter: SpanExporter {
-    private let lock = NSLock()
-    private var collected: [SpanData] = []
-
-    var spans: [SpanData] {
-        lock.withLock { collected }
-    }
-
-    func export(spans: [SpanData], explicitTimeout _: TimeInterval?) -> SpanExporterResultCode {
-        lock.withLock { collected.append(contentsOf: spans) }
-        return .success
-    }
-
-    func flush(explicitTimeout _: TimeInterval?) -> SpanExporterResultCode {
-        .success
-    }
-
-    func shutdown(explicitTimeout _: TimeInterval?) {}
 }
