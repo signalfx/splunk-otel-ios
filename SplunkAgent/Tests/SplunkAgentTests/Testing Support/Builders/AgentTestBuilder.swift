@@ -15,6 +15,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import CiscoLogger
+
 @testable import SplunkAgent
 
 final class AgentTestBuilder {
@@ -60,6 +62,10 @@ final class AgentTestBuilder {
 
         // Links the current session with the agent
         (agent.currentSession as? DefaultSession)?.owner = agent
+
+        // Each agent adds a log processor to the shared log pool, and every processor prints every
+        // line, so test agents that outlive their tests would multiply the log output of later tests
+        _ = agent.logProcessor.verbosity(.silent)
 
         return agent
     }

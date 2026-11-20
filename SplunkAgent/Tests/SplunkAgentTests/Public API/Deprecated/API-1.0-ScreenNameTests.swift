@@ -32,6 +32,7 @@ final class API10ScreenNameTests: XCTestCase {
         super.setUp()
 
         agent = nil
+        resetSharedAgentForTest()
     }
 
     override func tearDown() {
