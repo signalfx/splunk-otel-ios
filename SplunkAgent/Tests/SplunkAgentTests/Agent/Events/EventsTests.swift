@@ -75,6 +75,29 @@ final class EventsTests: XCTestCase {
         wait(for: [requestExpectation], timeout: 10)
     }
 
+    func testSessionReplayDataEventDisablesWireframeForHybridFramework() throws {
+        let agent = try XCTUnwrap(agent)
+        agent.globalAttributes["app.framework.rn.version"] = .string("1.0")
+
+        let event = try SessionReplayTestBuilder.buildDataEvent()
+        let eventManager = try XCTUnwrap(agent.eventManager as? DefaultEventManager)
+        let sessionReplayProcessor = eventManager.sessionReplayProcessor
+        let requestExpectation = XCTestExpectation(description: "Send request")
+
+        sessionReplayProcessor.sendEvent(event) { _ in
+            requestExpectation.fulfill()
+        }
+
+        let processedEvent = try XCTUnwrap(sessionReplayProcessor.storedLastProcessedEvent)
+        let metadataValue = try XCTUnwrap(processedEvent.attributes?["segmentMetadata"])
+        let metadataData = try XCTUnwrap(metadataValue.description.data(using: .utf8))
+        let metadata = try XCTUnwrap(JSONSerialization.jsonObject(with: metadataData) as? [String: Any])
+
+        XCTAssertEqual(metadata["displayWireframe"] as? Bool, false)
+
+        wait(for: [requestExpectation], timeout: 10)
+    }
+
     func testSessionReplayDataEventUserActivityInMetadata() throws {
         let timestamps = [1_700_000_000_000, 1_700_000_001_000, 1_700_000_002_000]
         let event = try SessionReplayTestBuilder.buildDataEvent(userActivity: timestamps)
