@@ -287,26 +287,10 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
     }
 
     private func metadataByAddingDisplayWireframe(to metadata: String) -> String? {
-        let attributes = globalAttributes()
-        guard
-            OTLPSessionReplayMetadata.isHybridFramework(attributes),
-            let metadataData = metadata.data(using: .utf8),
-            var metadataObject = try? JSONSerialization.jsonObject(with: metadataData) as? [String: Any]
-        else {
-            return nil
-        }
-
-        metadataObject[OTLPSessionReplayMetadata.displayWireframe] = false
-
-        guard
-            JSONSerialization.isValidJSONObject(metadataObject),
-            let updatedMetadataData = try? JSONSerialization.data(withJSONObject: metadataObject),
-            let updatedMetadata = String(data: updatedMetadataData, encoding: .utf8)
-        else {
-            return nil
-        }
-
-        return updatedMetadata
+        OTLPSessionReplayMetadata.metadataByAddingDisplayWireframe(
+            to: metadata,
+            globalAttributes: globalAttributes()
+        )
     }
 }
 

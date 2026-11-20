@@ -15,6 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import Foundation
 import OpenTelemetryApi
 
 enum OTLPSessionReplayMetadata {
@@ -30,5 +31,30 @@ enum OTLPSessionReplayMetadata {
 
     static func isHybridFramework(_ globalAttributes: [String: AttributeValue]) -> Bool {
         globalAttributes[reactNativeVersion] != nil || globalAttributes[flutterVersion] != nil
+    }
+
+    static func metadataByAddingDisplayWireframe(
+        to metadata: String,
+        globalAttributes: [String: AttributeValue]
+    ) -> String? {
+        guard
+            isHybridFramework(globalAttributes),
+            let metadataData = metadata.data(using: .utf8),
+            var metadataObject = try? JSONSerialization.jsonObject(with: metadataData) as? [String: Any]
+        else {
+            return nil
+        }
+
+        metadataObject[displayWireframe] = false
+
+        guard
+            JSONSerialization.isValidJSONObject(metadataObject),
+            let updatedMetadataData = try? JSONSerialization.data(withJSONObject: metadataObject),
+            let updatedMetadata = String(data: updatedMetadataData, encoding: .utf8)
+        else {
+            return nil
+        }
+
+        return updatedMetadata
     }
 }
