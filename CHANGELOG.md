@@ -10,6 +10,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Fixed
 
 * HTTP spans no longer emit a negative response body size when the response length is unknown.
+* Disabled Session Replay wireframe playback when the agent detects React Native or Flutter. DEMRUM-5171
 
 ## [2.6.0] - 2026-11-19
 

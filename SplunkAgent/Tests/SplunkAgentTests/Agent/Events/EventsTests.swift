@@ -119,6 +119,30 @@ final class EventsTests: XCTestCase {
         wait(for: [requestExpectation], timeout: 10)
     }
 
+    func testPublishedReplayDataUsesCurrentHybridFrameworkAttributes() throws {
+        let agent = try XCTUnwrap(agent)
+        let eventManager = try XCTUnwrap(agent.eventManager as? DefaultEventManager)
+        eventManager.sessionReplayIndexer = MockEventIndexer(isReady: true)
+
+        let keys = [
+            "app.framework.rn.version",
+            "app.framework.flutter.version",
+            "splunk.app.framework.rn.version",
+            "splunk.app.framework.flutter.version"
+        ]
+
+        for key in keys {
+            agent.globalAttributes[string: key] = "1.0"
+            defer { agent.globalAttributes[string: key] = nil }
+
+            let metadata = try publishReplayMetadata(through: eventManager, sessionStart: agent.currentSession.currentSessionStart)
+            XCTAssertEqual(metadata["displayWireframe"] as? Bool, false, key)
+        }
+
+        let nativeMetadata = try publishReplayMetadata(through: eventManager, sessionStart: agent.currentSession.currentSessionStart)
+        XCTAssertNil(nativeMetadata["displayWireframe"])
+    }
+
 
     // MARK: - Testing immediate and background processing
 
@@ -165,6 +189,23 @@ final class EventsTests: XCTestCase {
 
 
     // MARK: - Helpers
+
+    private func publishReplayMetadata(through eventManager: DefaultEventManager, sessionStart: Date) throws -> [String: Any] {
+        let startMs = Int(sessionStart.timeIntervalSince1970 * 1_000) + 10
+        let metadata = Metadata(startUnixMs: startMs, endUnixMs: startMs + 1)
+        let published = expectation(description: "Publish replay data")
+
+        eventManager.publish(data: Data([0]), metadata: metadata) { success in
+            XCTAssertTrue(success)
+            published.fulfill()
+        }
+
+        wait(for: [published], timeout: 10)
+
+        let event = try XCTUnwrap(eventManager.sessionReplayProcessor.storedLastProcessedEvent)
+        let metadataValue = try XCTUnwrap(event.attributes?["segmentMetadata"])
+        return try XCTUnwrap(JSONSerialization.jsonObject(with: Data(metadataValue.description.utf8)) as? [String: Any])
+    }
 
     private func checkEventAttributes(_ event: SplunkCommon.AgentEvent) throws {
         let eventAttributes = try XCTUnwrap(event.attributes)

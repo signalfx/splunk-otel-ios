@@ -48,6 +48,13 @@ class DefaultEventManager: AgentEventManager {
     /// Time limit for writing an event's span to disk when it is sent with `persistImmediately`.
     static let immediatePersistenceTimeout: TimeInterval = 2
 
+    private static let hybridFrameworkVersionKeys = [
+        "app.framework.rn.version",
+        "app.framework.flutter.version",
+        "splunk.app.framework.rn.version",
+        "splunk.app.framework.flutter.version"
+    ]
+
     // MARK: - Private properties (concrete types for endpoint updates)
 
     /// Event processor (internal for endpoint updates).
@@ -202,6 +209,8 @@ class DefaultEventManager: AgentEventManager {
             let scriptInstanceId = String(sessionId.prefix(upTo: sessionId.index(sessionId.startIndex, offsetBy: 16)))
 
             let flush = userActivityCollector.flush(startMs: metadata.startUnixMs, endMs: metadata.endUnixMs)
+            let globalAttributes = agent.globalAttributes.getAll()
+            let hideWireframe = Self.hybridFrameworkVersionKeys.contains { globalAttributes[$0] != nil }
 
             let event = SessionReplayDataEvent(
                 metadata: metadata,
@@ -209,7 +218,8 @@ class DefaultEventManager: AgentEventManager {
                 index: eventIndex,
                 sessionId: sessionId,
                 scriptInstanceId: scriptInstanceId,
-                userActivity: flush.timestamps
+                userActivity: flush.timestamps,
+                hideWireframe: hideWireframe
             )
 
             // Indexed replay data handed to its processor is telemetry of this session
