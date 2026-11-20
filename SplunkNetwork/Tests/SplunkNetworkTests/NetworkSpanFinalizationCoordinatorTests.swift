@@ -27,6 +27,19 @@ final class NetworkSpanFinalizationCoordinatorTests: XCTestCase {
 
     // MARK: - Tests
 
+    func testUnknownResponseContentLengthIsNotRecorded() throws {
+        let span = ThreadSafeMockSpan()
+        let url = try XCTUnwrap(URL(string: "https://finalization.test/resource"))
+        let response = try XCTUnwrap(
+            HTTPURLResponse(url: url, statusCode: 200, httpVersion: "HTTP/1.1", headerFields: nil)
+        )
+        XCTAssertLessThan(response.expectedContentLength, 0)
+
+        endHttpSpan(span: span, fallbackResponse: response)
+
+        XCTAssertNil(span.attributes[SemanticConventions.Http.responseBodySize.rawValue])
+    }
+
     func testConcurrentCallbacksFinalizeExactlyOnceWithRichTaskAttributes() {
         let task = completedTask()
         let span = ThreadSafeMockSpan()
