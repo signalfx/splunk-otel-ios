@@ -10,6 +10,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Fixed
 
 * HTTP spans no longer emit a negative response body size when the response length is unknown.
+* A session in which the app crashes before any of its telemetry is accepted for export now still sends its `session.start` event, with its original start time, when its crash report is sent at the next launch. Session Replay data of that session sent at a later launch also sends it. DEMRUM-7367
 
 ## [2.6.0] - 2026-11-19
 

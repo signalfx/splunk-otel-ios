@@ -33,6 +33,7 @@ final class UserDefaultsStorageTestBuilder {
 
         // Clean storage before test run
         UserDefaultsUtils.cleanItem(prefix: keysPrefix, key: defaultKey)
+        UserDefaultsUtils.cleanItem(prefix: keysPrefix, key: HeldSessionStartStore.storageKey)
 
         let storage = UserDefaultsStorage()
         storage.keysPrefix = keysPrefix

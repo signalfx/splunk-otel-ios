@@ -45,6 +45,9 @@ class SessionsModel {
     /// An array of all available sessions in this instance.
     var sessions: [SessionItem] = []
 
+    /// Saves the session starts held until their sessions produce telemetry, in the same storage.
+    let heldSessionStarts: HeldSessionStartStore
+
 
     // MARK: - Initialization
 
@@ -56,6 +59,7 @@ class SessionsModel {
     init(named: String = "sessions", storage: KeyValueStorage = UserDefaultsStorage()) {
         storageKey = named
         self.storage = storage
+        heldSessionStarts = HeldSessionStartStore(storage: storage)
 
         // Adds previously cached data
         sessions = read()

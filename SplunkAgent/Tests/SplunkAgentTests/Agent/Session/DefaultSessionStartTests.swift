@@ -34,6 +34,12 @@ final class DefaultSessionStartTests: XCTestCase {
     /// Waiting time for asserting that an event is not sent.
     private let absenceTimeout: TimeInterval = 0.3
 
+    /// Waiting time for an event that must be sent.
+    ///
+    /// The wait ends as soon as the event comes, so a generous limit costs nothing when the code works,
+    /// and a slow or stalled test machine does not fail the test.
+    private let arrivalTimeout: TimeInterval = 10
+
 
     // MARK: - Setup
 
@@ -64,7 +70,7 @@ final class DefaultSessionStartTests: XCTestCase {
         // Accepted telemetry releases it, with the session's own start and no previous session
         let sent = expectSessionStart(from: eventManager)
         defaultSession.trackAcceptedTelemetry(forSessionId: defaultSession.currentSessionId)
-        wait(for: [sent], timeout: 1)
+        wait(for: [sent], timeout: arrivalTimeout)
 
         let event = try XCTUnwrap(eventManager.sentEvents.first)
         XCTAssertEqual(event.sessionId, defaultSession.currentSessionId)
@@ -106,7 +112,7 @@ final class DefaultSessionStartTests: XCTestCase {
         // and with the screen shown when it started
         let sent = expectSessionStart(from: eventManager)
         defaultSession.trackAcceptedTelemetry(forSessionId: defaultSession.currentSessionId)
-        wait(for: [sent], timeout: 1)
+        wait(for: [sent], timeout: arrivalTimeout)
 
         let event = try XCTUnwrap(eventManager.sentEvents.first)
         XCTAssertEqual(event.sessionId, defaultSession.currentSessionId)
@@ -119,7 +125,7 @@ final class DefaultSessionStartTests: XCTestCase {
 
         let sentForReplaced = expectSessionStart(from: eventManager)
         defaultSession.trackAcceptedTelemetry(forSessionId: replacedSessionId)
-        wait(for: [sentForReplaced], timeout: 1)
+        wait(for: [sentForReplaced], timeout: arrivalTimeout)
 
         XCTAssertEqual(eventManager.sentEvents.last?.sessionId, replacedSessionId)
     }
@@ -141,7 +147,7 @@ final class DefaultSessionStartTests: XCTestCase {
         // The newest held start is still released
         let sent = expectSessionStart(from: eventManager)
         defaultSession.trackAcceptedTelemetry(forSessionId: defaultSession.currentSessionId)
-        wait(for: [sent], timeout: 1)
+        wait(for: [sent], timeout: arrivalTimeout)
 
         XCTAssertEqual(eventManager.sentEvents.first?.sessionId, defaultSession.currentSessionId)
     }
@@ -159,7 +165,7 @@ final class DefaultSessionStartTests: XCTestCase {
         // Telemetry of the replaced session, buffered before the rotation, is exported afterwards
         let sentForReplaced = expectSessionStart(from: eventManager)
         defaultSession.trackAcceptedTelemetry(forSessionId: replacedSessionId)
-        wait(for: [sentForReplaced], timeout: 1)
+        wait(for: [sentForReplaced], timeout: arrivalTimeout)
 
         let replacedEvent = try XCTUnwrap(eventManager.sentEvents.first)
         XCTAssertEqual(replacedEvent.sessionId, replacedSessionId)
@@ -168,7 +174,7 @@ final class DefaultSessionStartTests: XCTestCase {
         // The new session still sends its own start
         let sentForCurrent = expectSessionStart(from: eventManager)
         defaultSession.trackAcceptedTelemetry(forSessionId: defaultSession.currentSessionId)
-        wait(for: [sentForCurrent], timeout: 1)
+        wait(for: [sentForCurrent], timeout: arrivalTimeout)
 
         XCTAssertEqual(eventManager.sentEvents.count, 2)
         XCTAssertEqual(eventManager.sentEvents.last?.sessionId, defaultSession.currentSessionId)
@@ -190,11 +196,11 @@ final class DefaultSessionStartTests: XCTestCase {
 
             return true
         }
-        wait(for: [rotated], timeout: 5)
+        wait(for: [rotated], timeout: arrivalTimeout)
 
         let sent = expectSessionStart(from: eventManager)
         defaultSession.trackAcceptedTelemetry(forSessionId: defaultSession.currentSessionId)
-        wait(for: [sent], timeout: 1)
+        wait(for: [sent], timeout: arrivalTimeout)
 
         let event = try XCTUnwrap(eventManager.sentEvents.first)
         XCTAssertEqual(event.sessionId, defaultSession.currentSessionId)
@@ -210,7 +216,7 @@ final class DefaultSessionStartTests: XCTestCase {
 
         let sent = expectSessionStart(from: eventManager)
         try exportSpan(through: eventManager)
-        wait(for: [sent], timeout: 1)
+        wait(for: [sent], timeout: arrivalTimeout)
 
         XCTAssertEqual(eventManager.sentEvents.first?.sessionId, defaultSession.currentSessionId)
     }
@@ -253,7 +259,7 @@ final class DefaultSessionStartTests: XCTestCase {
 
         let sent = expectSessionStart(from: eventManager)
         publishReplayData(through: eventManager, after: defaultSession.currentSessionStart)
-        wait(for: [sent], timeout: 1)
+        wait(for: [sent], timeout: arrivalTimeout)
 
         // Replay data also sends an isRecording event, so find the start event by name
         let event = try XCTUnwrap(eventManager.sentEvents.first { $0.name == "session.start" })
@@ -328,7 +334,7 @@ final class DefaultSessionStartTests: XCTestCase {
         traceProcessor.persistBufferedSpans(timeout: 5) { _ in
             exported.fulfill()
         }
-        wait(for: [exported], timeout: 5)
+        wait(for: [exported], timeout: arrivalTimeout)
     }
 
     /// Publishes Session Replay data recorded just after the session started.

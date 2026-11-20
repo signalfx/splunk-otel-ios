@@ -30,7 +30,7 @@ class DefaultSession: AgentSession {
 
     var refreshJob: RepeatingJob?
 
-    private var sessionsModel: SessionsModel
+    let sessionsModel: SessionsModel
     private(set) lazy var currentSession: SessionItem = startSession()
 
     private var lastActivity: Date?
@@ -126,11 +126,9 @@ class DefaultSession: AgentSession {
     func trackAcceptedTelemetry(forSessionId sessionId: String) {
         accessQueue.async { [weak self] in
             // The pending state is cleared first, as sending the event produces telemetry itself.
-            guard let self, let index = pendingSessionStarts.firstIndex(where: { $0.session.id == sessionId }) else {
+            guard let self, let pending = takeHeldSessionStart(forSessionId: sessionId) else {
                 return
             }
-
-            let pending = pendingSessionStarts.remove(at: index)
 
             sendSessionStart(
                 sessionId: pending.session.id,
@@ -145,11 +143,13 @@ class DefaultSession: AgentSession {
     ///
     /// A session without telemetry then contains no events at all, instead of a lone
     /// zero-duration session start event. Sessions created by ``rotateSession(previousSessionId:)``
-    /// hold their start event themselves.
+    /// hold their start event themselves. Starts still held when the previous run ended are restored first.
     func scheduleSessionStart() {
         let screenName = screenNameForSessionStart()
+        let savedStarts = savedHeldSessionStarts()
 
         accessQueue.sync {
+            restoreHeldSessionStarts(savedStarts)
             holdSessionStart(PendingSessionStart(session: currentSession, previousSessionId: nil, screenName: screenName))
         }
     }

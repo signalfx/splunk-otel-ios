@@ -37,11 +37,38 @@ extension DefaultSession {
 
     /// Holds a session's start event, dropping the oldest held starts beyond ``maxHeldSessionStarts``.
     ///
+    /// The held starts are also saved, so that the next launch can restore them.
+    ///
     /// Must run on `accessQueue`.
     func holdSessionStart(_ pending: PendingSessionStart) {
         pendingSessionStarts.removeAll { $0.session.id == pending.session.id }
         pendingSessionStarts.append(pending)
 
+        dropHeldSessionStartsBeyondLimit()
+        persistHeldSessionStarts()
+    }
+
+    /// Removes and returns the held start event of a session, if there is one.
+    ///
+    /// The save of the held starts without this one is requested before the caller sends the event,
+    /// so that a start that is sent is not restored and sent again at the next launch.
+    ///
+    /// Must run on `accessQueue`.
+    func takeHeldSessionStart(forSessionId sessionId: String) -> PendingSessionStart? {
+        guard let index = pendingSessionStarts.firstIndex(where: { $0.session.id == sessionId }) else {
+            return nil
+        }
+
+        let pending = pendingSessionStarts.remove(at: index)
+        persistHeldSessionStarts()
+
+        return pending
+    }
+
+    /// Drops the oldest held starts beyond ``maxHeldSessionStarts``.
+    ///
+    /// Must run on `accessQueue`.
+    func dropHeldSessionStartsBeyondLimit() {
         let excess = pendingSessionStarts.count - Self.maxHeldSessionStarts
 
         if excess > 0 {
