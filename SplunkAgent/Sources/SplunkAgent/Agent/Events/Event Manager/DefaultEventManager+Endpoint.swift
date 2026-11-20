@@ -16,6 +16,7 @@ limitations under the License.
 */
 
 import Foundation
+import OpenTelemetrySdk
 internal import SplunkOpenTelemetry
 
 // MARK: - Endpoint Management
@@ -37,7 +38,7 @@ extension DefaultEventManager {
             throw AgentConfigurationError.invalidEndpoint(supplied: endpoint)
         }
 
-        // Update the trace processor endpoint (this also flushes pending data)
+        // Apply the new endpoint immediately. Pending disk data is activated asynchronously.
         concreteTraceProcessor.setEndpoint(traceUrl, accessToken: endpoint.rumAccessToken)
 
         // Replace semantics: the new config fully replaces the old one.
@@ -99,14 +100,6 @@ extension DefaultEventManager {
     ) -> Processors {
         let resources = buildResources(configuration: configuration)
 
-        // Initialize log event processor
-        // Note: This processor converts logs to spans, so it uses the trace endpoint
-        let logProcessor = OTLPLogToSpanEventProcessor(
-            with: traceUrl,
-            resources: resources,
-            debugEnabled: configuration.enableDebugLogging
-        )
-
         // Initialize session replay processor (operates in pending mode when endpoint is nil)
         let replayProcessor = OTLPSessionReplayEventProcessor(
             with: sessionReplayUrl,
@@ -126,7 +119,33 @@ extension DefaultEventManager {
             debugEnabled: configuration.enableDebugLogging,
             spanInterceptor: configuration.spanInterceptor,
             accessToken: accessToken,
-            activityTracker: agent.currentSession
+            activityTracker: agent.currentSession,
+            didIntercept: { [weak agent] spans in
+                // Spans that survived interception are about to be exported, which makes
+                // them the telemetry that releases a held session start event.
+                guard let session = agent?.currentSession else {
+                    return
+                }
+
+                var reportedSessionIds = Set<String>()
+
+                for span in spans {
+                    if case let .string(sessionId) = span.attributes[RuntimeAttributeKeys.sessionId],
+                        reportedSessionIds.insert(sessionId).inserted
+                    {
+                        session.trackAcceptedTelemetry(forSessionId: sessionId)
+                    }
+                }
+            }
+        )
+
+        // Initialize the log event processor. Converted spans share the direct-span batch and its
+        // bounded in-memory loss policy.
+        let logProcessor = OTLPLogToSpanEventProcessor(
+            with: traceUrl,
+            resources: resources,
+            debugEnabled: configuration.enableDebugLogging,
+            traceProcessor: traceProc
         )
 
         return Processors(
@@ -139,10 +158,12 @@ extension DefaultEventManager {
     private static func buildResources(configuration: any AgentConfigurationProtocol) -> DefaultResources {
         // Will be used later by hybrid agents
         let hybridType: String? = nil
+        let appVersionTracker = AppVersionTracker(currentVersion: configuration.appVersion)
 
         return DefaultResources(
             appName: configuration.appName,
             appVersion: configuration.appVersion,
+            appPreviousVersion: appVersionTracker.previousVersion,
             appBuild: AppInfo.buildId ?? "-",
             appDeploymentEnvironment: configuration.deploymentEnvironment,
             agentHybridType: hybridType,

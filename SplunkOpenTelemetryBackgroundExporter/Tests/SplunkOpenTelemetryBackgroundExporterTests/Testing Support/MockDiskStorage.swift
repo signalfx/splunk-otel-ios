@@ -31,6 +31,7 @@ final class MockDiskStorage: DiskStorage {
     var shouldThrowOnFinalDestination = false
     var shouldThrowOnlist = false
     var shouldThrowOnInsert = false
+    var onList: (() -> Void)?
 
     func insert(_ value: some Decodable & Encodable, forKey key: CiscoDiskStorage.KeyBuilder) throws {
         if shouldThrowOnInsert {
@@ -58,6 +59,8 @@ final class MockDiskStorage: DiskStorage {
     }
 
     func list(forKey _: CiscoDiskStorage.KeyBuilder) throws -> [CiscoDiskStorage.ItemInfo] {
+        onList?()
+
         if shouldThrowOnlist {
             throw NSError(domain: "MockDiskStorage", code: 1)
         }

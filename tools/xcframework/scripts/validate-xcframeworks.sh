@@ -18,6 +18,12 @@ OUTPUT_DIR="${TOOLS_ROOT}/output/xcframeworks"
 
 RELEASE="${RELEASE:-false}"
 IOS_ONLY="${IOS_ONLY:-false}"
+LEGACY_ARTIFACT=false
+CISCO_MACH_O_TYPE="${CISCO_MACH_O_TYPE:-}"
+if [[ -z "${CISCO_MACH_O_TYPE}" && -f "${OUTPUT_DIR}/cisco-release-manifest.txt" ]]; then
+    CISCO_MACH_O_TYPE="$(awk -F= '$1 == "mach_o_type" { print $2; exit }' "${OUTPUT_DIR}/cisco-release-manifest.txt")"
+fi
+CISCO_MACH_O_TYPE="${CISCO_MACH_O_TYPE:-mh_dylib}"
 
 TOTAL_CHECKS=0
 PASSED_CHECKS=0
@@ -30,11 +36,10 @@ EXPECTED_IOS_ONLY_SLICE_NAMES=(
     "ios-arm64"
     "ios-arm64_x86_64-simulator"
 )
-
 EXPECTED_FRAMEWORKS=(
     "OpenTelemetryApi"
     "OpenTelemetrySdk"
-    "CrashReporter"
+    "SplunkCrashReporter"
     "CiscoCommon"
     "CiscoLogger"
     "CiscoEncryption"
@@ -44,6 +49,11 @@ EXPECTED_FRAMEWORKS=(
     "CiscoSessionReplay"
     "CiscoInstanceManager"
     "CiscoRuntimeCache"
+    "CiscoVideoEncoder"
+    "CiscoScreenshot"
+    "CiscoWireframe"
+    "CiscoDataExporter"
+    "CiscoSnapshotManager"
     "SplunkCommon"
     "SplunkNavigation"
     "SplunkNetwork"
@@ -62,12 +72,16 @@ EXPECTED_FRAMEWORKS=(
     "SplunkAgentObjC"
 )
 
-NO_VISIONOS_MODULES="SplunkCrashReports CrashReporter"
+NO_VISIONOS_MODULES="SplunkCrashReporter SplunkCrashReports"
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --ios-only)
             IOS_ONLY=true
+            shift
+            ;;
+        --legacy-artifact)
+            LEGACY_ARTIFACT=true
             shift
             ;;
         *)
@@ -76,6 +90,14 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
+if [[ "${LEGACY_ARTIFACT}" == "true" ]]; then
+    # Artifacts from the previous pipeline contain only the original nine
+    # dynamic Cisco frameworks and dynamic Agent frameworks. Keep this
+    # compatibility path separate from current release validation.
+    EXPECTED_FRAMEWORKS=("${EXPECTED_FRAMEWORKS[@]:0:12}" "${EXPECTED_FRAMEWORKS[@]:17}")
+    CISCO_MACH_O_TYPE="mh_dylib"
+fi
 
 log() {
     echo "==> $*"
@@ -103,6 +125,34 @@ is_expected_framework() {
     done
 
     return 1
+}
+
+expected_linkage_for() {
+    local name="$1"
+
+    if [[ "${LEGACY_ARTIFACT}" == "true" ]]; then
+        echo "dynamic"
+        return
+    fi
+
+    case "${name}" in
+        OpenTelemetryApi|OpenTelemetrySdk|SplunkCrashReporter)
+            echo "dynamic"
+            ;;
+        Cisco*)
+            case "${CISCO_MACH_O_TYPE}" in
+                staticlib) echo "static" ;;
+                mh_dylib) echo "dynamic" ;;
+                *) return 1 ;;
+            esac
+            ;;
+        Splunk*)
+            echo "dynamic"
+            ;;
+        *)
+            return 1
+            ;;
+    esac
 }
 
 expected_slices_for() {
@@ -191,6 +241,19 @@ validate_dynamic_binary() {
     fi
 }
 
+validate_static_binary() {
+    local binary_path="$1"
+    local slice_name="$2"
+    local file_info
+
+    file_info="$(file "${binary_path}" 2>/dev/null || true)"
+    if [[ "${file_info}" == *archive* ]]; then
+        check_pass "Slice ${slice_name}: static library binary"
+    else
+        check_fail "Slice ${slice_name}: binary is not a static library (${file_info:-unknown})"
+    fi
+}
+
 validate_no_nested_frameworks() {
     local framework_path="$1"
     local slice_name="$2"
@@ -208,6 +271,32 @@ validate_no_nested_frameworks() {
         for nested_framework in "${nested_frameworks[@]}"; do
             echo "    ${nested_framework}"
         done
+    fi
+}
+
+validate_crash_reporter_resources() {
+    local framework_path="$1"
+    local slice_name="$2"
+    local umbrella_header="${framework_path}/Headers/SplunkCrashReporter.h"
+    local privacy_manifest="${framework_path}/PrivacyInfo.xcprivacy"
+    local module_map="${framework_path}/Modules/module.modulemap"
+
+    if [[ -f "${umbrella_header}" ]]; then
+        check_pass "Slice ${slice_name}: SplunkCrashReporter umbrella header present"
+    else
+        check_fail "Slice ${slice_name}: SplunkCrashReporter umbrella header missing"
+    fi
+
+    if [[ -f "${module_map}" ]] && grep -q 'umbrella header "SplunkCrashReporter.h"' "${module_map}"; then
+        check_pass "Slice ${slice_name}: module map uses SplunkCrashReporter umbrella header"
+    else
+        check_fail "Slice ${slice_name}: module map does not use SplunkCrashReporter umbrella header"
+    fi
+
+    if [[ -f "${privacy_manifest}" ]] && plutil -lint "${privacy_manifest}" >/dev/null; then
+        check_pass "Slice ${slice_name}: crash reporter privacy manifest present and valid"
+    else
+        check_fail "Slice ${slice_name}: crash reporter privacy manifest missing or invalid"
     fi
 }
 
@@ -304,13 +393,24 @@ validate_xcframework() {
         local framework_path="${xcfw_path}/${slice_name}/${library_path}"
         if [[ -d "${framework_path}" ]]; then
             validate_no_nested_frameworks "${framework_path}" "${slice_name}"
+
+            if [[ "${name}" == "SplunkCrashReporter" ]]; then
+                validate_crash_reporter_resources "${framework_path}" "${slice_name}"
+            fi
         else
             check_fail "Slice ${slice_name}: framework missing at ${framework_path}"
         fi
 
         if [[ -f "${fw_binary}" ]]; then
             check_pass "Slice ${slice_name}: binary present"
-            validate_dynamic_binary "${fw_binary}" "${slice_name}"
+            local expected_linkage
+            if ! expected_linkage="$(expected_linkage_for "${name}")"; then
+                check_fail "Slice ${slice_name}: no expected linkage type for ${name}"
+            elif [[ "${expected_linkage}" == "static" ]]; then
+                validate_static_binary "${fw_binary}" "${slice_name}"
+            else
+                validate_dynamic_binary "${fw_binary}" "${slice_name}"
+            fi
 
             local arch_info
             arch_info="$(lipo -info "${fw_binary}" 2>/dev/null || echo "unknown")"

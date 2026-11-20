@@ -16,6 +16,7 @@ limitations under the License.
 */
 
 import CiscoSessionReplay
+import Foundation
 import XCTest
 
 @testable import SplunkAgent
@@ -70,6 +71,47 @@ final class EventsTests: XCTestCase {
         try checkEventProperties(processedEvent)
 
         XCTAssertEqual(processedEvent.name, "session_replay_data")
+
+        wait(for: [requestExpectation], timeout: 10)
+    }
+
+    func testSessionReplayDataEventUserActivityInMetadata() throws {
+        let timestamps = [1_700_000_000_000, 1_700_000_001_000, 1_700_000_002_000]
+        let event = try SessionReplayTestBuilder.buildDataEvent(userActivity: timestamps)
+
+        let eventManager = try XCTUnwrap(agent?.eventManager as? DefaultEventManager)
+        let sessionReplayProcessor = eventManager.sessionReplayProcessor
+
+        let requestExpectation = XCTestExpectation(description: "Send request")
+        sessionReplayProcessor.sendEvent(event) { _ in requestExpectation.fulfill() }
+
+        let processedEvent = try XCTUnwrap(sessionReplayProcessor.storedLastProcessedEvent)
+        let metadataValue = try XCTUnwrap(processedEvent.attributes?["segmentMetadata"])
+        let metadataData = try XCTUnwrap(metadataValue.description.data(using: .utf8))
+        let json = try XCTUnwrap(JSONSerialization.jsonObject(with: metadataData) as? [String: Any])
+        let userActivity = try XCTUnwrap(json["userActivity"] as? [NSNumber]).map(\.intValue)
+
+        XCTAssertEqual(userActivity, timestamps)
+
+        wait(for: [requestExpectation], timeout: 10)
+    }
+
+    func testSessionReplayDataEventEmptyUserActivityInMetadata() throws {
+        let event = try SessionReplayTestBuilder.buildDataEvent(userActivity: [])
+
+        let eventManager = try XCTUnwrap(agent?.eventManager as? DefaultEventManager)
+        let sessionReplayProcessor = eventManager.sessionReplayProcessor
+
+        let requestExpectation = XCTestExpectation(description: "Send request")
+        sessionReplayProcessor.sendEvent(event) { _ in requestExpectation.fulfill() }
+
+        let processedEvent = try XCTUnwrap(sessionReplayProcessor.storedLastProcessedEvent)
+        let metadataValue = try XCTUnwrap(processedEvent.attributes?["segmentMetadata"])
+        let metadataData = try XCTUnwrap(metadataValue.description.data(using: .utf8))
+        let json = try XCTUnwrap(JSONSerialization.jsonObject(with: metadataData) as? [String: Any])
+        let userActivity = try XCTUnwrap(json["userActivity"] as? [NSNumber]).map(\.intValue)
+
+        XCTAssertTrue(userActivity.isEmpty)
 
         wait(for: [requestExpectation], timeout: 10)
     }

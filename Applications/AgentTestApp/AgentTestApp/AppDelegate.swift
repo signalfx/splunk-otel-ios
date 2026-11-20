@@ -50,10 +50,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             realm: "realm",
             rumAccessToken: "token"
         )
-
         let agentConfig = AgentConfiguration(
             endpoint: endpointConfig,
-            appName: "App Name",
+            appName: "AgentTestApp",
             deploymentEnvironment: "dev"
         )
         .enableDebugLogging(true)

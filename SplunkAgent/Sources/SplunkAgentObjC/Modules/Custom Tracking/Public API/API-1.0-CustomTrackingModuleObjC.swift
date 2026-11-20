@@ -94,6 +94,49 @@ public final class CustomTrackingModuleObjC: NSObject {
     }
 
 
+    // MARK: - Track Errors with an explicit stacktrace
+
+    /// Track an error described by an explicit type, message, and stacktrace, with attributes.
+    ///
+    /// The supplied `stacktrace` is emitted verbatim as `exception.stacktrace`; no native
+    /// stacktrace is derived. Intended for errors captured outside the native runtime, such
+    /// as caught JavaScript/Dart errors bridged from the React Native or Flutter agents.
+    ///
+    /// - Parameters:
+    ///   - typeName: The error type, reported as `exception.type`.
+    ///   - message: A concise summary of the error, reported as `exception.message`.
+    ///   - stacktrace: The verbatim stacktrace, reported as `exception.stacktrace`. Pass `nil`
+    ///     for string-only or stackless errors.
+    ///   - attributes: Dictionary with `AttributeValueObjC` value.
+    ///
+    /// - Returns: The updated `CustomTrackingModuleObjC` instance.
+    @discardableResult
+    @objc(trackErrorWithType:message:stacktrace:attributes:)
+    public func trackError(typeName: String, message: String, stacktrace: String?, attributes: [String: AttributeValueObjC]) -> CustomTrackingModuleObjC {
+        let mutableAttributes = MutableAttributes(with: attributes)
+        owner.agent.customTracking.trackError(typeName: typeName, message: message, stacktrace: stacktrace, attributes: mutableAttributes.all)
+
+        return self
+    }
+
+    /// Track an error described by an explicit type, message, and stacktrace.
+    ///
+    /// - Parameters:
+    ///   - typeName: The error type, reported as `exception.type`.
+    ///   - message: A concise summary of the error, reported as `exception.message`.
+    ///   - stacktrace: The verbatim stacktrace, reported as `exception.stacktrace`. Pass `nil`
+    ///     for string-only or stackless errors.
+    ///
+    /// - Returns: The updated `CustomTrackingModuleObjC` instance.
+    @discardableResult
+    @objc(trackErrorWithType:message:stacktrace:)
+    public func trackError(typeName: String, message: String, stacktrace: String?) -> CustomTrackingModuleObjC {
+        owner.agent.customTracking.trackError(typeName: typeName, message: message, stacktrace: stacktrace)
+
+        return self
+    }
+
+
     // MARK: - Single argument helpers (signatures)
 
     @discardableResult

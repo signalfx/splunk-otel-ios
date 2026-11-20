@@ -64,7 +64,6 @@ struct MockRequestDescriptor: RequestDescriptorProtocol {
         var request = URLRequest(url: endpoint)
 
         request.httpMethod = "POST"
-        request.setValue(OTLPHTTPHeaders.userAgent, forHTTPHeaderField: OTLPHTTPHeaders.userAgentKey)
         request.setValue(payloadFormat.contentType, forHTTPHeaderField: "Content-Type")
         request.timeoutInterval = explicitTimeout
 

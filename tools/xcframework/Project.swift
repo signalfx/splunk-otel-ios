@@ -4,10 +4,9 @@
 // xcframeworks. Each module is a separate framework target with
 // BUILD_LIBRARY_FOR_DISTRIBUTION=YES for stable ABI.
 //
-// External dependencies (OpenTelemetry, Cisco Session Replay,
-// PLCrashReporter) are consumed as pre-built xcframeworks from the
-// `dependencies/` directory, populated by the build script before
-// `tuist generate`.
+// External dependencies (OpenTelemetry and Cisco Session Replay) are
+// consumed as pre-built xcframeworks from the `dependencies/` directory,
+// populated by the build script before `tuist generate`.
 //
 // Key design decisions:
 //   - Individual xcframework per module (not a single fat framework)
@@ -27,7 +26,7 @@ import ProjectDescription
 /// Path to the repository root, relative to this Project.swift.
 let repoRoot: String = "../.."
 
-/// Directory containing pre-built xcframeworks (OTel, Cisco, PLCrashReporter).
+/// Directory containing pre-built xcframeworks (OTel and Cisco).
 ///
 /// Populated by the build script before `tuist generate`.
 let deps: String = "dependencies"
@@ -47,7 +46,7 @@ let allPlatforms: Set<Destination> = [
 
 /// Platforms excluding visionOS.
 ///
-/// Used by SplunkCrashReports (PLCrashReporter does not support visionOS).
+/// Used by SplunkCrashReporter and SplunkCrashReports (the crash reporter does not support visionOS).
 let platformsNoCrashReporter: Set<Destination> = [
     .iPhone, .iPad, // iOS
     .appleTv, // tvOS
@@ -56,7 +55,7 @@ let platformsNoCrashReporter: Set<Destination> = [
 
 /// Platform condition: iOS + tvOS + Mac Catalyst (excludes visionOS).
 ///
-/// Applied to SplunkCrashReports and CrashReporter dependencies.
+/// Applied to SplunkCrashReports dependencies.
 let noCrashReporterCondition = PlatformCondition.when([.ios, .tvos, .catalyst])
 
 
@@ -75,14 +74,76 @@ let sharedSettings: SettingsDictionary = [
     // Enable module interface generation.
     "SWIFT_EMIT_MODULE_INTERFACE": "YES",
 
+    // Tell the compiler these sources belong to the `SplunkAgent` package.
+    // This makes `package` access compile in the standalone Tuist build while
+    // keeping package-only members out of generated .swiftinterface files.
+    "OTHER_SWIFT_FLAGS": "-package-name SplunkAgent",
+
     // Minimum deployment targets matching Package.swift.
-    "IPHONEOS_DEPLOYMENT_TARGET": "13.0",
+    "IPHONEOS_DEPLOYMENT_TARGET": "15.0",
     "TVOS_DEPLOYMENT_TARGET": "15.0",
     "XROS_DEPLOYMENT_TARGET": "1.0",
     "MACOSX_DEPLOYMENT_TARGET": "12.0",
 
     // Support Mac Catalyst builds.
     "SUPPORTS_MACCATALYST": "YES"
+]
+
+/// Build settings for the vendored, namespaced crash reporter implementation.
+let crashReporterSettings: SettingsDictionary = [
+    // SplunkCrashReporter follows the agent's iOS/iPadOS 15 baseline.
+    "IPHONEOS_DEPLOYMENT_TARGET": "15.0",
+    // The crash reporter is shipped only for 64-bit Apple platforms. Keep this
+    // explicit so legacy 32-bit architecture support in its source cannot
+    // produce a 32-bit distribution slice.
+    "ARCHS": "$(ARCHS_STANDARD_64_BIT)",
+    "MACH_O_TYPE": "mh_dylib",
+    "SKIP_INSTALL": "NO",
+    "DEFINES_MODULE": "YES",
+    "GCC_PREPROCESSOR_DEFINITIONS": [
+        "PLCR_PRIVATE=1",
+        "PLCF_RELEASE_BUILD=1",
+        "PLCRASHREPORTER_PREFIX=SPLK",
+        "SWIFT_PACKAGE=1"
+    ],
+    "HEADER_SEARCH_PATHS": [
+        "$(SRCROOT)/\(repoRoot)/SplunkCrashReporter/Dependencies/protobuf-c",
+        "$(SRCROOT)/\(repoRoot)/SplunkCrashReporter/Source"
+    ],
+    "OTHER_LDFLAGS": ["-framework", "Foundation"],
+    "CLANG_ENABLE_MODULES": "YES",
+    "CLANG_CXX_LANGUAGE_STANDARD": "c++17",
+    "PUBLIC_HEADERS_FOLDER_PATH": "$(CONTENTS_FOLDER_PATH)/Headers"
+]
+
+/// Publish the cleaned facade and the headers it transitively imports.
+///
+/// The facade is the supported client entry point and restores namespace macros
+/// after importing the vendored API.
+let crashReporterPublicHeaders: FileList = [
+    "\(repoRoot)/SplunkCrashReporter/include/SplunkCrashReporter.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/CrashReporter.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/PLCrashFeatureConfig.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/PLCrashMacros.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/PLCrashNamespace.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/PLCrashReport.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/PLCrashReportApplicationInfo.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/PLCrashReportBinaryImageInfo.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/PLCrashReportExceptionInfo.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/PLCrashReportFormatter.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/PLCrashReportMachExceptionInfo.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/PLCrashReportMachineInfo.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/PLCrashReportProcessInfo.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/PLCrashReportProcessorInfo.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/PLCrashReportRegisterInfo.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/PLCrashReportSignalInfo.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/PLCrashReportStackFrameInfo.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/PLCrashReportSymbolInfo.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/PLCrashReportSystemInfo.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/PLCrashReportTextFormatter.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/PLCrashReportThreadInfo.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/PLCrashReporter.h",
+    "\(repoRoot)/SplunkCrashReporter/Source/PLCrashReporterConfig.h"
 ]
 
 
@@ -127,28 +188,86 @@ func ciscoInteractionsDependencies() -> [TargetDependency] {
     ]
 }
 
-/// CiscoRuntimeCache's swiftinterface imports CiscoLogger.
+/// CiscoRuntimeCache's swiftinterface imports CiscoCommon and CiscoLogger.
 func ciscoRuntimeCacheDependencies() -> [TargetDependency] {
     [
         dep("CiscoRuntimeCache"),
+        dep("CiscoCommon"),
         dep("CiscoLogger")
     ]
 }
 
-/// CiscoSessionReplay imports most Cisco support frameworks in its public interface.
+/// CiscoSessionReplay imports its support modules in its public interface.
 func ciscoSessionReplayDependencies() -> [TargetDependency] {
     [
         dep("CiscoSessionReplay"),
         dep("CiscoCommon"),
+        dep("CiscoDataExporter"),
         dep("CiscoDiskStorage"),
         dep("CiscoEncryption"),
         dep("CiscoInteractions"),
         dep("CiscoLogger"),
+        dep("CiscoRuntimeCache"),
+        dep("CiscoScreenshot"),
+        dep("CiscoSnapshotManager"),
         dep("CiscoSwizzling"),
-        dep("CiscoInstanceManager"),
-        dep("CiscoRuntimeCache")
+        dep("CiscoVideoEncoder"),
+        dep("CiscoWireframe"),
+        dep("CiscoInstanceManager")
     ]
 }
+
+/// Vendored and symbol-prefixed PLCrashReporter implementation.
+///
+/// Kept as a typed declaration so the compiler does not have to infer this
+/// mixed-source target as part of the complete project target array.
+let crashReporterTarget = Target.target(
+    name: "SplunkCrashReporter",
+    destinations: platformsNoCrashReporter,
+    product: .framework,
+    bundleId: "com.splunk.rum.crashreporter",
+    sources: [
+        .glob("\(repoRoot)/SplunkCrashReporter/Source/**/*.c"),
+        .glob("\(repoRoot)/SplunkCrashReporter/Source/**/*.m"),
+        .glob("\(repoRoot)/SplunkCrashReporter/Source/**/*.mm"),
+        .glob("\(repoRoot)/SplunkCrashReporter/Source/**/*.cpp"),
+        .glob("\(repoRoot)/SplunkCrashReporter/Source/**/*.S"),
+        .glob("\(repoRoot)/SplunkCrashReporter/Dependencies/protobuf-c/**/*.c")
+    ],
+    resources: [
+        .glob(pattern: "\(repoRoot)/SplunkCrashReporter/Resources/PrivacyInfo.xcprivacy")
+    ],
+    headers: .headers(
+        public: crashReporterPublicHeaders,
+        private: [
+            "\(repoRoot)/SplunkCrashReporter/Source/**/*.h",
+            "\(repoRoot)/SplunkCrashReporter/Dependencies/protobuf-c/**/*.h"
+        ],
+        project: []
+    ),
+    settings: .settings(
+        base: crashReporterSettings.merging([
+            "PRODUCT_MODULE_NAME": "SplunkCrashReporter",
+            "INFOPLIST_KEY_CFBundleDisplayName": "SplunkCrashReporter",
+            "PRODUCT_NAME": "SplunkCrashReporter"
+        ]) { _, new in new },
+        configurations: [
+            .debug(name: "Debug", settings: [:]),
+            .release(
+                name: "Release",
+                settings: [
+                    "GCC_PREPROCESSOR_DEFINITIONS": [
+                        "PLCR_PRIVATE=1",
+                        "PLCF_RELEASE_BUILD=1",
+                        "NDEBUG=1",
+                        "PLCRASHREPORTER_PREFIX=SPLK",
+                        "SWIFT_PACKAGE=1"
+                    ]
+                ]
+            )
+        ]
+    )
+)
 
 
 // ---------------------------------------------------------------------------
@@ -259,13 +378,21 @@ let project = Project(
 
 
         // =================================================================
+        // MARK: SplunkCrashReporter
+        // =================================================================
+        // Vendored and symbol-prefixed PLCrashReporter implementation.
+        // The SPLK prefix prevents collisions with another copy linked by a host app.
+        crashReporterTarget,
+
+
+        // =================================================================
         // MARK: SplunkCrashReports
         // =================================================================
         // Crash reporting via PLCrashReporter.
         //
         // PLATFORM RESTRICTION: Excludes visionOS because PLCrashReporter
         // does not support it. This is the only module with a platform
-        // restriction (besides the external CrashReporter dependency).
+        // restriction (besides the internal SplunkCrashReporter target).
         .target(
             name: "SplunkCrashReports",
             destinations: platformsNoCrashReporter,
@@ -275,7 +402,7 @@ let project = Project(
             dependencies: [
                 mod("SplunkCommon"),
                 dep("OpenTelemetryApi"),
-                dep("CrashReporter")
+                mod("SplunkCrashReporter")
             ]
         ),
 
@@ -490,6 +617,7 @@ let project = Project(
             dependencies: [
                 mod("SplunkAgent"),
                 mod("SplunkCommon"),
+                mod("SplunkCustomTracking"),
                 mod("SplunkInteractions"),
                 mod("SplunkNavigation"),
                 mod("SplunkNetworkMonitor"),

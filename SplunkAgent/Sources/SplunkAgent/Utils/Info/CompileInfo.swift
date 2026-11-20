@@ -37,25 +37,25 @@ struct CompileInfo {
     /// The target platform for which the currently running code has been compiled.
     static var platform: Platform {
         #if os(macOS)
-            return .macOS
+            .macOS
 
         #elseif targetEnvironment(macCatalyst)
-            return .macCatalyst
+            .macCatalyst
 
         #elseif os(iOS)
-            return .iOS
+            .iOS
 
         #elseif os(watchOS)
-            return .watchOS
+            .watchOS
 
         #elseif os(tvOS)
-            return .tvOS
+            .tvOS
 
         #elseif os(visionOS)
-            return .visionOS
+            .visionOS
 
         #else
-            return .unknown
+            .unknown
         #endif
     }
 }

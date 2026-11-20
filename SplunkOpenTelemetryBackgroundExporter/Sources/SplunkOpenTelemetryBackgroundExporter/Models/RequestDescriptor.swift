@@ -16,6 +16,7 @@ limitations under the License.
 */
 
 import Foundation
+import SplunkCommon
 
 enum RequestPayloadFormat: String, Codable {
     case json
@@ -139,7 +140,6 @@ struct RequestDescriptor: RequestDescriptorProtocol {
         var request = URLRequest(url: endpoint)
 
         request.httpMethod = "POST"
-        request.setValue(OTLPHTTPHeaders.userAgent, forHTTPHeaderField: OTLPHTTPHeaders.userAgentKey)
         request.setValue(payloadFormat.contentType, forHTTPHeaderField: "Content-Type")
         request.timeoutInterval = explicitTimeout
 
@@ -147,7 +147,7 @@ struct RequestDescriptor: RequestDescriptorProtocol {
             request.setValue(value, forHTTPHeaderField: key)
         }
 
-        return request
+        return InternalNetworkRequestMarker.mark(request)
     }
 }
 

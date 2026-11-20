@@ -81,7 +81,7 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
         debugEnabled: Bool,
         accessToken: String? = nil
     ) {
-        let configuration = OTLPExporterConfiguration()
+        let configuration = OTLPExporterConfiguration(agentVersion: resources.agentVersion)
         let envVarHeaders: [(String, String)] = []
         var headers: [String: String] = [:]
 

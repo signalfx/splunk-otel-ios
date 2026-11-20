@@ -22,7 +22,6 @@ import Testing
 
 @testable import SplunkOpenTelemetry
 
-// swiftlint:disable type_body_length
 // swiftlint:disable file_length
 @Suite
 struct SpanDataIsolatedCopyTests {
@@ -376,23 +375,12 @@ struct SpanDataIsolatedCopyTests {
                     let copy = original.isolatedCopy()
 
                     // Verify all expected data is present and correct
-                    guard copy.attributes["http.method"]?.description == "GET" else {
-                        return false
-                    }
-
-                    guard copy.attributes["http.status_code"]?.description == "200" else {
-                        return false
-                    }
-
-                    guard copy.attributes["http.url"]?.description == "https://example.com/api" else {
-                        return false
-                    }
-
-                    guard copy.events.first?.name == expectedEventName else {
-                        return false
-                    }
-
-                    guard copy.events.first?.attributes[expectedEventAttr]?.description == "2025-01-01" else {
+                    guard copy.attributes["http.method"]?.description == "GET",
+                        copy.attributes["http.status_code"]?.description == "200",
+                        copy.attributes["http.url"]?.description == "https://example.com/api",
+                        copy.events.first?.name == expectedEventName,
+                        copy.events.first?.attributes[expectedEventAttr]?.description == "2025-01-01"
+                    else {
                         return false
                     }
 
@@ -401,6 +389,7 @@ struct SpanDataIsolatedCopyTests {
             }
 
             var allValid = true
+
             for await isValid in group where !isValid {
                 allValid = false
             }
@@ -426,5 +415,4 @@ private class NoOpSpanExporter: SpanExporter {
     func shutdown(explicitTimeout _: TimeInterval?) {}
 }
 
-// swiftlint:enable type_body_length
 // swiftlint:enable file_length

@@ -20,6 +20,10 @@ import OpenTelemetryApi
 import OpenTelemetrySdk
 import SplunkCommon
 
+private enum ResourceAttributeKeys {
+    static let appPreviousVersion = "app.previous_version"
+}
+
 /// Builds OTel Resource object from AgentResources.
 extension Resource {
 
@@ -30,9 +34,7 @@ extension Resource {
         let requiredAttributes: [String: AttributeValue] = [
 
             // App info
-            // Note: Using string literal to preserve backward compatibility with "deployment.environment"
-            // (SemanticConventions uses "deployment.environment.name" which is a newer convention)
-            "deployment.environment": .string(agentResources.appDeploymentEnvironment),
+            SemanticConventions.Deployment.environmentName.rawValue: .string(agentResources.appDeploymentEnvironment),
             "app": .string(agentResources.appName),
             "app.version": .string(agentResources.appVersion),
             "app.build_id": .string(agentResources.appBuild),
@@ -56,6 +58,11 @@ extension Resource {
 
         // Add required attributes to the resource
         merge(other: Resource(attributes: requiredAttributes))
+
+        // A previous version is optional and must not be emitted as an empty string.
+        if let previousVersion = agentResources.appPreviousVersion, !previousVersion.isEmpty {
+            merge(other: Resource(attributes: [ResourceAttributeKeys.appPreviousVersion: .string(previousVersion)]))
+        }
 
         // Add optional hybrid agent type
         if let hybridType = agentResources.agentHybridType {

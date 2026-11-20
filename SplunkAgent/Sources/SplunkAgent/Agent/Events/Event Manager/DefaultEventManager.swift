@@ -45,6 +45,9 @@ class DefaultEventManager: AgentEventManager {
     /// Interval for sending pulse events (5 minutes).
     let pulseEventInterval: TimeInterval = 300
 
+    /// Time limit for writing an event's span to disk when it is sent with `persistImmediately`.
+    static let immediatePersistenceTimeout: TimeInterval = 2
+
     // MARK: - Private properties (concrete types for endpoint updates)
 
     /// Event processor (internal for endpoint updates).
@@ -79,6 +82,7 @@ class DefaultEventManager: AgentEventManager {
 
     var sessionReplayIndexer: EventIndexer
     var sessionReplayMemorizer: EventMemorizer
+    let userActivityCollector = UserActivityCollector()
 
     /// Agent reference.
     unowned let agent: SplunkRum
@@ -149,6 +153,7 @@ class DefaultEventManager: AgentEventManager {
 
         // Crash Reports module data
         #if canImport(SplunkCrashReports)
+
             case let (metadata as CrashReportsMetadata, data as String):
                 publishCrashReports(data: data, metadata: metadata, completion: completion)
         #endif
@@ -196,29 +201,32 @@ class DefaultEventManager: AgentEventManager {
             // Use scriptInstanceId as a 16 character substring of a sessionId
             let scriptInstanceId = String(sessionId.prefix(upTo: sessionId.index(sessionId.startIndex, offsetBy: 16)))
 
+            let flush = userActivityCollector.flush(startMs: metadata.startUnixMs, endMs: metadata.endUnixMs)
+
             let event = SessionReplayDataEvent(
                 metadata: metadata,
                 data: data,
                 index: eventIndex,
                 sessionId: sessionId,
-                scriptInstanceId: scriptInstanceId
+                scriptInstanceId: scriptInstanceId,
+                userActivity: flush.timestamps
             )
 
-            sessionReplayProcessor.sendEvent(
-                event: event,
-                immediateProcessing: false,
-                completion: { [weak self] processed in
-                    if processed {
-                        self?
-                            .removeSessionReplayIndex(
-                                sessionId: sessionId,
-                                timestamp: metadata.timestamp
-                            )
-                    }
+            // Indexed replay data handed to its processor is telemetry of this session
+            agent.currentSession.trackAcceptedTelemetry(forSessionId: sessionId)
 
-                    completion(processed)
+            sessionReplayProcessor.sendEvent(event: event, immediateProcessing: false) { [weak self] processed in
+                if processed {
+                    self?.removeSessionReplayIndex(sessionId: sessionId, timestamp: metadata.timestamp)
                 }
-            )
+                else {
+                    // Return timestamps to the collector so they are included on retry.
+                    // The generation guards against a stop/reset that happened while the
+                    // send was in flight — restore is a no-op in that case.
+                    self?.userActivityCollector.restore(flush.timestamps, generation: flush.generation)
+                }
+                completion(processed)
+            }
         }
     }
 
@@ -255,7 +263,7 @@ class DefaultEventManager: AgentEventManager {
                     sessionId: sessionId
                 )
 
-                agent.eventManager?.sendEvent(event)
+                agent.eventManager?.sendEvent(event, persistImmediately: false)
             }
         }
         catch {
@@ -268,11 +276,19 @@ class DefaultEventManager: AgentEventManager {
 
     // MARK: - Internal events
 
-    func sendEvent(_ event: AgentEvent) {
+    func sendEvent(_ event: AgentEvent, persistImmediately: Bool) {
         logEventProcessor.sendEvent(
             event: event,
             immediateProcessing: false
-        ) { _ in }
+        ) { [weak self] _ in
+            // The event's span is in the batch now. This callback runs on the main queue,
+            // so the write does not run once the app is terminating.
+            guard persistImmediately, let self else {
+                return
+            }
+
+            concreteTraceProcessor.persistBufferedSpans(timeout: Self.immediatePersistenceTimeout) { _ in }
+        }
     }
 }
 

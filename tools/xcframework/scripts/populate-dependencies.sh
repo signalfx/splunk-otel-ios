@@ -7,24 +7,21 @@
 #
 # Sources:
 #   - OpenTelemetryApi/Sdk: Built by build-otel-xcframeworks.sh → output/xcframeworks/
-#   - Cisco modules: Built locally as dynamic xcframeworks by build-cisco-xcframeworks.sh
-#                    (or linked from a legacy local path via --cisco-path)
-#   - CrashReporter: Downloaded from PLCrashReporter GitHub releases
+#   - Cisco modules: Built locally by build-cisco-xcframeworks.sh, downloaded
+#                    from Package.swift with --download-cisco, or linked from a
+#                    local path via --cisco-path
 #
 # Usage:
 #   ./scripts/populate-dependencies.sh [options]
 #
 # Options:
-#   --cisco-path PATH     Legacy path to directory containing dynamic Cisco xcframeworks
-#   --plcrash-version VER PLCrashReporter version (default: 1.12.0)
+#   --cisco-path PATH     Legacy path to directory containing Cisco xcframeworks
 #   --skip-otel           Skip OTel (assumes already built in output/xcframeworks/)
 #   --skip-cisco          Skip Cisco staging
-#   --skip-plcrash        Skip PLCrashReporter download
-#   --download-cisco      Legacy mode: download Cisco from Package.swift registry
+#   --download-cisco      Download Cisco xcframeworks from the Package.swift registry
 #
 # Environment variables:
 #   CISCO_XCFRAMEWORKS_PATH  Same as --cisco-path (legacy)
-#   PLCRASH_VERSION          Same as --plcrash-version
 
 set -euo pipefail
 
@@ -41,21 +38,32 @@ DEPS_DIR="${TOOLS_ROOT}/dependencies"
 # Where OTel xcframeworks are built
 OTEL_OUTPUT_DIR="${TOOLS_ROOT}/output/xcframeworks"
 
-# PLCrashReporter settings (built from source by build-plcrash-xcframeworks.sh)
-PLCRASH_VERSION="${PLCRASH_VERSION:-1.12.0}"
-
 # Cisco xcframeworks path (can be overridden)
 CISCO_XCFRAMEWORKS_PATH="${CISCO_XCFRAMEWORKS_PATH:-}"
 
 # Control flags
 SKIP_OTEL=false
 SKIP_CISCO=false
-SKIP_PLCRASH=false
 DOWNLOAD_CISCO=false
 
 # Expected xcframeworks
 OTEL_FRAMEWORKS=("OpenTelemetryApi" "OpenTelemetrySdk")
-CISCO_FRAMEWORKS=("CiscoCommon" "CiscoLogger" "CiscoEncryption" "CiscoSwizzling" "CiscoInteractions" "CiscoDiskStorage" "CiscoSessionReplay" "CiscoInstanceManager" "CiscoRuntimeCache")
+CISCO_FRAMEWORKS=(
+    "CiscoCommon"
+    "CiscoLogger"
+    "CiscoEncryption"
+    "CiscoSwizzling"
+    "CiscoInteractions"
+    "CiscoDiskStorage"
+    "CiscoVideoEncoder"
+    "CiscoScreenshot"
+    "CiscoWireframe"
+    "CiscoDataExporter"
+    "CiscoSnapshotManager"
+    "CiscoSessionReplay"
+    "CiscoInstanceManager"
+    "CiscoRuntimeCache"
+)
 
 
 # ---------------------------------------------------------------------------
@@ -68,13 +76,8 @@ while [[ $# -gt 0 ]]; do
             CISCO_XCFRAMEWORKS_PATH="$2"
             shift 2
             ;;
-        --plcrash-version)
-            PLCRASH_VERSION="$2"
-            shift 2
-            ;;
         --skip-otel) SKIP_OTEL=true; shift ;;
         --skip-cisco) SKIP_CISCO=true; shift ;;
-        --skip-plcrash) SKIP_PLCRASH=true; shift ;;
         --download-cisco) DOWNLOAD_CISCO=true; shift ;;
         *)
             echo "Unknown argument: $1"
@@ -149,54 +152,30 @@ if [[ "${SKIP_CISCO}" == "false" ]]; then
             echo "  ✓ ${fw}.xcframework (symlinked)"
         done
     elif [[ "${DOWNLOAD_CISCO}" == "true" ]]; then
-        # Legacy mode only: Package.swift now intentionally points to static
-        # Cisco artifacts, so this must never be the default xcframework path.
-        log "Downloading Cisco xcframeworks from Package.swift registry (legacy mode)"
-        "${SCRIPT_DIR}/download-cisco-xcframeworks.sh" --output-dir "${DEPS_DIR}"
+        log "Downloading Cisco xcframeworks from the Package.swift registry"
+        bash "${SCRIPT_DIR}/download-cisco-xcframeworks.sh" --output-dir "${DEPS_DIR}"
     else
         log "Using Cisco xcframeworks already staged in ${DEPS_DIR}"
-
-        for fw in "${CISCO_FRAMEWORKS[@]}"; do
-            dst="${DEPS_DIR}/${fw}.xcframework"
-
-            if [[ ! -d "${dst}" ]]; then
-                echo "ERROR: Cisco xcframework not found: ${dst}"
-                echo "  Run build-cisco-xcframeworks.sh first with SESSION_REPLAY_LOCAL_PATH set,"
-                echo "  or pass --cisco-path with prebuilt dynamic Cisco xcframeworks."
-                exit 1
-            fi
-        done
     fi
+
+    for fw in "${CISCO_FRAMEWORKS[@]}"; do
+        dst="${DEPS_DIR}/${fw}.xcframework"
+
+        if [[ ! -d "${dst}" ]]; then
+            echo "ERROR: Cisco xcframework not found: ${dst}"
+            echo "  Run build-cisco-xcframeworks.sh first, use --download-cisco,"
+            echo "  or pass --cisco-path with prebuilt Cisco xcframeworks."
+            exit 1
+        fi
+    done
 fi
 
 
 # ---------------------------------------------------------------------------
-# Step 4: Link PLCrashReporter xcframework (built from source)
-# ---------------------------------------------------------------------------
-
-if [[ "${SKIP_PLCRASH}" == "false" ]]; then
-    log "Linking CrashReporter xcframework from build output"
-
-    PLCRASH_SRC="${OTEL_OUTPUT_DIR}/CrashReporter.xcframework"
-    PLCRASH_DST="${DEPS_DIR}/CrashReporter.xcframework"
-
-    if [[ ! -d "${PLCRASH_SRC}" ]]; then
-        echo "ERROR: CrashReporter.xcframework not found at ${PLCRASH_SRC}"
-        echo "  Run build-plcrash-xcframeworks.sh first."
-        exit 1
-    fi
-
-    rm -rf "${PLCRASH_DST}"
-    ln -s "${PLCRASH_SRC}" "${PLCRASH_DST}"
-    echo "  ✓ CrashReporter.xcframework (symlinked from build output)"
-fi
-
-
-# ---------------------------------------------------------------------------
-# Step 5: Copy Cisco xcframeworks into the output directory
+# Step 4: Copy Cisco xcframeworks into the output directory
 # ---------------------------------------------------------------------------
 # The output/ directory is the single distribution artifact. It already
-# contains built-from-source frameworks (OTel, PLCrash, Agent modules).
+# contains built-from-source frameworks (OTel and Agent modules).
 # Cisco SR frameworks are pre-built externals that also need to be in
 # the output so customers get everything from one folder.
 
@@ -224,7 +203,7 @@ fi
 
 
 # ---------------------------------------------------------------------------
-# Step 6: Verify
+# Step 5: Verify
 # ---------------------------------------------------------------------------
 
 log "Dependencies directory contents:"

@@ -53,4 +53,13 @@ extension CustomTrackingNonOperational {
         logAccess(toApi: "trackException(exception:attributes:)")
         return self
     }
+
+
+    // MARK: - Track Errors with an explicit stacktrace
+
+    @discardableResult
+    func trackError(typeName _: String, message _: String, stacktrace _: String?, attributes _: [String: Any] = [:]) -> any CustomTrackingModule {
+        logAccess(toApi: "trackError(typeName:message:stacktrace:attributes:)")
+        return self
+    }
 }

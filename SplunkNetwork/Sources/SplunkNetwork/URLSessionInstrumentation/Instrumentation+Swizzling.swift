@@ -30,20 +30,21 @@ extension URLSessionTask {
         if !isSupportedTask(task: self) {
             return
         }
-        if state == Self.State.running {
+        // Only a completed task has stable response, metrics, and error information. Suspended and
+        // canceling are intermediate states and must not finalize the span.
+        guard shouldFinalizeNetworkSpan(for: state) else {
             return
         }
+
         if currentRequest?.url == nil {
             return
         }
 
-        // Check for span from task creation first, then from resume
-        let span = getCreationSpan(for: self) ?? objc_getAssociatedObject(self, &associatedKeySpanResume) as? Span
-        guard let span else {
+        guard let finalizationCoordinator = getSpanFinalizationCoordinator(for: self) else {
             return
         }
 
-        endHttpSpan(span: span, task: self)
+        finalizationCoordinator.finalize(task: self)
     }
 
     @objc
@@ -58,12 +59,15 @@ extension URLSessionTask {
             return
         }
 
-        // For tasks instrumented at creation time, record the actual network start.
-        // The span is started at creation (required for traceparent header injection),
-        // but actual network activity only begins at resume. The event allows downstream
-        // systems to compute accurate network duration.
+        // For tasks instrumented at creation time, start the telemetry watchdog at the first
+        // resume. The span is created earlier (required for traceparent header injection), but
+        // actual network activity only begins at resume.
         if wasInstrumentedAtCreation(self) {
-            getCreationSpan(for: self)?.addEvent(name: "http.request.started")
+            getSpanFinalizationCoordinator(for: self)?.start(task: self)
+            return
+        }
+
+        if wasSkippedForInstrumentation(self) {
             return
         }
 
@@ -75,11 +79,20 @@ extension URLSessionTask {
 
         // Fallback: create span at resume time (no header injection possible).
         // Covers tasks created before agent initialization or via un-swizzled APIs.
-        startHttpSpan(request: currentRequest)
-            .map { span in
-                objc_setAssociatedObject(self, &associatedKeySpanResume, span, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
-            }
+        guard let span = startHttpSpan(request: currentRequest) else {
+            return
+        }
+
+        let finalizationCoordinator = NetworkSpanFinalizationCoordinator(span: span)
+        objc_setAssociatedObject(self, &associatedKeySpanResume, span, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
+        setSpanFinalizationCoordinator(finalizationCoordinator, for: self)
+        finalizationCoordinator.start(task: self)
     }
+}
+
+/// Returns whether a URL session task state has stable terminal response information.
+func shouldFinalizeNetworkSpan(for state: URLSessionTask.State) -> Bool {
+    state == .completed
 }
 
 /// Swizzles two methods on a given class.
@@ -151,9 +164,24 @@ func swizzleUrlSession() {
 
     let setStateSelector = NSSelectorFromString("setState:")
     let resumeSelector = NSSelectorFromString("resume")
+    let resumeImplementations = classes.compactMap { classToSwizzle -> (AnyClass, UInt)? in
+        guard let method = class_getInstanceMethod(classToSwizzle, resumeSelector) else {
+            return nil
+        }
+
+        return (classToSwizzle, UInt(bitPattern: method_getImplementation(method)))
+    }
+    var swizzledResumeImplementations = Set<UInt>()
 
     for classToSwizzle in classes {
         swizzle(oneClass: classToSwizzle, original: setStateSelector, swizzled: #selector(URLSessionTask.splunkSwizzledSetState(state:)))
+
+        guard let resumeImplementation = resumeImplementations.first(where: { $0.0 === classToSwizzle })?.1,
+            swizzledResumeImplementations.insert(resumeImplementation).inserted
+        else {
+            continue
+        }
+
         swizzle(oneClass: classToSwizzle, original: resumeSelector, swizzled: #selector(URLSessionTask.splunkSwizzledResume))
     }
 }

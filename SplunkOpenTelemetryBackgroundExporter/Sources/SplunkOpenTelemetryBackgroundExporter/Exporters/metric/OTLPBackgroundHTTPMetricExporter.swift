@@ -41,13 +41,7 @@ public class OTLPBackgroundHTTPMetricExporter: OTLPBackgroundHTTPBaseExporter, M
 
             // If no endpoint is configured, store in pending folder for later
             if isPendingEndpoint {
-                try diskStorage.insert(
-                    storeData,
-                    forKey: KeyBuilder(
-                        requestId.uuidString,
-                        parrentKeyBuilder: getPendingStorageKey()
-                    )
-                )
+                try storePendingData(storeData, requestId: requestId)
                 return .success
             }
 
@@ -94,14 +88,7 @@ public class OTLPBackgroundHTTPMetricExporter: OTLPBackgroundHTTPBaseExporter, M
     }
 
     public func flush() -> ExportResult {
-        let semaphore = DispatchSemaphore(value: 0)
-
-        httpClient.flush {
-            semaphore.signal()
-        }
-        semaphore.wait()
-
-        return .success
+        flushHTTPClient() ? .success : .failure
     }
 
     public func shutdown() -> ExportResult {

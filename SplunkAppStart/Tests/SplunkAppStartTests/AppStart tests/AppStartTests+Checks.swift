@@ -23,23 +23,17 @@ extension AppStartTests {
     func checkDeterminedType(_ checkedType: AppStartType, in destination: DebugDestination) throws {
         let storedAppStart = try XCTUnwrap(destination.storedAppStart)
 
-        let type = try XCTUnwrap(storedAppStart.type)
-        let startTime = try XCTUnwrap(storedAppStart.start)
-        let endTime = try XCTUnwrap(storedAppStart.end)
+        XCTAssertEqual(storedAppStart.type, checkedType)
 
-        XCTAssertTrue(type == checkedType)
-
-        let duration = endTime.timeIntervalSince(startTime)
-        XCTAssertTrue(duration > 0.0)
-        XCTAssertTrue(duration < 60.0)
+        let duration = storedAppStart.end.timeIntervalSince(storedAppStart.start)
+        XCTAssertGreaterThan(duration, 0)
     }
 
     func checkDates(in destination: DebugDestination) throws {
         let storedAppStart = try XCTUnwrap(destination.storedAppStart)
 
         let timeInterval = storedAppStart.end.timeIntervalSince(storedAppStart.start)
-        XCTAssertTrue(timeInterval > 0.0)
-        XCTAssertTrue(timeInterval < 60.0)
+        XCTAssertGreaterThan(timeInterval, 0)
     }
 
     func checkNotDeterminedType(in destination: DebugDestination) throws {

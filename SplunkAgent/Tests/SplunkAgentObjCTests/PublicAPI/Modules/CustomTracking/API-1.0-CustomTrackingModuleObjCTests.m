@@ -87,4 +87,25 @@ limitations under the License.
     XCTAssertNoThrow([agent.customTracking trackException:exception attributes:attrs]);
 }
 
+- (void)testTrackError_withExplicitStacktrace {
+    SPLKAgent *agent = [AgentTestBuilderObjC buildDefault];
+    XCTAssertNoThrow([agent.customTracking trackErrorWithType:@"TypeError"
+                                                      message:@"x is not a function"
+                                                   stacktrace:@"at f (index.bundle:1:537284)"]);
+}
+
+- (void)testTrackError_withExplicitStacktrace_andAttributes {
+    SPLKAgent *agent = [AgentTestBuilderObjC buildDefault];
+    NSDictionary<NSString *, SPLKAttributeValue *> *attrs = [self sampleAttributes];
+    XCTAssertNoThrow([agent.customTracking trackErrorWithType:@"TypeError"
+                                                      message:@"x is not a function"
+                                                   stacktrace:@"at f (index.bundle:1:537284)"
+                                                   attributes:attrs]);
+}
+
+- (void)testTrackError_withExplicitStacktrace_nilStacktrace {
+    SPLKAgent *agent = [AgentTestBuilderObjC buildDefault];
+    XCTAssertNoThrow([agent.customTracking trackErrorWithType:@"Error" message:@"Something failed" stacktrace:nil]);
+}
+
 @end

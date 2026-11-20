@@ -37,7 +37,8 @@ final class AgentTestBuilder {
     ) throws -> SplunkRum {
         // Custom key-value storage instance with different keys for testing
         let storage = UserDefaultsStorageTestBuilder.buildCleanStorage(named: "com.splunk.rum.test.")
-        let apiClient = try APIClientTestBuilder.buildError()
+        // A client that sends no request, so the agent never fetches the remote configuration
+        let apiClient = NoRequestAPIClient()
 
         let handler = ConfigurationHandler(
             for: configuration,

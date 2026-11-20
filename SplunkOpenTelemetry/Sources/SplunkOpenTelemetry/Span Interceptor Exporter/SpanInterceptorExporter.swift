@@ -21,6 +21,35 @@ import SplunkCommon
 
 public typealias SplunkSpanInterceptor = (SpanData) -> SpanData?
 
+/// Rewrites network span start time from task-creation time to the actual request start event.
+///
+/// Network instrumentation creates a span before `resume()` so it can inject `traceparent`. The
+/// request-start event is the authoritative beginning of network activity and is therefore used
+/// for the exported duration. Invalid or incomplete event timing is left unchanged.
+func normalizeNetworkSpanStartTime(_ span: SpanData) -> SpanData {
+    guard span.instrumentationScope.name == NetworkInstrumentationConstants.instrumentationName,
+        span.name.hasPrefix(NetworkInstrumentationConstants.httpSpanNamePrefix)
+    else {
+        return span
+    }
+
+    var requestStarted: Date?
+    for event in span.events where event.name == NetworkInstrumentationConstants.requestStartedEventName {
+        requestStarted = event.timestamp
+        break
+    }
+
+    guard let requestStarted,
+        requestStarted >= span.startTime,
+        requestStarted <= span.endTime
+    else {
+        return span
+    }
+
+    var normalized = span
+    return normalized.settingStartTime(requestStarted)
+}
+
 class SpanInterceptorExporter: SpanExporter {
 
     // MARK: - Private
@@ -29,12 +58,27 @@ class SpanInterceptorExporter: SpanExporter {
 
     private let proxyExporter: SpanExporter
 
+    private let didIntercept: (([SpanData]) -> Void)?
+
 
     // MARK: - Initialization
 
-    init(with interceptor: SplunkSpanInterceptor?, proxy: SpanExporter) {
+    /// Initializes the exporter.
+    ///
+    /// - Parameters:
+    ///   - interceptor: An optional customer interceptor that can modify or drop spans.
+    ///   - proxy: The exporter that receives the spans.
+    ///   - didIntercept: An optional closure called with the spans that remain after interception,
+    ///     right before they are passed on to `proxy`. It is called on the export thread for every
+    ///     exported batch, so it must return quickly and must not block.
+    init(
+        with interceptor: SplunkSpanInterceptor?,
+        proxy: SpanExporter,
+        didIntercept: (([SpanData]) -> Void)? = nil
+    ) {
         spanInterceptor = interceptor
         proxyExporter = proxy
+        self.didIntercept = didIntercept
     }
 
 
@@ -48,7 +92,7 @@ class SpanInterceptorExporter: SpanExporter {
         proxyExporter.flush(explicitTimeout: explicitTimeout)
     }
 
-    func export(spans: [OpenTelemetrySdk.SpanData], explicitTimeout _: TimeInterval?) -> OpenTelemetrySdk.SpanExporterResultCode {
+    func export(spans: [OpenTelemetrySdk.SpanData], explicitTimeout: TimeInterval?) -> OpenTelemetrySdk.SpanExporterResultCode {
 
         // Create thread-isolated copies to prevent CoW data races.
         //
@@ -56,11 +100,16 @@ class SpanInterceptorExporter: SpanExporter {
         // When captured in async closures (e.g., by SimpleSpanProcessor), the
         // dictionary storage is shared. If the original goes out of scope while
         // the closure executes, reference count operations can race, causing crashes.
-        let isolatedSpans = spans.map { $0.isolatedCopy() }
+        let isolatedSpans =
+            spans
+            .map(normalizeNetworkSpanStartTime)
+            .map { $0.isolatedCopy() }
 
         // Simply re-export the spans if no interceptor was set.
         guard let spanInterceptor else {
-            return proxyExporter.export(spans: isolatedSpans)
+            didIntercept?(isolatedSpans)
+
+            return proxyExporter.export(spans: isolatedSpans, explicitTimeout: explicitTimeout)
         }
 
         // Invoke the interceptor and only pass through non-nil spans.
@@ -91,6 +140,8 @@ class SpanInterceptorExporter: SpanExporter {
             return span
         }
 
-        return proxyExporter.export(spans: recalculatedSpans)
+        didIntercept?(recalculatedSpans)
+
+        return proxyExporter.export(spans: recalculatedSpans, explicitTimeout: explicitTimeout)
     }
 }

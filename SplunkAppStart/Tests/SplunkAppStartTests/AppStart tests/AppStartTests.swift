@@ -17,207 +17,331 @@ limitations under the License.
 
 import XCTest
 
-@testable import SplunkAppStart
+@_spi(SplunkInternal) @testable import SplunkAppStart
 
 final class AppStartTests: XCTestCase {
+
+    // MARK: - Process and observation
 
     func testProcessStart() throws {
         let appStart = AppStart()
         let processStart = try XCTUnwrap(appStart.processStartTime())
 
-        let duration = Date().timeIntervalSince(processStart)
-        XCTAssert(duration > 0.0)
-        XCTAssert(duration < 60.0)
+        let processAge = Date().timeIntervalSince(processStart)
+        XCTAssertGreaterThan(processAge, 0)
+        XCTAssertLessThanOrEqual(
+            processAge,
+            ProcessInfo.processInfo.systemUptime
+        )
+    }
+}
+
+extension AppStartTests {
+
+    // MARK: - Initial classification
+
+    func testDelayedHybridHandoffUsesCapturedActivationAsEnd() throws {
+        let processStart = Date(timeIntervalSinceReferenceDate: 2_000)
+        let didBecomeActive = processStart.addingTimeInterval(0.287)
+        let (appStart, destination) = configuredAppStart(processStart: processStart)
+
+        appStart.track(
+            initialLifecycle: AppStartLifecycleSnapshot(
+                launchOrigin: .foreground,
+                didFinishLaunching: processStart.addingTimeInterval(0.1),
+                willEnterForeground: nil,
+                didBecomeActive: didBecomeActive
+            )
+        )
+
+        let span = try XCTUnwrap(destination.storedAppStart)
+        XCTAssertEqual(span.end, didBecomeActive)
+        XCTAssertEqual(span.end.timeIntervalSince(span.start), 0.287, accuracy: 0.000001)
     }
 
-    func testStart() throws {
-        let destination = DebugDestination()
+    func testBackgroundResidenceIsExcludedFromWarmStart() throws {
+        let processStart = Date(timeIntervalSinceReferenceDate: 3_000)
+        let foreground = processStart.addingTimeInterval(3 * 60 * 60)
+        let active = foreground.addingTimeInterval(0.4)
+        let (appStart, destination) = configuredAppStart(processStart: processStart)
 
-        let appStart = AppStart()
-        appStart.processStartTimestamp = Date()
-        appStart.destination = destination
+        appStart.track(
+            initialLifecycle: AppStartLifecycleSnapshot(
+                launchOrigin: .background,
+                didFinishLaunching: processStart.addingTimeInterval(0.1),
+                willEnterForeground: foreground,
+                didBecomeActive: active
+            )
+        )
 
-        appStart.startDetection()
-
-        simulateColdStartNotifications()
-
-        // Check type and dates
-        try checkDeterminedType(.cold, in: destination)
-        try checkDates(in: destination)
+        let span = try XCTUnwrap(destination.storedAppStart)
+        XCTAssertEqual(span.type, .warm)
+        XCTAssertEqual(span.start, foreground)
+        XCTAssertEqual(span.end, active)
+        XCTAssertEqual(span.end.timeIntervalSince(span.start), 0.4, accuracy: 0.000001)
     }
 
-    func testStop() throws {
-        let destination = DebugDestination()
+    func testBackgroundLaunchWaitsForFutureForeground() throws {
+        let processStart = Date(timeIntervalSinceReferenceDate: 4_000)
+        let foreground = processStart.addingTimeInterval(4 * 60 * 60)
+        let active = foreground.addingTimeInterval(0.5)
+        let (appStart, destination) = configuredAppStart(processStart: processStart)
 
-        let appStart = AppStart()
-        appStart.destination = destination
+        appStart.track(
+            initialLifecycle: AppStartLifecycleSnapshot(
+                launchOrigin: .background,
+                didFinishLaunching: processStart.addingTimeInterval(0.1),
+                willEnterForeground: nil,
+                didBecomeActive: nil
+            )
+        )
 
-        appStart.startDetection()
-        appStart.stopDetection()
+        XCTAssertNil(destination.storedAppStart)
+        XCTAssertNil(appStart.suppressionReason)
 
-        simulateColdStartNotifications()
+        appStart.process(event: .willEnterForeground(foreground))
+        appStart.process(event: .didBecomeActive(active))
 
-        // Check type and dates
-        try checkNotDeterminedType(in: destination)
+        let span = try XCTUnwrap(destination.storedAppStart)
+        XCTAssertEqual(span.type, .warm)
+        XCTAssertEqual(span.start, foreground)
+        XCTAssertEqual(span.end, active)
     }
 
-    func testColdStart() throws {
-        let destination = DebugDestination()
+    func testBackgroundLaunchWithoutForegroundSuppressesAtTermination() {
+        let (appStart, destination) = configuredAppStart()
+        appStart.track(
+            initialLifecycle: AppStartLifecycleSnapshot(
+                launchOrigin: .background,
+                didFinishLaunching: Date(),
+                willEnterForeground: nil,
+                didBecomeActive: nil
+            )
+        )
 
-        let appStart = AppStart()
-        appStart.processStartTimestamp = Date()
-        appStart.destination = destination
-        appStart.install(with: nil, remoteConfiguration: nil)
+        appStart.process(event: .willTerminate)
 
-        simulateColdStartNotifications()
-
-        // Check type and dates
-        try checkDeterminedType(.cold, in: destination)
-        try checkDates(in: destination)
-
-        // Check events
-        let events = try XCTUnwrap(destination.storedAppStart?.events)
-        XCTAssertTrue(events.count >= 4)
-
-        // Check event sorting
-        var testedDate = Date(timeIntervalSince1970: 0)
-        for event in events {
-            XCTAssertTrue(event.timestamp > testedDate)
-            testedDate = event.timestamp
-        }
+        XCTAssertNil(destination.storedAppStart)
+        XCTAssertEqual(appStart.suppressionReason, .backgroundWithoutForeground)
     }
 
-    func testPrewarmStart() throws {
-        let destination = DebugDestination()
-
-        let appStart = AppStart()
-        appStart.destination = destination
-        appStart.install(with: nil, remoteConfiguration: nil)
+    func testPrewarmTakesPrecedenceOverForegroundSnapshot() throws {
+        let processStart = Date(timeIntervalSinceReferenceDate: 5_000)
+        let foreground = processStart.addingTimeInterval(120)
+        let active = foreground.addingTimeInterval(0.3)
+        let (appStart, destination) = configuredAppStart(processStart: processStart)
         appStart.prewarmDetected = true
 
-        simulateWarmStartNotifications()
+        appStart.track(
+            initialLifecycle: AppStartLifecycleSnapshot(
+                launchOrigin: .foreground,
+                didFinishLaunching: processStart.addingTimeInterval(0.1),
+                willEnterForeground: foreground,
+                didBecomeActive: active
+            )
+        )
 
-        // Check type and dates
-        try checkDeterminedType(.warm, in: destination)
-        try checkDates(in: destination)
+        let span = try XCTUnwrap(destination.storedAppStart)
+        XCTAssertEqual(span.type, .warm)
+        XCTAssertEqual(span.start, foreground)
     }
 
-    /// Tests that when the app is launched in background (backgroundLaunchDetected = true),
-    /// a warm start is correctly reported.
-    ///
-    /// Note: We manually set `backgroundLaunchDetected = true` because UIApplication.shared.applicationState
-    /// cannot be mocked in unit tests. In production, this flag is set automatically in the
-    /// `willEnterForegroundNotification` handler when `applicationState == .background` or when
-    /// more than 10 seconds have passed since `didFinishLaunching`.
-    func testBackgroundStart() throws {
-        let destination = DebugDestination()
+    func testPrewarmWithoutForegroundBoundaryIsSuppressed() {
+        let processStart = Date(timeIntervalSinceReferenceDate: 5_500)
+        let (appStart, destination) = configuredAppStart(processStart: processStart)
+        appStart.prewarmDetected = true
 
-        let appStart = AppStart()
-        appStart.backgroundLaunchDetected = true
-        appStart.destination = destination
-        appStart.install(with: nil, remoteConfiguration: nil)
+        appStart.track(
+            initialLifecycle: AppStartLifecycleSnapshot(
+                launchOrigin: .unknown,
+                didFinishLaunching: processStart.addingTimeInterval(0.1),
+                willEnterForeground: nil,
+                didBecomeActive: processStart.addingTimeInterval(1)
+            )
+        )
 
-        simulateWarmStartNotifications()
-
-        // Check type and dates
-        try checkDeterminedType(.warm, in: destination)
-        try checkDates(in: destination)
+        XCTAssertNil(destination.storedAppStart)
+        XCTAssertEqual(appStart.suppressionReason, .missingForegroundBoundary)
     }
 
-    /// Tests the timing-based background launch detection.
-    /// This simulates an app that:
-    /// 1. Starts in background (didFinishLaunching fires more than 10 seconds ago)
-    /// 2. Stays in background for a while
-    /// 3. User brings app to foreground (willEnterForeground, didBecomeActive fire)
-    ///
-    /// The backgroundLaunchDetected flag should be automatically set to true
-    /// because more than 10 seconds have passed since didFinishLaunching,
-    /// resulting in a warm start instead of a cold start with hours-long duration.
-    func testBackgroundLaunchDetectedByTiming() throws {
-        let destination = DebugDestination()
+    func testIncompleteUnknownHandoffCannotBecomeLongColdStart() {
+        let processStart = Date(timeIntervalSinceReferenceDate: 5_750)
+        let foreground = processStart.addingTimeInterval(4 * 60 * 60)
+        let active = foreground.addingTimeInterval(0.4)
+        let (appStart, destination) = configuredAppStart(processStart: processStart)
 
-        let appStart = AppStart()
-        appStart.destination = destination
-        appStart.install(with: nil, remoteConfiguration: nil)
+        appStart.track(
+            initialLifecycle: AppStartLifecycleSnapshot(
+                launchOrigin: .unknown,
+                didFinishLaunching: processStart.addingTimeInterval(0.1),
+                willEnterForeground: nil,
+                didBecomeActive: nil
+            )
+        )
+        appStart.process(event: .willEnterForeground(foreground))
+        appStart.process(event: .didBecomeActive(active))
 
-        // Simulate didFinishLaunching happened more than 10 seconds ago
-        // (app was launched in background and stayed there)
-        appStart.didFinishLaunchingTimestamp = Date().addingTimeInterval(-15.0)
+        XCTAssertNil(destination.storedAppStart)
+        XCTAssertEqual(appStart.suppressionReason, .unknownLaunchOrigin)
+    }
+}
 
-        // Now simulate user bringing app to foreground
-        // The willEnterForeground handler should detect this as a background launch
-        // because more than 10 seconds have passed since didFinishLaunching
-        simulateWarmStartNotifications()
+extension AppStartTests {
 
-        // Verify backgroundLaunchDetected was set to true by the timing check
-        XCTAssertTrue(appStart.backgroundLaunchDetected == true, "backgroundLaunchDetected should be true due to timing check")
+    // MARK: - Suppression and validation
 
-        // Should be warm start, NOT cold start
-        try checkDeterminedType(.warm, in: destination)
-        try checkDates(in: destination)
+    func testAmbiguousLegacyForegroundHandoffIsSuppressed() {
+        let processStart = Date(timeIntervalSinceReferenceDate: 6_000)
+        let (appStart, destination) = configuredAppStart(processStart: processStart)
+
+        appStart.track(
+            didBecomeActive: processStart.addingTimeInterval(1),
+            didFinishLaunching: processStart.addingTimeInterval(0.2),
+            willEnterForeground: nil
+        )
+
+        XCTAssertNil(destination.storedAppStart)
+        XCTAssertEqual(appStart.suppressionReason, .unknownLaunchOrigin)
     }
 
-    func testHotStart() throws {
-        let destination = DebugDestination()
+    func testNativeForegroundBoundaryWithoutLaunchEvidenceIsNotClassified() {
+        let processStart = Date(timeIntervalSinceReferenceDate: 6_500)
+        let foreground = processStart.addingTimeInterval(3 * 60 * 60)
+        let (appStart, destination) = configuredAppStart(processStart: processStart)
 
-        let appStart = AppStart()
-        appStart.destination = destination
-        appStart.install(with: nil, remoteConfiguration: nil)
+        appStart.process(event: .willEnterForeground(foreground))
+        appStart.process(event: .didBecomeActive(foreground.addingTimeInterval(0.2)))
 
-        simulateHotStartNotifications()
+        XCTAssertNil(destination.storedAppStart)
+        XCTAssertNil(appStart.suppressionReason)
 
-        // Check type and dates
-        try checkDeterminedType(.hot, in: destination)
-        try checkDates(in: destination)
+        appStart.process(event: .didEnterBackground)
+
+        XCTAssertEqual(appStart.suppressionReason, .unknownLaunchOrigin)
     }
 
-    func testNoDidFinishLaunching() throws {
-        let destination = DebugDestination()
+    func testLegacyForegroundBoundaryWithoutProvenanceIsSuppressed() {
+        let processStart = Date(timeIntervalSinceReferenceDate: 7_000)
+        let foreground = processStart.addingTimeInterval(60)
+        let active = foreground.addingTimeInterval(0.2)
+        let (appStart, destination) = configuredAppStart(processStart: processStart)
 
-        let appStart = AppStart()
-        appStart.destination = destination
-        appStart.install(with: nil, remoteConfiguration: nil)
+        appStart.track(
+            didBecomeActive: active,
+            didFinishLaunching: processStart.addingTimeInterval(0.1),
+            willEnterForeground: foreground
+        )
 
-        simulateStartNotificationsWithNoDidFinishLaunching()
-
-        try checkDeterminedType(.cold, in: destination)
+        XCTAssertNil(destination.storedAppStart)
+        XCTAssertEqual(appStart.suppressionReason, .unknownLaunchOrigin)
     }
 
-    func testManualTrackWithFullParameters() throws {
-        let destination = DebugDestination()
+    func testReversedTimestampsAreSuppressed() {
+        let processStart = Date(timeIntervalSinceReferenceDate: 8_000)
+        let (appStart, destination) = configuredAppStart(processStart: processStart)
 
-        let appStart = AppStart()
-        appStart.processStartTimestamp = Date()
-        appStart.destination = destination
+        appStart.track(
+            initialLifecycle: AppStartLifecycleSnapshot(
+                launchOrigin: .foreground,
+                didFinishLaunching: processStart.addingTimeInterval(2),
+                willEnterForeground: nil,
+                didBecomeActive: processStart.addingTimeInterval(1)
+            )
+        )
 
-        appStart.startDetection()
-
-        let didFinishLaunching = Date()
-        let willEnterForeground = Date()
-        let didBecomeActive = Date()
-
-        appStart.track(didBecomeActive: didBecomeActive, didFinishLaunching: didFinishLaunching, willEnterForeground: willEnterForeground)
-
-        // Check type and dates
-        try checkDeterminedType(.cold, in: destination)
-        try checkDates(in: destination)
+        XCTAssertNil(destination.storedAppStart)
+        XCTAssertEqual(appStart.suppressionReason, .invalidTimestampOrder)
     }
 
-    func testManualTrackWithMinimumParameters() throws {
-        let destination = DebugDestination()
+    func testForegroundBeforeLaunchTimestampIsSuppressed() {
+        let processStart = Date(timeIntervalSinceReferenceDate: 8_500)
+        let foreground = processStart.addingTimeInterval(1)
+        let (appStart, destination) = configuredAppStart(processStart: processStart)
 
+        appStart.track(
+            initialLifecycle: AppStartLifecycleSnapshot(
+                launchOrigin: .background,
+                didFinishLaunching: foreground.addingTimeInterval(1),
+                willEnterForeground: foreground,
+                didBecomeActive: foreground.addingTimeInterval(2)
+            )
+        )
+
+        XCTAssertNil(destination.storedAppStart)
+        XCTAssertEqual(appStart.suppressionReason, .invalidTimestampOrder)
+    }
+
+    func testNonFiniteTimestampIsSuppressed() {
+        let processStart = Date(timeIntervalSinceReferenceDate: 9_000)
+        let (appStart, destination) = configuredAppStart(processStart: processStart)
+
+        appStart.track(
+            initialLifecycle: AppStartLifecycleSnapshot(
+                launchOrigin: .foreground,
+                didFinishLaunching: nil,
+                willEnterForeground: nil,
+                didBecomeActive: Date(timeIntervalSinceReferenceDate: .infinity)
+            )
+        )
+
+        XCTAssertNil(destination.storedAppStart)
+        XCTAssertEqual(appStart.suppressionReason, .invalidTimestampOrder)
+    }
+
+    func testInitialMeasurementIsEmittedExactlyOnce() {
+        let processStart = Date(timeIntervalSinceReferenceDate: 10_000)
+        let active = processStart.addingTimeInterval(1)
+        let (appStart, destination) = configuredAppStart(processStart: processStart)
+        let snapshot = AppStartLifecycleSnapshot(
+            launchOrigin: .foreground,
+            didFinishLaunching: processStart.addingTimeInterval(0.1),
+            willEnterForeground: nil,
+            didBecomeActive: active
+        )
+
+        appStart.track(initialLifecycle: snapshot)
+        appStart.track(initialLifecycle: snapshot)
+        appStart.process(event: .didBecomeActive(active.addingTimeInterval(1)))
+
+        XCTAssertEqual(destination.storedAppStarts.count, 1)
+    }
+
+    func testConflictingNativeAndHybridOriginsAreSuppressed() {
+        let processStart = Date(timeIntervalSinceReferenceDate: 10_500)
+        let (appStart, destination) = configuredAppStart(processStart: processStart)
+
+        appStart.process(
+            event: .didFinishLaunching(
+                processStart.addingTimeInterval(0.05),
+                .background
+            )
+        )
+        appStart.track(
+            initialLifecycle: AppStartLifecycleSnapshot(
+                launchOrigin: .foreground,
+                didFinishLaunching: processStart.addingTimeInterval(0.1),
+                willEnterForeground: nil,
+                didBecomeActive: processStart.addingTimeInterval(1)
+            )
+        )
+
+        XCTAssertNil(destination.storedAppStart)
+        XCTAssertEqual(appStart.suppressionReason, .conflictingLaunchOrigin)
+    }
+}
+
+extension AppStartTests {
+
+    // MARK: - Helpers
+
+    func configuredAppStart(
+        processStart: Date = Date(timeIntervalSinceReferenceDate: 100)
+    ) -> (AppStart, DebugDestination) {
+        let destination = DebugDestination()
         let appStart = AppStart()
-        appStart.processStartTimestamp = Date()
+        appStart.processStartTimestamp = processStart
         appStart.destination = destination
 
-        appStart.startDetection()
-
-        let didBecomeActive = Date()
-
-        appStart.track(didBecomeActive: didBecomeActive, didFinishLaunching: nil, willEnterForeground: nil)
-
-        // Check type and dates
-        try checkDeterminedType(.cold, in: destination)
-        try checkDates(in: destination)
+        return (appStart, destination)
     }
 }

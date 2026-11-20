@@ -38,7 +38,7 @@ final class SlowFrameDetector: SlowFrameDetectorModule, SlowFrameDetectorModuleS
         module.isEnabled
     }
 
-    // MARK: - InitializationSplunkSlowFrameDetector.SlowFrameDetector.configuration
+    // MARK: - Initialization
 
     init(for module: SplunkSlowFrameDetector.SlowFrameDetector) {
         self.module = module

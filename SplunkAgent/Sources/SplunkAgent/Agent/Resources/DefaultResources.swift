@@ -26,6 +26,8 @@ struct DefaultResources: AgentResources {
 
     var appVersion: String
 
+    var appPreviousVersion: String?
+
     var appBuild: String
 
     var appDeploymentEnvironment: String

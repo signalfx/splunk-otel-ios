@@ -124,6 +124,39 @@ final class AdditionalTaskSwizzlingTests: XCTestCase {
 
     // MARK: - Download Task Completion Handler Tests
 
+    func testDataTaskWithExistingTraceparent_CreatesSpanAtResumeWithoutOverwritingHeader() throws {
+        let existingTraceparent = "00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01"
+        let url = URLSessionMockProtocol.url(path: "/headers")
+        var request = URLRequest(url: url)
+        request.setValue(existingTraceparent, forHTTPHeaderField: "traceparent")
+
+        let expectation = expectation(description: "Completion called")
+        var responseBody: Data?
+        let session = URLSession(configuration: URLSessionMockProtocol.configuration())
+
+        let task = session.dataTask(with: request) { data, _, _ in
+            responseBody = data
+            expectation.fulfill()
+        }
+
+        XCTAssertFalse(wasSkippedForInstrumentation(task))
+        XCTAssertFalse(wasInstrumentedAtCreation(task))
+
+        task.resume()
+
+        wait(for: [expectation], timeout: 10.0)
+        waitForSpans(count: 1)
+
+        let body = try XCTUnwrap(responseBody, "Mock protocol should return a response body")
+        let json = try XCTUnwrap(JSONSerialization.jsonObject(with: body) as? [String: Any])
+        let headers = try XCTUnwrap(json["headers"] as? [String: Any])
+        let receivedTraceparent = try XCTUnwrap((headers["Traceparent"] ?? headers["traceparent"]) as? String)
+        XCTAssertEqual(receivedTraceparent, existingTraceparent)
+
+        let spans = Self.exporter.spans.filter { $0.name.starts(with: "HTTP") }
+        XCTAssertEqual(spans.count, 1, "Existing traceparent customer requests should still create one HTTP span")
+    }
+
     func testDownloadTaskWithRequestAndCompletion_CreatesSpan() {
         let url = URLSessionMockProtocol.url()
         let request = URLRequest(url: url)

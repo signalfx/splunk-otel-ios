@@ -22,9 +22,9 @@
 #
 # Environment Variables:
 #   OTEL_VERSION          - OpenTelemetry Swift Core version (read from Package.swift)
-#   SESSION_REPLAY_LOCAL_PATH - Required path to local Session Replay repo for Cisco dynamic xcframeworks
-#   CISCO_XCFRAMEWORKS_PATH - Legacy path to prebuilt dynamic Cisco SR xcframeworks directory
-#   PLCRASH_VERSION       - PLCrashReporter version (read from Package.swift)
+#   SESSION_REPLAY_LOCAL_PATH - Required path to local Session Replay repo for Cisco xcframeworks
+#   CISCO_MACH_O_TYPE - Session Replay output type (mh_dylib by default)
+#   CISCO_XCFRAMEWORKS_PATH - Legacy path to prebuilt Cisco SR xcframeworks directory
 #   SIGNING_IDENTITY      - Code signing identity for codesign
 #   VERSION               - Release version number
 #   IOS_ONLY              - Set to true to build only iOS device and simulator slices
@@ -52,13 +52,13 @@ REPO_ROOT    := $(TOOLS_ROOT)/../..
 PACKAGE_SWIFT := $(REPO_ROOT)/Package.swift
 
 OTEL_VERSION    ?= $(shell awk '/opentelemetry-swift-core/{found=1} found && !/^ *\/\// && /exact:/{gsub(/.*exact: *"/,""); gsub(/".*/,""); print; exit}' $(PACKAGE_SWIFT))
-PLCRASH_VERSION ?= $(shell awk '/plcrashreporter/{found=1} found && !/^ *\/\// && /exact:/{gsub(/.*exact: *"/,""); gsub(/".*/,""); print; exit}' $(PACKAGE_SWIFT))
 SIGNING_IDENTITY        ?=
 VERSION                 ?=
 RELEASE                 ?= false
 IOS_ONLY                ?= false
 SESSION_REPLAY_LOCAL_PATH ?=
 CISCO_XCFRAMEWORKS_PATH ?=
+CISCO_MACH_O_TYPE       ?= mh_dylib
 
 # ---------------------------------------------------------------------------
 # Targets
@@ -78,23 +78,24 @@ help:
 	@echo "Variables:"
 	@echo "  OTEL_VERSION              OTel Swift Core version (default: $(OTEL_VERSION))"
 	@echo "  SESSION_REPLAY_LOCAL_PATH Required path to local Session Replay repo"
-	@echo "  CISCO_XCFRAMEWORKS_PATH   Legacy path to prebuilt dynamic Cisco xcframeworks"
-	@echo "  PLCRASH_VERSION           PLCrashReporter version (default: $(PLCRASH_VERSION))"
+	@echo "  CISCO_MACH_O_TYPE         Session Replay output type (default: mh_dylib)"
+	@echo "  CISCO_XCFRAMEWORKS_PATH   Legacy path to prebuilt Cisco xcframeworks"
 	@echo "  SIGNING_IDENTITY          Apple code signing identity"
 	@echo "  VERSION                   Release version (required for 'make release')"
 	@echo "  RELEASE                   Set to 'true' for release-mode validation"
 	@echo "  IOS_ONLY                  Set to 'true' to build only iOS device and simulator slices"
 
 
-## build: Build all xcframeworks (OTel + PLCrash + Cisco + dependencies + Agent modules)
+## build: Build all xcframeworks (OTel + Cisco + dependencies + Agent modules)
 .PHONY: build
-build: check-session-replay-path build-otel build-plcrash build-cisco populate-deps build-agent
+build: check-session-replay-path build-otel build-cisco populate-deps build-agent
+	IOS_ONLY="$(IOS_ONLY)" $(SCRIPTS_DIR)/generate-xcframework-size-report.sh
 	@echo ""
 	@echo "==> All xcframeworks built successfully"
 	@echo "    Output: $(XCFW_DIR)"
 
 
-## check-session-replay-path: Verify SESSION_REPLAY_LOCAL_PATH is set for dynamic Cisco builds
+## check-session-replay-path: Verify SESSION_REPLAY_LOCAL_PATH is set for Cisco builds
 .PHONY: check-session-replay-path
 check-session-replay-path:
 ifndef SESSION_REPLAY_LOCAL_PATH
@@ -119,18 +120,11 @@ build-otel:
 	OTEL_VERSION=$(OTEL_VERSION) IOS_ONLY=$(IOS_ONLY) $(SCRIPTS_DIR)/build-otel-xcframeworks.sh
 
 
-## build-plcrash: Build CrashReporter (PLCrashReporter) xcframework from source
-.PHONY: build-plcrash
-build-plcrash:
-	@echo "==> Building PLCrashReporter xcframework..."
-	PLCRASH_VERSION=$(PLCRASH_VERSION) IOS_ONLY=$(IOS_ONLY) $(SCRIPTS_DIR)/build-plcrash-xcframeworks.sh
-
-
 ## build-cisco: Build dynamic Cisco Session Replay xcframeworks from local source
 .PHONY: build-cisco
 build-cisco:
-	@echo "==> Building dynamic Cisco Session Replay xcframeworks..."
-	SESSION_REPLAY_LOCAL_PATH="$(SESSION_REPLAY_LOCAL_PATH)" IOS_ONLY=$(IOS_ONLY) $(SCRIPTS_DIR)/build-cisco-xcframeworks.sh
+	@echo "==> Building $(CISCO_MACH_O_TYPE) Cisco Session Replay xcframeworks..."
+	SESSION_REPLAY_LOCAL_PATH="$(SESSION_REPLAY_LOCAL_PATH)" CISCO_MACH_O_TYPE="$(CISCO_MACH_O_TYPE)" IOS_ONLY=$(IOS_ONLY) $(SCRIPTS_DIR)/build-cisco-xcframeworks.sh
 
 
 ## populate-deps: Populate dependencies/ directory with pre-built xcframeworks
@@ -210,16 +204,11 @@ clean:
 	rm -rf $(DEPS_DIR)
 	rm -rf $(TOOLS_ROOT)/otel/vendor
 	rm -rf $(TOOLS_ROOT)/otel/build
-	rm -rf $(TOOLS_ROOT)/plcrash/vendor
-	rm -rf $(TOOLS_ROOT)/plcrash/build
 	# Remove Tuist-generated Xcode projects/workspaces
 	rm -rf $(TOOLS_ROOT)/*.xcodeproj
 	rm -rf $(TOOLS_ROOT)/*.xcworkspace
 	rm -rf $(TOOLS_ROOT)/otel/*.xcodeproj
 	rm -rf $(TOOLS_ROOT)/otel/*.xcworkspace
-	rm -rf $(TOOLS_ROOT)/plcrash/*.xcodeproj
-	rm -rf $(TOOLS_ROOT)/plcrash/*.xcworkspace
 	rm -rf $(TOOLS_ROOT)/Derived
 	rm -rf $(TOOLS_ROOT)/otel/Derived
-	rm -rf $(TOOLS_ROOT)/plcrash/Derived
 	@echo "==> Clean complete"

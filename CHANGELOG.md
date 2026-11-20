@@ -9,7 +9,120 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+* HTTP spans no longer emit a negative response body size when the response length is unknown.
 * Disabled Session Replay wireframe playback when React Native or Flutter version global attributes are present. #668
+
+## [2.6.0] - 2026-11-19
+
+### Added
+
+* Added Swift and Objective-C runtime controls under `sessionReplay.preferences.interactionCapture` for enabling or disabling keyboard, touch, gesture, focus, and rage tap interactions in Session Replay.
+
+### Changed
+
+* Reduced disk reads and memory use when detecting the payload format of recovered uploads by reading only the first byte instead of loading and parsing the entire file.
+* Renamed the span that reports the agent installation from `SplunkRum.initialize` to `SplunkRum.install`, to match the `SplunkRum.install(with:moduleConfigurations:)` method and the Android agent 2.4.0 and later. The span keeps its parent, attributes and events. Apps on earlier agent versions still send `SplunkRum.initialize`, so dashboards, detectors and queries that filter on the span name must match both names. A `spanInterceptor` that matches this span by name must use the new name. DEMRUM-7220
+
+### Fixed
+
+* Fixed the default Session Replay sampling rate after agent installation. When no sampling rate is configured, the effective rate is now 0.2 (20%) as intended.
+* A session that produces no telemetry no longer shows up as an empty session with zero duration. The `session.start` event is now sent with the session's first exported telemetry instead of when the session is created. Spans dropped by a `spanInterceptor` do not count as exported telemetry.
+* Fixed a data race when several threads read the anonymous user ID for the first time at the same moment. The race could crash the app soon after the agent was installed. On the first launch of an app, it could also give some early signals a `user.anonymous_id` that differs from the stored one.
+* WebView instrumentation now skips bridge injection instead of crashing if the JavaScript bridge resource is missing or unreadable.
+
+## [2.5.0] - 2026-11-05
+
+### Added
+
+* Session Replay now captures text content in wireframes for SwiftUI applications.
+
+### Changed
+
+* Updated Cisco Session Replay binaries to 2.0.0.300.
+* The XCFramework release pipeline now includes all 14 Cisco Session Replay modules and an SDK size report for the five added modules. All frameworks are dynamic by default; Cisco Session Replay frameworks can be built as static archives with `CISCO_MACH_O_TYPE=staticlib`.
+
+## [2.4.3] - 2026-10-14
+
+### Changed
+
+* Raised the minimum supported iOS and iPadOS version from 13 to 15. Applications targeting iOS or iPadOS 13 and 14 are no longer supported.
+* Replaced the external PLCrashReporter package dependency with the SDK-owned, symbol-prefixed `SplunkCrashReporter` implementation.
+* Network span start times now use the `http.request.started` timestamp recorded when the task is resumed.
+* Network spans for requests that are never resumed are suppressed.
+* Downloads and uploads use a 30-minute telemetry watchdog; ordinary requests use a 5-minute watchdog without cancelling the application task.
+
+### Fixed
+
+* Fixed network spans remaining open when URLSession does not deliver a terminal callback by ending them at the instrumentation deadline.
+
+### Fixed
+
+* Fixed AppStart classification for delayed and background-launched hybrid applications. AppStart now uses the captured `didBecomeActive` timestamp, requires a one-shot lifecycle snapshot with explicit launch and activation provenance for ambiguous late handoffs, excludes background residence from warm-start duration, and suppresses any resolved cold, warm, or hot span longer than ten seconds. The legacy timestamp-only hybrid handoff is deprecated. DEMRUM-6128
+
+
+## [2.4.2] - 2026-09-09
+
+### Changed
+
+* Set the periodic in-memory trace batch drain interval to 1 second.
+* Added the optional `app.previous_version` resource attribute, which identifies the app version installed immediately before the current version.
+* Updated Cisco Session Replay binaries to 1.1.3.266
+
+### Added
+
+* Added `skills/splunk-rum-ios/` — a skill bundle for coding agents instrumenting customer iOS apps with Splunk RUM. Covers install, endpoint setup, navigation, network, Session Replay, Objective-C, dSYM, and verification workflows.
+
+### Fixed
+
+* Fixed Server-Timing `traceparent` parsing to support bitmask trace flags, including the W3C random trace ID flag.
+* Fixed Server-Timing `traceparent` parsing to reject all-zero trace IDs and span IDs, which are invalid according to the OpenTelemetry trace context requirements.
+* Fixed URLSession network span finalization races that could drop Server-Timing links and response attributes, duplicate attribute processing, or end spans on nonterminal task states.
+* Fixed a crash during `NavigationSplitView` multiwindow resizing on iPad when automated navigation tracking is enabled. Fixes issue #711.
+
+## [2.4.1] - 2026-08-13
+
+### Changed
+
+* Deployment environment resources now use the OpenTelemetry `deployment.environment.name` attribute instead of `deployment.environment`
+
+### Added
+
+* Session Replay segment metadata now includes a `userActivity` field containing Unix-millisecond timestamps of user interactions that occurred during the segment window, enabling timeline visualization in the backend. Timestamps are only collected while Session Replay is recording; disabling `InteractionsConfiguration` does not affect Session Replay segment recording but does prevent user-activity timestamps from being collected because they originate from the Interactions detector. #646
+* Added `customTracking.trackError(typeName:message:stacktrace:attributes:)` for reporting an error with an explicitly supplied stacktrace. Unlike the existing `trackError` overloads, the supplied stack is emitted verbatim as `exception.stacktrace` (no native stack is derived) and the resulting `component=error` span is named after `typeName` (falling back to `"error"`). This is the native emission path for caught JavaScript/Dart errors bridged from the React Native and Flutter agents. A matching Objective-C selector (`trackErrorWithType:message:stacktrace:attributes:`) is also available.
+
+### Fixed
+
+* Improved accuracy of `slowRenders` and `frozenRenders` detection: the detector now derives the expected cadence per frame, counts a continuous freeze once, and makes slow and frozen classifications mutually exclusive. #696
+* Fixed a spurious `frozenRenders` event that could be emitted when the app backgrounded while a frame was in flight. #696
+
+## [2.4.0] - 2026-07-20
+
+### Fixed
+
+* Fixed non-finite floating-point span attributes blocking subsequent trace export from the in-memory batch queue.
+
+### Changed
+
+* Trace spans are now persisted in batches of up to 100 every 0.5 seconds, reducing disk activity and export overhead. Spans still buffered in memory may be lost if the app crashes or is force-terminated.
+
+## [2.3.2] - 2026-07-09
+
+### Added
+
+* Custom error and exception reporting now includes crash-report-style metadata: `crash.processPath`, `exception.images`, and `exception.threads` stack frames with resolved binary image names. Configure via `CustomTrackingConfiguration.includeBinaryImagesOnErrors` (Swift) or `SPLKCustomTrackingConfiguration.includeBinaryImagesOnErrors` (Objective-C). #677
+
+### Changed
+
+* OTLP exporter `User-Agent` headers now identify the Splunk RUM agent version, OS name/version, and OTLP exporter package version. #682
+
+### Fixed
+
+* Fixed SDK-owned exporter uploads incorrectly being emitted as Network Instrumentation HTTP spans. Internal SDK requests are now excluded from network telemetry. #683
+
+## [2.3.1] - 2026-06-15
+
+### Fixed
+
 * Fixed `ShowVC` and `PresentationTransition` timing spans incorrectly emitting `last.screen.name` with the destination screen name instead of the actual previous screen name. #662
 * Fixed automated screen tracking incorrectly firing for internal UIKit controllers `UIEditingOverlayViewController` and `UITrackingElementWindowController`. #667
 * Fixed `app.ui.navigation` spans incorrectly emitting `last.screen.name` with the value `"unknown"` on the first navigation event. The attribute is now omitted when no previous screen has been shown. #661
@@ -86,7 +199,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 * Replaced OTLP binary protobuf with custom JSON encoding to reduce binary size. The SDK now uses `opentelemetry-swift-core` (API/SDK only) instead of the full `opentelemetry-swift` package with protocol exporters. #566
-  
+
 ## [2.0.7] - 2026-02-04
 
 ### Fixed

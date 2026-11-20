@@ -5,7 +5,7 @@ Build tooling for producing signed, multi-platform xcframeworks from the Splunk 
 ## Quick Start
 
 ```bash
-# Full build: OTel + PLCrash + dynamic Cisco + Agent modules
+# Full build: OTel + dynamic Cisco Session Replay + dynamic Agent modules by default
 export SESSION_REPLAY_LOCAL_PATH=/path/to/session-replay-repo
 make build
 
@@ -21,15 +21,14 @@ make smoke-test
 
 ## Build Pipeline
 
-The `make build` target requires `SESSION_REPLAY_LOCAL_PATH` and runs five stages in order:
+The `make build` target requires `SESSION_REPLAY_LOCAL_PATH` and runs four stages in order:
 
 | Stage | Command | What it does |
 |-------|---------|-------------|
 | 1 | `make build-otel` | Clones `opentelemetry-swift-core`, generates a Tuist project, and archives `OpenTelemetryApi` + `OpenTelemetrySdk` for all 7 platform slices, or 2 slices with `IOS_ONLY=true` |
-| 2 | `make build-plcrash` | Clones `PLCrashReporter`, builds it as a **dynamic** framework from source for iOS/tvOS/macCatalyst |
-| 3 | `make build-cisco` | Builds the 9 Cisco Session Replay frameworks as **dynamic** xcframeworks from the local Session Replay checkout |
-| 4 | `make populate-deps` | Stages OTel, PLCrash, and already-built dynamic Cisco xcframeworks into `dependencies/` |
-| 5 | `make build-agent` | Generates the main Tuist workspace and builds all 16 Splunk module xcframeworks |
+| 2 | `make build-cisco` | Builds all 14 Cisco Session Replay frameworks as **dynamic by default** xcframeworks from the local Session Replay checkout |
+| 3 | `make populate-deps` | Stages OTel and already-built dynamic Cisco xcframeworks into `dependencies/` |
+| 4 | `make build-agent` | Generates the main Tuist workspace and builds all Splunk module xcframeworks as dynamic frameworks |
 
 ### Output
 
@@ -39,13 +38,18 @@ All built xcframeworks are placed in `output/xcframeworks/`:
 output/xcframeworks/
 ├── OpenTelemetryApi.xcframework
 ├── OpenTelemetrySdk.xcframework
-├── CrashReporter.xcframework
+├── SplunkCrashReporter.xcframework
 ├── CiscoCommon.xcframework
 ├── CiscoLogger.xcframework
 ├── CiscoEncryption.xcframework
 ├── CiscoSwizzling.xcframework
 ├── CiscoInteractions.xcframework
 ├── CiscoDiskStorage.xcframework
+├── CiscoVideoEncoder.xcframework
+├── CiscoScreenshot.xcframework
+├── CiscoWireframe.xcframework
+├── CiscoDataExporter.xcframework
+├── CiscoSnapshotManager.xcframework
 ├── CiscoSessionReplay.xcframework
 ├── CiscoInstanceManager.xcframework
 ├── CiscoRuntimeCache.xcframework
@@ -67,7 +71,7 @@ output/xcframeworks/
 └── SplunkSessionReplayProxy.xcframework
 ```
 
-Cisco Session Replay xcframeworks are built locally as dynamic frameworks. The Agent `Package.swift` Cisco binary target URLs intentionally point to static artifacts for SPM and are not used by this xcframework release path.
+The default binary distribution builds all Cisco Session Replay, Splunk Agent, OpenTelemetry, and `SplunkCrashReporter` xcframeworks as dynamic frameworks. Set `CISCO_MACH_O_TYPE=staticlib` to build the Cisco Session Replay frameworks as static archives for hybrid consumers; the default is `mh_dylib`. This setting applies only to the Session Replay artifacts. `Package.swift` uses a separate registry of published static Cisco binaries, which this build-output setting does not change. The legacy `populate-dependencies.sh --download-cisco` option is disabled until that registry contains all 14 modules.
 
 ### Platform Matrix
 
@@ -77,7 +81,7 @@ Cisco Session Replay xcframeworks are built locally as dynamic frameworks. The A
 | Cisco modules | arm64 | arm64 | arm64 | arm64+x86_64 |
 | SplunkCrashReports | arm64 | arm64 | -- | arm64 |
 | OpenTelemetryApi/Sdk | arm64 | arm64 | arm64 | arm64+x86_64 |
-| CrashReporter | arm64 | arm64 | -- | arm64+x86_64 |
+| SplunkCrashReporter | arm64 | arm64 | -- | arm64 |
 
 All platforms also include simulator slices (arm64+x86_64).
 
@@ -90,26 +94,28 @@ Key variables in the Makefile:
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `OTEL_VERSION` | `2.3.0` | OpenTelemetry Swift Core tag to build |
-| `PLCRASH_VERSION` | `1.12.0` | PLCrashReporter tag to build |
 | `SESSION_REPLAY_LOCAL_PATH` | *(required)* | Local path to the Session Replay repository |
-| `CISCO_XCFRAMEWORKS_PATH` | *(empty)* | Legacy path to prebuilt dynamic Cisco xcframeworks |
+| `CISCO_MACH_O_TYPE` | `mh_dylib` | Session Replay output type (`mh_dylib` or `staticlib`) |
+| `CISCO_XCFRAMEWORKS_PATH` | *(empty)* | Legacy path to prebuilt Cisco xcframeworks |
 | `IOS_ONLY` | `false` | Build and validate only `ios-arm64` and `ios-arm64_x86_64-simulator` slices |
 
 ---
 
 ## Release
 
-Releasing xcframeworks is currently a local process while the Agent and Session Replay repositories are separate. The local release script builds dynamic Cisco frameworks from `SESSION_REPLAY_LOCAL_PATH`, signs non-Cisco xcframeworks, validates all shipped signatures, packages, and optionally uploads to the GitHub release.
+The build workflow checks out the private Session Replay repository with read-only access, defaults to its `main` branch, builds dynamic frameworks by default, validates platform slices, and runs the consumer linkage smoke test. Its `cisco-mach-o-type` input can select `staticlib` for Cisco Session Replay artifacts. Configure the `SESSION_REPLAY_READ_TOKEN` repository secret with read access to `smartlook-ios-sdk-private`. Signed release packaging remains a local process while distribution certificates cannot be stored in GitHub secrets.
 
 ### How it works
 
 1. A developer triggers `release.yml` with a version and ticket ID.
 2. The release PR is reviewed and merged to `main`.
 3. `merge_release.yml` runs automatically — creates a git tag and a GitHub Release.
-4. A developer runs `scripts/sign-and-upload.sh` locally with `SESSION_REPLAY_LOCAL_PATH` set.
-5. The script builds, signs, validates, packages, and uploads `SplunkAgent-XCFrameworks.zip`.
+4. The `build-xcframeworks.yml` workflow builds the distribution from the selected Session Replay ref and uploads the unsigned frameworks and size report.
+5. A developer runs `scripts/sign-and-upload.sh` locally with `SESSION_REPLAY_LOCAL_PATH` set to build, sign, validate, package, and upload `SplunkAgent-XCFrameworks.zip`.
 
-`build-xcframeworks.yml` is now a manual legacy/testing workflow. It requires caller-provided dynamic Cisco artifacts and must not download Cisco artifacts from Agent `Package.swift`.
+`build-xcframeworks.yml` checks out Session Replay source directly and builds the complete distribution. Set its `session-replay-ref` input to the branch, tag, or commit being released. It defaults to `main` and dynamic frameworks; select `staticlib` only when building static Cisco Session Replay artifacts.
+
+Each build writes `output/size-report.md`, which records overall XCFramework size, the existing Session Replay size, and the contribution from the five new modules. The report is included in the release zip.
 
 ### Local signing
 
@@ -123,7 +129,7 @@ export SESSION_REPLAY_LOCAL_PATH=/path/to/session-replay-repo
 
 The script will:
 - Auto-detect your signing identity from the local keychain
-- Build OTel, PLCrashReporter, dynamic Cisco, and Splunk xcframeworks locally
+- Build OTel, dynamic Cisco, and Splunk xcframeworks locally
 - Record the Session Replay commit, branch, and dirty state in `cisco-release-manifest.txt`
 - Sign non-Cisco xcframeworks while preserving pre-signed Cisco framework signatures
 - Validate signatures for all shipped xcframeworks
@@ -132,7 +138,7 @@ The script will:
 #### Options
 
 ```bash
-# Legacy: use a specific CI run with already-dynamic Cisco artifacts
+# Legacy: use a specific CI run with prebuilt Cisco artifacts
 ./scripts/sign-and-upload.sh 1.2.0 --run-id 12345678
 
 # Use a specific signing identity
@@ -191,7 +197,7 @@ For an iOS-only manual build, pass `IOS_ONLY=true` to `make build`, `make valida
 
 2. **Drag and drop** all `.xcframework` bundles into your Xcode project navigator.
 
-3. For each target that uses Splunk RUM, go to **General > Frameworks, Libraries, and Embedded Content** and ensure every framework is set to **Embed & Sign**.
+3. For the default dynamic distribution, set all frameworks to **Embed & Sign**. If the distribution was built with `CISCO_MACH_O_TYPE=staticlib`, set the Cisco Session Replay frameworks to **Do Not Embed**.
 
 4. **Import** the SDK in your code:
 
@@ -238,7 +244,7 @@ Add these based on which instrumentation you need:
 | `SplunkNavigation.xcframework` | Screen view changes |
 | `SplunkNetwork.xcframework` | HTTP requests via URLSession |
 | `SplunkNetworkMonitor.xcframework` | Network connectivity status |
-| `SplunkCrashReports.xcframework` | Crash reports (+ `CrashReporter.xcframework`) |
+| `SplunkCrashReports.xcframework` | Crash report instrumentation (+ `SplunkCrashReporter.xcframework`) |
 | `SplunkInteractions.xcframework` | UI taps and gestures |
 | `SplunkAppStart.xcframework` | App launch timing |
 | `SplunkAppState.xcframework` | Foreground/background transitions |
@@ -253,7 +259,7 @@ For Objective-C projects, also include `SplunkAgentObjC.xcframework` and use the
 
 ### visionOS Note
 
-`SplunkCrashReports.xcframework` and `CrashReporter.xcframework` do **not** support visionOS. Crash reporting is automatically disabled on that platform. All other modules work on visionOS.
+`SplunkCrashReporter.xcframework` and `SplunkCrashReports.xcframework` do **not** support visionOS. Crash reporting is automatically disabled on that platform. All other modules work on visionOS.
 
 ---
 

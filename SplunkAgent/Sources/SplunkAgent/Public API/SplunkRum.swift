@@ -19,6 +19,7 @@ internal import CiscoLogger
 import Combine
 import Foundation
 import OpenTelemetryApi
+internal import SplunkAppStart
 internal import SplunkCommon
 
 /// The class implementing Splunk Agent public API.
@@ -129,10 +130,7 @@ public class SplunkRum: ObservableObject {
         slowFrameDetectorProxy
     }
 
-    /// An object that holds the ``AppStartModule``.
-    ///
-    /// - Warning: Internal use only.
-    @_spi(SplunkInternal)
+    /// An object that provides the ``AppStartModule`` hybrid lifecycle bridge.
     public var appStart: any AppStartModule {
         appStartProxy
     }
@@ -175,6 +173,10 @@ public class SplunkRum: ObservableObject {
 
             return shared
         }
+
+        // Record the installed version before session sampling so sampled-out launches still
+        // participate in version transition tracking.
+        AppVersionTracker.record(currentVersion: configuration.appVersion)
 
         // Re-configure and call the Session Sampler
         shared.sessionSampler.configure(with: configuration)
@@ -281,16 +283,26 @@ public class SplunkRum: ObservableObject {
         eventManager = try DefaultEventManager(with: configuration, agent: self)
         initializeEvents["event_manager_initialized"] = Date()
 
-        // Send a session start event explicitly as soon as a Session and an EventManager are available
-        (currentSession as? DefaultSession)?.sendInitialSessionStartEvent()
+        // The initial session holds its start event until the session produces telemetry
+        (currentSession as? DefaultSession)?.scheduleSessionStart()
 
         // Store module configurations for later use in module customization
         self.moduleConfigurations = moduleConfigurations
 
         // Starts connecting available modules to agent
+        let appStartSharedState = sharedState
         modulesManager = DefaultModulesManager(
             rawConfiguration: configurationHandler.configurationData,
-            moduleConfigurations: moduleConfigurations
+            moduleConfigurations: moduleConfigurations,
+            prepareModuleForInstallation: { module in
+                guard let appStart = module as? SplunkAppStart.AppStart else {
+                    return
+                }
+
+                // AppStart begins observing during install so lifecycle events
+                // cannot be lost while the remaining modules are connected.
+                appStart.sharedState = appStartSharedState
+            }
         )
 
         // Module installation above activates URLSession swizzling. Set the
@@ -338,5 +350,5 @@ public class SplunkRum: ObservableObject {
     // MARK: - Version
 
     /// A version of this agent.
-    public static let version = "2.3.0"
+    public static let version = "2.6.0"
 }

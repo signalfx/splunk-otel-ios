@@ -100,6 +100,23 @@ struct OTLPBackgroundHTTPMetricExporterTests {
     }
 
     @Test
+    func flushReturnsFailureWhenHTTPClientDoesNotCompleteBeforeTimeout() throws {
+        let disk = makeDisk(uniqueLabel: "flush_timeout_\(UUID().uuidString)")
+        let http = MockHTTPClient()
+        let exporter = try makeExporter(
+            disk: disk,
+            http: http,
+            config: OTLPExporterConfiguration(timeout: 0.01)
+        )
+        let start = Date()
+
+        let result = exporter.flush()
+
+        #expect(result == .failure)
+        #expect(Date().timeIntervalSince(start) < 1)
+    }
+
+    @Test
     func shutdownReturnsSuccess() throws {
         let disk = makeDisk(uniqueLabel: "shutdown_\(UUID().uuidString)")
         let http = MockHTTPClient()

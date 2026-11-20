@@ -15,6 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import SplunkCommon
 import XCTest
 
 @testable import SplunkOpenTelemetryBackgroundExporter
@@ -142,5 +143,20 @@ final class SplunkRequestDescriptorTests: XCTestCase {
         let request = descriptor.createRequest()
 
         XCTAssertEqual(request.value(forHTTPHeaderField: "Content-Type"), "application/x-protobuf")
+    }
+
+    func testCreateRequestMarksRequestAsInternalSDKTraffic() throws {
+        let exampleURL = try XCTUnwrap(URL(string: "https://example.com"))
+        let descriptor = RequestDescriptor(
+            id: UUID(),
+            endpoint: exampleURL,
+            explicitTimeout: 1.0,
+            fileKeyType: fileKeyType
+        )
+
+        let request = descriptor.createRequest()
+
+        XCTAssertTrue(InternalNetworkRequestMarker.isMarked(request))
+        XCTAssertNil(request.value(forHTTPHeaderField: "com.splunk.rum.internal-network-request"))
     }
 }

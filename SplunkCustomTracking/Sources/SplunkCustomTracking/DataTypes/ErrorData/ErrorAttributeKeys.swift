@@ -35,6 +35,8 @@ enum ErrorAttributeKeys {
         case type = "exception.type"
         case message = "exception.message"
         case stacktrace = "exception.stacktrace"
+        case threads = "exception.threads"
+        case images = "exception.images"
         case code = "exception.code"
         case escaped = "exception.escaped"
     }
@@ -42,6 +44,11 @@ enum ErrorAttributeKeys {
     /// ErrorCode-specific attribute keys.
     enum ErrorCode: String, AttributeKey {
         case namespace = "code.namespace"
+    }
+
+    /// Crash-specific attribute keys shared with crash report telemetry.
+    enum Crash: String, AttributeKey {
+        case processPath = "crash.processPath"
     }
 
     /// Service-specific attribute keys.

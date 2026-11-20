@@ -15,10 +15,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import SplunkAppStart
 import XCTest
 
-@testable import SplunkAgent
+@_spi(SplunkInternal) @testable import SplunkAgent
+@_spi(SplunkInternal) @testable import SplunkAppStart
 
 final class AppStartAPI10ModuleProxyTests: XCTestCase {
 
@@ -55,5 +55,39 @@ final class AppStartAPI10ModuleProxyTests: XCTestCase {
 
         XCTAssertNotNil(moduleProxy.track(didBecomeActive: Date(), didFinishLaunching: Date(), willEnterForeground: Date()))
         XCTAssertNotNil(moduleProxy.track(didBecomeActive: Date(), didFinishLaunching: nil, willEnterForeground: nil))
+        XCTAssertNotNil(
+            moduleProxy.track(
+                initialLifecycle: SplunkAgent.AppStartLifecycleSnapshot(
+                    launchOrigin: .foreground,
+                    didFinishLaunching: Date(),
+                    willEnterForeground: nil,
+                    didBecomeActive: Date()
+                )
+            )
+        )
+    }
+
+    func testInitialLifecycleSnapshotIsForwardedToModule() throws {
+        let module = try XCTUnwrap(module)
+        let moduleProxy = try XCTUnwrap(moduleProxy)
+        let destination = DebugDestination()
+        let processStart = Date(timeIntervalSinceReferenceDate: 1_000)
+        let active = processStart.addingTimeInterval(0.5)
+        module.processStartTimestamp = processStart
+        module.destination = destination
+
+        moduleProxy.track(
+            initialLifecycle: SplunkAgent.AppStartLifecycleSnapshot(
+                launchOrigin: .foreground,
+                didFinishLaunching: processStart.addingTimeInterval(0.1),
+                willEnterForeground: nil,
+                didBecomeActive: active
+            )
+        )
+
+        let appStart = try XCTUnwrap(destination.storedAppStart)
+        XCTAssertEqual(appStart.type, .cold)
+        XCTAssertEqual(appStart.start, processStart)
+        XCTAssertEqual(appStart.end, active)
     }
 }

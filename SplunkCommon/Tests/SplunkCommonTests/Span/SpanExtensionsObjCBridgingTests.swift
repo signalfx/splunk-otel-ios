@@ -15,10 +15,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// swift-format-ignore-file
+// swiftlint:disable sorted_imports
 import Foundation
 import OpenTelemetryApi
-@_spi(SplunkInternal) import SplunkCommon
 import XCTest
+@_spi(SplunkInternal) @testable import SplunkCommon
+
+// swiftlint:enable sorted_imports
 
 final class SpanExtensionsObjCBridgingTests: XCTestCase {
 

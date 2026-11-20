@@ -17,48 +17,64 @@ limitations under the License.
 
 import Foundation
 
-/// Defines a public API for the AppStart module.
-///
-/// Currently all APIs are for internal use only.
+/// Defines the AppStart API used by hybrid integrations.
 public protocol AppStartModule {
 
     // MARK: - Manual app start detection
 
-    /// This method is for internal use only.
+    /// Supplies legacy lifecycle timestamps captured before installation.
     ///
-    /// App start event and it's type are determined and sent based on `UIApplication`'s lifecycle notifications. If agent's `install()` is called after
-    /// receiving the `UIApplication.didBecomeActive`, app start event is not determined and is not sent.
-    ///
-    /// This method allows bridges (React, Flutter etc.) to track app lifecycle notifications timestamps to determine and send the app start event manually.
-    ///
-    /// This method should be called as soon as possible, but not sooner that the agent's `install()` method.
-    /// Method call is ignored if an initial app start event has has already been sent, either automatically or by using this method.
+    /// This overload cannot establish launch provenance by itself. New hybrid
+    /// integrations should use ``track(initialLifecycle:)``; ambiguous legacy
+    /// handoffs are suppressed.
     ///
     /// - Parameters:
-    ///   - didBecomeActive: A timestamp of the `UIApplication.didBecomeActive` notification. Needed for type determination and sending.
-    ///   - didFinishLaunching: An optional timestamp of the `UIApplication.didFinishLaunching` notification.
-    ///   Does not determine AppStart type, but is sent as a metadata.
-    ///   - willEnterForeground: An optional timestamp of the `UIApplication.willEnterForeground` notification.
-    ///   Does not determine AppStart type, but is sent as a metadata.
+    ///   - didBecomeActive: The activation timestamp and exact measurement end.
+    ///   - didFinishLaunching: The optional launch timestamp.
+    ///   - willEnterForeground: The optional warm-start boundary.
     ///
     /// - Returns: The actual ``AppStartModule`` instance.
     ///
-    /// - Warning: Internal use only.
+    /// - Warning: For internal compatibility only.
     @_spi(SplunkInternal)
+    @available(*, deprecated, message: "Use track(initialLifecycle:) to supply explicit launch provenance.")
     func track(didBecomeActive: Date, didFinishLaunching: Date?, willEnterForeground: Date?) -> any AppStartModule
+
+    /// Supplies lifecycle evidence captured before agent installation.
+    ///
+    /// Call this exactly once immediately after `install()`, including when the
+    /// snapshot is partial. The native observer completes a pending activation;
+    /// the native reducer owns classification, validation, and suppression.
+    /// Calls before installation are discarded, and repeated handoffs are suppressed.
+    /// Snapshots supplied after initial resolution are ignored.
+    /// Measurements longer than ten seconds are suppressed.
+    ///
+    /// - Parameter snapshot: Initial lifecycle evidence captured by the integration.
+    ///
+    /// - Returns: The actual ``AppStartModule`` instance.
+    ///
+    func track(initialLifecycle snapshot: AppStartLifecycleSnapshot) -> any AppStartModule
 }
 
 /// Default implementation required for BUILD_LIBRARY_FOR_DISTRIBUTION
-/// compatibility. @_spi protocol requirements must have a default
-/// implementation in library evolution mode.
+/// compatibility. Protocol requirements must have a default implementation
+/// in library evolution mode.
 extension AppStartModule {
 
     @_spi(SplunkInternal)
+    @available(*, deprecated, message: "Use track(initialLifecycle:) to supply explicit launch provenance.")
     public func track(didBecomeActive: Date, didFinishLaunching: Date?, willEnterForeground: Date?) -> any AppStartModule {
         // Intentionally unused
         _ = didBecomeActive
         _ = didFinishLaunching
         _ = willEnterForeground
+
+        return self
+    }
+
+    public func track(initialLifecycle snapshot: AppStartLifecycleSnapshot) -> any AppStartModule {
+        // Intentionally unused
+        _ = snapshot
 
         return self
     }

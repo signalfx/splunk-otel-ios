@@ -29,6 +29,13 @@ func startHttpSpan(request: URLRequest?) -> Span? {
         return nil
     }
 
+    if InternalNetworkRequestMarker.isMarked(request) {
+        NetworkInstrumentationManager.shared.logger.log(level: .debug) {
+            "URL excluded as an internal SDK request \(url.absoluteString)"
+        }
+        return nil
+    }
+
     if !(url.scheme?.lowercased().starts(with: "http") ?? false) {
         return nil
     }
@@ -39,33 +46,35 @@ func startHttpSpan(request: URLRequest?) -> Span? {
     let manager = NetworkInstrumentationManager.shared
 
     // Filter using excludedEndpoints, backend URLs
-    if let excludedEndpoints = manager.getModule()?.excludedEndpoints {
-        if shouldExcludeURL(url, excludedEndpoints: excludedEndpoints) {
-            manager.logger.log(level: .debug) {
-                "Should Not Instrument Backend URL \(url.absoluteString)"
-            }
-            return nil
+    if let excludedEndpoints = manager.getModule()?.excludedEndpoints,
+        shouldExcludeURL(url, excludedEndpoints: excludedEndpoints)
+    {
+        manager.logger.log(level: .debug) {
+            "Should Not Instrument Backend URL \(url.absoluteString)"
         }
+
+        return nil
     }
 
     // Filter using ignoreURLs API
-    if let ignoreURLs = manager.getModule()?.getIgnoreURLs() {
-        if ignoreURLs.matches(url: url) {
-            manager.logger.log(level: .debug) {
-                "URL excluded via IgnoreURLs API \(url.absoluteString)"
-            }
-            return nil
+    if let ignoreURLs = manager.getModule()?.getIgnoreURLs(),
+        ignoreURLs.matches(url: url)
+    {
+        manager.logger.log(level: .debug) {
+            "URL excluded via IgnoreURLs API \(url.absoluteString)"
         }
+
+        return nil
     }
 
     let tracer = OpenTelemetry.instance
         .tracerProvider
         .get(
-            instrumentationName: "NetworkInstrumentation",
+            instrumentationName: NetworkInstrumentationConstants.instrumentationName,
             instrumentationVersion: manager.getModule()?.sharedState?.agentVersion
         )
 
-    let span = tracer.spanBuilder(spanName: "HTTP " + method)
+    let span = tracer.spanBuilder(spanName: NetworkInstrumentationConstants.httpSpanNamePrefix + method)
         .setStartTime(time: Date())
         .startSpan()
 
@@ -75,13 +84,27 @@ func startHttpSpan(request: URLRequest?) -> Span? {
     return span
 }
 
-/// Ends an HTTP span for a completed URL session task.
+/// Ends an HTTP span for a completed URL session task or an instrumentation timeout.
 ///
 /// - Parameters:
 ///   - span: The span to end.
-///   - task: The completed URL session task.
-func endHttpSpan(span: Span, task: URLSessionTask) {
-    let httpResponse: HTTPURLResponse? = task.response as? HTTPURLResponse
+///   - task: The completed URL session task. Omit this for timeout finalization because the task
+///     may still be active and unsafe to read concurrently.
+///   - fallbackResponse: A response supplied by the completion handler when the task has no response.
+///   - fallbackError: An error supplied by the completion handler when the task has no error.
+///   - errorTypeOverride: An optional error type to use when the instrumentation detects an error.
+///   - errorMessageOverride: An optional error message to use when the instrumentation detects an error.
+///   - endTime: An explicit end time, used by instrumentation timeout finalization.
+func endHttpSpan(
+    span: Span,
+    task: URLSessionTask? = nil,
+    fallbackResponse: URLResponse? = nil,
+    fallbackError: Error? = nil,
+    errorTypeOverride: String? = nil,
+    errorMessageOverride: String? = nil,
+    endTime: Date? = nil
+) {
+    let httpResponse = task?.response as? HTTPURLResponse ?? fallbackResponse as? HTTPURLResponse
     if let httpResponse {
         span.clearAndSetAttribute(key: SemanticConventions.Http.responseStatusCode, value: httpResponse.statusCode)
         for (key, val) in httpResponse.allHeaderFields {
@@ -94,8 +117,7 @@ func endHttpSpan(span: Span, task: URLSessionTask) {
             }
         }
 
-        let length = httpResponse.expectedContentLength
-        span.clearAndSetAttribute(key: SemanticConventions.Http.responseBodySize, value: Int(length))
+        setResponseBodySize(httpResponse.expectedContentLength, on: span)
 
         // Try to capture IP address from the response/connection
         // Update network.peer.address with actual IP if we can get it
@@ -110,20 +132,46 @@ func endHttpSpan(span: Span, task: URLSessionTask) {
         addCapturedResponseHeaders(from: httpResponse, to: span)
     }
 
-    if let error = task.error {
+    if let error = fallbackError ?? task?.error {
         span.clearAndSetAttribute(key: NetworkSpanAttributeKeys.error, value: true)
-        span.clearAndSetAttribute(key: SemanticConventions.Error.message, value: error.localizedDescription)
-        span.clearAndSetAttribute(key: SemanticConventions.Error.type, value: String(describing: type(of: error)))
+        let errorMessage = error.localizedDescription
+        let errorType = String(describing: type(of: error))
+        span.clearAndSetAttribute(key: SemanticConventions.Error.message, value: errorMessage)
+        span.clearAndSetAttribute(key: SemanticConventions.Error.type, value: errorType)
 
         NetworkInstrumentationManager.shared.logger.log(level: .error) {
-            "Error: \(error.localizedDescription)"
+            "Error: \(errorMessage)"
+        }
+    }
+    else if let errorTypeOverride, let errorMessageOverride {
+        span.clearAndSetAttribute(key: NetworkSpanAttributeKeys.error, value: true)
+        span.clearAndSetAttribute(key: SemanticConventions.Error.message, value: errorMessageOverride)
+        span.clearAndSetAttribute(key: SemanticConventions.Error.type, value: errorTypeOverride)
+
+        NetworkInstrumentationManager.shared.logger.log(level: .error) {
+            "Error: \(errorMessageOverride)"
         }
     }
 
-    if task.countOfBytesSent != 0 {
+    if let task, task.countOfBytesSent != 0 {
         span.clearAndSetAttribute(key: SemanticConventions.Http.requestBodySize, value: Int(task.countOfBytesSent))
     }
-    span.end()
+    if let endTime {
+        span.end(time: endTime)
+    }
+    else {
+        span.end()
+    }
+}
+
+private func setResponseBodySize(_ expectedLength: Int64, on span: Span) {
+    // URLResponse uses a negative value when the expected response length is unknown.
+    // Do not emit that sentinel as a body size; the attribute represents bytes.
+    guard expectedLength >= 0 else {
+        return
+    }
+
+    span.clearAndSetAttribute(key: SemanticConventions.Http.responseBodySize, value: Int(expectedLength))
 }
 
 /// Adds HTTP request data as attributes to a span.

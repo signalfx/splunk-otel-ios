@@ -28,8 +28,15 @@ extension CustomTrackingInternal: Module {
     public typealias EventMetadata = CustomTrackingMetadata
     public typealias EventData = CustomTrackingData
 
-    public func install(with _: (any ModuleConfiguration)?, remoteConfiguration _: (any SplunkCommon.RemoteModuleConfiguration)?) {
-        _ = Self.instance
+    public func install(with configuration: (any ModuleConfiguration)?, remoteConfiguration _: (any SplunkCommon.RemoteModuleConfiguration)?) {
+        let configuration = configuration as? CustomTrackingConfiguration
+        isEnabled = configuration?.isEnabled ?? true
+
+        if isEnabled {
+            diagnosticEnricher.configure(
+                includeBinaryImagesOnErrors: configuration?.includeBinaryImagesOnErrors ?? true
+            )
+        }
     }
 
     public func onPublish(data: @escaping (CustomTrackingMetadata, CustomTrackingData) -> Void) {

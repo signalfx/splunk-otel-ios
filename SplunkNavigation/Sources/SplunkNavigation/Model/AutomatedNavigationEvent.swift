@@ -33,4 +33,18 @@ struct AutomatedNavigationEvent: NavigationActionEvent {
     }
 
     var viewFrame: CGRect?
+
+    init(
+        timestamp: Date,
+        type: NavigationActionEventType,
+        controllerTypeName: String,
+        controllerIdentifier: ObjectIdentifier,
+        viewFrame: CGRect? = nil
+    ) {
+        self.timestamp = timestamp
+        self.type = type
+        self.controllerTypeName = controllerTypeName
+        self.controllerIdentifier = controllerIdentifier
+        self.viewFrame = viewFrame
+    }
 }

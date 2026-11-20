@@ -54,6 +54,107 @@ final class ThrowingHTTPClient: NSObject, BackgroundHTTPClientProtocol {
     }
 }
 
+final class FirstSendThrowingHTTPClient: NSObject, BackgroundHTTPClientProtocol {
+    enum StubError: Error {
+        case firstSendFailed
+    }
+
+    private let lock = NSLock()
+    private let recoveredSend = DispatchSemaphore(value: 0)
+    private var storedSendAttemptCount = 0
+    private var storedSuccessfulRequests: [RequestDescriptorProtocol] = []
+
+    var sendAttemptCount: Int {
+        withLock { storedSendAttemptCount }
+    }
+
+    var successfulRequests: [RequestDescriptorProtocol] {
+        withLock { storedSuccessfulRequests }
+    }
+
+    func send(_ requestDescriptor: RequestDescriptorProtocol) throws {
+        let shouldFail = withLock {
+            storedSendAttemptCount += 1
+            return storedSendAttemptCount == 1
+        }
+
+        guard !shouldFail else {
+            throw StubError.firstSendFailed
+        }
+
+        withLock {
+            storedSuccessfulRequests.append(requestDescriptor)
+        }
+        recoveredSend.signal()
+    }
+
+    func flush(completion: @escaping () -> Void) {
+        completion()
+    }
+
+    func getAllSessionsTasks(_ completionHandler: @escaping ([URLSessionTask]) -> Void) {
+        completionHandler([])
+    }
+
+    func waitForRecoveredSend(timeout: TimeInterval) -> DispatchTimeoutResult {
+        recoveredSend.wait(timeout: .now() + timeout)
+    }
+
+    private func withLock<T>(_ work: () throws -> T) rethrows -> T {
+        lock.lock()
+        defer { lock.unlock() }
+        return try work()
+    }
+}
+
+final class AlwaysThrowingHTTPClient: NSObject, BackgroundHTTPClientProtocol {
+    enum StubError: Error {
+        case sendFailed
+    }
+
+    private let lock = NSLock()
+    private let recoveryScan = DispatchSemaphore(value: 0)
+    private var storedRecoveryScanCount = 0
+    private var storedSendAttemptCount = 0
+
+    var recoveryScanCount: Int {
+        withLock { storedRecoveryScanCount }
+    }
+
+    var sendAttemptCount: Int {
+        withLock { storedSendAttemptCount }
+    }
+
+    func send(_: RequestDescriptorProtocol) throws {
+        withLock {
+            storedSendAttemptCount += 1
+        }
+        throw StubError.sendFailed
+    }
+
+    func flush(completion: @escaping () -> Void) {
+        completion()
+    }
+
+    func getAllSessionsTasks(_ completionHandler: @escaping ([URLSessionTask]) -> Void) {
+        withLock {
+            storedRecoveryScanCount += 1
+        }
+        completionHandler([])
+        recoveryScan.signal()
+    }
+
+    func waitForRecoveryScan(timeout: TimeInterval) -> DispatchTimeoutResult {
+        recoveryScan.wait(timeout: .now() + timeout)
+    }
+
+    private func withLock<T>(_ work: () throws -> T) rethrows -> T {
+        lock.lock()
+        defer { lock.unlock() }
+        return try work()
+    }
+}
+
 final class FlushSpyHTTPClient: NSObject, BackgroundHTTPClientProtocol {
     var sent: [RequestDescriptorProtocol] = []
     var flushed = false

@@ -21,7 +21,7 @@ import SwiftUI
 struct DemoHeaderView: View {
 
     @ObservedObject
-    var agentDataSource = AgentDataSource()
+    private var agentDataSource = AgentDataSource()
 
     @State
     private var currentTime = Date()

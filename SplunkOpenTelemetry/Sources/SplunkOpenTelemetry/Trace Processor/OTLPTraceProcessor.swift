@@ -26,14 +26,36 @@ import SplunkOpenTelemetryBackgroundExporter
 /// Traces are enriched by provided Resources and exported via an instantiated background exporter.
 public class OTLPTraceProcessor: TraceProcessor {
 
+    // MARK: - Inline types
+
+    private struct InitializationState {
+        let tracerProvider: any TracerProvider
+        let batchSpanProcessor: OTLPBatchSpanProcessor
+    }
+
+    private struct PipelineConfiguration {
+        let resources: AgentResources
+        let runtimeAttributes: RuntimeAttributes
+        let globalAttributes: () -> [String: AttributeValue]
+        let debugEnabled: Bool
+        let spanInterceptor: SplunkSpanInterceptor?
+        let activityTracker: ActivityTracker
+        let didIntercept: (([SpanData]) -> Void)?
+    }
+
+    // MARK: - Internal properties
+
+    /// OTel tracer provider shared by direct and log-derived spans.
+    let tracerProvider: any TracerProvider
+
+
     // MARK: - Private properties
 
-    /// OTel tracer provider.
-    private let tracerProvider: TracerProvider
-
     /// Background exporter for traces (stored to support endpoint updates).
-    private let backgroundTraceExporter: OTLPBackgroundHTTPTraceExporter
+    private let backgroundTraceExporter: any EndpointConfigurableSpanExporter
 
+    /// In-memory batch processor for direct spans.
+    private let batchSpanProcessor: OTLPBatchSpanProcessor
 
     // MARK: - Initialization
 
@@ -45,10 +67,10 @@ public class OTLPTraceProcessor: TraceProcessor {
         debugEnabled: Bool,
         spanInterceptor: SplunkSpanInterceptor?,
         accessToken: String? = nil,
-        activityTracker: ActivityTracker
+        activityTracker: ActivityTracker,
+        didIntercept: (([SpanData]) -> Void)? = nil
     ) {
-
-        let configuration = OTLPExporterConfiguration()
+        let exporterConfiguration = OTLPExporterConfiguration(agentVersion: resources.agentVersion)
         let envVarHeaders: [(String, String)] = []
         var headers: [String: String] = [:]
 
@@ -56,42 +78,98 @@ public class OTLPTraceProcessor: TraceProcessor {
             headers["X-SF-Token"] = accessToken
         }
 
-        // Initialize background exporter
-        backgroundTraceExporter = OTLPBackgroundHTTPTraceExporter(
+        let backgroundTraceExporter = OTLPBackgroundHTTPTraceExporter(
             endpoint: tracesEndpoint,
-            config: configuration,
+            config: exporterConfiguration,
             qosConfig: SessionQOSConfiguration(),
             envVarHeaders: envVarHeaders,
             headers: headers
         )
+        let pipelineConfiguration = PipelineConfiguration(
+            resources: resources,
+            runtimeAttributes: runtimeAttributes,
+            globalAttributes: globalAttributes,
+            debugEnabled: debugEnabled,
+            spanInterceptor: spanInterceptor,
+            activityTracker: activityTracker,
+            didIntercept: didIntercept
+        )
+
+        let state = Self.makeInitializationState(
+            backgroundTraceExporter: backgroundTraceExporter,
+            configuration: pipelineConfiguration
+        )
+
+        self.backgroundTraceExporter = backgroundTraceExporter
+        tracerProvider = state.tracerProvider
+        batchSpanProcessor = state.batchSpanProcessor
+    }
+
+    init(
+        backgroundTraceExporter: any EndpointConfigurableSpanExporter,
+        resources: AgentResources,
+        runtimeAttributes: RuntimeAttributes,
+        globalAttributes: @escaping () -> [String: AttributeValue],
+        debugEnabled: Bool,
+        spanInterceptor: SplunkSpanInterceptor?,
+        activityTracker: ActivityTracker,
+        didIntercept: (([SpanData]) -> Void)? = nil
+    ) {
+        let pipelineConfiguration = PipelineConfiguration(
+            resources: resources,
+            runtimeAttributes: runtimeAttributes,
+            globalAttributes: globalAttributes,
+            debugEnabled: debugEnabled,
+            spanInterceptor: spanInterceptor,
+            activityTracker: activityTracker,
+            didIntercept: didIntercept
+        )
+        let state = Self.makeInitializationState(
+            backgroundTraceExporter: backgroundTraceExporter,
+            configuration: pipelineConfiguration
+        )
+
+        self.backgroundTraceExporter = backgroundTraceExporter
+        tracerProvider = state.tracerProvider
+        batchSpanProcessor = state.batchSpanProcessor
+    }
+
+    private static func makeInitializationState(
+        backgroundTraceExporter: any EndpointConfigurableSpanExporter,
+        configuration: PipelineConfiguration
+    ) -> InitializationState {
 
         // Initialize attribute checker proxy exporter
         // Optionally chain it through stdout exporter
         let attributeCheckerExporter = AttributeCheckerSpanExporter(
-            proxy: debugEnabled
+            proxy: configuration.debugEnabled
                 ? SplunkStdoutSpanExporter(with: backgroundTraceExporter)
                 : backgroundTraceExporter
         )
 
         // Initialize span interceptor proxy exporter
         let spanInterceptorExporter = SpanInterceptorExporter(
-            with: spanInterceptor,
-            proxy: attributeCheckerExporter
+            with: configuration.spanInterceptor,
+            proxy: attributeCheckerExporter,
+            didIntercept: configuration.didIntercept
         )
-
-        // Initialize processor
-        let spanProcessor = SimpleSpanProcessor(spanExporter: spanInterceptorExporter)
-        let attributesProcessor = OTLPAttributesSpanProcessor(
-            with: runtimeAttributes,
-            activityTracker: activityTracker
-        )
-
-        // Global Attributes processor
-        let globalAttributesProcessor = OTLPGlobalAttributesSpanProcessor(with: globalAttributes)
 
         // Build Resources
         var resource = Resource()
-        resource.merge(with: resources)
+        resource.merge(with: configuration.resources)
+
+        // Initialize processor
+        // Pools ended spans in memory and flushes a batch to the exporter every 1s or when
+        // 100 spans accumulate, whichever is first (plus best-effort asynchronous drains on app
+        // background/termination and a drain on shutdown).
+        let spanProcessor = OTLPBatchSpanProcessor(spanExporter: spanInterceptorExporter)
+        let attributesProcessor = OTLPAttributesSpanProcessor(
+            with: configuration.runtimeAttributes,
+            activityTracker: configuration.activityTracker
+        )
+
+        // Global Attributes processor
+        let globalAttributesProcessor = OTLPGlobalAttributesSpanProcessor(with: configuration.globalAttributes)
 
         // Initialize tracer provider
         let tracerProviderBuilder = TracerProviderBuilder()
@@ -105,13 +183,39 @@ public class OTLPTraceProcessor: TraceProcessor {
         // Register default tracer provider
         OpenTelemetry.registerTracerProvider(tracerProvider: tracerProvider)
 
-        self.tracerProvider = tracerProvider
+        return InitializationState(
+            tracerProvider: tracerProvider,
+            batchSpanProcessor: spanProcessor
+        )
+    }
+
+    /// Emits and persists one span, reporting success only for that exact span.
+    package func emitAndPersistSpan(
+        emitting emitSpan: @escaping () -> SpanId,
+        timeout: TimeInterval,
+        completion: @escaping (Bool) -> Void
+    ) {
+        batchSpanProcessor.persistSpan(
+            emitting: emitSpan,
+            timeout: timeout,
+            completion: completion
+        )
+    }
+
+    /// Flushes the shared direct and log-derived span batch and reports durable completion.
+    package func forceFlushBufferedSpans(timeout: TimeInterval?) -> ExportResult {
+        batchSpanProcessor.forceFlushResult(timeout: timeout) ? .success : .failure
+    }
+
+    /// Writes the buffered spans to disk without waiting for the next batch export and without blocking the caller.
+    package func persistBufferedSpans(timeout: TimeInterval, completion: @escaping (Bool) -> Void) {
+        batchSpanProcessor.persistBufferedSpans(timeout: timeout, completion: completion)
     }
 
 
     // MARK: - Endpoint Management
 
-    /// Updates the endpoint and flushes any pending data.
+    /// Immediately updates the endpoint used by subsequent exports.
     ///
     /// - Parameters:
     ///   - newEndpoint: The new endpoint URL.
@@ -126,8 +230,16 @@ public class OTLPTraceProcessor: TraceProcessor {
         backgroundTraceExporter.setEndpoint(newEndpoint, headers: headers)
     }
 
-    /// Clears the endpoint, causing new data to be cached to pending storage.
+    /// Immediately clears the endpoint so subsequent exports use pending storage.
     public func clearEndpoint() {
         backgroundTraceExporter.clearEndpoint()
     }
 }
+
+protocol EndpointConfigurableSpanExporter: SpanExporter {
+    func setEndpoint(_ newEndpoint: URL, headers newHeaders: [String: String]?)
+
+    func clearEndpoint()
+}
+
+extension OTLPBackgroundHTTPTraceExporter: EndpointConfigurableSpanExporter {}
