@@ -95,26 +95,24 @@ final class FileKeyValueStorageTests: XCTestCase {
         XCTAssertThrowsError(try storage.delete(forKey: "key"))
     }
 
+
+    // MARK: - Backup
+
+    func testCreatedDirectoryIsExcludedFromBackup() throws {
+        let storeDirectory = directory.appendingPathComponent("store", isDirectory: true)
+
+        try FileKeyValueStorage(directory: storeDirectory).update(1, forKey: "key")
+
+        let resourceValues = try storeDirectory.resourceValues(forKeys: [.isExcludedFromBackupKey])
+        XCTAssertEqual(resourceValues.isExcludedFromBackup, true)
+    }
+
+
     // MARK: - Helpers
 
     private static func makeTemporaryDirectory() -> URL {
         let name = "FileKeyValueStorageTests-\(UUID().uuidString)"
 
         return FileManager.default.temporaryDirectory.appendingPathComponent(name, isDirectory: true)
-    }
-
-
-    // MARK: - Directory per keys prefix
-
-    func testEachKeysPrefixGetsItsOwnHeldStartsDirectory() {
-        let first = UserDefaultsStorage()
-        first.keysPrefix = "com.splunk.rum.first."
-        let second = UserDefaultsStorage()
-        second.keysPrefix = "com.splunk.rum.second."
-
-        XCTAssertNotEqual(
-            SessionsModel.defaultHeldStartsStorage(for: first).directory,
-            SessionsModel.defaultHeldStartsStorage(for: second).directory
-        )
     }
 }

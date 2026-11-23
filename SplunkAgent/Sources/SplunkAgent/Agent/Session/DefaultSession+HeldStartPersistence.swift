@@ -31,8 +31,8 @@ extension DefaultSession {
     /// Saves the held session starts, so that the next launch can restore them.
     ///
     /// The save is requested in the order of the changes to the held starts, and written later
-    /// off `accessQueue`. Storage calls can block for seconds, and `UserDefaults` posts its change
-    /// notification on the writing thread, where app code may read the current session id.
+    /// by ``heldSessionStarts`` on its own queue. Storage calls can block, for example on file I/O or
+    /// while data protection keeps the file closed, so they must never run on `accessQueue`.
     ///
     /// Must run on `accessQueue`.
     func persistHeldSessionStarts() {
@@ -45,22 +45,15 @@ extension DefaultSession {
             )
         }
 
-        sessionsModel.heldSessionStarts.save(records)
-    }
-
-    /// Reads the session starts that were still held when the previous run of the app ended.
-    ///
-    /// Must not run on `accessQueue`, as it waits for the requested saves.
-    func savedHeldSessionStarts() -> [HeldSessionStartRecord] {
-        sessionsModel.heldSessionStarts.load()
+        heldSessionStarts.save(records)
     }
 
     /// Restores saved session starts, so that late telemetry of their sessions can still release them.
     ///
     /// The restored starts go before the starts held now, oldest first, and the oldest are dropped
     /// beyond ``maxHeldSessionStarts``. A start already held now is not restored a second time, and
-    /// a start older than ``maxRestoredSessionStartAge`` is not restored at all. The restored starts
-    /// are saved with the next held start.
+    /// a start older than ``maxRestoredSessionStartAge`` is not restored at all. The save of the
+    /// merged list is requested here, not left to the next change of the held starts.
     ///
     /// Must run on `accessQueue`.
     ///
@@ -81,5 +74,6 @@ extension DefaultSession {
 
         pendingSessionStarts = restored + pendingSessionStarts
         dropHeldSessionStartsBeyondLimit()
+        persistHeldSessionStarts()
     }
 }

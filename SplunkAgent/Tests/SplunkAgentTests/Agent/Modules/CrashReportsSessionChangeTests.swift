@@ -22,7 +22,7 @@ limitations under the License.
 
     @testable import SplunkAgent
     @testable import SplunkCommon
-    @_spi(SplunkInternal) @testable import SplunkCrashReports
+    @testable import SplunkCrashReports
 
     final class CrashReportsSessionChangeTests: XCTestCase {
 
@@ -38,12 +38,13 @@ limitations under the License.
         // MARK: - Tests
 
         func testAgentCachesSessionIdNowAndAfterRotation() throws {
-            let session = makeSession()
+            let session = try DefaultSessionTestBuilder.build(named: "crashSessionIdTest")
             let agent = try AgentTestBuilder.build(with: ConfigurationTestBuilder.buildDefault(), session: session)
+            stopAtTeardown(agent)
             let crashReports = makeCrashReports(sharedState: agent.sharedState)
 
             // As at installation.
-            agent.cacheSessionIds(in: crashReports)
+            agent.keepCrashReportSessionIdCurrent(in: crashReports)
             let observer = try XCTUnwrap(agent.crashReportsSessionObserver)
             addTeardownBlock {
                 NotificationCenter.default.removeObserver(observer)
@@ -103,14 +104,6 @@ limitations under the License.
 
 
         // MARK: - Helpers
-
-        private func makeSession() -> DefaultSession {
-            DefaultSession(
-                sessionsModel: SessionsModel(
-                    storage: UserDefaultsStorageTestBuilder.buildCleanStorage(named: "com.splunk.rum.test.crashSessionId.")
-                )
-            )
-        }
 
         /// A configured crash reporter that stores custom data, reading the session ID from `sharedState`.
         ///

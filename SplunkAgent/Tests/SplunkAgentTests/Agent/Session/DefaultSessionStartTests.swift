@@ -31,9 +31,6 @@ final class DefaultSessionStartTests: XCTestCase {
     /// Keeps agents alive, as a session only holds an unowned reference to its agent.
     private var retainedAgents: [SplunkRum] = []
 
-    /// Waiting time for asserting that an event is not sent.
-    private let absenceTimeout: TimeInterval = 0.3
-
     /// Waiting time for an event that must be sent.
     ///
     /// The wait ends as soon as the event comes, so a generous limit costs nothing when the code works,
@@ -64,9 +61,9 @@ final class DefaultSessionStartTests: XCTestCase {
         defaultSession.scheduleSessionStart()
 
         // Tracked activity alone does not release the session start
-        let notSentForActivity = expectSessionStart(from: eventManager, isInverted: true)
         defaultSession.trackActivity(at: Date())
-        wait(for: [notSentForActivity], timeout: absenceTimeout)
+        waitForQueuedWork(of: defaultSession)
+        XCTAssertTrue(sessionStarts(sentBy: eventManager).isEmpty)
 
         // Accepted telemetry releases it, with the session's own start and no previous session
         let sent = expectSessionStart(from: eventManager)
@@ -79,9 +76,8 @@ final class DefaultSessionStartTests: XCTestCase {
         XCTAssertNil(event.attributes?["session.previous_id"])
 
         // Further telemetry does not repeat it
-        let notRepeated = expectSessionStart(from: eventManager, isInverted: true)
         defaultSession.trackAcceptedTelemetry(forSessionId: defaultSession.currentSessionId)
-        wait(for: [notRepeated], timeout: absenceTimeout)
+        waitForQueuedWork(of: defaultSession)
 
         XCTAssertEqual(eventManager.sentEvents.count, 1)
     }
@@ -90,10 +86,10 @@ final class DefaultSessionStartTests: XCTestCase {
         let (defaultSession, eventManager) = try buildSession(named: "otherSessionStartTest")
         defaultSession.scheduleSessionStart()
 
-        let notSent = expectSessionStart(from: eventManager, isInverted: true)
         defaultSession.trackAcceptedTelemetry(forSessionId: "some-other-session")
+        waitForQueuedWork(of: defaultSession)
 
-        wait(for: [notSent], timeout: absenceTimeout)
+        XCTAssertTrue(sessionStarts(sentBy: eventManager).isEmpty)
     }
 
 
@@ -141,9 +137,9 @@ final class DefaultSessionStartTests: XCTestCase {
             defaultSession.rotateSession()
         }
 
-        let notSent = expectSessionStart(from: eventManager, isInverted: true)
         defaultSession.trackAcceptedTelemetry(forSessionId: oldestSessionId)
-        wait(for: [notSent], timeout: absenceTimeout)
+        waitForQueuedWork(of: defaultSession)
+        XCTAssertTrue(sessionStarts(sentBy: eventManager).isEmpty)
 
         // The newest held start is still released
         let sent = expectSessionStart(from: eventManager)
@@ -226,10 +222,11 @@ final class DefaultSessionStartTests: XCTestCase {
         let (defaultSession, eventManager) = try buildSession(named: "pipelineDroppedTest", interceptor: { _ in nil })
         defaultSession.scheduleSessionStart()
 
-        let notSent = expectSessionStart(from: eventManager, isInverted: true)
+        // The export has finished when this returns, so the drop has been decided
         try exportSpan(through: eventManager)
+        waitForQueuedWork(of: defaultSession)
 
-        wait(for: [notSent], timeout: absenceTimeout)
+        XCTAssertTrue(sessionStarts(sentBy: eventManager).isEmpty)
     }
 
     func testReleasedSessionStartIsSavedBeforeNextBatchExport() throws {
@@ -274,10 +271,15 @@ final class DefaultSessionStartTests: XCTestCase {
 
         // This covers the replay data only. Its isRecording event is a span too, and in the agent it can
         // release the start even when indexing fails; MockEventManager records that event instead of sending it.
-        let notSent = expectSessionStart(from: eventManager, isInverted: true)
-        publishReplayData(through: eventManager, after: defaultSession.currentSessionStart)
+        let rejected = expectation(description: "replay data not indexed")
+        publishReplayData(through: eventManager, after: defaultSession.currentSessionStart) { processed in
+            XCTAssertFalse(processed)
+            rejected.fulfill()
+        }
+        wait(for: [rejected], timeout: arrivalTimeout)
+        waitForQueuedWork(of: defaultSession)
 
-        wait(for: [notSent], timeout: absenceTimeout)
+        XCTAssertTrue(sessionStarts(sentBy: eventManager).isEmpty)
     }
 
 
@@ -316,9 +318,8 @@ final class DefaultSessionStartTests: XCTestCase {
     }
 
     /// Returns an expectation fulfilled when the event manager sends a session start event.
-    private func expectSessionStart(from eventManager: MockEventManager, isInverted: Bool = false) -> XCTestExpectation {
-        let sessionStart = expectation(description: isInverted ? "session.start not sent" : "session.start sent")
-        sessionStart.isInverted = isInverted
+    private func expectSessionStart(from eventManager: MockEventManager) -> XCTestExpectation {
+        let sessionStart = expectation(description: "session.start sent")
 
         eventManager.sentEventHandler = { event in
             if event.name == "session.start" {
@@ -329,7 +330,23 @@ final class DefaultSessionStartTests: XCTestCase {
         return sessionStart
     }
 
+    /// Waits until the session has done the work queued on its access queue so far.
+    ///
+    /// The access queue is serial and reading the current session id waits for it, so the read returns
+    /// after the queued work. The mock event manager records sent events at once, so a check after
+    /// this wait does not depend on timing.
+    private func waitForQueuedWork(of session: DefaultSession) {
+        _ = session.currentSessionId
+    }
+
+    /// The session start events the event manager sent so far.
+    private func sessionStarts(sentBy eventManager: MockEventManager) -> [AgentEvent] {
+        eventManager.sentEvents.filter { $0.name == "session.start" }
+    }
+
     /// Ends one span on the event manager's tracer and waits until it is exported.
+    ///
+    /// When this returns, the span has passed the interceptor, so the session has been told about it if it was kept.
     private func exportSpan(through eventManager: DefaultEventManager) throws {
         let traceProcessor = eventManager.concreteTraceProcessor
         let tracer = traceProcessor.tracerProvider.get(instrumentationName: "test")
@@ -345,11 +362,15 @@ final class DefaultSessionStartTests: XCTestCase {
     }
 
     /// Publishes Session Replay data recorded just after the session started.
-    private func publishReplayData(through eventManager: DefaultEventManager, after sessionStart: Date) {
+    private func publishReplayData(
+        through eventManager: DefaultEventManager,
+        after sessionStart: Date,
+        completion: @escaping (Bool) -> Void = { _ in }
+    ) {
         // Replay data is matched to a session by time, so it starts just after the session did
         let startMs = Int((sessionStart.timeIntervalSince1970 + 0.01) * 1_000.0)
         let metadata = Metadata(startUnixMs: startMs, endUnixMs: startMs + 1)
 
-        eventManager.publish(data: Data([0]), metadata: metadata) { _ in }
+        eventManager.publish(data: Data([0]), metadata: metadata, completion: completion)
     }
 }

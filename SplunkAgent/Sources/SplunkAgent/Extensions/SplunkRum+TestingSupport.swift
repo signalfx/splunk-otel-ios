@@ -53,7 +53,8 @@ extension SplunkRum {
 
         // All main objects configured with custom storage
         let sessionModel = SessionsModel(storage: storage)
-        let session = DefaultSession(sessionsModel: sessionModel)
+        let heldSessionStarts = HeldSessionStartStore(storage: buildTemporaryFileStorage(named: storageName))
+        let session = DefaultSession(sessionsModel: sessionModel, heldSessionStarts: heldSessionStarts)
 
         let userModel = UserModel(storage: storage)
         let user = DefaultUser(userModel: userModel)
@@ -97,5 +98,12 @@ extension SplunkRum {
         storage.keysPrefix = keysPrefix
 
         return storage
+    }
+
+    /// File storage in a temporary directory, so that test instances never write the agent's production files.
+    private static func buildTemporaryFileStorage(named: String) -> FileKeyValueStorage {
+        FileKeyValueStorage(
+            directory: FileManager.default.temporaryDirectory.appendingPathComponent(named, isDirectory: true)
+        )
     }
 }

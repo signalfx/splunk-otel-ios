@@ -33,7 +33,7 @@ final class AgentTestBuilder {
 
     static func build(
         with configuration: AgentConfiguration,
-        session: AgentSession = DefaultSession(),
+        session: AgentSession = DefaultSession(heldSessionStarts: DefaultSessionTestBuilder.buildHeldSessionStarts(named: "agentTest")),
         user: AgentUser = DefaultUser(),
         sessionSampler: AgentSessionSampler = SamplerFactory.alwaysOnSampler()
     ) throws -> SplunkRum {

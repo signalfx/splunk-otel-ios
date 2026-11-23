@@ -26,11 +26,21 @@ class DefaultSession: AgentSession {
     // MARK: - Private
 
     /// Serializes external access to stored data.
-    private let accessQueue: DispatchQueue
+    ///
+    /// Internal, so that the session start extensions can run their work on it.
+    let accessQueue: DispatchQueue
 
     var refreshJob: RepeatingJob?
 
     let sessionsModel: SessionsModel
+
+    /// Saves the session starts held until their sessions produce telemetry, so that the next launch can restore them.
+    ///
+    /// By default they are saved in a file rather than in `UserDefaults`, because a `UserDefaults` write
+    /// can wait seconds for the preferences daemon. The file is written asynchronously, so a crash in the
+    /// short window before the write can still lose a start.
+    let heldSessionStarts: HeldSessionStartStore
+
     private(set) lazy var currentSession: SessionItem = startSession()
 
     private var lastActivity: Date?
@@ -139,26 +149,15 @@ class DefaultSession: AgentSession {
         }
     }
 
-    /// Holds the start event of the initial session until the session produces telemetry.
-    ///
-    /// A session without telemetry then contains no events at all, instead of a lone
-    /// zero-duration session start event. Sessions created by ``rotateSession(previousSessionId:)``
-    /// hold their start event themselves. Starts still held when the previous run ended are restored first.
-    func scheduleSessionStart() {
-        let screenName = screenNameForSessionStart()
-        let savedStarts = savedHeldSessionStarts()
-
-        accessQueue.sync {
-            restoreHeldSessionStarts(savedStarts)
-            holdSessionStart(PendingSessionStart(session: currentSession, previousSessionId: nil, screenName: screenName))
-        }
-    }
-
 
     // MARK: - Initialization
 
-    required init(sessionsModel: SessionsModel = SessionsModel()) {
+    required init(
+        sessionsModel: SessionsModel = SessionsModel(),
+        heldSessionStarts: HeldSessionStartStore = HeldSessionStartStore(storage: FileKeyValueStorage(named: "sessions"))
+    ) {
         self.sessionsModel = sessionsModel
+        self.heldSessionStarts = heldSessionStarts
 
         let queueName = PackageIdentifier.default(named: "sessionAccess")
         accessQueue = DispatchQueue(label: queueName)

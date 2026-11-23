@@ -19,7 +19,7 @@ import Foundation
 import XCTest
 
 @testable import SplunkCommon
-@_spi(SplunkInternal) @testable import SplunkCrashReports
+@testable import SplunkCrashReports
 
 /// Tests for `initializeCrashReporter`, `crashReportUpdateScreenName` and `appStateHandler`
 /// in `CrashReports.swift`, and `refreshCachedSessionId` in `CrashReports+SessionId.swift`.

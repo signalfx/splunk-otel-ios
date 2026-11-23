@@ -15,7 +15,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import OpenTelemetryApi
 import SplunkCommon
 import XCTest
 
@@ -44,6 +43,7 @@ final class HeldSessionStartPersistenceTests: XCTestCase {
         super.setUp()
 
         retainedAgents = []
+        restoreOpenTelemetryGlobalsAtTeardown()
     }
 
     override func tearDown() {
@@ -151,8 +151,8 @@ final class HeldSessionStartPersistenceTests: XCTestCase {
 
     func testUnreadableSavedStartsAreIgnored() throws {
         let (firstRun, _) = try buildSession(named: "heldStartUnreadableTest")
-        firstRun.sessionsModel.heldSessionStarts.waitForRequestedSaves()
-        try firstRun.sessionsModel.heldSessionStarts.storage.update("not a list of starts", forKey: HeldSessionStartStore.storageKey)
+        firstRun.heldSessionStarts.waitForRequestedSaves()
+        try firstRun.heldSessionStarts.storage.update("not a list of starts", forKey: HeldSessionStartStore.storageKey)
 
         // The next run restores nothing, and its own session start still works
         let (nextRun, eventManager) = try buildSession(relaunching: firstRun)
@@ -166,7 +166,7 @@ final class HeldSessionStartPersistenceTests: XCTestCase {
 
     func testSavedStartsOlderThanTheSessionsListAreNotRestored() throws {
         let (firstRun, _) = try buildSession(named: "heldStartAgeTest")
-        firstRun.sessionsModel.heldSessionStarts.waitForRequestedSaves()
+        firstRun.heldSessionStarts.waitForRequestedSaves()
 
         // Starts that nothing released, for example after the app was killed before its first export
         let day: TimeInterval = 86_400
@@ -186,7 +186,7 @@ final class HeldSessionStartPersistenceTests: XCTestCase {
                 screenName: nil
             )
         ]
-        try firstRun.sessionsModel.heldSessionStarts.storage.update(savedStarts, forKey: HeldSessionStartStore.storageKey)
+        try firstRun.heldSessionStarts.storage.update(savedStarts, forKey: HeldSessionStartStore.storageKey)
 
         let (nextRun, eventManager) = try buildSession(relaunching: firstRun)
         nextRun.scheduleSessionStart()
@@ -201,8 +201,8 @@ final class HeldSessionStartPersistenceTests: XCTestCase {
         XCTAssertNil(sessionStart(sentBy: eventManager, sessionId: expiredSessionId))
 
         // The expired start is not saved again either
-        nextRun.sessionsModel.heldSessionStarts.waitForRequestedSaves()
-        let stillSaved = nextRun.sessionsModel.heldSessionStarts.load().map(\.sessionId)
+        nextRun.heldSessionStarts.waitForRequestedSaves()
+        let stillSaved = nextRun.heldSessionStarts.load().map(\.sessionId)
         XCTAssertFalse(stillSaved.contains(expiredSessionId))
     }
 
@@ -211,14 +211,15 @@ final class HeldSessionStartPersistenceTests: XCTestCase {
 
     func testReleaseAndSessionIdDoNotWaitForStorage() throws {
         // Saving the held starts blocks until the test lets it go, as a stalled storage call can
-        let sessionsStorage = UserDefaultsStorageTestBuilder.buildCleanStorage(named: "heldStartBlockedStorageTest")
-        let storage = BlockingHeldStartStorage(wrapping: SessionsModel.defaultHeldStartsStorage(for: sessionsStorage))
-        let sessionsModel = SessionsModel(storage: sessionsStorage, heldStartsStorage: storage)
-        let (session, eventManager) = try link(DefaultSession(sessionsModel: sessionsModel))
+        let name = "heldStartBlockedStorageTest"
+        let sessionsModel = SessionsModel(storage: UserDefaultsStorageTestBuilder.buildCleanStorage(named: name))
+        let storage = BlockingHeldStartStorage(wrapping: DefaultSessionTestBuilder.buildCleanHeldStartsStorage(named: name))
+        let heldSessionStarts = HeldSessionStartStore(storage: storage)
+        let (session, eventManager) = try link(DefaultSession(sessionsModel: sessionsModel, heldSessionStarts: heldSessionStarts))
 
         defer {
             storage.unblock()
-            session.sessionsModel.heldSessionStarts.waitForRequestedSaves()
+            session.heldSessionStarts.waitForRequestedSaves()
         }
 
         // The session id can still be read, and the held start is still released and sent
@@ -237,10 +238,17 @@ final class HeldSessionStartPersistenceTests: XCTestCase {
     // MARK: - Storage notifications
 
     func testSessionIdCanBeReadInDefaultsObserverWhileHeldStartsAreSaved() throws {
-        let (session, eventManager) = try buildSession(named: "heldStartObserverTest")
+        // The held starts are saved in `UserDefaults` here, as an injected storage can be, so that every
+        // save posts the notification below. A save written on the access queue would deadlock in the observer.
+        let storage = UserDefaultsStorageTestBuilder.buildCleanStorage(named: "heldStartObserverTest")
+        try? storage.delete(forKey: HeldSessionStartStore.storageKey)
+        let session = DefaultSession(
+            sessionsModel: SessionsModel(storage: storage),
+            heldSessionStarts: HeldSessionStartStore(storage: storage)
+        )
+        let (_, eventManager) = try link(session)
 
-        // `UserDefaults` posts this notification synchronously on the thread that writes, here the thread
-        // that saves the sessions list while held starts are saved and released.
+        // `UserDefaults` posts this notification synchronously on the thread that writes.
         // App code can observe it and read the session id there, for example by starting a span.
         let lock = NSLock()
         var didRead = false
@@ -276,7 +284,7 @@ final class HeldSessionStartPersistenceTests: XCTestCase {
         session.trackAcceptedTelemetry(forSessionId: session.currentSessionId)
         wait(for: [read, sent], timeout: arrivalTimeout)
 
-        session.sessionsModel.heldSessionStarts.waitForRequestedSaves()
+        session.heldSessionStarts.waitForRequestedSaves()
     }
 
 
@@ -290,9 +298,11 @@ final class HeldSessionStartPersistenceTests: XCTestCase {
     /// Builds the session of the next run of the app: a new session object on the same storage as `previous`,
     /// after the saves that `previous` requested are written.
     private func buildSession(relaunching previous: DefaultSession) throws -> (DefaultSession, MockEventManager) {
-        previous.sessionsModel.heldSessionStarts.waitForRequestedSaves()
+        previous.heldSessionStarts.waitForRequestedSaves()
 
-        return try link(DefaultSession(sessionsModel: SessionsModel(storage: previous.sessionsModel.storage)))
+        let sessionsModel = SessionsModel(storage: previous.sessionsModel.storage)
+
+        return try link(DefaultSession(sessionsModel: sessionsModel, heldSessionStarts: previous.heldSessionStarts))
     }
 
     /// Waits until the session has done the work queued on its access queue so far.
@@ -311,13 +321,12 @@ final class HeldSessionStartPersistenceTests: XCTestCase {
 
         // The event manager registers its pipeline as the global one, where spans that other tests leave
         // running would end with this session's id and release its held starts. The globals are put back.
-        let tracerProvider = OpenTelemetry.instance.tracerProvider
-        let loggerProvider = OpenTelemetry.instance.loggerProvider
+        let globals = OpenTelemetryGlobals()
         let eventManager = try MockEventManager(with: configuration, agent: agent)
-        OpenTelemetry.registerTracerProvider(tracerProvider: tracerProvider)
-        OpenTelemetry.registerLoggerProvider(loggerProvider: loggerProvider)
+        globals.restore()
         agent.eventManager = eventManager
         retainedAgents.append(agent)
+        stopAtTeardown(agent)
 
         return (session, eventManager)
     }

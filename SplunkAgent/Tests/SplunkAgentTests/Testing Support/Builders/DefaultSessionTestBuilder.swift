@@ -15,6 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import Foundation
+import SplunkCommon
+
 @testable import SplunkAgent
 
 final class DefaultSessionTestBuilder {
@@ -25,6 +28,26 @@ final class DefaultSessionTestBuilder {
         // Build session with preconfigured storage
         let storage = UserDefaultsStorageTestBuilder.buildCleanStorage(named: named)
         let sessionModel = SessionsModel(storage: storage)
-        return DefaultSession(sessionsModel: sessionModel)
+        return DefaultSession(sessionsModel: sessionModel, heldSessionStarts: buildHeldSessionStarts(named: named))
+    }
+
+
+    // MARK: - Held session starts
+
+    /// Builds a store of held session starts in a clean temporary directory derived from `named`,
+    /// so that tests never write the agent's production file.
+    static func buildHeldSessionStarts(named: String) -> HeldSessionStartStore {
+        HeldSessionStartStore(storage: buildCleanHeldStartsStorage(named: named))
+    }
+
+    /// Builds file storage in a temporary directory derived from `named`, removing what an earlier run left there.
+    static func buildCleanHeldStartsStorage(named: String) -> FileKeyValueStorage {
+        let testsDirectory = FileManager.default.temporaryDirectory.appendingPathComponent("\(PackageIdentifier.default).tests")
+        let directory = testsDirectory.appendingPathComponent(named, isDirectory: true)
+
+        // Clean storage before test run
+        try? FileManager.default.removeItem(at: directory)
+
+        return FileKeyValueStorage(directory: directory)
     }
 }

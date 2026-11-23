@@ -36,9 +36,10 @@ struct HeldSessionStartRecord: Codable, Equatable {
 /// Saves the held session starts, so that the next launch can restore them.
 ///
 /// Saves run in order on a serial queue of their own, so the session's access queue never waits
-/// for storage. A storage call can block for seconds, and `UserDefaults` posts its change
-/// notification on the writing thread, where app code may read the current session id through
-/// the session's access queue.
+/// for storage. A storage call can block, for example on file I/O or while data protection keeps
+/// the file closed, so storage calls must never run on the session's access queue. A storage that
+/// posts notifications as it writes, as `UserDefaults` does, would also let observers that read
+/// the current session id run on the writing thread.
 final class HeldSessionStartStore {
 
     // MARK: - Static constants
@@ -47,10 +48,13 @@ final class HeldSessionStartStore {
     static let storageKey = "heldSessionStarts"
 
 
-    // MARK: - Private
+    // MARK: - Storage
 
     /// The storage of the held session starts.
     let storage: KeyValueStorage
+
+
+    // MARK: - Private
 
     private let queue: DispatchQueue
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "Agent")
@@ -88,7 +92,9 @@ final class HeldSessionStartStore {
 
     /// Loads the saved held session starts, after the saves already requested are written.
     ///
-    /// Must not be called on a queue that a save may wait for, such as the session's access queue.
+    /// Must not be called on a queue that a save may wait for, such as the session's access queue:
+    /// it waits for this store's queue, and a storage that calls back into the session while it
+    /// saves would then deadlock.
     ///
     /// - Returns: The saved held session starts, oldest first, or an empty array if none can be read.
     func load() -> [HeldSessionStartRecord] {
@@ -106,9 +112,12 @@ final class HeldSessionStartStore {
         }
     }
 
+
+    // MARK: - Test support
+
     /// Waits until the saves already requested are written.
     ///
-    /// Tests use it to simulate the next launch of the app after the saves reached storage.
+    /// Exists for tests, which use it to simulate the next launch of the app after the saves reached storage.
     func waitForRequestedSaves() {
         queue.sync {}
     }

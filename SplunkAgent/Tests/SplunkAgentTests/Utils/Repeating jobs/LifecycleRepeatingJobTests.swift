@@ -59,7 +59,8 @@ import XCTest
 
         func testLifecycle() async throws {
             /* Going into the background for some time */
-            try await simulateBackgroundStay(for: DefaultSession(), duration: 5)
+            let session = DefaultSession(heldSessionStarts: DefaultSessionTestBuilder.buildHeldSessionStarts(named: "lifecycleJobTest"))
+            try await simulateBackgroundStay(for: session, duration: 5)
 
             /* SUSPENDED */
             // The job should stay suspended

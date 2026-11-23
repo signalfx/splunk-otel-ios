@@ -35,6 +35,24 @@ extension DefaultSession {
     /// When the limit is exceeded, the oldest start is dropped.
     static let maxHeldSessionStarts = 3
 
+    /// Holds the start event of the initial session until the session produces telemetry.
+    ///
+    /// A session without telemetry then contains no events at all, instead of a lone
+    /// zero-duration session start event. Sessions created by ``rotateSession(previousSessionId:)``
+    /// hold their start event themselves. Starts still held when the previous run ended are restored first.
+    func scheduleSessionStart() {
+        let screenName = screenNameForSessionStart()
+
+        // Loaded before entering `accessQueue`: loading waits for the store's queue, and an injected
+        // storage that calls back into the session while it saves would then deadlock.
+        let savedStarts = heldSessionStarts.load()
+
+        accessQueue.sync {
+            restoreHeldSessionStarts(savedStarts)
+            holdSessionStart(PendingSessionStart(session: currentSession, previousSessionId: nil, screenName: screenName))
+        }
+    }
+
     /// Holds a session's start event, dropping the oldest held starts beyond ``maxHeldSessionStarts``.
     ///
     /// The held starts are also saved, so that the next launch can restore them.

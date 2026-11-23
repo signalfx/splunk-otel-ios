@@ -37,9 +37,6 @@ final class UserDefaultsStorageTestBuilder {
         let storage = UserDefaultsStorage()
         storage.keysPrefix = keysPrefix
 
-        // The held session starts of this prefix are kept in a file of their own
-        try? SessionsModel.defaultHeldStartsStorage(for: storage).delete(forKey: HeldSessionStartStore.storageKey)
-
         return storage
     }
 }

@@ -18,7 +18,7 @@ limitations under the License.
 #if canImport(SplunkCrashReports)
 
     import Foundation
-    @_spi(SplunkInternal) internal import SplunkCrashReports
+    internal import SplunkCrashReports
 
     extension SplunkRum {
 
@@ -26,7 +26,7 @@ limitations under the License.
         ///
         /// A crash right after installation or after a session change then carries the ID of the
         /// session in which it happened.
-        func cacheSessionIds(in crashReportsModule: SplunkCrashReports.CrashReports) {
+        func keepCrashReportSessionIdCurrent(in crashReportsModule: SplunkCrashReports.CrashReports) {
             crashReportsSessionObserver = Self.observeSessionChanges(for: crashReportsModule)
 
             crashReportsModule.refreshCachedSessionId()

@@ -24,6 +24,12 @@ internal import SplunkCommon
 /// A write is in the file system when the call returns. Unlike `UserDefaults`, it does not depend on
 /// the preferences daemon, which can delay a write by seconds, so a crash shortly after the write
 /// does not lose the value.
+///
+/// The files have the default data protection of the app. Before the first unlock of the device
+/// after it starts, for example when the system launches the app in the background, the files can
+/// be neither read nor written: a read then throws, so nothing saved is restored, and a write throws too.
+///
+/// The directory is excluded from device backups, as the values only matter to later launches on this device.
 final class FileKeyValueStorage: KeyValueStorage {
 
     // MARK: - Private
@@ -99,7 +105,7 @@ final class FileKeyValueStorage: KeyValueStorage {
             throw KeyValueStorageError.dataSerializationFailure
         }
 
-        try fileManager.createDirectory(at: directory, withIntermediateDirectories: true)
+        try createDirectoryIfNeeded()
 
         // The atomic write never leaves a partly written file behind
         try data.write(to: fileURL(for: key), options: .atomic)
@@ -117,6 +123,32 @@ final class FileKeyValueStorage: KeyValueStorage {
 
 
     // MARK: - Private methods
+
+    private func createDirectoryIfNeeded() throws {
+        guard !fileManager.fileExists(atPath: directory.path) else {
+            return
+        }
+
+        try fileManager.createDirectory(at: directory, withIntermediateDirectories: true)
+        excludeDirectoryFromBackup()
+    }
+
+    /// Marks the directory as excluded from backups, best effort: the store works without it.
+    private func excludeDirectoryFromBackup() {
+        var resourceValues = URLResourceValues()
+        resourceValues.isExcludedFromBackup = true
+
+        var directory = directory
+
+        do {
+            try directory.setResourceValues(resourceValues)
+        }
+        catch {
+            logger.log(level: .debug) {
+                "Could not exclude the directory \(directory.lastPathComponent) from backup: \(error)"
+            }
+        }
+    }
 
     private func fileURL(for key: String) -> URL {
         directory.appendingPathComponent("\(key).json", isDirectory: false)

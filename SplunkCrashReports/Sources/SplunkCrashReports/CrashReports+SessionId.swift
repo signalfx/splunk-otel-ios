@@ -27,8 +27,7 @@ extension CrashReports {
     /// after either one carries the current session ID. On the main thread the ID is stored before
     /// this method returns; from another thread, on the main queue.
     /// While crash reporting is not enabled, it does nothing.
-    @_spi(SplunkInternal)
-    public func refreshCachedSessionId() {
+    package func refreshCachedSessionId() {
         // A crash reporter that is not enabled records no crash, so it needs no session ID.
         guard isCrashReportingEnabled else {
             return

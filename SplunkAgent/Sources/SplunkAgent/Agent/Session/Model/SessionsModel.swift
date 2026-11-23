@@ -45,12 +45,6 @@ class SessionsModel {
     /// An array of all available sessions in this instance.
     var sessions: [SessionItem] = []
 
-    /// Saves the session starts held until their sessions produce telemetry.
-    ///
-    /// They are saved in a file rather than in `storage`, so that a crash soon after a start is held
-    /// cannot lose it. A `UserDefaults` write can wait seconds for the preferences daemon.
-    let heldSessionStarts: HeldSessionStartStore
-
 
     // MARK: - Initialization
 
@@ -59,18 +53,9 @@ class SessionsModel {
     /// - Parameters:
     ///   - named: The `String` with name of this session list.
     ///   - storage: Instance of key-value storage for data persistence.
-    ///   - heldStartsStorage: Storage for the held session starts. By default, files in a directory
-    ///     named after the keys prefix of `storage`.
-    init(
-        named: String = "sessions",
-        storage: KeyValueStorage = UserDefaultsStorage(),
-        heldStartsStorage: KeyValueStorage? = nil
-    ) {
+    init(named: String = "sessions", storage: KeyValueStorage = UserDefaultsStorage()) {
         storageKey = named
         self.storage = storage
-        heldSessionStarts = HeldSessionStartStore(
-            storage: heldStartsStorage ?? Self.defaultHeldStartsStorage(for: storage)
-        )
 
         // Adds previously cached data
         sessions = read()
@@ -79,19 +64,6 @@ class SessionsModel {
 
 
 extension SessionsModel {
-
-    // MARK: - Held session starts storage
-
-    /// File storage for the held session starts, in a directory named after the keys prefix of `storage`.
-    ///
-    /// Each prefix gets a directory of its own, as each prefix keeps a sessions list of its own.
-    static func defaultHeldStartsStorage(for storage: KeyValueStorage) -> FileKeyValueStorage {
-        let prefix = (storage as? UserDefaultsStorage)?.keysPrefix ?? PackageIdentifier.default
-        let name = prefix.hasSuffix(".") ? String(prefix.dropLast()) : prefix
-
-        return FileKeyValueStorage(named: name.isEmpty ? PackageIdentifier.default : name)
-    }
-
 
     // MARK: - Storage management
 

@@ -31,7 +31,8 @@ final class DefaultSessionTests: XCTestCase {
         let agent = try AgentTestBuilder.buildDefault()
 
         // After the object is created, there should be one open session
-        let defaultSession = DefaultSession(sessionsModel: sessionModel)
+        let heldSessionStarts = DefaultSessionTestBuilder.buildHeldSessionStarts(named: testName)
+        let defaultSession = DefaultSession(sessionsModel: sessionModel, heldSessionStarts: heldSessionStarts)
         defaultSession.owner = agent
         XCTAssertEqual(sessionModel.sessions.count, 1)
 
@@ -157,11 +158,12 @@ final class DefaultSessionTests: XCTestCase {
     func testNextLaunchSession() throws {
         let storage = UserDefaultsStorageTestBuilder.buildCleanStorage(named: "nextLaunchSessionTest")
         let sessionModel = SessionsModel(storage: storage)
+        let heldSessionStarts = DefaultSessionTestBuilder.buildHeldSessionStarts(named: "nextLaunchSessionTest")
 
-        let previousSession = DefaultSession(sessionsModel: sessionModel)
+        let previousSession = DefaultSession(sessionsModel: sessionModel, heldSessionStarts: heldSessionStarts)
         let previousSessionId = previousSession.currentSession.id
 
-        let nextSession = DefaultSession(sessionsModel: sessionModel)
+        let nextSession = DefaultSession(sessionsModel: sessionModel, heldSessionStarts: heldSessionStarts)
         let nextSessionId = nextSession.currentSession.id
 
         XCTAssertNotEqual(previousSessionId, nextSessionId)
