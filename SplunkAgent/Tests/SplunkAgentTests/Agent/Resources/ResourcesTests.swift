@@ -27,10 +27,13 @@ import XCTest
 final class ResourcesTests: XCTestCase {
 
     func testRequiredResources() throws {
+        restoreOpenTelemetryGlobalsAtTeardown()
+
         // Agent initialization
         let configuration = try ConfigurationTestBuilder.buildDefault()
         let agent = try AgentTestBuilder.build(with: configuration)
         agent.eventManager = try DefaultEventManager(with: configuration, agent: agent)
+        stopAtTeardown(agent)
 
         // Get stored resources
         let eventManager = try XCTUnwrap(agent.eventManager as? DefaultEventManager)
@@ -153,11 +156,14 @@ final class ResourcesTests: XCTestCase {
             try? storage.delete(forKey: AppVersionTracker.storageKey)
         }
 
+        restoreOpenTelemetryGlobalsAtTeardown()
+
         var firstConfiguration = try ConfigurationTestBuilder.buildDefault()
         firstConfiguration.appVersion = "5.1.3"
         AppVersionTracker.record(currentVersion: firstConfiguration.appVersion)
         let firstAgent = try AgentTestBuilder.build(with: firstConfiguration)
         firstAgent.eventManager = try DefaultEventManager(with: firstConfiguration, agent: firstAgent)
+        stopAtTeardown(firstAgent)
 
         let firstEventManager = try XCTUnwrap(firstAgent.eventManager as? DefaultEventManager)
         let firstLogEventProcessor = try XCTUnwrap(
@@ -170,6 +176,7 @@ final class ResourcesTests: XCTestCase {
         AppVersionTracker.record(currentVersion: upgradedConfiguration.appVersion)
         let upgradedAgent = try AgentTestBuilder.build(with: upgradedConfiguration)
         upgradedAgent.eventManager = try DefaultEventManager(with: upgradedConfiguration, agent: upgradedAgent)
+        stopAtTeardown(upgradedAgent)
 
         let upgradedEventManager = try XCTUnwrap(upgradedAgent.eventManager as? DefaultEventManager)
         let upgradedLogEventProcessor = try XCTUnwrap(

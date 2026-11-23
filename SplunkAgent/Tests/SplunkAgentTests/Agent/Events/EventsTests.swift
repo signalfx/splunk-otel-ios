@@ -33,10 +33,13 @@ final class EventsTests: XCTestCase {
     // MARK: - Setup
 
     override func setUpWithError() throws {
+        restoreOpenTelemetryGlobalsAtTeardown()
+
         // Setup Agent against a mock server
         let configuration = try ConfigurationTestBuilder.buildDefault()
         let mockAgent = try AgentTestBuilder.build(with: configuration)
         mockAgent.eventManager = try DefaultEventManager(with: configuration, agent: mockAgent)
+        stopAtTeardown(mockAgent)
 
         // Use mock agent
         agent = mockAgent

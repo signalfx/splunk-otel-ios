@@ -27,7 +27,7 @@ final class API10SplunkRumBuilderTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        SplunkRum.resetSharedInstance()
+        resetSharedAgentForTest()
     }
 
     override func tearDown() {
