@@ -24,6 +24,8 @@ internal import SplunkCommon
 /// Sends session replay blob with metadata.
 class SessionReplayDataEvent: AgentEvent {
 
+    private static let displayWireframeKey = "displayWireframe"
+
     // MARK: - Event Identification
 
     let domain = "mrum"
@@ -52,7 +54,16 @@ class SessionReplayDataEvent: AgentEvent {
     ///               Optional so that we can see sessions with no session id in the backend.
     ///   - scriptInstanceId: Internal identifier used for backend purposes.
     ///   - userActivity: Unix-millisecond timestamps of user interactions recorded during this segment.
-    init(metadata: Metadata, data: Data, index: Int, sessionId: String?, scriptInstanceId: String, userActivity: [Int] = []) {
+    ///   - hideWireframe: Whether to disable wireframe playback for this segment.
+    init(
+        metadata: Metadata,
+        data: Data,
+        index: Int,
+        sessionId: String?,
+        scriptInstanceId: String,
+        userActivity: [Int] = [],
+        hideWireframe: Bool = false
+    ) {
         // Event properties
         timestamp = metadata.timestamp
         body = EventAttributeValue(data)
@@ -65,7 +76,7 @@ class SessionReplayDataEvent: AgentEvent {
         // Event attributes
         attributes = [
             // Chunk metadata
-            "segmentMetadata": .string(metadataToJSONString(metadata, userActivity: userActivity)),
+            "segmentMetadata": .string(metadataToJSONString(metadata, userActivity: userActivity, hideWireframe: hideWireframe)),
 
             // Script ID
             "splunk.scriptInstance": .string(scriptInstanceId),
@@ -81,35 +92,41 @@ class SessionReplayDataEvent: AgentEvent {
 
     // MARK: - Private methods
 
-    private func metadataToJSONString(_ metadata: Metadata, userActivity: [Int]) -> String {
+    private func metadataToJSONString(_ metadata: Metadata, userActivity: [Int], hideWireframe: Bool) -> String {
         // We always prefer conversion with a standard encoder ...
         guard
             let metadataContent = try? JSONEncoder().encode(metadata),
             var jsonObject = try? JSONSerialization.jsonObject(with: metadataContent) as? [String: Any]
         else {
             // ... but if something fails, we can build it manually
-            return fallbackJSON(metadata: metadata, userActivity: userActivity)
+            return fallbackJSON(metadata: metadata, userActivity: userActivity, hideWireframe: hideWireframe)
         }
 
         jsonObject["userActivity"] = userActivity
+        if hideWireframe {
+            jsonObject[Self.displayWireframeKey] = false
+        }
 
         guard
             let enrichedData = try? JSONSerialization.data(withJSONObject: jsonObject),
             let jsonString = String(data: enrichedData, encoding: .utf8)
         else {
-            return fallbackJSON(metadata: metadata, userActivity: userActivity)
+            return fallbackJSON(metadata: metadata, userActivity: userActivity, hideWireframe: hideWireframe)
         }
 
         return jsonString
     }
 
-    private func fallbackJSON(metadata: Metadata, userActivity: [Int]) -> String {
-        let dict: [String: Any] = [
+    private func fallbackJSON(metadata: Metadata, userActivity: [Int], hideWireframe: Bool) -> String {
+        var dict: [String: Any] = [
             "startUnixMs": metadata.startUnixMs,
             "endUnixMs": metadata.endUnixMs,
             "source": metadata.source,
             "userActivity": userActivity
         ]
+        if hideWireframe {
+            dict[Self.displayWireframeKey] = false
+        }
         guard
             let data = try? JSONSerialization.data(withJSONObject: dict),
             let jsonString = String(data: data, encoding: .utf8)
@@ -118,7 +135,8 @@ class SessionReplayDataEvent: AgentEvent {
             let src = jsonEscaped(metadata.source)
             let start = metadata.startUnixMs
             let end = metadata.endUnixMs
-            return "{\"startUnixMs\":\(start),\"endUnixMs\":\(end),\"source\":\"\(src)\",\"userActivity\":[\(activityJSON)]}"
+            let wireframeJSON = hideWireframe ? ",\"\(Self.displayWireframeKey)\":false" : ""
+            return "{\"startUnixMs\":\(start),\"endUnixMs\":\(end),\"source\":\"\(src)\",\"userActivity\":[\(activityJSON)]\(wireframeJSON)}"
         }
 
         return jsonString
