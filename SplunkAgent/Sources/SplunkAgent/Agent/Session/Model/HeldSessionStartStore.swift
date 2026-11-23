@@ -49,7 +49,9 @@ final class HeldSessionStartStore {
 
     // MARK: - Private
 
-    private let storage: KeyValueStorage
+    /// The storage of the held session starts.
+    let storage: KeyValueStorage
+
     private let queue: DispatchQueue
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "Agent")
 

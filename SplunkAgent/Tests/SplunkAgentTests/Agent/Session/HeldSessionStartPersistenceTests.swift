@@ -152,7 +152,7 @@ final class HeldSessionStartPersistenceTests: XCTestCase {
     func testUnreadableSavedStartsAreIgnored() throws {
         let (firstRun, _) = try buildSession(named: "heldStartUnreadableTest")
         firstRun.sessionsModel.heldSessionStarts.waitForRequestedSaves()
-        try firstRun.sessionsModel.storage.update("not a list of starts", forKey: HeldSessionStartStore.storageKey)
+        try firstRun.sessionsModel.heldSessionStarts.storage.update("not a list of starts", forKey: HeldSessionStartStore.storageKey)
 
         // The next run restores nothing, and its own session start still works
         let (nextRun, eventManager) = try buildSession(relaunching: firstRun)
@@ -164,14 +164,57 @@ final class HeldSessionStartPersistenceTests: XCTestCase {
     }
 
 
+    func testSavedStartsOlderThanTheSessionsListAreNotRestored() throws {
+        let (firstRun, _) = try buildSession(named: "heldStartAgeTest")
+        firstRun.sessionsModel.heldSessionStarts.waitForRequestedSaves()
+
+        // Starts that nothing released, for example after the app was killed before its first export
+        let day: TimeInterval = 86_400
+        let expiredSessionId = "0123456789abcdef0123456789abcdef"
+        let keptSessionId = "fedcba9876543210fedcba9876543210"
+        let savedStarts = [
+            HeldSessionStartRecord(
+                sessionId: expiredSessionId,
+                start: Date().addingTimeInterval(-DefaultSession.maxRestoredSessionStartAge - day),
+                previousSessionId: nil,
+                screenName: nil
+            ),
+            HeldSessionStartRecord(
+                sessionId: keptSessionId,
+                start: Date().addingTimeInterval(-DefaultSession.maxRestoredSessionStartAge + day),
+                previousSessionId: nil,
+                screenName: nil
+            )
+        ]
+        try firstRun.sessionsModel.heldSessionStarts.storage.update(savedStarts, forKey: HeldSessionStartStore.storageKey)
+
+        let (nextRun, eventManager) = try buildSession(relaunching: firstRun)
+        nextRun.scheduleSessionStart()
+
+        let sent = expectSessionStart(from: eventManager, sessionId: keptSessionId)
+        nextRun.trackAcceptedTelemetry(forSessionId: keptSessionId)
+        wait(for: [sent], timeout: arrivalTimeout)
+
+        nextRun.trackAcceptedTelemetry(forSessionId: expiredSessionId)
+        waitForQueuedWork(of: nextRun)
+
+        XCTAssertNil(sessionStart(sentBy: eventManager, sessionId: expiredSessionId))
+
+        // The expired start is not saved again either
+        nextRun.sessionsModel.heldSessionStarts.waitForRequestedSaves()
+        let stillSaved = nextRun.sessionsModel.heldSessionStarts.load().map(\.sessionId)
+        XCTAssertFalse(stillSaved.contains(expiredSessionId))
+    }
+
+
     // MARK: - Slow storage
 
     func testReleaseAndSessionIdDoNotWaitForStorage() throws {
         // Saving the held starts blocks until the test lets it go, as a stalled storage call can
-        let storage = BlockingHeldStartStorage(
-            wrapping: UserDefaultsStorageTestBuilder.buildCleanStorage(named: "heldStartBlockedStorageTest")
-        )
-        let (session, eventManager) = try link(DefaultSession(sessionsModel: SessionsModel(storage: storage)))
+        let sessionsStorage = UserDefaultsStorageTestBuilder.buildCleanStorage(named: "heldStartBlockedStorageTest")
+        let storage = BlockingHeldStartStorage(wrapping: SessionsModel.defaultHeldStartsStorage(for: sessionsStorage))
+        let sessionsModel = SessionsModel(storage: sessionsStorage, heldStartsStorage: storage)
+        let (session, eventManager) = try link(DefaultSession(sessionsModel: sessionsModel))
 
         defer {
             storage.unblock()
@@ -196,7 +239,8 @@ final class HeldSessionStartPersistenceTests: XCTestCase {
     func testSessionIdCanBeReadInDefaultsObserverWhileHeldStartsAreSaved() throws {
         let (session, eventManager) = try buildSession(named: "heldStartObserverTest")
 
-        // `UserDefaults` posts this notification synchronously on the thread that saves the held starts.
+        // `UserDefaults` posts this notification synchronously on the thread that writes, here the thread
+        // that saves the sessions list while held starts are saved and released.
         // App code can observe it and read the session id there, for example by starting a span.
         let lock = NSLock()
         var didRead = false
@@ -293,81 +337,5 @@ final class HeldSessionStartPersistenceTests: XCTestCase {
 
     private func sessionStart(sentBy eventManager: MockEventManager, sessionId: String) -> AgentEvent? {
         eventManager.sentEvents.first { $0.name == "session.start" && $0.sessionId == sessionId }
-    }
-}
-
-
-/// A storage whose saves of the held session starts block until the test unblocks them.
-///
-/// Other keys pass through at once. A blocked save gives up after a while, so that a regression fails
-/// the test instead of hanging it.
-private final class BlockingHeldStartStorage: KeyValueStorage {
-
-    // MARK: - Private
-
-    private let storage: KeyValueStorage
-    private let gate = DispatchSemaphore(value: 0)
-    private let lock = NSLock()
-    private var isBlocking = true
-    private var writtenSaves = 0
-
-
-    // MARK: - Recorded saves
-
-    /// The number of saves of the held session starts written so far.
-    var writtenHeldStartSaves: Int {
-        lock.withLock { writtenSaves }
-    }
-
-
-    // MARK: - Initialization
-
-    init(wrapping storage: KeyValueStorage) {
-        self.storage = storage
-    }
-
-
-    // MARK: - Blocking
-
-    /// Lets the blocked saves and all later saves through.
-    func unblock() {
-        let wasBlocking = lock.withLock {
-            defer { isBlocking = false }
-
-            return isBlocking
-        }
-
-        if wasBlocking {
-            gate.signal()
-        }
-    }
-
-
-    // MARK: - CRUD operations
-
-    func insert(_ value: Codable, forKey key: String) throws {
-        try storage.insert(value, forKey: key)
-    }
-
-    func read<T: Codable>(forKey key: String) throws -> T? {
-        try storage.read(forKey: key)
-    }
-
-    func update(_ value: Codable, forKey key: String) throws {
-        if key == HeldSessionStartStore.storageKey, lock.withLock({ isBlocking }) {
-            // One blocked save at a time: the store writes in order on its own serial queue
-            _ = gate.wait(timeout: .now() + 20)
-            gate.signal()
-        }
-
-        try storage.update(value, forKey: key)
-
-        if key == HeldSessionStartStore.storageKey {
-            lock.withLock { writtenSaves += 1 }
-        }
-    }
-
-    func delete(forKey key: String) throws {
-        try storage.delete(forKey: key)
     }
 }

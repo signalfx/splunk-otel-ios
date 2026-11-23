@@ -33,10 +33,12 @@ final class UserDefaultsStorageTestBuilder {
 
         // Clean storage before test run
         UserDefaultsUtils.cleanItem(prefix: keysPrefix, key: defaultKey)
-        UserDefaultsUtils.cleanItem(prefix: keysPrefix, key: HeldSessionStartStore.storageKey)
 
         let storage = UserDefaultsStorage()
         storage.keysPrefix = keysPrefix
+
+        // The held session starts of this prefix are kept in a file of their own
+        try? SessionsModel.defaultHeldStartsStorage(for: storage).delete(forKey: HeldSessionStartStore.storageKey)
 
         return storage
     }

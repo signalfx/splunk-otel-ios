@@ -21,6 +21,13 @@ extension DefaultSession {
 
     // MARK: - Persisted held session starts
 
+    /// The age beyond which a saved session start is not restored.
+    ///
+    /// It matches how long the sessions list keeps a session, so a start is not sent once the agent
+    /// has forgotten its session. Without a limit, a start that nothing released, for example after
+    /// the app was killed before its first export, would be saved again at every launch.
+    static let maxRestoredSessionStartAge: TimeInterval = SessionsModel.maxDataLifetime
+
     /// Saves the held session starts, so that the next launch can restore them.
     ///
     /// The save is requested in the order of the changes to the held starts, and written later
@@ -51,17 +58,19 @@ extension DefaultSession {
     /// Restores saved session starts, so that late telemetry of their sessions can still release them.
     ///
     /// The restored starts go before the starts held now, oldest first, and the oldest are dropped
-    /// beyond ``maxHeldSessionStarts``. A start already held now is not restored a second time.
-    /// The restored starts are saved with the next held start.
+    /// beyond ``maxHeldSessionStarts``. A start already held now is not restored a second time, and
+    /// a start older than ``maxRestoredSessionStartAge`` is not restored at all. The restored starts
+    /// are saved with the next held start.
     ///
     /// Must run on `accessQueue`.
     ///
     /// - Parameter records: The saved session starts, oldest first.
     func restoreHeldSessionStarts(_ records: [HeldSessionStartRecord]) {
         let heldSessionIds = Set(pendingSessionStarts.map(\.session.id))
+        let oldestRestoredStart = Date().addingTimeInterval(-Self.maxRestoredSessionStartAge)
         let restored =
             records
-            .filter { !heldSessionIds.contains($0.sessionId) }
+            .filter { !heldSessionIds.contains($0.sessionId) && $0.start >= oldestRestoredStart }
             .map { record in
                 PendingSessionStart(
                     session: SessionItem(id: record.sessionId, start: record.start),
