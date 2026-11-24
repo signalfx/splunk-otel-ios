@@ -55,7 +55,7 @@ public class OTLPAttributesSpanProcessor: SpanProcessor {
     /// runtime attributes.
     ///
     /// With `ownsSessionId`, a span started while the runtime attributes lack one of these keys loses any
-    /// value for it that an earlier processor set, such as a customer global attribute. Pass `true` only
+    /// value for it that the span already holds, such as one set on the span builder. Pass `true` only
     /// for an agent's pipeline.
     package init(with runtimeAttributes: RuntimeAttributes, activityTracker: ActivityTracker, ownsSessionId: Bool) {
         self.runtimeAttributes = runtimeAttributes
@@ -74,9 +74,9 @@ public class OTLPAttributesSpanProcessor: SpanProcessor {
         inject(attributes: attributes, to: span)
 
         if ownsSessionId {
-            // The agent owns both session keys. Remove a value that an earlier processor set, such as a
-            // customer global attribute, unless the runtime attributes carry the key. Only a key that the
-            // span holds is removed, so the usual span start (no such value) writes nothing.
+            // The agent owns both session keys. Remove a value that the span already holds, such as one set
+            // on the span builder, unless the runtime attributes carry the key. Only a key that the span
+            // holds is removed, so the usual span start (no such value) writes nothing.
             for key in SessionAttributeKeys.agentOnly where attributes[key] == nil && startedSpan.attributes[key] != nil {
                 span.setAttribute(key: key, value: nil)
             }

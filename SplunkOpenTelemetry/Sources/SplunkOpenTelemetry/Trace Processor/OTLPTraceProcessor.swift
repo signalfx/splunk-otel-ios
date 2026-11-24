@@ -246,7 +246,10 @@ public class OTLPTraceProcessor: TraceProcessor {
         )
 
         // Global Attributes processor
-        let globalAttributesProcessor = OTLPGlobalAttributesSpanProcessor(with: configuration.globalAttributes)
+        let globalAttributesProcessor = OTLPGlobalAttributesSpanProcessor(
+            with: configuration.globalAttributes,
+            ownsSessionId: configuration.enforcesSessionPolicy
+        )
 
         // Initialize tracer provider
         let tracerProviderBuilder = TracerProviderBuilder()

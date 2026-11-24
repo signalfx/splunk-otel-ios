@@ -35,12 +35,14 @@ enum SessionPolicyPipelineTestBuilder {
     /// Starts and ends one span through the global attributes and attributes processors.
     ///
     /// - Parameters:
+    ///   - spanAttributes: Attributes set on the span builder, before the processors run.
     ///   - globalAttributes: The app's global attributes.
     ///   - runtimeSessionId: The `session.id` of the agent's runtime attributes, or `nil` for no session.
-    ///   - ownsSessionId: Whether the attributes processor treats the session keys as agent-only.
+    ///   - ownsSessionId: Whether both processors treat the session keys as agent-only, as in the agent's pipeline.
     ///
     /// - Returns: The ended span as an exporter receives it.
     static func startAndEndSpan(
+        spanAttributes: [String: AttributeValue] = [:],
         globalAttributes: [String: AttributeValue],
         runtimeSessionId: String?,
         ownsSessionId: Bool
@@ -48,7 +50,7 @@ enum SessionPolicyPipelineTestBuilder {
         // The processor holds the runtime attributes without owning them, so this reference keeps them alive.
         let runtimeAttributes = MockRuntimeAttributes(sessionId: runtimeSessionId)
         let provider = TracerProviderBuilder()
-            .add(spanProcessor: OTLPGlobalAttributesSpanProcessor(with: { globalAttributes }))
+            .add(spanProcessor: OTLPGlobalAttributesSpanProcessor(with: { globalAttributes }, ownsSessionId: ownsSessionId))
             .add(
                 spanProcessor: OTLPAttributesSpanProcessor(
                     with: runtimeAttributes,
@@ -57,9 +59,12 @@ enum SessionPolicyPipelineTestBuilder {
                 )
             )
             .build()
-        let span = provider.get(instrumentationName: "session-policy-pipeline-test-builder")
+        let builder = provider.get(instrumentationName: "session-policy-pipeline-test-builder")
             .spanBuilder(spanName: "test")
-            .startSpan()
+        for (key, value) in spanAttributes {
+            builder.setAttribute(key: key, value: value)
+        }
+        let span = builder.startSpan()
         span.end()
 
         // The SDK tracer provider always creates readable spans.

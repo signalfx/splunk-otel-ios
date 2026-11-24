@@ -148,6 +148,40 @@ struct SessionPreviousIdPolicyTests {
         #expect(span.attributes["session.previous_id"] == nil)
     }
 
+    /// A reserved global attribute does not take the slot that the agent's `session.id` needs on a span at its
+    /// attribute limit.
+    @Test
+    func reservedGlobalLeavesRoomForAgentId() {
+        let limit = SpanLimits().attributeCountLimit
+        var globalAttributes = Dictionary(
+            uniqueKeysWithValues: (0 ..< limit - 1).map { index in ("global.\(index)", AttributeValue.int(index)) }
+        )
+        globalAttributes["session.previous_id"] = .string(Self.otherSessionId)
+
+        let span = SessionPolicyPipelineTestBuilder.startAndEndSpan(
+            globalAttributes: globalAttributes,
+            runtimeSessionId: Self.sessionId,
+            ownsSessionId: true
+        )
+
+        #expect(span.attributes["session.id"] == .string(Self.sessionId))
+        #expect(span.attributes["session.previous_id"] == nil)
+    }
+
+    /// A `session.previous_id` set on the span builder is removed when the agent has no such value.
+    @Test
+    func spanBuilderPreviousIdRemoved() {
+        let span = SessionPolicyPipelineTestBuilder.startAndEndSpan(
+            spanAttributes: ["session.previous_id": .string(Self.otherSessionId)],
+            globalAttributes: [:],
+            runtimeSessionId: Self.sessionId,
+            ownsSessionId: true
+        )
+
+        #expect(span.attributes["session.id"] == .string(Self.sessionId))
+        #expect(span.attributes["session.previous_id"] == nil)
+    }
+
     @Test
     func standaloneKeepsGlobalPreviousId() {
         let span = SessionPolicyPipelineTestBuilder.startAndEndSpan(
