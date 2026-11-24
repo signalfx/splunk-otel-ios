@@ -66,6 +66,8 @@ public final class AgentConfigurationObjC: NSObject {
 
     /// Sets global attributes, which are sent with all signals.
     ///
+    /// `session.id` and `session.previous_id` are set only by the agent. These keys in `globalAttributes` are ignored.
+    ///
     /// Defaults to an empty `NSDictionary` object.
     @objc
     public var globalAttributes: [String: AttributeValueObjC]

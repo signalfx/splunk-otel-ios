@@ -15,12 +15,59 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import Foundation
 import SplunkCommon
 
+/// Runtime attributes with values that a test sets.
+///
+/// A test can change `sessionId` while spans start on other threads, so `lock` guards the stored values.
 final class MockRuntimeAttributes: RuntimeAttributes {
-    let all: [String: Any]
+
+    // MARK: - Private
+
+    private let lock = NSLock()
+    private var values: [String: Any]
+
+
+    // MARK: - Initialization
 
     init(all: [String: Any] = [:]) {
-        self.all = all
+        values = all
+    }
+
+    convenience init(sessionId: String?) {
+        self.init()
+        self.sessionId = sessionId
+    }
+
+
+    // MARK: - RuntimeAttributes
+
+    var all: [String: Any] {
+        lock.lock()
+        defer { lock.unlock() }
+
+        return values
+    }
+
+
+    // MARK: - Session
+
+    /// The `session.id` value, or `nil` when the attributes carry none.
+    var sessionId: String? {
+        get {
+            all["session.id"] as? String
+        }
+        set {
+            lock.lock()
+            defer { lock.unlock() }
+
+            if let newValue {
+                values["session.id"] = newValue
+            }
+            else {
+                values.removeValue(forKey: "session.id")
+            }
+        }
     }
 }

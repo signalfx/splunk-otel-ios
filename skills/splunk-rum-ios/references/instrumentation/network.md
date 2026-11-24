@@ -17,6 +17,11 @@ Objective-C API has no span interceptor; use
 `SPLKNetworkInstrumentationConfiguration.ignoreURLs` to drop matching spans or
 report that retaining them with URL redaction is unsupported.
 
+Spans whose `session.id` does not have the form of an agent session ID are
+dropped before the `spanInterceptor` callback runs. A span whose `session.id`
+or `session.previous_id` the callback changes is dropped; these keys in
+`globalAttributes` are ignored.
+
 Swift module configuration types live in `SplunkNetwork`; import it when using
 `NetworkInstrumentationConfiguration` or `IgnoreURLs`:
 

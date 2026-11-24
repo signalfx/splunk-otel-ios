@@ -31,6 +31,7 @@ struct SessionPolicySpanExporterTests {
         let proxy = MockSpanExporter()
         let exporter = SessionPolicySpanExporter(proxy: proxy)
 
+        // No session existed when the span was created, so the attributes processor omitted the key.
         let result = exporter.export(spans: [SpanDataTestBuilder.build()], explicitTimeout: nil)
 
         #expect(result == .success)
@@ -41,18 +42,24 @@ struct SessionPolicySpanExporterTests {
     func dropsNonGeneratedSessionIds() {
         let proxy = MockSpanExporter()
         let exporter = SessionPolicySpanExporter(proxy: proxy)
-        let rejected = [
-            "",
-            "undefined",
-            "no-op",
-            "00000000-0000-0000-0000-000000000000",
+        let rejected: [AttributeValue] = [
+            .string(""),
+            .string("undefined"),
+            .string("no-op"),
+            .string("00000000-0000-0000-0000-000000000000"),
             // Right length, wrong alphabet.
-            "0123456789ABCDEF0123456789ABCDEF",
+            .string("0123456789ABCDEF0123456789ABCDEF"),
+            // Right length, one character outside the hexadecimal alphabet.
+            .string("0123456789abcdef0123456789abcdeg"),
             // Hexadecimal but too short.
-            "0123456789abcdef"
+            .string("0123456789abcdef"),
+            // Hexadecimal but one character too long.
+            .string("0123456789abcdef0123456789abcdef0"),
+            // Not a string.
+            .int(1)
         ]
         let spans = rejected.map { sessionID in
-            SpanDataTestBuilder.build(attributes: ["session.id": .string(sessionID)])
+            SpanDataTestBuilder.build(attributes: ["session.id": sessionID])
         }
 
         let result = exporter.export(spans: spans, explicitTimeout: nil)

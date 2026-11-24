@@ -60,6 +60,8 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
 
     /// Sets global attributes, which are sent with all signals.
     ///
+    /// `session.id` and `session.previous_id` are set only by the agent. These keys in `globalAttributes` are ignored.
+    ///
     /// Defaults to an empty MutableAttributes object.
     public var globalAttributes: MutableAttributes = ConfigurationDefaults.globalAttributes
 
@@ -69,6 +71,7 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
     /// returning the span in the callback, or discarded by returning `nil` in the callback. Spans can also be modified by the callback.
     ///
     /// Spans whose `session.id` does not have the form of an agent session ID are dropped before the callback runs.
+    /// A span whose `session.id` or `session.previous_id` the callback changes is dropped; these keys in `globalAttributes` are ignored.
     public var spanInterceptor: ((SpanData) -> SpanData?)?
 
     /// Sets the `UserConfiguration` object.
@@ -161,6 +164,8 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
 
     /// Sets global attributes, which are sent with all signals.
     ///
+    /// `session.id` and `session.previous_id` are set only by the agent. These keys in `globalAttributes` are ignored.
+    ///
     /// - Parameter globalAttributes: A ``MutableAttributes`` object containing the global attributes to be sent with all signals.
     ///
     /// - Returns: The updated configuration structure.
@@ -179,6 +184,7 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
     /// Spans can also be modified by the callback.
     ///
     /// Spans whose `session.id` does not have the form of an agent session ID are dropped before the callback runs.
+    /// A span whose `session.id` or `session.previous_id` the callback changes is dropped; these keys in `globalAttributes` are ignored.
     ///
     /// - Parameter spanInterceptor: A `SpanData` interceptor callback.
     ///

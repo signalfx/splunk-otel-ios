@@ -12,7 +12,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 * Calling `integrateWithBrowserRum(_:)` again on an instrumented web view now gives the open page the current session. The SDK does not change the web view's user scripts. DEMRUM-6858
 * The SDK now registers the bridge's script message handler (`SplunkRumNativeUpdate`) once per content controller. If the app removes that handler after calling `integrateWithBrowserRum(_:)`, a later call no longer adds it back, and the page cannot ask the app for the session. DEMRUM-6858
 * Spans whose `session.id` is missing, or is not 32 lowercase hexadecimal characters, are dropped before they are stored (breaking change). A dropped span does not release a held `session.start`. Custom events and errors are sent as spans, so this applies to them too. With debug logging on, the agent logs how many spans each export batch dropped. DEMRUM-6856
-* The session check runs before the `spanInterceptor`, so the interceptor no longer sees spans that will be dropped. A span is still exported if the interceptor changes or removes its `session.id`. DEMRUM-6856
+* The session check runs before the `spanInterceptor`, so the interceptor no longer sees spans that will be dropped. DEMRUM-6856
+* A span is dropped if the `spanInterceptor` changes or removes its `session.id`, or adds, changes or removes its `session.previous_id`; with debug logging on, the agent logs how many spans each export batch dropped for this. Such a span releases no held `session.start`. A global attribute named `session.id` or `session.previous_id` is removed from every span, so it cannot give a span a session when the agent has none (breaking change). DEMRUM-7201
 
 ### Fixed
 
