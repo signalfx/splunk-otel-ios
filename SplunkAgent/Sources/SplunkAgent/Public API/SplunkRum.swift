@@ -288,8 +288,8 @@ public class SplunkRum: ObservableObject {
 
         // The initial session holds its start event until the session produces telemetry. This also starts
         // restoring, in the background, the starts held when the previous run ended. Releases that arrive
-        // before the restoring finishes, including the one by the crash report, wait for it. This must run
-        // before customizeModules(), because crash report processing there releases restored starts.
+        // before restoration finishes wait for it. Start restoration before customizeModules() registers
+        // previous crash report processing to run after it finishes.
         (currentSession as? DefaultSession)?.scheduleSessionStart()
 
         // Store module configurations for later use in module customization

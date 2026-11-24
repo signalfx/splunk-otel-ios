@@ -255,11 +255,8 @@ extension SplunkRum {
                 }
             }
 
-            // Check if a crash ended the previous run of the app
-            crashReportsModule?.reportCrashIfPresent()
-
             if let crashReportsModule {
-                keepCrashReportSessionIdCurrent(in: crashReportsModule)
+                startCrashReportProcessing(in: crashReportsModule)
             }
         #endif
     }

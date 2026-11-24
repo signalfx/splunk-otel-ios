@@ -22,6 +22,25 @@ limitations under the License.
 
     extension SplunkRum {
 
+        /// Keeps crash capture current while the saved starts are read.
+        ///
+        /// Processing can delete the previous crash's pending report, so wait until its session's
+        /// held start can be released.
+        func startCrashReportProcessing(in crashReportsModule: SplunkCrashReports.CrashReports) {
+            keepCrashReportSessionIdCurrent(in: crashReportsModule)
+
+            let processPendingReport: () -> Void = { [weak crashReportsModule] in
+                crashReportsModule?.reportCrashIfPresent()
+            }
+
+            if let session = currentSession as? DefaultSession {
+                session.whenHeldSessionStartsRestored(processPendingReport)
+            }
+            else {
+                DispatchQueue.main.async(execute: processPendingReport)
+            }
+        }
+
         /// Gives the crash reporter the current session ID now and after every session change.
         ///
         /// A crash right after installation or after a session change then carries the ID of the

@@ -33,6 +33,9 @@ extension DefaultSession {
         /// The session ids whose held starts are released once the restoring finishes, in the order
         /// their releases came, each once.
         var deferredReleases: [String] = []
+
+        /// Work to dispatch to the main queue after the saved starts and deferred releases are applied.
+        var completions: [() -> Void] = []
     }
 
     /// The age beyond which a saved session start is not restored.
@@ -98,6 +101,24 @@ extension DefaultSession {
         persistHeldSessionStarts()
     }
 
+    /// Schedules work on the main queue after the saved starts have been restored.
+    ///
+    /// Call after ``scheduleSessionStart()`` has started restoration. A failed read also completes it.
+    func whenHeldSessionStartsRestored(_ completion: @escaping () -> Void) {
+        accessQueue.async { [weak self] in
+            guard let self else {
+                return
+            }
+
+            if heldStartRestoration.isRestoring {
+                heldStartRestoration.completions.append(completion)
+            }
+            else {
+                DispatchQueue.main.async(execute: completion)
+            }
+        }
+    }
+
     /// Finishes restoring the held starts that the previous run saved, and runs the releases that waited for it.
     ///
     /// The restoring is marked finished first, so that the merged list is saved and the waiting
@@ -107,13 +128,17 @@ extension DefaultSession {
     ///
     /// - Parameter records: The saved session starts, oldest first.
     func finishRestoringHeldSessionStarts(_ records: [HeldSessionStartRecord]) {
-        let deferredReleases = heldStartRestoration.deferredReleases
+        let restoration = heldStartRestoration
         heldStartRestoration = HeldStartRestoration()
 
         restoreHeldSessionStarts(records)
 
-        for sessionId in deferredReleases {
+        for sessionId in restoration.deferredReleases {
             releaseHeldSessionStart(forSessionId: sessionId)
+        }
+
+        for completion in restoration.completions {
+            DispatchQueue.main.async(execute: completion)
         }
     }
 }
