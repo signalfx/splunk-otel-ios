@@ -19,7 +19,7 @@ import Foundation
 import OpenTelemetryApi
 
 extension OTLPBatchSpanProcessor {
-    /// Emits and persists one span, reporting success only when that exact span was admitted.
+    /// Emits and persists one span, reporting success only when that exact span reached the exporter.
     func persistSpan(
         emitting emitSpan: @escaping () -> SpanId,
         timeout: TimeInterval,

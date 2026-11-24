@@ -63,10 +63,12 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
     /// Defaults to an empty MutableAttributes object.
     public var globalAttributes: MutableAttributes = ConfigurationDefaults.globalAttributes
 
-    /// Span interceptor to be used to filter or modify all outgoing `SpanData` instances.
+    /// Span interceptor to be used to filter or modify every `SpanData` instance that passes the session check.
     ///
-    /// If the callback is provided, all spans are funneled through the callback, and can be either approved by returning the span in the callback,
-    /// or discarded by returning `nil` in the callback. Spans can also be modified by the callback.
+    /// If the callback is provided, every span that passes the session check is funneled through the callback, and can be either approved by
+    /// returning the span in the callback, or discarded by returning `nil` in the callback. Spans can also be modified by the callback.
+    ///
+    /// Spans whose `session.id` does not have the form of an agent session ID are dropped before the callback runs.
     public var spanInterceptor: ((SpanData) -> SpanData?)?
 
     /// Sets the `UserConfiguration` object.
@@ -172,9 +174,11 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
 
     /// Sets the span interceptor callback.
     ///
-    /// If the callback is provided, all spans will be funneled through the callback,
+    /// If the callback is provided, every span that passes the session check will be funneled through the callback,
     /// and can be either approved by returning the span in the callback, or discarded by returning `nil`.
     /// Spans can also be modified by the callback.
+    ///
+    /// Spans whose `session.id` does not have the form of an agent session ID are dropped before the callback runs.
     ///
     /// - Parameter spanInterceptor: A `SpanData` interceptor callback.
     ///

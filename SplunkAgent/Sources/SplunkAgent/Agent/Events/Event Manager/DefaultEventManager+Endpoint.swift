@@ -120,6 +120,7 @@ extension DefaultEventManager {
             spanInterceptor: configuration.spanInterceptor,
             accessToken: accessToken,
             activityTracker: agent.currentSession,
+            enforcesSessionPolicy: true,
             didIntercept: { [weak agent] spans in
                 // Spans that survived interception are about to be exported, which makes
                 // them the telemetry that releases a held session start event.
