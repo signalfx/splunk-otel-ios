@@ -70,6 +70,8 @@ extension CrashReports {
                         return
                     }
 
+                    // Success also covers a crash span that the session policy dropped because it has no
+                    // agent session ID. That report can never be sent, so it is deleted on purpose.
                     if succeeded {
                         self.crashReporter?.purgePendingCrashReport()
                     }

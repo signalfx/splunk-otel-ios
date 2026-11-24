@@ -40,10 +40,12 @@ final class TraceProcessorSessionWiringTests: XCTestCase {
         XCTAssertTrue(eventManager.concreteTraceProcessor.enforcesSessionPolicy)
     }
 
+    /// Spans without an agent session ID reach neither the customer `spanInterceptor` nor `didIntercept`.
     func testSpansWithoutAgentSessionIdSkipDidIntercept() {
         // Building the processor registers its tracer provider globally.
         restoreOpenTelemetryGlobalsAtTeardown()
 
+        let interceptorRecorder = InterceptedSpanRecorder()
         let recorder = InterceptedSpanRecorder()
         let agentSpanReported = expectation(description: "the span with an agent session ID reaches didIntercept")
         recorder.onName("agent-session") {
@@ -58,7 +60,11 @@ final class TraceProcessorSessionWiringTests: XCTestCase {
             runtimeAttributes: runtimeAttributes,
             globalAttributes: { [:] },
             debugEnabled: false,
-            spanInterceptor: nil,
+            spanInterceptor: { span in
+                interceptorRecorder.record([span])
+
+                return span
+            },
             activityTracker: IgnoredActivityTracker(),
             enforcesSessionPolicy: true,
             didIntercept: { spans in
@@ -76,6 +82,7 @@ final class TraceProcessorSessionWiringTests: XCTestCase {
         wait(for: [agentSpanReported], timeout: 10)
         _ = processor.forceFlushBufferedSpans(timeout: 10)
 
+        XCTAssertEqual(interceptorRecorder.names, ["agent-session"])
         XCTAssertEqual(recorder.names, ["agent-session"])
     }
 
@@ -96,7 +103,7 @@ final class TraceProcessorSessionWiringTests: XCTestCase {
 
 // MARK: - Test doubles
 
-/// Records the names of the spans that reach `didIntercept`, from any export thread.
+/// Records the names of the spans that reach the interceptor or `didIntercept`, from any export thread.
 private final class InterceptedSpanRecorder {
 
     private let lock = NSLock()

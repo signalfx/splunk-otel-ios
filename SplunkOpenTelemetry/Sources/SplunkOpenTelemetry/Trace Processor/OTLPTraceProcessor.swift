@@ -263,6 +263,11 @@ public class OTLPTraceProcessor: TraceProcessor {
     }
 
     /// Emits and persists one span, reporting success only for that exact span.
+    ///
+    /// With the session policy on, success also covers a span that the policy dropped on purpose
+    /// because its `session.id` is not an agent session ID. Such a span is not written to disk. A
+    /// caller that deletes its source payload on success, such as the crash reporter, then deletes it
+    /// without a durable copy.
     package func emitAndPersistSpan(
         emitting emitSpan: @escaping () -> SpanId,
         timeout: TimeInterval,
