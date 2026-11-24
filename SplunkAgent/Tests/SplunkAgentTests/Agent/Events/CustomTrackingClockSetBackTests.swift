@@ -48,6 +48,9 @@ final class CustomTrackingClockSetBackTests: XCTestCase {
     override func setUpWithError() throws {
         try super.setUpWithError()
 
+        // Building the event manager registers its tracer and logger providers globally.
+        restoreOpenTelemetryGlobalsAtTeardown()
+
         // The stored sessions hold one earlier session; the session object closes it and starts the current one.
         let sessionsModel = SessionsModel(storage: UserDefaultsStorageTestBuilder.buildCleanStorage(named: UUID().uuidString))
         sessionsModel.sessions = [SessionItem(id: Self.endedSessionId, start: Date().addingTimeInterval(-120))]
@@ -56,6 +59,7 @@ final class CustomTrackingClockSetBackTests: XCTestCase {
         let agent = try AgentTestBuilder.build(with: configuration, session: session)
         let eventManager = try DefaultEventManager(with: configuration, agent: agent)
         agent.eventManager = eventManager
+        stopAtTeardown(agent)
 
         self.session = session
         self.agent = agent

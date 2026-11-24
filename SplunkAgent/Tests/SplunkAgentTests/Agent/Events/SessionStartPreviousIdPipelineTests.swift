@@ -39,12 +39,11 @@ final class SessionStartPreviousIdPipelineTests: XCTestCase {
     // MARK: - Tests
 
     func testSessionStartKeepsPreviousId() throws {
-        let originalTracerProvider = OpenTelemetry.instance.tracerProvider
-        addTeardownBlock {
-            OpenTelemetry.registerTracerProvider(tracerProvider: originalTracerProvider)
-        }
+        // The agent and the trace processor register their providers globally.
+        restoreOpenTelemetryGlobalsAtTeardown()
 
         let agent = try AgentTestBuilder.build(with: ConfigurationTestBuilder.buildDefault())
+        stopAtTeardown(agent)
         let sessionId = agent.currentSession.currentSessionId
 
         let exporter = RecordingTraceExporter()
@@ -72,10 +71,8 @@ final class SessionStartPreviousIdPipelineTests: XCTestCase {
     /// A held start that a span of its session releases, through the agent's `didIntercept` closure,
     /// keeps its own `session.id`, `session.previous_id` and `screen.name` on the exported span.
     func testReleasedStartKeepsItsAttributes() throws {
-        let originalTracerProvider = OpenTelemetry.instance.tracerProvider
-        addTeardownBlock {
-            OpenTelemetry.registerTracerProvider(tracerProvider: originalTracerProvider)
-        }
+        // The agent and the trace processor register their providers globally.
+        restoreOpenTelemetryGlobalsAtTeardown()
 
         let configuration = try ConfigurationTestBuilder.buildDefault()
         let session = DefaultSession(
@@ -84,6 +81,7 @@ final class SessionStartPreviousIdPipelineTests: XCTestCase {
         let agent = try AgentTestBuilder.build(with: configuration, session: session)
         let eventManager = try MockEventManager(with: configuration, agent: agent)
         agent.eventManager = eventManager
+        stopAtTeardown(agent)
         let firstSessionId = session.currentSessionId
 
         // The linked session starts on one screen; its first telemetry comes from another.

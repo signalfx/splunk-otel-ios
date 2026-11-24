@@ -130,7 +130,8 @@ final class TraceProcessorSessionWiringTests: XCTestCase {
     // MARK: - Fixture
 
     private func makeFixture() -> Fixture {
-        let originalTracerProvider = OpenTelemetry.instance.tracerProvider
+        // Building the processor registers its tracer provider globally.
+        restoreOpenTelemetryGlobalsAtTeardown()
 
         // The agent's runtime attributes carry `session.id` while the agent has a session; it starts with none.
         let runtimeAttributes = MockRuntimeAttributes()
@@ -160,10 +161,6 @@ final class TraceProcessorSessionWiringTests: XCTestCase {
             activityTracker: MockActivityTracker(),
             enforcesSessionPolicy: true
         )
-
-        addTeardownBlock {
-            OpenTelemetry.registerTracerProvider(tracerProvider: originalTracerProvider)
-        }
 
         return Fixture(
             runtimeAttributes: runtimeAttributes,
