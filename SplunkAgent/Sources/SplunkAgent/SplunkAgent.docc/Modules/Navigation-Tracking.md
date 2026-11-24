@@ -37,7 +37,7 @@ let agent = try SplunkRum.install(
 Implement ``SplunkNavigation/NavigationEventProcessor`` to customize how detected `UIViewController` transitions are named, enriched, or filtered. The processor is called once per automated navigation event; manual ``NavigationModule/track(screen:)`` calls bypass it.
 
 - **Rename screens:** Return a ``SplunkNavigation/NavigationEvent`` with a custom name.
-- **Add span attributes:** Include key-value pairs in the event's `attributes`. These are added to the `app.ui.navigation` span.
+- **Add span attributes:** Include key-value pairs in the event's `attributes`. These are added to the `app.ui.navigation` span. The keys `session.id` and `session.previous_id` are ignored.
 - **Suppress events:** Return `nil` to prevent the navigation event.
 
 See ``SplunkNavigation/NavigationEventProcessor`` for code examples.
@@ -70,6 +70,8 @@ agent?.navigation.track(
     attributes: ["product.id": "abc-123"]
 )
 ```
+
+The agent sets `session.id` and `session.previous_id` itself, so these keys are ignored in the attributes of `track(screen:attributes:)` and `trackScreen(_:attributes:)`.
 
 ### SwiftUI
 

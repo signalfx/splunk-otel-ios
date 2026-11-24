@@ -59,6 +59,7 @@ public protocol NavigationModule: ObservableObject {
     ///   - attributes: Optional custom key-value pairs to attach to the `app.ui.navigation` span.
     ///     Supported value types: `String`, `Int`, `Double`, `Bool`, and arrays of those types.
     ///     Other types are converted to their string representation.
+    ///     `session.id` and `session.previous_id` are set only by the agent; these keys are ignored.
     ///
     /// - Returns: The actual ``NavigationModule`` instance.
     ///

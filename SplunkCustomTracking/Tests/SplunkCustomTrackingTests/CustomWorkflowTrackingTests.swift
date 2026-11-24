@@ -61,8 +61,8 @@ final class CustomWorkflowTrackingTests: XCTestCase {
         let module = try XCTUnwrap(module)
         let span = module.track(workflowName)
 
-        // The span should be our testable mock span
-        let mockSpan = try XCTUnwrap(span as? MockSpan)
+        // The span should wrap our testable mock span
+        let mockSpan = try startedSpan(of: span)
 
         // Verify span properties
         XCTAssertEqual(mockSpan.name, workflowName)
@@ -90,13 +90,94 @@ final class CustomWorkflowTrackingTests: XCTestCase {
         span.setAttribute(key: "job_id", value: .string("job-5678"))
         span.setAttribute(key: "data_size_kb", value: .int(1_024))
 
-        let mockSpan = try XCTUnwrap(span as? MockSpan)
+        let mockSpan = try startedSpan(of: span)
 
         // Verify custom attributes are present
         XCTAssertEqual(mockSpan.attributes["job_id"]?.description, "job-5678")
         XCTAssertEqual(mockSpan.attributes["data_size_kb"]?.description, "1024")
 
         span.end()
+    }
+
+    /// The agent stamps `session.id` when the span starts, so the app cannot change it afterwards.
+    func testTrackWorkflowIgnoresSessionAttributes() throws {
+        let module = try XCTUnwrap(module)
+
+        let span = module.track("testSessionWorkflow")
+        let mockSpan = try startedSpan(of: span)
+        mockSpan.attributes["session.id"] = .string("agent-session")
+
+        span.setAttribute(key: "session.id", value: .string("app-session"))
+        span.setAttribute(key: "session.previous_id", value: "app-previous-session")
+        span.setAttributes([
+            "session.id": .string("app-session"),
+            "session.previous_id": .string("app-previous-session"),
+            "job_id": .string("job-5678")
+        ])
+
+        XCTAssertEqual(mockSpan.attributes["session.id"], .string("agent-session"))
+        XCTAssertNil(mockSpan.attributes["session.previous_id"])
+        XCTAssertEqual(mockSpan.attributes["job_id"], .string("job-5678"))
+
+        span.end()
+    }
+
+    /// Ending the workflow span removes the span the app made active.
+    ///
+    /// The context manager matches spans by identity, so the workflow span must remove itself.
+    func testTrackWorkflowEndRemovesActiveSpan() throws {
+        let module = try XCTUnwrap(module)
+        let contextProvider = OpenTelemetry.instance.contextProvider
+
+        let span = module.track("testActiveWorkflow")
+        contextProvider.setActiveSpan(span)
+        defer { contextProvider.removeContextForSpan(span) }
+        XCTAssertTrue(contextProvider.activeSpan === span)
+
+        span.end()
+
+        XCTAssertFalse(contextProvider.activeSpan === span)
+    }
+
+    /// The wrapper passes the end time, status, name, one event and an exception to the real span.
+    func testTrackWorkflowForwardsSpanCalls() throws {
+        let module = try XCTUnwrap(module)
+        let span = module.track("testForwardingWorkflow")
+        let mockSpan = try startedSpan(of: span)
+        let endTime = Date(timeIntervalSince1970: 1_800_000_000)
+
+        span.name = "renamedWorkflow"
+        span.status = .error(description: "failed")
+        span.addEvent(name: "checkpoint")
+        span.recordException(ForwardedTestError())
+        span.end(time: endTime)
+
+        XCTAssertEqual(mockSpan.name, "renamedWorkflow")
+        XCTAssertEqual(mockSpan.status, .error(description: "failed"))
+        XCTAssertEqual(mockSpan.recordedEventNames, ["checkpoint"])
+        XCTAssertEqual(mockSpan.recordedExceptions.count, 1)
+        XCTAssertEqual(mockSpan.endTime, endTime)
+        XCTAssertFalse(mockSpan.isRecording)
+    }
+
+    /// The returned span wraps the tracer's span, so casting it to `ReadableSpan` returns `nil`.
+    func testTrackWorkflowSpanIsNotAReadableSpan() throws {
+        let module = try XCTUnwrap(module)
+        let span = module.track("testReadableWorkflow")
+
+        XCTAssertNil(span as? ReadableSpan)
+
+        span.end()
+    }
+
+
+    // MARK: - Helpers
+
+    /// The span the tracer started, which the returned workflow span wraps.
+    private func startedSpan(of span: Span) throws -> MockSpan {
+        let workflowSpan = try XCTUnwrap(span as? CustomWorkflowSpan)
+
+        return try XCTUnwrap(workflowSpan.span as? MockSpan)
     }
 }
 

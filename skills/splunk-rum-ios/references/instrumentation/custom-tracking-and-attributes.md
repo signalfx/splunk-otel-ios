@@ -45,7 +45,9 @@ agent.customTracking.trackError("checkout_validation_failed")
 ```
 
 `trackWorkflow(_:)` returns an OpenTelemetry `Span`; only recommend workflows
-when the Host App has a clear owner for ending the span.
+when the Host App has a clear owner for ending the span. The agent sets
+`session.id` and `session.previous_id` on it; values that the app sets for
+these keys are ignored.
 
 Keep attributes low-cardinality and non-sensitive. Never add raw names, emails,
 addresses, account numbers, auth identifiers, or other PII. Use the Host App's

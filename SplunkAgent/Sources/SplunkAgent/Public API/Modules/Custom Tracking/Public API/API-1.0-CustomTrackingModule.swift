@@ -23,6 +23,9 @@ internal import SplunkCommon
 // MARK: - CustomTracking
 
 /// Defines a public API for the CustomTracking  module.
+///
+/// Only the agent sets `session.id` and `session.previous_id` on tracked events, errors and
+/// workflow spans. Values the app supplies for these attributes are ignored.
 public protocol CustomTrackingModule {
 
     // MARK: - Track Custom Events
@@ -117,6 +120,9 @@ public protocol CustomTrackingModule {
     // MARK: - Track Custom Workflow
 
     /// Track a workflow with a name and return a `Span` object.
+    ///
+    /// The span keeps the session that is current when it starts. A `session.id` or `session.previous_id` set on it is ignored.
+    /// The span is dropped if no session exists when it starts. The returned span is not a `ReadableSpan`: `as?` returns `nil` and `as!` crashes.
     ///
     /// - Parameter workflowName: The name of the workflow to track.
     ///

@@ -33,6 +33,7 @@ do {
 
 ### Tracking a Workflow
 The trackWorkflow method returns a Span object that you are responsible for ending.
+The agent sets `session.id` and `session.previous_id` on the span; values that your app sets for these keys are ignored.
 
 ```swift
 let checkoutSpan = agent?.customTracking.trackWorkflow("checkout_process")
