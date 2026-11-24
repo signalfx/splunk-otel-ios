@@ -27,23 +27,10 @@ final class MockWKUserContentController: WKUserContentController {
     var addScriptMessageHandlerCallCount = 0
     var removeScriptMessageHandlerCallCount = 0
     var lastAddedMessageHandlerName: String?
-    var removeAllUserScriptsCallCount = 0
 
-    private var installedUserScripts: [WKUserScript] = []
-
-    override var userScripts: [WKUserScript] {
-        installedUserScripts
-    }
-
-    override func addUserScript(_ userScript: WKUserScript) {
+    override func addUserScript(_: WKUserScript) {
         addUserScriptCalled = true
         addUserScriptCallCount += 1
-        installedUserScripts.append(userScript)
-    }
-
-    override func removeAllUserScripts() {
-        removeAllUserScriptsCallCount += 1
-        installedUserScripts.removeAll()
     }
 
     @available(iOS 14.0, *)

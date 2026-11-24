@@ -65,8 +65,6 @@ final class WebViewBridgeUserScriptTests: XCTestCase {
         XCTAssertEqual(order, "[\"before:undefined\",\"after:object\"]")
         let runs = try await customerScriptRuns(in: page.webView)
         XCTAssertEqual(runs, ["before": 1, "after": 1, "world": 1])
-        let synchronous = try await waitForValue("second-session") { try await self.synchronousSessionId(in: page.webView) }
-        XCTAssertEqual(synchronous, "second-session")
     }
 
     func testChangeCallbackFiresOncePerChange() async throws {

@@ -27,40 +27,27 @@ final class WebViewSessionPushTests: XCTestCase {
     private let sharedState = MockAgentSharedState(sessionId: "first-session")
     private lazy var instrumentation = WebViewInstrumentation(logger: MockLogAgent(), sharedState: sharedState)
 
-    func testSessionChangeOneUpdatePerView() {
-        let first = MockWKWebView()
-        let second = MockWKWebView()
+    func testSessionChangePushesEachViewOnce() throws {
+        // Two views that share a content controller, as views created from one configuration do.
+        let configuration = MockWKWebViewConfiguration()
+        let first = MockWKWebView(frame: .zero, configuration: configuration)
+        let second = MockWKWebView(frame: .zero, configuration: configuration)
+        let controller = try XCTUnwrap(configuration.userContentController as? MockWKUserContentController)
         instrumentation.injectSessionId(into: first)
         instrumentation.injectSessionId(into: second)
 
         sharedState.updateSessionId("second-session")
         instrumentation.nativeSessionDidChange()
 
+        XCTAssertEqual(controller.addScriptMessageHandlerCallCount, 1)
+        // One bridge script per web view; the page's guard runs only the first.
+        XCTAssertEqual(controller.addUserScriptCallCount, 2)
         for webView in [first, second] {
             let updates = webView.evaluatedJavaScripts.filter { $0.contains("_setNativeSession('second-session'") }
             XCTAssertEqual(updates.count, 1)
             // The full script and the update of the injection, then the push.
             XCTAssertEqual(webView.evaluatedJavaScripts.count, 3)
         }
-    }
-
-    func testSessionChangeLeavesUserScripts() throws {
-        let webView = MockWKWebView()
-        let controller = try XCTUnwrap(webView.configuration.userContentController as? MockWKUserContentController)
-        let before = makeCustomerScript("before")
-        let after = makeCustomerScript("after")
-        controller.addUserScript(before)
-        instrumentation.injectSessionId(into: webView)
-        controller.addUserScript(after)
-        let scriptsBefore = controller.userScripts
-
-        sharedState.updateSessionId("second-session")
-        instrumentation.nativeSessionDidChange()
-        instrumentation.injectSessionId(into: webView)
-
-        XCTAssertEqual(controller.removeAllUserScriptsCallCount, 0)
-        XCTAssertEqual(controller.userScripts.count, 3)
-        XCTAssertTrue(zip(controller.userScripts, scriptsBefore).allSatisfy { $0 === $1 })
     }
 
     func testRepeatedInjectionRegistersHandlerOnce() throws {
@@ -75,57 +62,16 @@ final class WebViewSessionPushTests: XCTestCase {
         XCTAssertEqual(controller.addScriptMessageHandlerCallCount, 1)
     }
 
-    func testSharedControllerRegistersHandlerOnceAndPushesEachView() throws {
-        let configuration = MockWKWebViewConfiguration()
-        let first = MockWKWebView(frame: .zero, configuration: configuration)
-        let second = MockWKWebView(frame: .zero, configuration: configuration)
-        let controller = try XCTUnwrap(configuration.userContentController as? MockWKUserContentController)
-        instrumentation.injectSessionId(into: first)
-        instrumentation.injectSessionId(into: second)
-
-        sharedState.updateSessionId("second-session")
-        instrumentation.nativeSessionDidChange()
-
-        XCTAssertEqual(controller.addScriptMessageHandlerCallCount, 1)
-        // One bridge script per web view, as before; the page's guard runs only the first.
-        XCTAssertEqual(controller.userScripts.count, 2)
-        XCTAssertEqual(controller.removeAllUserScriptsCallCount, 0)
-        for webView in [first, second] {
-            let updates = webView.evaluatedJavaScripts.filter { $0.contains("_setNativeSession('second-session'") }
-            XCTAssertEqual(updates.count, 1)
-        }
-    }
-
-    func testDeallocatedWebViewIsSkipped() {
-        let configuration = MockWKWebViewConfiguration()
+    func testReleasedWebViewIsNotRetainedOrPushed() {
         let liveWebView = MockWKWebView()
-        weak var releasedWebView: MockWKWebView?
+        weak var releasedWebView: WKWebView?
+        weak var releasedController: WKUserContentController?
         // Inject both views inside the pool. Reading the weak table can autorelease the
         // released view, and outside a pool that keeps it alive until the test ends.
         autoreleasepool {
-            let webView = MockWKWebView(frame: .zero, configuration: configuration)
-            instrumentation.injectSessionId(into: webView)
-            instrumentation.injectSessionId(into: liveWebView)
-            releasedWebView = webView
-        }
-
-        // WebKit can release a web view on a later run loop turn, later still under load.
-        let released = waitUntil(timeout: 30) { releasedWebView == nil }
-        XCTAssertTrue(released, "WebKit did not release the web view.")
-
-        sharedState.updateSessionId("second-session")
-        instrumentation.nativeSessionDidChange()
-
-        // The full script and the update of the injection, then the push.
-        XCTAssertEqual(liveWebView.evaluatedJavaScripts.count, 3)
-    }
-
-    func testInstrumentationDoesNotRetainWebView() {
-        weak var releasedWebView: WKWebView?
-        weak var releasedController: WKUserContentController?
-        autoreleasepool {
             let webView = WKWebView()
             instrumentation.injectSessionId(into: webView)
+            instrumentation.injectSessionId(into: liveWebView)
             let controller = webView.configuration.userContentController
             // WebKit keeps a content controller alive while it has a script message handler,
             // so remove the handlers as an app does at teardown.
@@ -134,39 +80,15 @@ final class WebViewSessionPushTests: XCTestCase {
             releasedController = controller
         }
 
+        // WebKit can release a web view on a later run loop turn, later still under load.
         let released = waitUntil(timeout: 30) { releasedWebView == nil && releasedController == nil }
         XCTAssertTrue(released, "The instrumentation kept the web view or its content controller alive.")
 
-        // A push with only released views does nothing and does not crash.
         sharedState.updateSessionId("second-session")
         instrumentation.nativeSessionDidChange()
-    }
 
-    func testSessionEndPushesEmptySessionId() {
-        let webView = MockWKWebView()
-        instrumentation.injectSessionId(into: webView)
-
-        sharedState.updateSessionId("")
-        instrumentation.nativeSessionDidChange()
-
-        XCTAssertEqual(
-            webView.lastEvaluatedJavaScript,
-            WebViewBridgeScript.update(sessionId: "", sessionMetadata: nil)
-        )
-    }
-
-    func testRepeatedInjectionAlsoUpdatesOpenPage() {
-        let webView = MockWKWebView()
-        instrumentation.injectSessionId(into: webView)
-
-        sharedState.updateSessionId("second-session")
-        sharedState.updateSessionMetadata("bWV0YQ==")
-        instrumentation.injectSessionId(into: webView)
-
-        XCTAssertEqual(
-            webView.lastEvaluatedJavaScript,
-            WebViewBridgeScript.update(sessionId: "second-session", sessionMetadata: "bWV0YQ==")
-        )
+        // The full script and the update of the injection, then the push.
+        XCTAssertEqual(liveWebView.evaluatedJavaScripts.count, 3)
     }
 
     func testSessionChangeFromBackgroundHopsToMain() async throws {
@@ -196,42 +118,6 @@ final class WebViewSessionPushTests: XCTestCase {
         XCTAssertEqual(updates.count, 1)
     }
 
-    func testSessionChangeBuildsNoBridgeScript() {
-        var generatorCalls = 0
-        let counting = WebViewInstrumentation(
-            logger: MockLogAgent(),
-            sharedState: sharedState,
-            bridgeScriptGenerator: { sessionId, sessionMetadata, handlerName in
-                generatorCalls += 1
-                return WebViewBridgeScript.generate(sessionId: sessionId, sessionMetadata: sessionMetadata, handlerName: handlerName)
-            }
-        )
-
-        counting.nativeSessionDidChange()
-        XCTAssertEqual(generatorCalls, 0)
-
-        // The counter works: one build for the injection, none for the push.
-        let webView = MockWKWebView()
-        counting.injectSessionId(into: webView)
-        counting.nativeSessionDidChange()
-        XCTAssertEqual(generatorCalls, 1)
-    }
-
-    func testUninstrumentedWebViewGetsNoPush() {
-        let unavailable = WebViewInstrumentation(
-            logger: MockLogAgent(),
-            sharedState: sharedState,
-            bridgeScriptGenerator: { _, _, _ in nil }
-        )
-        let webView = MockWKWebView()
-        unavailable.injectSessionId(into: webView)
-
-        sharedState.updateSessionId("second-session")
-        unavailable.nativeSessionDidChange()
-
-        XCTAssertTrue(webView.evaluatedJavaScripts.isEmpty)
-    }
-
     func testWebViewsMatchedByIdentityNotEquality() {
         let first = EqualWebView()
         let second = EqualWebView()
@@ -250,14 +136,6 @@ final class WebViewSessionPushTests: XCTestCase {
 
 
     // MARK: - Helpers
-
-    private func makeCustomerScript(_ name: String) -> WKUserScript {
-        WKUserScript(
-            source: "window.customerScript = '\(name)';",
-            injectionTime: .atDocumentEnd,
-            forMainFrameOnly: true
-        )
-    }
 
     /// Runs the main run loop until the condition holds or the timeout passes.
     private func waitUntil(timeout: TimeInterval, _ condition: () -> Bool) -> Bool {

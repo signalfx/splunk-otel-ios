@@ -49,7 +49,8 @@ final class WebViewBridgeJavaScriptTests: XCTestCase {
         try await navigation.reload(webView)
 
         // The reloaded page starts from the ID baked into the bridge script and asks native at once.
-        let reloadedSync = try await waitForValue("foreground-session-id") { try await self.synchronousSessionId(in: webView) }
+        // Stay under the getter's 5 s refresh, so only the request at page load can satisfy the wait.
+        let reloadedSync = try await waitForValue("foreground-session-id", timeout: 2) { try await self.synchronousSessionId(in: webView) }
         XCTAssertEqual(reloadedSync, "foreground-session-id")
         let reloadedAsync = try await asynchronousSessionId(in: webView)
         XCTAssertEqual(reloadedAsync, "foreground-session-id")
@@ -104,10 +105,13 @@ final class WebViewBridgeJavaScriptTests: XCTestCase {
         XCTAssertEqual(firstSync, "first-session")
 
         sharedState.updateSessionId("second-session")
+        sharedState.updateSessionMetadata("bWV0YQ==")
         instrumentation.injectSessionId(into: webView)
 
         let repeatedSync = try await synchronousSessionId(in: webView)
         XCTAssertEqual(repeatedSync, "second-session")
+        let repeatedMetadata = try await pageMetadata(in: webView)
+        XCTAssertEqual(repeatedMetadata, "bWV0YQ==")
     }
 
     func testNavigationWaiterGivesUpWithNoFinish() async {

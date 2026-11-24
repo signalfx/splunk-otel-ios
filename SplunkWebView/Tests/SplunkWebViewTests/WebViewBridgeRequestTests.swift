@@ -128,3 +128,26 @@ final class WebViewBridgeRequestTests: XCTestCase {
         return handler.pendingReplies.count
     }
 }
+
+
+/// A message handler that keeps each request's reply handler until the test replies.
+@MainActor
+private final class HeldReplyHandler: NSObject, WKScriptMessageHandlerWithReply {
+
+    static let name = "HeldReplyHandler"
+
+    private(set) var pendingReplies: [@MainActor @Sendable (Any?, String?) -> Void] = []
+
+    func userContentController(
+        _: WKUserContentController,
+        didReceive _: WKScriptMessage,
+        replyHandler: @escaping @MainActor @Sendable (Any?, String?) -> Void
+    ) {
+        pendingReplies.append(replyHandler)
+    }
+
+    /// Replies to the request at the index with a session ID and no metadata.
+    func reply(_ index: Int, sessionId: String) {
+        pendingReplies[index](["sessionId": sessionId, "sessionMetadata": NSNull()], nil)
+    }
+}
