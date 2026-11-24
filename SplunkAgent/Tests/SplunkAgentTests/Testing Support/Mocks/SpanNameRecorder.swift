@@ -21,14 +21,17 @@ import OpenTelemetrySdk
 /// Records the names of the spans it is given, from any thread.
 ///
 /// It can also run an action once a span with a given name arrives, so a test can wait for that span.
-final class SpanNameRecorder {
+///
+/// Safety: spans arrive on export threads while the test reads the names, and `lock` guards all stored
+/// state. A `Mutex` (iOS 18 and later) would remove the `@unchecked`.
+final class SpanNameRecorder: @unchecked Sendable {
 
     // MARK: - Private
 
     private let lock = NSLock()
     private var recordedNames: [String] = []
     private var watchedName: String?
-    private var onWatchedName: (() -> Void)?
+    private var onWatchedName: (@Sendable () -> Void)?
 
 
     // MARK: - Public
@@ -41,7 +44,7 @@ final class SpanNameRecorder {
     }
 
     /// Runs `action` when a span named `name` is recorded.
-    func onName(_ name: String, perform action: @escaping () -> Void) {
+    func onName(_ name: String, perform action: @escaping @Sendable () -> Void) {
         lock.lock()
         defer { lock.unlock() }
 

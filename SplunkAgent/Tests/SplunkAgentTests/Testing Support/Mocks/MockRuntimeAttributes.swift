@@ -20,8 +20,9 @@ import SplunkCommon
 
 /// Runtime attributes with values that a test sets.
 ///
-/// A test can change `sessionId` while spans start on other threads, so `lock` guards the stored values.
-final class MockRuntimeAttributes: RuntimeAttributes {
+/// Safety: a test can change `sessionId` while spans start on other threads, and `lock` guards the stored
+/// values. A `Mutex` (iOS 18 and later) would remove the `@unchecked`.
+final class MockRuntimeAttributes: RuntimeAttributes, @unchecked Sendable {
 
     // MARK: - Private
 

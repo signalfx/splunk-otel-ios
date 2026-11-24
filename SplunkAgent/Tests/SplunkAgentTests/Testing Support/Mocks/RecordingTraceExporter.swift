@@ -21,7 +21,10 @@ import OpenTelemetrySdk
 @testable import SplunkOpenTelemetry
 
 /// Stands in for the background exporter, which is the stage after the session policy.
-final class RecordingTraceExporter: EndpointConfigurableSpanExporter {
+///
+/// Safety: spans arrive on the export thread while the test reads them, and `lock` guards `recordedSpans`.
+/// A `Mutex` (iOS 18 and later) would remove the `@unchecked`.
+final class RecordingTraceExporter: EndpointConfigurableSpanExporter, @unchecked Sendable {
 
     // MARK: - Private
 
