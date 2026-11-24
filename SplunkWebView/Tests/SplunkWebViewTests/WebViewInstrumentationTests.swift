@@ -157,17 +157,17 @@ final class WebViewInstrumentationTests: XCTestCase {
         XCTAssertEqual(mockWebView.evaluateJavaScriptCallCount, 4)
     }
 
-    func testInjectSessionIdRepeatKeepsOneScript() throws {
+    func testInjectSessionId_addsUserScriptOnlyOnce_whenCalledMultipleTimes() throws {
         let mockWebView = try XCTUnwrap(mockWebView)
         let mockContentController = mockWebView.configuration.userContentController as? MockWKUserContentController
         XCTAssertNotNil(mockContentController)
 
         // First injection adds the user script.
         webViewInstrumentation?.injectSessionId(into: mockWebView)
-        // Second injection replaces it instead of adding another one.
+        // Second injection should not add the user script again.
         webViewInstrumentation?.injectSessionId(into: mockWebView)
 
-        XCTAssertEqual(mockContentController?.userScripts.count, 1, "A web view should hold one bridge user script.")
+        XCTAssertEqual(mockContentController?.addUserScriptCallCount, 1, "User script should be added only once per webview.")
     }
 
     func testMessageHandler_whenSessionIdChanges_repliesWithNewSessionId() async throws {

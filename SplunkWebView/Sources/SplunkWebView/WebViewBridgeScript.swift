@@ -109,8 +109,9 @@ enum WebViewBridgeScript {
 
     /// Generates a JavaScript statement that pushes a new native session into an installed bridge.
     ///
-    /// The bridge's synchronous getter returns the pushed ID at once. The statement does nothing
-    /// in a page where the bridge is not installed.
+    /// The bridge's synchronous getter returns the pushed ID at once. The bridge ignores a reply
+    /// to a session request that the page sent before the push, because native computed that reply
+    /// before the push. The statement does nothing in a page where the bridge is not installed.
     ///
     /// - Parameters:
     ///   - sessionId: The current native session ID, or an empty string when no session exists.

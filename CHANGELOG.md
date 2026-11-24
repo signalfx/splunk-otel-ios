@@ -9,11 +9,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
-* Calling `integrateWithBrowserRum(_:)` again on an instrumented web view now gives the open page the current session and replaces the bridge script with one built from the current session. The new script applies from the page's next load. The SDK removes and re-adds all of the web view's user scripts in the same order; the other scripts are the same objects, and the bridge script is a new object.
+* Calling `integrateWithBrowserRum(_:)` again on an instrumented web view now gives the open page the current session. The SDK does not change the web view's user scripts. DEMRUM-6858
+* The SDK now registers the bridge's script message handler (`SplunkRumNativeUpdate`) once per content controller. If the app removes that handler after calling `integrateWithBrowserRum(_:)`, a later call no longer adds it back, and the page cannot ask the app for the session. DEMRUM-6858
 
 ### Fixed
 
 * HTTP spans no longer emit a negative response body size when the response length is unknown.
+* A page in an instrumented web view now asks the app for the current session as soon as it loads, and again when it returns from the back-forward cache. Before, a page that loaded after a session change used the session of the first `integrateWithBrowserRum(_:)` call for up to 5 seconds. DEMRUM-6858
+* Calling `integrateWithBrowserRum(_:)` again on the same web view no longer removes and re-adds the bridge's message handler, so a session request from the page can no longer fail during the call. DEMRUM-6858
 
 ## [2.6.0] - 2026-11-19
 

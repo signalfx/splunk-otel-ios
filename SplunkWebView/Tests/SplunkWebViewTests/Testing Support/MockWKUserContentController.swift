@@ -24,6 +24,8 @@ final class MockWKUserContentController: WKUserContentController {
     var addScriptMessageHandlerCalled = false
     var addLegacyScriptMessageHandlerCalled = false
     var removeScriptMessageHandlerCalled = false
+    var addScriptMessageHandlerCallCount = 0
+    var removeScriptMessageHandlerCallCount = 0
     var lastAddedMessageHandlerName: String?
     var removeAllUserScriptsCallCount = 0
 
@@ -47,6 +49,7 @@ final class MockWKUserContentController: WKUserContentController {
     @available(iOS 14.0, *)
     override func addScriptMessageHandler(_: WKScriptMessageHandlerWithReply, contentWorld _: WKContentWorld, name: String) {
         addScriptMessageHandlerCalled = true
+        addScriptMessageHandlerCallCount += 1
         lastAddedMessageHandlerName = name
     }
 
@@ -59,5 +62,6 @@ final class MockWKUserContentController: WKUserContentController {
     /// real framework implementation.
     override func removeScriptMessageHandler(forName _: String) {
         removeScriptMessageHandlerCalled = true
+        removeScriptMessageHandlerCallCount += 1
     }
 }
