@@ -39,23 +39,79 @@ extension DefaultSession {
     ///
     /// A session without telemetry then contains no events at all, instead of a lone
     /// zero-duration session start event. Sessions created by ``rotateSession(previousSessionId:)``
-    /// hold their start event themselves. Starts still held when the previous run ended are restored first.
+    /// hold their start event themselves.
+    ///
+    /// Also starts restoring the starts still held when the previous run ended. They are read in the
+    /// background, so this method does not wait for storage. Until the restoring finishes, the held
+    /// starts are not saved and no held start is released: releases wait and run when it finishes,
+    /// because the start a release is for may be one that is still being read. If a restoring is already running, a
+    /// second one is not started, and the running one restores the saved starts.
     func scheduleSessionStart() {
         let screenName = screenNameForSessionStart()
 
-        // Loaded before entering `accessQueue`: loading waits for the store's queue, and an injected
-        // storage that calls back into the session while it saves would then deadlock.
-        let savedStarts = heldSessionStarts.load()
+        let isAlreadyRestoring = accessQueue.sync {
+            let wasRestoring = heldStartRestoration.isRestoring
 
-        accessQueue.sync {
-            restoreHeldSessionStarts(savedStarts)
+            // Marked first, so that holding the start below does not save over the saved starts
+            heldStartRestoration.isRestoring = true
             holdSessionStart(PendingSessionStart(session: currentSession, previousSessionId: nil, screenName: screenName))
+
+            return wasRestoring
         }
+
+        guard !isAlreadyRestoring else {
+            return
+        }
+
+        heldSessionStarts.load { [weak self] records in
+            guard let self else {
+                return
+            }
+
+            accessQueue.async { [weak self] in
+                self?.finishRestoringHeldSessionStarts(records)
+            }
+        }
+    }
+
+    func trackAcceptedTelemetry(forSessionId sessionId: String) {
+        accessQueue.async { [weak self] in
+            self?.releaseHeldSessionStart(forSessionId: sessionId)
+        }
+    }
+
+    /// Sends the held start event of a session, if there is one.
+    ///
+    /// While the saved held starts are restored, the release waits until the restoring finishes,
+    /// because the start may be one that is still being read. Each session id waits once.
+    ///
+    /// Must run on `accessQueue`.
+    func releaseHeldSessionStart(forSessionId sessionId: String) {
+        if heldStartRestoration.isRestoring {
+            if !heldStartRestoration.deferredReleases.contains(sessionId) {
+                heldStartRestoration.deferredReleases.append(sessionId)
+            }
+
+            return
+        }
+
+        // The pending state is cleared first, as sending the event produces telemetry itself.
+        guard let pending = takeHeldSessionStart(forSessionId: sessionId) else {
+            return
+        }
+
+        sendSessionStart(
+            sessionId: pending.session.id,
+            timestamp: pending.session.start,
+            previousSessionId: pending.previousSessionId,
+            screenName: pending.screenName
+        )
     }
 
     /// Holds a session's start event, dropping the oldest held starts beyond ``maxHeldSessionStarts``.
     ///
-    /// The held starts are also saved, so that the next launch can restore them.
+    /// The held starts are also saved, so that the next launch can restore them, unless the saved starts
+    /// are being restored (see ``persistHeldSessionStarts()``).
     ///
     /// Must run on `accessQueue`.
     func holdSessionStart(_ pending: PendingSessionStart) {

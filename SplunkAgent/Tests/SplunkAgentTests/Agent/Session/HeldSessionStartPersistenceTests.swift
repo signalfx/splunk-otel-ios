@@ -81,6 +81,7 @@ final class HeldSessionStartPersistenceTests: XCTestCase {
         XCTAssertEqual(event.attributes?["screen.name"], .string("LaunchScreen"))
 
         // The new session's start still waits for the new session's own telemetry
+        waitForQueuedWork(of: nextRun)
         XCTAssertNil(sessionStart(sentBy: eventManager, sessionId: nextRun.currentSessionId))
     }
 
@@ -200,7 +201,8 @@ final class HeldSessionStartPersistenceTests: XCTestCase {
 
         XCTAssertNil(sessionStart(sentBy: eventManager, sessionId: expiredSessionId))
 
-        // The expired start is not saved again either
+        // The expired start is not saved again either: the merged list was saved when the restoring finished
+        nextRun.waitForHeldStartRestoration()
         nextRun.heldSessionStarts.waitForRequestedSaves()
         let stillSaved = nextRun.heldSessionStarts.load().map(\.sessionId)
         XCTAssertFalse(stillSaved.contains(expiredSessionId))
@@ -296,8 +298,10 @@ final class HeldSessionStartPersistenceTests: XCTestCase {
     }
 
     /// Builds the session of the next run of the app: a new session object on the same storage as `previous`,
-    /// after the saves that `previous` requested are written.
+    /// after `previous` finished restoring its saved starts and the saves it requested are written.
     private func buildSession(relaunching previous: DefaultSession) throws -> (DefaultSession, MockEventManager) {
+        // The held starts are saved only once the restoring finishes, so the save is requested after it
+        previous.waitForHeldStartRestoration()
         previous.heldSessionStarts.waitForRequestedSaves()
 
         let sessionsModel = SessionsModel(storage: previous.sessionsModel.storage)
@@ -305,13 +309,14 @@ final class HeldSessionStartPersistenceTests: XCTestCase {
         return try link(DefaultSession(sessionsModel: sessionsModel, heldSessionStarts: previous.heldSessionStarts))
     }
 
-    /// Waits until the session has done the work queued on its access queue so far.
+    /// Waits until the session has finished restoring the saved held starts and done the work queued
+    /// on its access queue so far.
     ///
-    /// The access queue is serial and reading the current session id waits for it, so the read returns
-    /// after the queued work. The mock event manager records sent events at once, so a check after
-    /// this wait does not depend on timing.
+    /// Releases that come while the saved starts are restored wait for the restoring, so a check that a
+    /// start was not sent must come after it. The mock event manager records sent events at once, so a
+    /// check after this wait does not depend on timing.
     private func waitForQueuedWork(of session: DefaultSession) {
-        _ = session.currentSessionId
+        session.waitForHeldStartRestoration()
     }
 
     private func link(_ session: DefaultSession) throws -> (DefaultSession, MockEventManager) {

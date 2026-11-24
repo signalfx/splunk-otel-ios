@@ -330,13 +330,14 @@ final class DefaultSessionStartTests: XCTestCase {
         return sessionStart
     }
 
-    /// Waits until the session has done the work queued on its access queue so far.
+    /// Waits until the session has finished restoring the saved held starts and done the work queued
+    /// on its access queue so far.
     ///
-    /// The access queue is serial and reading the current session id waits for it, so the read returns
-    /// after the queued work. The mock event manager records sent events at once, so a check after
-    /// this wait does not depend on timing.
+    /// Releases that come while the saved starts are restored wait for the restoring, so a check that a
+    /// start was not sent must come after it. The mock event manager records sent events at once, so a
+    /// check after this wait does not depend on timing.
     private func waitForQueuedWork(of session: DefaultSession) {
-        _ = session.currentSessionId
+        session.waitForHeldStartRestoration()
     }
 
     /// The session start events the event manager sent so far.

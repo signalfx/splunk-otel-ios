@@ -37,8 +37,9 @@ class DefaultSession: AgentSession {
     /// Saves the session starts held until their sessions produce telemetry, so that the next launch can restore them.
     ///
     /// By default they are saved in a file rather than in `UserDefaults`, because a `UserDefaults` write
-    /// can wait seconds for the preferences daemon. The file is written asynchronously, so a crash in the
-    /// short window before the write can still lose a start.
+    /// can wait seconds for the preferences daemon. The file is written asynchronously, and the new session's
+    /// start is saved only once the starts saved by the previous run are restored, so a crash in either short
+    /// window can still lose a start.
     let heldSessionStarts: HeldSessionStartStore
 
     private(set) lazy var currentSession: SessionItem = startSession()
@@ -52,6 +53,11 @@ class DefaultSession: AgentSession {
     /// Holds the current session and the sessions it replaced, as their late telemetry still carries their
     /// ids. Bounded by ``maxHeldSessionStarts``. Accessed only on `accessQueue`.
     var pendingSessionStarts: [PendingSessionStart] = []
+
+    /// The restoring of the held starts that the previous run saved.
+    ///
+    /// ``scheduleSessionStart()`` reads them in the background. Accessed only on `accessQueue`.
+    var heldStartRestoration = HeldStartRestoration()
 
     let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "Agent")
 
@@ -130,22 +136,6 @@ class DefaultSession: AgentSession {
             let baseline = lastActivity ?? currentSession.start
 
             lastActivity = max(baseline, date)
-        }
-    }
-
-    func trackAcceptedTelemetry(forSessionId sessionId: String) {
-        accessQueue.async { [weak self] in
-            // The pending state is cleared first, as sending the event produces telemetry itself.
-            guard let self, let pending = takeHeldSessionStart(forSessionId: sessionId) else {
-                return
-            }
-
-            sendSessionStart(
-                sessionId: pending.session.id,
-                timestamp: pending.session.start,
-                previousSessionId: pending.previousSessionId,
-                screenName: pending.screenName
-            )
         }
     }
 

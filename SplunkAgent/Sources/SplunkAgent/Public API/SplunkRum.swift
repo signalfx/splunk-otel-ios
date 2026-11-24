@@ -286,7 +286,9 @@ public class SplunkRum: ObservableObject {
         eventManager = try DefaultEventManager(with: configuration, agent: self)
         initializeEvents["event_manager_initialized"] = Date()
 
-        // The initial session holds its start event until the session produces telemetry. This must run
+        // The initial session holds its start event until the session produces telemetry. This also starts
+        // restoring, in the background, the starts held when the previous run ended. Releases that arrive
+        // before the restoring finishes, including the one by the crash report, wait for it. This must run
         // before customizeModules(), because crash report processing there releases restored starts.
         (currentSession as? DefaultSession)?.scheduleSessionStart()
 

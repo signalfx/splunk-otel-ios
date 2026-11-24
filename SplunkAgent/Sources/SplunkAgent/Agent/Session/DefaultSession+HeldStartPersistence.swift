@@ -21,6 +21,20 @@ extension DefaultSession {
 
     // MARK: - Persisted held session starts
 
+    /// The state of restoring the held starts that the previous run saved.
+    ///
+    /// The saved starts are read in the background. Until they are restored, the held starts are not
+    /// saved, so that a save cannot overwrite the saved starts before they are merged, and releases of
+    /// held starts wait, because the start a release is for may be one that is still being read.
+    struct HeldStartRestoration {
+        /// Whether the saved starts are being read and are not restored yet.
+        var isRestoring = false
+
+        /// The session ids whose held starts are released once the restoring finishes, in the order
+        /// their releases came, each once.
+        var deferredReleases: [String] = []
+    }
+
     /// The age beyond which a saved session start is not restored.
     ///
     /// It matches how long the sessions list keeps a session, so a start is not sent once the agent
@@ -34,8 +48,15 @@ extension DefaultSession {
     /// by ``heldSessionStarts`` on its own queue. Storage calls can block, for example on file I/O or
     /// while data protection keeps the file closed, so they must never run on `accessQueue`.
     ///
+    /// Does nothing while the starts saved by the previous run are restored: the merged list is saved
+    /// when the restoring finishes, so a save cannot overwrite the saved starts before they are merged.
+    ///
     /// Must run on `accessQueue`.
     func persistHeldSessionStarts() {
+        guard !heldStartRestoration.isRestoring else {
+            return
+        }
+
         let records = pendingSessionStarts.map { pending in
             HeldSessionStartRecord(
                 sessionId: pending.session.id,
@@ -55,7 +76,7 @@ extension DefaultSession {
     /// a start older than ``maxRestoredSessionStartAge`` is not restored at all. The save of the
     /// merged list is requested here, not left to the next change of the held starts.
     ///
-    /// Must run on `accessQueue`.
+    /// Must run on `accessQueue`, after the restoring is marked finished, so that the merged list is saved.
     ///
     /// - Parameter records: The saved session starts, oldest first.
     func restoreHeldSessionStarts(_ records: [HeldSessionStartRecord]) {
@@ -75,5 +96,24 @@ extension DefaultSession {
         pendingSessionStarts = restored + pendingSessionStarts
         dropHeldSessionStartsBeyondLimit()
         persistHeldSessionStarts()
+    }
+
+    /// Finishes restoring the held starts that the previous run saved, and runs the releases that waited for it.
+    ///
+    /// The restoring is marked finished first, so that the merged list is saved and the waiting
+    /// releases send their starts. A failed read arrives as an empty list and finishes the same way.
+    ///
+    /// Must run on `accessQueue`.
+    ///
+    /// - Parameter records: The saved session starts, oldest first.
+    func finishRestoringHeldSessionStarts(_ records: [HeldSessionStartRecord]) {
+        let deferredReleases = heldStartRestoration.deferredReleases
+        heldStartRestoration = HeldStartRestoration()
+
+        restoreHeldSessionStarts(records)
+
+        for sessionId in deferredReleases {
+            releaseHeldSessionStart(forSessionId: sessionId)
+        }
     }
 }

@@ -35,11 +35,11 @@ struct HeldSessionStartRecord: Codable, Equatable {
 
 /// Saves the held session starts, so that the next launch can restore them.
 ///
-/// Saves run in order on a serial queue of their own, so the session's access queue never waits
-/// for storage. A storage call can block, for example on file I/O or while data protection keeps
-/// the file closed, so storage calls must never run on the session's access queue. A storage that
-/// posts notifications as it writes, as `UserDefaults` does, would also let observers that read
-/// the current session id run on the writing thread.
+/// Saves and loads run in order on a serial queue of their own, so neither the session's access queue
+/// nor the caller of a load waits for storage. A storage call can block, for example on file I/O or
+/// while data protection keeps the file closed, so storage calls must never run on the session's
+/// access queue or on the main thread. A storage that posts notifications as it writes, as
+/// `UserDefaults` does, would also let observers that read the current session id run on the writing thread.
 final class HeldSessionStartStore {
 
     // MARK: - Static constants
@@ -90,34 +90,58 @@ final class HeldSessionStartStore {
         }
     }
 
-    /// Loads the saved held session starts, after the saves already requested are written.
+    /// Loads the saved held session starts after the saves already requested are written, without waiting for the read.
     ///
-    /// Must not be called on a queue that a save may wait for, such as the session's access queue:
-    /// it waits for this store's queue, and a storage that calls back into the session while it
-    /// saves would then deadlock.
+    /// The read and the completion run on this store's queue, so a storage call that blocks, for example on
+    /// file I/O or while data protection keeps the file closed, never blocks the caller.
     ///
-    /// - Returns: The saved held session starts, oldest first, or an empty array if none can be read.
-    func load() -> [HeldSessionStartRecord] {
-        queue.sync {
-            do {
-                return try storage.read(forKey: Self.storageKey) ?? []
-            }
-            catch {
-                logger.log(level: .error) {
-                    "Could not read the saved held session starts, so none are restored: \(error)"
-                }
+    /// - Parameter completion: Called on this store's queue with the saved held session starts, oldest first,
+    ///   or with an empty array if none can be read.
+    func load(completion: @escaping ([HeldSessionStartRecord]) -> Void) {
+        queue.async { [self] in
+            completion(readRecords())
+        }
+    }
 
-                return []
+
+    // MARK: - Private methods
+
+    /// Reads the saved held session starts.
+    ///
+    /// Must run on this store's queue.
+    private func readRecords() -> [HeldSessionStartRecord] {
+        do {
+            return try storage.read(forKey: Self.storageKey) ?? []
+        }
+        catch {
+            logger.log(level: .error) {
+                "Could not read the saved held session starts, so none are restored: \(error)"
             }
+
+            return []
         }
     }
 
 
     // MARK: - Test support
 
-    /// Waits until the saves already requested are written.
+    /// Loads the saved held session starts, after the saves already requested are written.
     ///
-    /// Exists for tests, which use it to simulate the next launch of the app after the saves reached storage.
+    /// Exists for tests, which use it to check what was saved. Production code must not call it, and uses
+    /// ``load(completion:)`` instead: this method waits for this store's queue and for the storage call,
+    /// which can block, and it would deadlock on a queue that a save may wait for, such as the session's access queue.
+    ///
+    /// - Returns: The saved held session starts, oldest first, or an empty array if none can be read.
+    func load() -> [HeldSessionStartRecord] {
+        queue.sync {
+            readRecords()
+        }
+    }
+
+    /// Waits until the saves and loads already requested have run.
+    ///
+    /// Exists for tests, which use it to simulate the next launch of the app after the saves reached storage,
+    /// and to wait until a load has called its completion.
     func waitForRequestedSaves() {
         queue.sync {}
     }

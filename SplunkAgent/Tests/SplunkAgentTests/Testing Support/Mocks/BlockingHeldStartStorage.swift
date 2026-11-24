@@ -20,19 +20,34 @@ import SplunkCommon
 
 @testable import SplunkAgent
 
-/// A storage whose saves of the held session starts block until the test unblocks them.
+/// A storage whose saves or reads of the held session starts block until the test unblocks them.
 ///
-/// Other keys pass through at once. A blocked save gives up after a while, so that a regression fails
-/// the test instead of hanging it.
+/// Other keys, and the calls of the kind that is not blocked, pass through at once. A blocked call gives up
+/// after a while, so that a regression fails the test instead of hanging it.
 final class BlockingHeldStartStorage: KeyValueStorage {
+
+    // MARK: - Blocked calls
+
+    /// The kind of storage call that blocks.
+    enum BlockedCall {
+        /// Saves of the held session starts block.
+        case save
+
+        /// Reads of the held session starts block.
+        case read
+    }
+
 
     // MARK: - Private
 
     private let storage: KeyValueStorage
+    private let blockedCall: BlockedCall
     private let gate = DispatchSemaphore(value: 0)
     private let lock = NSLock()
     private var isBlocking = true
     private var writtenSaves = 0
+    private var finishedReads = 0
+    private var blockedReadHandler: (() -> Void)?
 
 
     // MARK: - Recorded saves
@@ -42,17 +57,35 @@ final class BlockingHeldStartStorage: KeyValueStorage {
         lock.withLock { writtenSaves }
     }
 
+    /// The number of reads of the held session starts finished so far.
+    var finishedHeldStartReads: Int {
+        lock.withLock { finishedReads }
+    }
+
+    /// The held session starts in the wrapped storage now, read without blocking or counting the read.
+    func storedHeldStarts() throws -> [HeldSessionStartRecord]? {
+        try storage.read(forKey: HeldSessionStartStore.storageKey)
+    }
+
+    /// A closure called when a read of the held session starts begins to wait, on the reading thread.
+    var didBlockRead: (() -> Void)? {
+        get { lock.withLock { blockedReadHandler } }
+        set { lock.withLock { blockedReadHandler = newValue } }
+    }
+
 
     // MARK: - Initialization
 
-    init(wrapping storage: KeyValueStorage) {
+    /// Initializes a storage that wraps `storage` and blocks the given kind of call for the held session starts.
+    init(wrapping storage: KeyValueStorage, blocking blockedCall: BlockedCall = .save) {
         self.storage = storage
+        self.blockedCall = blockedCall
     }
 
 
     // MARK: - Blocking
 
-    /// Lets the blocked saves and all later saves through.
+    /// Lets the blocked calls and all later calls through.
     func unblock() {
         let wasBlocking = lock.withLock {
             defer { isBlocking = false }
@@ -73,14 +106,25 @@ final class BlockingHeldStartStorage: KeyValueStorage {
     }
 
     func read<T: Codable>(forKey key: String) throws -> T? {
-        try storage.read(forKey: key)
+        guard key == HeldSessionStartStore.storageKey else {
+            return try storage.read(forKey: key)
+        }
+
+        if blockedCall == .read, lock.withLock({ isBlocking }) {
+            didBlockRead?()
+            waitAtGate()
+        }
+
+        defer {
+            lock.withLock { finishedReads += 1 }
+        }
+
+        return try storage.read(forKey: key)
     }
 
     func update(_ value: Codable, forKey key: String) throws {
-        if key == HeldSessionStartStore.storageKey, lock.withLock({ isBlocking }) {
-            // One blocked save at a time: the store writes in order on its own serial queue
-            _ = gate.wait(timeout: .now() + 20)
-            gate.signal()
+        if key == HeldSessionStartStore.storageKey, blockedCall == .save, lock.withLock({ isBlocking }) {
+            waitAtGate()
         }
 
         try storage.update(value, forKey: key)
@@ -92,5 +136,14 @@ final class BlockingHeldStartStorage: KeyValueStorage {
 
     func delete(forKey key: String) throws {
         try storage.delete(forKey: key)
+    }
+
+
+    // MARK: - Private methods
+
+    private func waitAtGate() {
+        // One blocked call at a time: the store calls storage in order on its own serial queue
+        _ = gate.wait(timeout: .now() + 20)
+        gate.signal()
     }
 }
