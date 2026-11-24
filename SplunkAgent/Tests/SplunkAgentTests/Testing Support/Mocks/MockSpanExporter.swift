@@ -23,10 +23,19 @@ final class MockSpanExporter: SpanExporter {
 
     private(set) var exportedSpans: [SpanData] = []
 
+    /// The results of the next exports, consumed in order.
+    ///
+    /// Once the list is empty, an export reports success.
+    var results: [SpanExporterResultCode] = []
+
     func export(spans: [SpanData], explicitTimeout _: TimeInterval?) -> SpanExporterResultCode {
         exportedSpans.append(contentsOf: spans)
 
-        return .success
+        guard !results.isEmpty else {
+            return .success
+        }
+
+        return results.removeFirst()
     }
 
     func flush(explicitTimeout _: TimeInterval?) -> SpanExporterResultCode {

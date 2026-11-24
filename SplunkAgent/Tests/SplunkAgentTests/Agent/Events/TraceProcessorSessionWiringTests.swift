@@ -45,18 +45,18 @@ final class TraceProcessorSessionWiringTests: XCTestCase {
         // Building the processor registers its tracer provider globally.
         restoreOpenTelemetryGlobalsAtTeardown()
 
-        let interceptorRecorder = InterceptedSpanRecorder()
-        let recorder = InterceptedSpanRecorder()
+        let interceptorRecorder = SpanNameRecorder()
+        let recorder = SpanNameRecorder()
         let agentSpanReported = expectation(description: "the span with an agent session ID reaches didIntercept")
         recorder.onName("agent-session") {
             agentSpanReported.fulfill()
         }
 
         // Kept alive here: the attributes processor holds it unowned.
-        let runtimeAttributes = EmptyRuntimeAttributes()
+        let runtimeAttributes = MockRuntimeAttributes()
         let processor = OTLPTraceProcessor(
             with: nil,
-            resources: WiringTestResources(),
+            resources: MockAgentResources(),
             runtimeAttributes: runtimeAttributes,
             globalAttributes: { [:] },
             debugEnabled: false,
@@ -65,7 +65,7 @@ final class TraceProcessorSessionWiringTests: XCTestCase {
 
                 return span
             },
-            activityTracker: IgnoredActivityTracker(),
+            activityTracker: MockActivityTracker(),
             enforcesSessionPolicy: true,
             didIntercept: { spans in
                 recorder.record(spans)
@@ -98,64 +98,4 @@ final class TraceProcessorSessionWiringTests: XCTestCase {
 
         builder.startSpan().end()
     }
-}
-
-
-// MARK: - Test doubles
-
-/// Records the names of the spans that reach the interceptor or `didIntercept`, from any export thread.
-private final class InterceptedSpanRecorder {
-
-    private let lock = NSLock()
-    private var recordedNames: [String] = []
-    private var watchedName: String?
-    private var onWatchedName: (() -> Void)?
-
-    var names: [String] {
-        lock.lock()
-        defer { lock.unlock() }
-
-        return recordedNames
-    }
-
-    func onName(_ name: String, perform action: @escaping () -> Void) {
-        lock.lock()
-        defer { lock.unlock() }
-
-        watchedName = name
-        onWatchedName = action
-    }
-
-    func record(_ spans: [SpanData]) {
-        lock.lock()
-        recordedNames.append(contentsOf: spans.map(\.name))
-        let action = spans.contains { $0.name == watchedName } ? onWatchedName : nil
-        lock.unlock()
-
-        action?()
-    }
-}
-
-private final class EmptyRuntimeAttributes: RuntimeAttributes {
-    let all: [String: Any] = [:]
-}
-
-private struct IgnoredActivityTracker: ActivityTracker {
-    func trackActivity(at _: Date) {}
-}
-
-private struct WiringTestResources: AgentResources {
-    let appName = "WiringTestApp"
-    let appVersion = "1.0"
-    let appBuild = "1"
-    let appDeploymentEnvironment = "test"
-    let agentHybridType: String? = nil
-    let agentVersion = "test"
-    let deviceModelIdentifier = "test-device"
-    let deviceManufacturer = "Apple"
-    let deviceID = "test-device-id"
-    let osName = "iOS"
-    let osVersion = "test-os"
-    let osDescription = "test-os-description"
-    let osType = "darwin"
 }
