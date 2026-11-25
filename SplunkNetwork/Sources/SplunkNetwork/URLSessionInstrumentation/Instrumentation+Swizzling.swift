@@ -17,6 +17,7 @@ limitations under the License.
 
 import CiscoLogger
 import Foundation
+import ObjectiveC.runtime
 import OpenTelemetryApi
 
 private var associatedKeySpanResume: UInt8 = 0
@@ -133,29 +134,82 @@ func swizzledUrlSessionClasses() -> [AnyClass] {
 
     let setStateSelector = NSSelectorFromString("setState:")
     var classes: [AnyClass] = []
-    guard var currentClass: AnyClass = object_getClass(localDataTask) else {
+    var seenClasses = Set<ObjectIdentifier>()
+
+    // Normally the probe task gives us the concrete Foundation task class. Some agents return
+    // proxy objects here, though, and the proxy's class hierarchy may not expose setState:. In
+    // that case, find already-loaded URLSessionTask subclasses directly in the Objective-C
+    // runtime so we can still hook the underlying Foundation implementations.
+    if let taskClass = object_getClass(localDataTask) {
+        var currentClass: AnyClass? = taskClass
+        while let candidate = currentClass {
+            appendIfOverridesSetState(candidate, selector: setStateSelector, to: &classes, seen: &seenClasses)
+            currentClass = class_getSuperclass(candidate)
+        }
+    }
+
+    var classCount = Int(objc_getClassList(nil, 0))
+    guard classCount > 0 else {
         return classes
     }
 
-    var method = class_getInstanceMethod(currentClass, setStateSelector)
-    while let currentMethod = method {
-        let classResumeImp = method_getImplementation(currentMethod)
-        let superClass: AnyClass? = currentClass.superclass()
-        let superClassMethod = class_getInstanceMethod(superClass, setStateSelector)
-        let superClassResumeImp = superClassMethod.map { method_getImplementation($0) }
-
-        if classResumeImp != superClassResumeImp {
-            classes.append(currentClass)
+    while true {
+        var runtimeClasses = [AnyClass?](repeating: nil, count: classCount)
+        let copiedCount = runtimeClasses.withUnsafeMutableBufferPointer { buffer -> Int in
+            guard let baseAddress = buffer.baseAddress else {
+                return 0
+            }
+            return Int(objc_getClassList(AutoreleasingUnsafeMutablePointer(baseAddress), Int32(classCount)))
         }
 
-        guard let nextClass = superClass else {
-            return classes
+        // The runtime can load classes while the list is being copied. Retry with a larger
+        // buffer rather than silently omitting task classes.
+        let currentClassCount = Int(objc_getClassList(nil, 0))
+        if currentClassCount > classCount {
+            classCount = currentClassCount
+            continue
         }
 
-        currentClass = nextClass
-        method = superClassMethod
+        for candidate in runtimeClasses.prefix(copiedCount).compactMap({ $0 }) {
+            guard isURLSessionTaskSubclass(candidate) else {
+                continue
+            }
+            appendIfOverridesSetState(candidate, selector: setStateSelector, to: &classes, seen: &seenClasses)
+        }
+        return classes
     }
-    return classes
+}
+
+private func isURLSessionTaskSubclass(_ candidate: AnyClass) -> Bool {
+    var superclass = class_getSuperclass(candidate)
+    while let current = superclass {
+        if current === URLSessionTask.self {
+            return true
+        }
+        superclass = class_getSuperclass(current)
+    }
+    return false
+}
+
+private func appendIfOverridesSetState(
+    _ candidate: AnyClass,
+    selector: Selector,
+    to classes: inout [AnyClass],
+    seen: inout Set<ObjectIdentifier>
+) {
+    guard let method = class_getInstanceMethod(candidate, selector) else {
+        return
+    }
+
+    let superclassMethod = class_getInstanceMethod(class_getSuperclass(candidate), selector)
+    let superclassImplementation = superclassMethod.map { method_getImplementation($0) }
+    guard method_getImplementation(method) != superclassImplementation,
+        seen.insert(ObjectIdentifier(candidate)).inserted
+    else {
+        return
+    }
+
+    classes.append(candidate)
 }
 
 /// Performs method swizzling on URLSession classes.
