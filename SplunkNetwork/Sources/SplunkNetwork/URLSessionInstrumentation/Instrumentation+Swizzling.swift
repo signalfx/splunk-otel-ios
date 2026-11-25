@@ -185,6 +185,7 @@ func swizzledUrlSessionClasses() -> [AnyClass] {
             guard let baseAddress = buffer.baseAddress else {
                 return 0
             }
+
             return Int(objc_getClassList(AutoreleasingUnsafeMutablePointer(baseAddress), Int32(classCount)))
         }
 
@@ -196,7 +197,7 @@ func swizzledUrlSessionClasses() -> [AnyClass] {
             continue
         }
 
-        for candidate in runtimeClasses.prefix(copiedCount).compactMap({ $0 }) where isURLSessionTaskSubclass(candidate) {
+        for candidate in runtimeClasses.prefix(copiedCount).compactMap(\.self) where isURLSessionTaskSubclass(candidate) {
             appendIfOverridesSetState(candidate, selector: setStateSelector, to: &classes, seen: &seenClasses)
         }
         return classes
