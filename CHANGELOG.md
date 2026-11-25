@@ -15,6 +15,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Fixed
 
 * HTTP spans no longer emit a negative response body size when the response length is unknown.
+* Improved URLSession network span collection when another instrumentation agent is initialized before Splunk.
 * A page in an instrumented web view now asks the app for the current session as soon as it loads, and again when it returns from the back-forward cache. Before, a page that loaded after a session change used the session of the first `integrateWithBrowserRum(_:)` call for up to 5 seconds. DEMRUM-6858
 * Calling `integrateWithBrowserRum(_:)` again on the same web view no longer removes and re-adds the bridge's message handler, so a session request from the page can no longer fail during the call. DEMRUM-6858
 

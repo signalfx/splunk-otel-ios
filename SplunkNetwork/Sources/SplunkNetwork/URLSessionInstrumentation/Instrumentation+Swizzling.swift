@@ -17,6 +17,7 @@ limitations under the License.
 
 import CiscoLogger
 import Foundation
+import ObjectiveC.runtime
 import OpenTelemetryApi
 
 private var associatedKeySpanResume: UInt8 = 0
@@ -105,7 +106,27 @@ func swizzle(oneClass: AnyClass, original: Selector, swizzled: Selector) {
     let originalMethod = class_getInstanceMethod(oneClass, original)
     let swizzledMethod = class_getInstanceMethod(oneClass, swizzled)
     if let originalMethod, let swizzledMethod {
-        method_exchangeImplementations(originalMethod, swizzledMethod)
+        let originalImplementation = method_getImplementation(originalMethod)
+        let originalTypeEncoding = method_getTypeEncoding(originalMethod)
+        let swizzledImplementation = method_getImplementation(swizzledMethod)
+        let swizzledTypeEncoding = method_getTypeEncoding(swizzledMethod)
+
+        // `class_getInstanceMethod` can return a method inherited from a superclass. Add
+        // class-local copies before exchanging implementations so swizzling one task subclass
+        // cannot replace the saved implementation used by a sibling subclass.
+        class_addMethod(oneClass, original, originalImplementation, originalTypeEncoding)
+        class_addMethod(oneClass, swizzled, swizzledImplementation, swizzledTypeEncoding)
+
+        if let classOriginalMethod = class_getInstanceMethod(oneClass, original),
+            let classSwizzledMethod = class_getInstanceMethod(oneClass, swizzled)
+        {
+            method_exchangeImplementations(classOriginalMethod, classSwizzledMethod)
+        }
+        else {
+            NetworkInstrumentationManager.shared.logger.log(level: .fault) {
+                "could not install class-local swizzle for \(NSStringFromSelector(original))"
+            }
+        }
     }
     else {
         NetworkInstrumentationManager.shared.logger.log(level: .fault) {
@@ -133,55 +154,120 @@ func swizzledUrlSessionClasses() -> [AnyClass] {
 
     let setStateSelector = NSSelectorFromString("setState:")
     var classes: [AnyClass] = []
-    guard var currentClass: AnyClass = object_getClass(localDataTask) else {
+    var seenClasses = Set<ObjectIdentifier>()
+
+    // Normally the probe task gives us the concrete Foundation task class. Some agents return
+    // proxy objects here, though, and the proxy's class hierarchy may not expose setState:. In
+    // that case, find already-loaded URLSessionTask subclasses directly in the Objective-C
+    // runtime so we can still hook the underlying Foundation implementations.
+    if let taskClass = object_getClass(localDataTask) {
+        var currentClass: AnyClass? = taskClass
+        while let candidate = currentClass {
+            appendIfOverridesSetState(candidate, selector: setStateSelector, to: &classes, seen: &seenClasses)
+            currentClass = class_getSuperclass(candidate)
+        }
+    }
+
+    // Keep the normal installation path limited to the probe task's class hierarchy. Scan the
+    // runtime only when a proxy prevents the probe from exposing any hookable task classes.
+    guard classes.isEmpty else {
         return classes
     }
 
-    var method = class_getInstanceMethod(currentClass, setStateSelector)
-    while let currentMethod = method {
-        let classResumeImp = method_getImplementation(currentMethod)
-        let superClass: AnyClass? = currentClass.superclass()
-        let superClassMethod = class_getInstanceMethod(superClass, setStateSelector)
-        let superClassResumeImp = superClassMethod.map { method_getImplementation($0) }
-
-        if classResumeImp != superClassResumeImp {
-            classes.append(currentClass)
-        }
-
-        guard let nextClass = superClass else {
-            return classes
-        }
-
-        currentClass = nextClass
-        method = superClassMethod
+    var classCount = Int(objc_getClassList(nil, 0))
+    guard classCount > 0 else {
+        return classes
     }
-    return classes
+
+    while true {
+        var runtimeClasses = [AnyClass?](repeating: nil, count: classCount)
+        let copiedCount = runtimeClasses.withUnsafeMutableBufferPointer { buffer -> Int in
+            guard let baseAddress = buffer.baseAddress else {
+                return 0
+            }
+
+            return Int(objc_getClassList(AutoreleasingUnsafeMutablePointer(baseAddress), Int32(classCount)))
+        }
+
+        // The runtime can load classes while the list is being copied. Retry with a larger
+        // buffer rather than silently omitting task classes.
+        let currentClassCount = Int(objc_getClassList(nil, 0))
+        if currentClassCount > classCount {
+            classCount = currentClassCount
+            continue
+        }
+
+        for candidate in runtimeClasses.prefix(copiedCount).compactMap(\.self) where isURLSessionTaskSubclass(candidate) {
+            appendIfOverridesSetState(candidate, selector: setStateSelector, to: &classes, seen: &seenClasses)
+        }
+        return classes
+    }
+}
+
+private func isURLSessionTaskSubclass(_ candidate: AnyClass) -> Bool {
+    var superclass = class_getSuperclass(candidate)
+    while let current = superclass {
+        if current === URLSessionTask.self {
+            return true
+        }
+        superclass = class_getSuperclass(current)
+    }
+    return false
+}
+
+private func appendIfOverridesSetState(
+    _ candidate: AnyClass,
+    selector: Selector,
+    to classes: inout [AnyClass],
+    seen: inout Set<ObjectIdentifier>
+) {
+    guard let method = class_getInstanceMethod(candidate, selector) else {
+        return
+    }
+
+    let superclassMethod = class_getInstanceMethod(class_getSuperclass(candidate), selector)
+    let superclassImplementation = superclassMethod.map { method_getImplementation($0) }
+    guard method_getImplementation(method) != superclassImplementation,
+        seen.insert(ObjectIdentifier(candidate)).inserted
+    else {
+        return
+    }
+
+    classes.append(candidate)
 }
 
 /// Performs method swizzling on URLSession classes.
 func swizzleUrlSession() {
+    // Swizzle descendants before their superclasses. This ensures each class copies the
+    // unswizzled inherited implementation into its local method entries before a superclass
+    // implementation is exchanged.
     let classes = swizzledUrlSessionClasses()
+        .sorted {
+            classDepth($0) > classDepth($1)
+        }
 
     let setStateSelector = NSSelectorFromString("setState:")
     let resumeSelector = NSSelectorFromString("resume")
-    let resumeImplementations = classes.compactMap { classToSwizzle -> (AnyClass, UInt)? in
-        guard let method = class_getInstanceMethod(classToSwizzle, resumeSelector) else {
-            return nil
-        }
-
-        return (classToSwizzle, UInt(bitPattern: method_getImplementation(method)))
-    }
-    var swizzledResumeImplementations = Set<UInt>()
 
     for classToSwizzle in classes {
         swizzle(oneClass: classToSwizzle, original: setStateSelector, swizzled: #selector(URLSessionTask.splunkSwizzledSetState(state:)))
 
-        guard let resumeImplementation = resumeImplementations.first(where: { $0.0 === classToSwizzle })?.1,
-            swizzledResumeImplementations.insert(resumeImplementation).inserted
-        else {
+        // Each class now owns its swizzled method entry, so classes that share a resume IMP
+        // still need an independent local hook.
+        guard class_getInstanceMethod(classToSwizzle, resumeSelector) != nil else {
             continue
         }
 
         swizzle(oneClass: classToSwizzle, original: resumeSelector, swizzled: #selector(URLSessionTask.splunkSwizzledResume))
     }
+}
+
+private func classDepth(_ candidate: AnyClass) -> Int {
+    var depth = 0
+    var currentClass: AnyClass? = candidate
+    while let current = currentClass {
+        depth += 1
+        currentClass = class_getSuperclass(current)
+    }
+    return depth
 }
