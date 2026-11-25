@@ -196,10 +196,7 @@ func swizzledUrlSessionClasses() -> [AnyClass] {
             continue
         }
 
-        for candidate in runtimeClasses.prefix(copiedCount).compactMap({ $0 }) {
-            guard isURLSessionTaskSubclass(candidate) else {
-                continue
-            }
+        for candidate in runtimeClasses.prefix(copiedCount).compactMap({ $0 }) where isURLSessionTaskSubclass(candidate) {
             appendIfOverridesSetState(candidate, selector: setStateSelector, to: &classes, seen: &seenClasses)
         }
         return classes
@@ -243,9 +240,10 @@ func swizzleUrlSession() {
     // Swizzle descendants before their superclasses. This ensures each class copies the
     // unswizzled inherited implementation into its local method entries before a superclass
     // implementation is exchanged.
-    let classes = swizzledUrlSessionClasses().sorted {
-        classDepth($0) > classDepth($1)
-    }
+    let classes = swizzledUrlSessionClasses()
+        .sorted {
+            classDepth($0) > classDepth($1)
+        }
 
     let setStateSelector = NSSelectorFromString("setState:")
     let resumeSelector = NSSelectorFromString("resume")
