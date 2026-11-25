@@ -10,6 +10,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Fixed
 
 * HTTP spans no longer emit a negative response body size when the response length is unknown.
+* Improved URLSession network span collection when another instrumentation agent is initialized before Splunk.
 
 ## [2.6.0] - 2026-11-19
 
