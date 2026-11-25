@@ -139,6 +139,36 @@ final class CustomWorkflowTrackingTests: XCTestCase {
         XCTAssertFalse(contextProvider.activeSpan === span)
     }
 
+    /// The workflow leaves the active context before its span ends, so the `onEnd` processors do not see
+    /// the ended workflow as the active span, for either `end` method.
+    func testTrackWorkflowLeavesContextBeforeOnEnd() {
+        let recorder = ActiveSpanAtEndRecorder()
+        let tracer = TracerProviderBuilder()
+            .add(spanProcessor: recorder)
+            .build()
+            .get(instrumentationName: "workflow-end-order-tests")
+        let contextProvider = OpenTelemetry.instance.contextProvider
+
+        let ended = CustomWorkflowSpan(span: tracer.spanBuilder(spanName: "ended").startSpan())
+        contextProvider.setActiveSpan(ended)
+        defer { contextProvider.removeContextForSpan(ended) }
+        ended.end()
+
+        let endedAtTime = CustomWorkflowSpan(span: tracer.spanBuilder(spanName: "endedAtTime").startSpan())
+        contextProvider.setActiveSpan(endedAtTime)
+        defer { contextProvider.removeContextForSpan(endedAtTime) }
+        endedAtTime.end(time: Date())
+
+        let activeSpansAtEnd = recorder.activeSpansAtEnd
+        guard activeSpansAtEnd.count == 2 else {
+            XCTFail("Expected one onEnd call per workflow, got \(activeSpansAtEnd.count)")
+            return
+        }
+
+        XCTAssertFalse(activeSpansAtEnd[0] === ended)
+        XCTAssertFalse(activeSpansAtEnd[1] === endedAtTime)
+    }
+
     /// The wrapper passes the end time, status, name, one event and an exception to the real span.
     func testTrackWorkflowForwardsSpanCalls() throws {
         let module = try XCTUnwrap(module)

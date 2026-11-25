@@ -27,6 +27,10 @@ import OpenTelemetryApi
 ///
 /// The SDK span cannot be subclassed, so wrapping it is the only way to see attribute writes.
 /// Nothing is stored besides the wrapped span, which synchronizes its own state.
+///
+/// A child span started with this span as its parent keeps the parent's trace and span IDs, but the SDK
+/// takes its timestamps from the child's own tracer clock, because it reuses a parent's clock only for an
+/// SDK span.
 final class CustomWorkflowSpan: Span {
 
     // MARK: - Properties
@@ -121,13 +125,13 @@ final class CustomWorkflowSpan: Span {
     // MARK: - Span
 
     func end() {
-        span.end()
         removeActiveContext()
+        span.end()
     }
 
     func end(time: Date) {
-        span.end(time: time)
         removeActiveContext()
+        span.end(time: time)
     }
 
 
@@ -135,7 +139,9 @@ final class CustomWorkflowSpan: Span {
 
     /// Removes this span from the active context, if the app made it active.
     ///
-    /// The context manager matches spans by identity, so the wrapped span's end removes only itself.
+    /// It runs before the wrapped span ends, as the SDK span removes itself before it calls the `onEnd`
+    /// processors: a span that a processor starts then does not take the ended workflow as its parent. The
+    /// context manager matches spans by identity, so the wrapped span's end removes only itself.
     private func removeActiveContext() {
         OpenTelemetry.instance.contextProvider.removeContextForSpan(self)
     }

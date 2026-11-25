@@ -123,6 +123,7 @@ public protocol CustomTrackingModule {
     ///
     /// The span keeps the session that is current when it starts. A `session.id` or `session.previous_id` set on it is ignored.
     /// The span is dropped if no session exists when it starts. The returned span is not a `ReadableSpan`: `as?` returns `nil` and `as!` crashes.
+    /// A child span started with it as the parent gets that parent's trace and span IDs, but its timestamps come from the child's own tracer clock.
     ///
     /// - Parameter workflowName: The name of the workflow to track.
     ///
