@@ -11,7 +11,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 * Calling `integrateWithBrowserRum(_:)` again on an instrumented web view now gives the open page the current session. The SDK does not change the web view's user scripts. DEMRUM-6858
 * The SDK now registers the bridge's script message handler (`SplunkRumNativeUpdate`) once per content controller. If the app removes that handler after calling `integrateWithBrowserRum(_:)`, a later call no longer adds it back, and the page cannot ask the app for the session. DEMRUM-6858
-* When the agent's session changes, it pushes the new session ID into the main frame of every instrumented web view, so an open page uses the new session at once. Before, the page kept the previous ID until its bridge next asked the app. DEMRUM-6858
+* When the agent's session changes, it pushes the new session ID into the bridge in the main frame of every instrumented web view, so the bridge reports the new ID at once. Before, the bridge kept the previous ID until it next asked the app. DEMRUM-6858
 
 ### Fixed
 

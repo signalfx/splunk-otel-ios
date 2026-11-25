@@ -15,17 +15,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import WebKit
+#if canImport(WebKit)
 
-/// A `WKWebView` that records the JavaScript it is asked to evaluate instead of running it.
-final class MockWKWebView: WKWebView {
+    import WebKit
 
-    /// The JavaScript sources passed to `evaluateJavaScript`, in order.
-    private(set) var evaluatedJavaScripts: [String] = []
+    /// A `WKWebView` that records the JavaScript it is asked to evaluate instead of running it.
+    final class MockWKWebView: WKWebView {
 
-    @MainActor
-    override func evaluateJavaScript(_ javaScriptString: String, completionHandler: (@MainActor (Any?, (any Error)?) -> Void)? = nil) {
-        evaluatedJavaScripts.append(javaScriptString)
-        completionHandler?(nil, nil)
+        /// The JavaScript sources passed to `evaluateJavaScript`, in order.
+        private(set) var evaluatedJavaScripts: [String] = []
+
+        @MainActor
+        override func evaluateJavaScript(_ javaScriptString: String, completionHandler: (@MainActor (Any?, (any Error)?) -> Void)? = nil) {
+            evaluatedJavaScripts.append(javaScriptString)
+            completionHandler?(nil, nil)
+        }
     }
-}
+
+#endif

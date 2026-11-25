@@ -29,7 +29,7 @@ webView.loadHTMLString(contentIncludingEmbeddedBRUMLibrary, baseURL: nil)
 
 This injects a JavaScript object (window.SplunkRumNative) that the Browser RUM agent can use to retrieve the native session ID.
 
-When the agent's session changes, the agent pushes the new session ID into the main frame of every instrumented web view and calls the page's `onNativeSessionIdChanged` callback, if the page set one, so the open page uses the new session at once. A page that loads later asks the app for the current session when its bridge is set up. An iframe's bridge gets the new ID when it next asks the app.
+When the agent's session changes, the agent pushes the new session ID into the bridge in the main frame of every instrumented web view, so the bridge reports the new ID at once, and calls the page's `onNativeSessionIdChanged` callback, if the page set one. Browser RUM picks up the new ID the next time it reads the bridge. A page that loads later asks the app for the current session when its bridge is set up. An iframe's bridge gets the new ID when it next asks the app.
 
 > Important: For best results, it is recommended you load the web content that includes the Browser RUM library only after making the `integrateWithBrowserRum()` call.
 
