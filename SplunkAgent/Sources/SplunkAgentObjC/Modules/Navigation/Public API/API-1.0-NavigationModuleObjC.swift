@@ -78,6 +78,7 @@ public final class NavigationModuleObjC: NSObject {
     ///   - attributes: Optional custom key-value pairs to attach to the `app.ui.navigation` span.
     ///     Supported value types: `NSString`, `NSNumber` (integer, double, boolean), and arrays of those types.
     ///     Other types are converted to their string representation.
+    ///     `session.id` and `session.previous_id` are set only by the agent; these keys are ignored.
     ///
     /// - Returns: The actual ``NavigationModuleObjC`` instance.
     ///

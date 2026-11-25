@@ -149,11 +149,12 @@ extension CustomTrackingInternal {
             )
 
         // Start a span for the workflow
-        return tracer.spanBuilder(spanName: workflowName)
+        let span = tracer.spanBuilder(spanName: workflowName)
             .setAttribute(key: "workflow.name", value: workflowName)
             .setAttribute(key: "component", value: "custom-workflow")
             .startSpan()
 
-        // Return the span object
+        // Return the span object, which keeps the session it started in
+        return CustomWorkflowSpan(span: span)
     }
 }

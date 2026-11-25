@@ -15,6 +15,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 * The session check runs before the `spanInterceptor`, so the interceptor no longer sees spans that will be dropped. DEMRUM-6856
 * A span is dropped if the `spanInterceptor` changes or removes its `session.id`, or adds, changes or removes its `session.previous_id`; with debug logging on, the agent logs how many spans each export batch dropped for this. Such a span releases no held `session.start`. A global attribute named `session.id` or `session.previous_id` is ignored on every span, so it cannot give a span a session when the agent has none (breaking change). DEMRUM-7201
 * A custom event or error takes the session that is current when it is published, not the session found for its timestamp. After the device clock is set back, it is no longer attributed to an ended session. Session Replay data and crash reports still use the session found for their timestamp. DEMRUM-7201
+* `session.id` and `session.previous_id` are set only by the agent on custom events, errors, workflow spans and screen spans. A value passed in the attributes of `trackCustomEvent`, `trackError`, `trackException` or `track(screen:attributes:)`, returned in the attributes of a `NavigationEventProcessor` event, or set on the span that `trackWorkflow` returns, is ignored. The span that `trackWorkflow` returns is no longer an OpenTelemetry SDK span type: casting it with `as?` to one such as `ReadableSpan` returns `nil`, and `as!` crashes (breaking change). DEMRUM-7201
 
 ### Fixed
 

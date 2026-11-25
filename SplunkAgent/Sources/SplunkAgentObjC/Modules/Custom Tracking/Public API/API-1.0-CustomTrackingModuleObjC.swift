@@ -19,6 +19,9 @@ import Foundation
 import SplunkAgent
 
 /// The class implements a public API for the CustomTracking module.
+///
+/// Only the agent sets `session.id` and `session.previous_id` on tracked events and errors.
+/// Values the app supplies for these attributes are ignored.
 @objc(SPLKCustomTrackingModule)
 public final class CustomTrackingModuleObjC: NSObject {
 

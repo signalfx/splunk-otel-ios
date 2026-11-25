@@ -27,12 +27,17 @@ public struct CustomTrackingMetadata: ModuleEventMetadata {
 public struct CustomTrackingData: ModuleEventData {
     public let name: String
     public let component: String
+
+    /// The app's attributes, without the session attributes only the agent sets.
+    ///
+    /// The agent stamps the session itself, so an app value cannot move the event or error to
+    /// another session, or give one that found no session an ID.
     public let attributes: [String: EventAttributeValue]
 
     public init(name: String, component: String, attributes: [String: EventAttributeValue]) {
         self.name = name
         self.component = component
-        self.attributes = attributes
+        self.attributes = attributes.removingAgentOnlyAttributes()
     }
 }
 

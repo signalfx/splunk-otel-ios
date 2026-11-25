@@ -23,12 +23,18 @@ extension Navigation {
 
     // MARK: - Static constants
 
-    static let screenStateReservedAttributeKeys: Set<String> = [
-        "component",
-        "navigation.name",
-        "last.screen.name",
-        "screen.name"
-    ]
+    /// Keys that caller attributes cannot set on a navigation span or in the stored screen state.
+    ///
+    /// The session keys are included because only the agent sets them. A value from the app would replace
+    /// the agent's session, or give a span tracked with no session an ID that passes the session policy.
+    static let screenStateReservedAttributeKeys: Set<String> = Set(
+        [
+            "component",
+            "navigation.name",
+            "last.screen.name",
+            "screen.name"
+        ] + SessionAttributeKeys.agentOnly
+    )
 
 
     // MARK: - Screen state

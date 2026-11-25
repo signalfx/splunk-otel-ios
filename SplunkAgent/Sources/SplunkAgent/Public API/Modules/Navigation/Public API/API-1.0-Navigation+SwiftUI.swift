@@ -62,6 +62,7 @@ extension View {
     ///   - attributes: Optional attributes associated with the screen tracking event.
     ///     Supported value types: `String`, `Int`, `Double`, `Bool`, and arrays of those types.
     ///     Other types are converted to their string representation.
+    ///     `session.id` and `session.previous_id` are set only by the agent; these keys are ignored.
     ///
     /// - Returns: The `View` with screen tracking applied.
     public func trackScreen(_ name: String, attributes: [String: Any]?) -> some View {

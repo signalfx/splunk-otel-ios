@@ -35,6 +35,8 @@ public struct NavigationEvent {
     ///
     /// Use this to enrich the `app.ui.navigation` span with application-specific metadata
     /// (e.g., content identifiers, feature flags, or section names).
+    ///
+    /// `session.id` and `session.previous_id` are set only by the agent; these keys are ignored.
     public let attributes: [String: Any]?
 
 

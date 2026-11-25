@@ -132,6 +132,12 @@ class MockSpan: Span {
 
     var attributes: [String: AttributeValue] = [:]
 
+    /// The names of the events added to the span, in order.
+    var recordedEventNames: [String] = []
+
+    /// The exceptions recorded on the span, in order.
+    var recordedExceptions: [any SpanException] = []
+
     init(name: String) {
         self.name = name
         context = SpanContext.create(
@@ -157,15 +163,37 @@ class MockSpan: Span {
         }
     }
 
-    func recordException(_: any SpanException) {}
-    func recordException(_: any SpanException, attributes _: [String: AttributeValue]) {}
-    func recordException(_: any SpanException, timestamp _: Date) {}
-    func recordException(_: any SpanException, attributes _: [String: AttributeValue], timestamp _: Date) {}
+    func recordException(_ exception: any SpanException) {
+        recordedExceptions.append(exception)
+    }
 
-    func addEvent(name _: String, attributes _: [String: AttributeValue]) {}
-    func addEvent(name _: String) {}
-    func addEvent(name _: String, timestamp _: Date) {}
-    func addEvent(name _: String, attributes _: [String: AttributeValue], timestamp _: Date) {}
+    func recordException(_ exception: any SpanException, attributes _: [String: AttributeValue]) {
+        recordedExceptions.append(exception)
+    }
+
+    func recordException(_ exception: any SpanException, timestamp _: Date) {
+        recordedExceptions.append(exception)
+    }
+
+    func recordException(_ exception: any SpanException, attributes _: [String: AttributeValue], timestamp _: Date) {
+        recordedExceptions.append(exception)
+    }
+
+    func addEvent(name: String, attributes _: [String: AttributeValue]) {
+        recordedEventNames.append(name)
+    }
+
+    func addEvent(name: String) {
+        recordedEventNames.append(name)
+    }
+
+    func addEvent(name: String, timestamp _: Date) {
+        recordedEventNames.append(name)
+    }
+
+    func addEvent(name: String, attributes _: [String: AttributeValue], timestamp _: Date) {
+        recordedEventNames.append(name)
+    }
 
     func end() {
         end(time: Date())
