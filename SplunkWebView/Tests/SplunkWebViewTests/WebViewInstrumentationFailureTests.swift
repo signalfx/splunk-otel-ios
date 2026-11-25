@@ -19,7 +19,7 @@ import SplunkCommon
 import WebKit
 import XCTest
 
-@testable import SplunkWebView
+@_spi(SplunkInternal) @testable import SplunkWebView
 
 @MainActor
 final class WebViewInstrumentationFailureTests: XCTestCase {
@@ -39,5 +39,10 @@ final class WebViewInstrumentationFailureTests: XCTestCase {
         XCTAssertEqual(webView.evaluateJavaScriptCallCount, 0)
         let errorFound = logger.logMessages.contains { $0.level == .error && $0.message.contains("bridge script is unavailable") }
         XCTAssertTrue(errorFound, "An error should be logged when the bridge script is unavailable")
+
+        // A web view that was never instrumented gets no push either.
+        sharedState.updateSessionId("second-session")
+        instrumentation.nativeSessionDidChange()
+        XCTAssertEqual(webView.evaluateJavaScriptCallCount, 0)
     }
 }

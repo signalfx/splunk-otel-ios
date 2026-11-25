@@ -77,8 +77,8 @@ final class WebViewInstrumentationTests: XCTestCase {
         let mockWebView = try XCTUnwrap(mockWebView)
         webViewInstrumentation?.injectSessionId(into: mockWebView)
 
-        // The new implementation calls evaluateJavaScript once for the immediate injection
-        XCTAssertEqual(mockWebView.evaluateJavaScriptCallCount, 1)
+        // The injection evaluates the full script, then the update for a page that already has the bridge.
+        XCTAssertEqual(mockWebView.evaluateJavaScriptCallCount, 2)
         XCTAssertNotNil(mockWebView.lastEvaluatedJavaScript)
     }
 
@@ -146,15 +146,15 @@ final class WebViewInstrumentationTests: XCTestCase {
         XCTAssertNotNil(mockContentController)
         XCTAssertTrue(mockContentController?.removeScriptMessageHandlerCalled ?? false)
         XCTAssertTrue(mockContentController?.addScriptMessageHandlerCalled ?? false)
-        XCTAssertEqual(mockWebView.evaluateJavaScriptCallCount, 1)
+        XCTAssertEqual(mockWebView.evaluateJavaScriptCallCount, 2)
 
         // Call inject second time
         webViewInstrumentation?.injectSessionId(into: mockWebView)
 
         // Then: The native side safely re-establishes the bridge.
         // The JS itself has an internal guard, so it won't re-initialize.
-        // The evaluateJavaScript call will run again but the script will bail early.
-        XCTAssertEqual(mockWebView.evaluateJavaScriptCallCount, 2)
+        // The full script and the update are evaluated again; the full script will bail early.
+        XCTAssertEqual(mockWebView.evaluateJavaScriptCallCount, 4)
     }
 
     func testInjectSessionId_addsUserScriptOnlyOnce_whenCalledMultipleTimes() throws {
@@ -227,7 +227,7 @@ final class WebViewInstrumentationTests: XCTestCase {
 
         webViewInstrumentation?.injectSessionId(into: mockWebView)
 
-        let script = mockWebView.lastEvaluatedJavaScript ?? ""
+        let script = mockWebView.evaluatedJavaScripts.first ?? ""
         XCTAssertTrue(script.contains("cachedSessionId: '\(expectedSessionId)'"), "The injected script must contain the session ID")
     }
 
@@ -235,7 +235,7 @@ final class WebViewInstrumentationTests: XCTestCase {
         let mockWebView = try XCTUnwrap(mockWebView)
         webViewInstrumentation?.injectSessionId(into: mockWebView)
 
-        let script = mockWebView.lastEvaluatedJavaScript ?? ""
+        let script = mockWebView.evaluatedJavaScripts.first ?? ""
         XCTAssertTrue(script.contains("getNativeSessionId: function()"), "JS should contain getNativeSessionId")
         XCTAssertTrue(script.contains("getNativeSessionIdAsync: async function()"), "JS should contain getNativeSessionIdAsync")
         XCTAssertTrue(script.contains("onNativeSessionIdChanged: null"), "JS should contain onNativeSessionIdChanged")
@@ -246,7 +246,7 @@ final class WebViewInstrumentationTests: XCTestCase {
         let mockWebView = try XCTUnwrap(mockWebView)
         webViewInstrumentation?.injectSessionId(into: mockWebView)
 
-        let script = mockWebView.lastEvaluatedJavaScript ?? ""
+        let script = mockWebView.evaluatedJavaScripts.first ?? ""
         XCTAssertTrue(script.contains("postMessage handler is unavailable"), "JS should guard missing handler")
         XCTAssertTrue(script.contains("postMessage did not return a Promise"), "JS should guard non-promise return")
     }
@@ -255,7 +255,7 @@ final class WebViewInstrumentationTests: XCTestCase {
         let mockWebView = try XCTUnwrap(mockWebView)
         webViewInstrumentation?.injectSessionId(into: mockWebView)
 
-        let script = mockWebView.lastEvaluatedJavaScript ?? ""
+        let script = mockWebView.evaluatedJavaScripts.first ?? ""
         XCTAssertFalse(script.contains("?."), "JS should avoid optional chaining for iOS 13.0")
         XCTAssertTrue(script.contains("window.webkit &&"), "JS should use explicit guards for WebKit access")
     }
@@ -268,7 +268,7 @@ final class WebViewInstrumentationTests: XCTestCase {
 
         webViewInstrumentation?.injectSessionId(into: mockWebView)
 
-        let script = mockWebView.lastEvaluatedJavaScript ?? ""
+        let script = mockWebView.evaluatedJavaScripts.first ?? ""
         XCTAssertTrue(script.contains("nativeSessionMetadata: '\(expectedMetadata)'"), "Injected script must contain the session metadata")
     }
 
@@ -278,7 +278,7 @@ final class WebViewInstrumentationTests: XCTestCase {
 
         webViewInstrumentation?.injectSessionId(into: mockWebView)
 
-        let script = mockWebView.lastEvaluatedJavaScript ?? ""
+        let script = mockWebView.evaluatedJavaScripts.first ?? ""
         XCTAssertTrue(script.contains("nativeSessionMetadata: null"), "Injected script must set nativeSessionMetadata to null when unavailable")
     }
 
