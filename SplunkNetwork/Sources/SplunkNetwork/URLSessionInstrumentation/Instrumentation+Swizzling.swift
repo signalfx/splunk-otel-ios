@@ -106,7 +106,27 @@ func swizzle(oneClass: AnyClass, original: Selector, swizzled: Selector) {
     let originalMethod = class_getInstanceMethod(oneClass, original)
     let swizzledMethod = class_getInstanceMethod(oneClass, swizzled)
     if let originalMethod, let swizzledMethod {
-        method_exchangeImplementations(originalMethod, swizzledMethod)
+        let originalImplementation = method_getImplementation(originalMethod)
+        let originalTypeEncoding = method_getTypeEncoding(originalMethod)
+        let swizzledImplementation = method_getImplementation(swizzledMethod)
+        let swizzledTypeEncoding = method_getTypeEncoding(swizzledMethod)
+
+        // `class_getInstanceMethod` can return a method inherited from a superclass. Add
+        // class-local copies before exchanging implementations so swizzling one task subclass
+        // cannot replace the saved implementation used by a sibling subclass.
+        class_addMethod(oneClass, original, originalImplementation, originalTypeEncoding)
+        class_addMethod(oneClass, swizzled, swizzledImplementation, swizzledTypeEncoding)
+
+        if let classOriginalMethod = class_getInstanceMethod(oneClass, original),
+            let classSwizzledMethod = class_getInstanceMethod(oneClass, swizzled)
+        {
+            method_exchangeImplementations(classOriginalMethod, classSwizzledMethod)
+        }
+        else {
+            NetworkInstrumentationManager.shared.logger.log(level: .fault) {
+                "could not install class-local swizzle for \(NSStringFromSelector(original))"
+            }
+        }
     }
     else {
         NetworkInstrumentationManager.shared.logger.log(level: .fault) {
@@ -214,28 +234,35 @@ private func appendIfOverridesSetState(
 
 /// Performs method swizzling on URLSession classes.
 func swizzleUrlSession() {
-    let classes = swizzledUrlSessionClasses()
+    // Swizzle descendants before their superclasses. This ensures each class copies the
+    // unswizzled inherited implementation into its local method entries before a superclass
+    // implementation is exchanged.
+    let classes = swizzledUrlSessionClasses().sorted {
+        classDepth($0) > classDepth($1)
+    }
 
     let setStateSelector = NSSelectorFromString("setState:")
     let resumeSelector = NSSelectorFromString("resume")
-    let resumeImplementations = classes.compactMap { classToSwizzle -> (AnyClass, UInt)? in
-        guard let method = class_getInstanceMethod(classToSwizzle, resumeSelector) else {
-            return nil
-        }
-
-        return (classToSwizzle, UInt(bitPattern: method_getImplementation(method)))
-    }
-    var swizzledResumeImplementations = Set<UInt>()
 
     for classToSwizzle in classes {
         swizzle(oneClass: classToSwizzle, original: setStateSelector, swizzled: #selector(URLSessionTask.splunkSwizzledSetState(state:)))
 
-        guard let resumeImplementation = resumeImplementations.first(where: { $0.0 === classToSwizzle })?.1,
-            swizzledResumeImplementations.insert(resumeImplementation).inserted
-        else {
+        // Each class now owns its swizzled method entry, so classes that share a resume IMP
+        // still need an independent local hook.
+        guard class_getInstanceMethod(classToSwizzle, resumeSelector) != nil else {
             continue
         }
 
         swizzle(oneClass: classToSwizzle, original: resumeSelector, swizzled: #selector(URLSessionTask.splunkSwizzledResume))
     }
+}
+
+private func classDepth(_ candidate: AnyClass) -> Int {
+    var depth = 0
+    var currentClass: AnyClass? = candidate
+    while let current = currentClass {
+        depth += 1
+        currentClass = class_getSuperclass(current)
+    }
+    return depth
 }
