@@ -26,5 +26,9 @@ Call from the main thread before `load`, `loadHTMLString`, or similar methods.
 The bridge registration is intended to be idempotent for a web view, but do not
 recreate or replace `webView.configuration.userContentController` afterwards.
 
+When the agent's session changes, it pushes the new session ID into the main
+frame of every bridged web view. An iframe's bridge gets the new ID when it next
+asks the app.
+
 ObjC bridge selector is `integrateWithBrowserRumView:` on
 `SPLKWebViewInstrumentationModule`.

@@ -38,6 +38,9 @@ public final class WebViewModuleObjC: NSObject {
         /// Injects the necessary JavaScript bridge into a given `WKWebView` to enable
         /// communication between the web content and the native RUM agent.
         ///
+        /// When the agent's session changes, the agent pushes the new session ID into the main frame of
+        /// every web view bridged this way. An iframe's bridge gets the new ID when it next asks the app.
+        ///
         /// - Note: To ensure proper correlation, call this before the `WKWebView`
         ///   starts loading any content (for example, before `load`, `loadHTMLString`, etc.).
         @objc(integrateWithBrowserRumView:)
