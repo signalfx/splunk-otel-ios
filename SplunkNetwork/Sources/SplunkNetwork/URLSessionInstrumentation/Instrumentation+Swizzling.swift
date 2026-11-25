@@ -168,6 +168,12 @@ func swizzledUrlSessionClasses() -> [AnyClass] {
         }
     }
 
+    // Keep the normal installation path limited to the probe task's class hierarchy. Scan the
+    // runtime only when a proxy prevents the probe from exposing any hookable task classes.
+    guard classes.isEmpty else {
+        return classes
+    }
+
     var classCount = Int(objc_getClassList(nil, 0))
     guard classCount > 0 else {
         return classes
