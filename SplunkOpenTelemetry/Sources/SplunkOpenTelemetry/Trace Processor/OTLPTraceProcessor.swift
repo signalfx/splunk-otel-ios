@@ -213,10 +213,13 @@ public class OTLPTraceProcessor: TraceProcessor {
                 : backgroundTraceExporter
         )
 
-        // Initialize span interceptor proxy exporter
+        // Initialize span interceptor proxy exporter. Under the session policy, a span whose session ID
+        // the interceptor changed is dropped.
         let spanInterceptorExporter = SpanInterceptorExporter(
             with: configuration.spanInterceptor,
             proxy: attributeCheckerExporter,
+            requiresUnchangedSessionId: configuration.enforcesSessionPolicy,
+            debugEnabled: configuration.debugEnabled,
             didIntercept: configuration.didIntercept
         )
 
@@ -238,11 +241,15 @@ public class OTLPTraceProcessor: TraceProcessor {
         let spanProcessor = OTLPBatchSpanProcessor(spanExporter: exportPipeline)
         let attributesProcessor = OTLPAttributesSpanProcessor(
             with: configuration.runtimeAttributes,
-            activityTracker: configuration.activityTracker
+            activityTracker: configuration.activityTracker,
+            ownsSessionId: configuration.enforcesSessionPolicy
         )
 
         // Global Attributes processor
-        let globalAttributesProcessor = OTLPGlobalAttributesSpanProcessor(with: configuration.globalAttributes)
+        let globalAttributesProcessor = OTLPGlobalAttributesSpanProcessor(
+            with: configuration.globalAttributes,
+            ownsSessionId: configuration.enforcesSessionPolicy
+        )
 
         // Initialize tracer provider
         let tracerProviderBuilder = TracerProviderBuilder()

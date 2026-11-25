@@ -52,6 +52,8 @@ public final class SplunkRumObjC: NSObject {
 
     /// A dictionary that contains global attributes added to all signals.
     ///
+    /// `session.id` and `session.previous_id` are set only by the agent. These keys in `globalAttributes` are ignored.
+    ///
     /// Defaults to an empty `NSDictionary` object.
     @objc
     public var globalAttributes: [String: AttributeValueObjC] {

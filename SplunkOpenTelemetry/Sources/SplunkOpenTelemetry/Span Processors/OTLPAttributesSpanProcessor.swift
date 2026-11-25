@@ -27,6 +27,7 @@ public class OTLPAttributesSpanProcessor: SpanProcessor {
 
     private unowned let runtimeAttributes: any RuntimeAttributes
     private let activityTracker: ActivityTracker
+    private let ownsSessionId: Bool
 
 
     // MARK: - SpanProcessor settings
@@ -46,17 +47,40 @@ public class OTLPAttributesSpanProcessor: SpanProcessor {
     ///
     /// - Note: The processor itself does not own the object with runtime attributes.
     ///         So, ensuring its existence outside this span processor is always necessary.
-    public init(with runtimeAttributes: RuntimeAttributes, activityTracker: ActivityTracker) {
+    public convenience init(with runtimeAttributes: RuntimeAttributes, activityTracker: ActivityTracker) {
+        self.init(with: runtimeAttributes, activityTracker: activityTracker, ownsSessionId: false)
+    }
+
+    /// Initializes a span processor that can treat `session.id` and `session.previous_id` as set only by the
+    /// runtime attributes.
+    ///
+    /// With `ownsSessionId`, a span started while the runtime attributes lack one of these keys loses any
+    /// value for it that the span already holds, such as one set on the span builder. Pass `true` only
+    /// for an agent's pipeline.
+    package init(with runtimeAttributes: RuntimeAttributes, activityTracker: ActivityTracker, ownsSessionId: Bool) {
         self.runtimeAttributes = runtimeAttributes
         self.activityTracker = activityTracker
+        self.ownsSessionId = ownsSessionId
     }
 
 
     // MARK: - SpanProcessor methods
 
     public func onStart(parentContext _: OpenTelemetryApi.SpanContext?, span: any OpenTelemetrySdk.ReadableSpan) {
-        activityTracker.trackActivity(at: span.toSpanData().startTime)
-        inject(attributes: runtimeAttributes.all, to: span)
+        let startedSpan = span.toSpanData()
+        activityTracker.trackActivity(at: startedSpan.startTime)
+
+        let attributes = runtimeAttributes.all
+        inject(attributes: attributes, to: span)
+
+        if ownsSessionId {
+            // The agent owns both session keys. Remove a value that the span already holds, such as one set
+            // on the span builder, unless the runtime attributes carry the key. Only a key that the span
+            // holds is removed, so the usual span start (no such value) writes nothing.
+            for key in SessionAttributeKeys.agentOnly where attributes[key] == nil && startedSpan.attributes[key] != nil {
+                span.setAttribute(key: key, value: nil)
+            }
+        }
     }
 
     public func onEnd(span _: any OpenTelemetrySdk.ReadableSpan) {}

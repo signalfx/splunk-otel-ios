@@ -24,7 +24,8 @@ extension BatchSpanProcessorCore {
     /// The configured exporter reports success after it writes the batch to disk. In an agent's
     /// pipeline, success also covers a span that the session policy dropped, which has no durable
     /// copy. For a caller that keeps a source payload until success, success means that the span was
-    /// stored or dropped on purpose.
+    /// stored, or dropped on purpose by the session policy, the interceptor check or the app's span
+    /// interceptor returning `nil`.
     func persistBufferedSpans(timeout: TimeInterval, completion: @escaping (Bool) -> Void) {
         let boundedTimeout = timeout.isFinite ? max(0, timeout) : 0
         let deadline = Date().addingTimeInterval(boundedTimeout)
@@ -40,6 +41,9 @@ extension BatchSpanProcessorCore {
     }
 
     /// Emits a span on the processor queue and persists a snapshot containing that exact span.
+    ///
+    /// Success means that the span was stored, or dropped on purpose by the session policy, the
+    /// interceptor check or the app's span interceptor returning `nil`.
     func persistSpan(
         emitting emitSpan: @escaping () -> SpanId,
         timeout: TimeInterval,

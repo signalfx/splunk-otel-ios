@@ -24,7 +24,7 @@ import SplunkCommon
 /// Drops spans whose `session.id` does not have the shape of an ID the agent generates.
 ///
 /// The stage runs before the customer span interceptor, so the interceptor never sees a span that
-/// cannot be exported.
+/// cannot be exported. `SpanInterceptorExporter` then drops any span whose ID the interceptor changed.
 ///
 /// This stage is stateless on purpose. It owns no lifecycle policy, no retained telemetry and no
 /// history.
@@ -32,7 +32,7 @@ final class SessionPolicySpanExporter: SpanExporter {
 
     // MARK: - Constants
 
-    static let sessionIdKey = "session.id"
+    static let sessionIdKey = SessionAttributeKeys.sessionId
 
 
     // MARK: - Private
@@ -117,18 +117,16 @@ final class SessionPolicySpanExporter: SpanExporter {
     /// Whether the value has the shape of an ID this SDK generates: 32 lowercase hexadecimal digits.
     ///
     /// Checking the shape rather than mere presence rejects an empty string, a placeholder such as
-    /// `"undefined"`, a sentinel UUID, and a corrupted persisted value. Deliberately byte-wise and
-    /// allocation-free, because this runs for every exported span.
+    /// `"undefined"`, a sentinel UUID, and a corrupted persisted value. The shape is defined in
+    /// `SessionAttributeKeys`. Deliberately byte-wise and allocation-free, because this runs for every
+    /// exported span.
     private static func isGeneratedSessionID(_ value: String) -> Bool {
         let digits = value.utf8
 
-        guard digits.count == 32 else {
+        guard digits.count == SessionAttributeKeys.agentSessionIdLength else {
             return false
         }
 
-        return digits.allSatisfy { digit in
-            (digit >= UInt8(ascii: "0") && digit <= UInt8(ascii: "9"))
-                || (digit >= UInt8(ascii: "a") && digit <= UInt8(ascii: "f"))
-        }
+        return digits.allSatisfy(SessionAttributeKeys.isAgentSessionIdDigit)
     }
 }

@@ -21,6 +21,10 @@ extension String {
 
     /// Creates a unique hex-encoded identifier.
     ///
+    /// The agent's session ID is made with `ofLength: 32`. `SessionAttributeKeys` in `SplunkCommon` defines the
+    /// shape that the session policy accepts for a session ID (32 lowercase hexadecimal characters); keep both
+    /// in step.
+    ///
     /// - Parameter length: A number of hex characters in the identifier. Default is `16`.
     ///
     /// - Returns: A new `String` with a generated identifier.

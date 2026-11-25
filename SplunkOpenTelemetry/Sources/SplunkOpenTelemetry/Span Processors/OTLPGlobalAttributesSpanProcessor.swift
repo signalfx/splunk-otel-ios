@@ -22,9 +22,20 @@ import OpenTelemetrySdk
 
 public class OTLPGlobalAttributesSpanProcessor: SpanProcessor {
     private let globalAttributes: () -> [String: AttributeValue]
+    private let ownsSessionId: Bool
 
-    public init(with globalAttributes: @escaping () -> [String: AttributeValue]) {
+    public convenience init(with globalAttributes: @escaping () -> [String: AttributeValue]) {
+        self.init(with: globalAttributes, ownsSessionId: false)
+    }
+
+    /// Initializes a span processor that can leave `session.id` and `session.previous_id` to the agent.
+    ///
+    /// With `ownsSessionId`, global attributes with these keys are not written to spans. They would be
+    /// removed later anyway, and on a span that is at its attribute limit they could take the slot that the
+    /// agent's own `session.id` needs. Pass `true` only for an agent's pipeline.
+    package init(with globalAttributes: @escaping () -> [String: AttributeValue], ownsSessionId: Bool) {
         self.globalAttributes = globalAttributes
+        self.ownsSessionId = ownsSessionId
     }
 
     // MARK: - SpanProcessor
@@ -40,6 +51,10 @@ public class OTLPGlobalAttributesSpanProcessor: SpanProcessor {
     public func onStart(parentContext _: SpanContext?, span: ReadableSpan) {
         // Add global attributes to the span attributes when it's created
         for (key, value) in globalAttributes() {
+            if ownsSessionId, SessionAttributeKeys.agentOnly.contains(key) {
+                continue
+            }
+
             span.clearAndSetAttribute(key: key, value: value)
         }
     }

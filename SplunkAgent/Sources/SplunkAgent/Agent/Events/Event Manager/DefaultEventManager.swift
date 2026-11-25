@@ -244,7 +244,10 @@ class DefaultEventManager: AgentEventManager {
     #endif
 
     private func publishCustomTracking(data: CustomTrackingData, metadata: CustomTrackingMetadata, completion: @escaping (Bool) -> Void) {
-        let sessionId = agent.session.sessionId(for: metadata.timestamp)
+        // A custom event or error takes the session that is current when it is published, not the one found
+        // for its timestamp. A device clock set back into an ended session would otherwise leave the event in
+        // that session or with none. Session Replay chunks and crash reports keep the timestamp lookup.
+        let sessionId = agent.currentSession.currentSessionId
         let event = CustomTrackingDataEvent(metadata: metadata, data: data, sessionId: sessionId)
 
         logEventProcessor.sendEvent(

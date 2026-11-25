@@ -15,6 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+internal import CiscoLogger
 import Foundation
 import OpenTelemetrySdk
 import SplunkCommon
@@ -58,6 +59,12 @@ class SpanInterceptorExporter: SpanExporter {
 
     private let proxyExporter: SpanExporter
 
+    private let requiresUnchangedSessionId: Bool
+
+    /// Receives the number of spans dropped from one batch for a changed `session.id` or `session.previous_id`, or is `nil`
+    /// when debug logging is off.
+    private let droppedCountLog: ((Int) -> Void)?
+
     private let didIntercept: (([SpanData]) -> Void)?
 
 
@@ -65,20 +72,37 @@ class SpanInterceptorExporter: SpanExporter {
 
     /// Initializes the exporter.
     ///
+    /// With `requiresUnchangedSessionId`, a span is dropped if the interceptor adds, replaces or removes
+    /// its `session.id` or `session.previous_id`, so only the IDs the agent assigned are ever exported.
+    ///
     /// - Parameters:
     ///   - interceptor: An optional customer interceptor that can modify or drop spans.
     ///   - proxy: The exporter that receives the spans.
+    ///   - requiresUnchangedSessionId: Whether to drop a span whose `session.id` or `session.previous_id` the interceptor changed.
+    ///   - debugEnabled: Whether to log how many spans each batch dropped for a changed `session.id` or `session.previous_id`.
+    ///   - logDroppedCount: Writes that log line instead of the internal logger. Used by tests.
     ///   - didIntercept: An optional closure called with the spans that remain after interception,
     ///     right before they are passed on to `proxy`. It is called on the export thread for every
     ///     exported batch, so it must return quickly and must not block.
     init(
         with interceptor: SplunkSpanInterceptor?,
         proxy: SpanExporter,
+        requiresUnchangedSessionId: Bool = false,
+        debugEnabled: Bool = false,
+        logDroppedCount: ((Int) -> Void)? = nil,
         didIntercept: (([SpanData]) -> Void)? = nil
     ) {
         spanInterceptor = interceptor
         proxyExporter = proxy
+        self.requiresUnchangedSessionId = requiresUnchangedSessionId
         self.didIntercept = didIntercept
+
+        if debugEnabled {
+            droppedCountLog = logDroppedCount ?? Self.makeDroppedCountLog()
+        }
+        else {
+            droppedCountLog = nil
+        }
     }
 
 
@@ -112,9 +136,28 @@ class SpanInterceptorExporter: SpanExporter {
             return proxyExporter.export(spans: isolatedSpans, explicitTimeout: explicitTimeout)
         }
 
-        // Invoke the interceptor and only pass through non-nil spans.
-        let interceptedSpans = isolatedSpans.compactMap { span in
-            spanInterceptor(span)
+        // Invoke the interceptor and only pass through non-nil spans. Only the spans dropped for a
+        // changed session ID or previous session ID are counted; a `nil` from the interceptor is the customer's own choice.
+        var changedSessionIdCount = 0
+        let interceptedSpans = isolatedSpans.compactMap { span -> SpanData? in
+            guard let interceptedSpan = spanInterceptor(span) else {
+                return nil
+            }
+
+            guard
+                !requiresUnchangedSessionId
+                    || Self.keepsAgentOnlyAttributes(original: span, intercepted: interceptedSpan)
+            else {
+                changedSessionIdCount += 1
+                return nil
+            }
+
+            return interceptedSpan
+        }
+
+        // One line per batch.
+        if let droppedCountLog, changedSessionIdCount > 0 {
+            droppedCountLog(changedSessionIdCount)
         }
 
 
@@ -143,5 +186,28 @@ class SpanInterceptorExporter: SpanExporter {
         didIntercept?(recalculatedSpans)
 
         return proxyExporter.export(spans: recalculatedSpans, explicitTimeout: explicitTimeout)
+    }
+
+
+    // MARK: - Session attributes
+
+    /// Whether the interceptor left `session.id` and `session.previous_id` as they were: same presence, same value.
+    private static func keepsAgentOnlyAttributes(original: SpanData, intercepted: SpanData) -> Bool {
+        SessionAttributeKeys.agentOnly.allSatisfy { key in
+            intercepted.attributes[key] == original.attributes[key]
+        }
+    }
+
+
+    // MARK: - Debug logging
+
+    private static func makeDroppedCountLog() -> (Int) -> Void {
+        let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "OpenTelemetry")
+
+        return { droppedCount in
+            logger.log(level: .debug) {
+                "Span interceptor changed the session ID or previous session ID of \(droppedCount) span(s), so they were dropped."
+            }
+        }
     }
 }

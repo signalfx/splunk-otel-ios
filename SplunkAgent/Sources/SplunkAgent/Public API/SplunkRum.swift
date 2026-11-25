@@ -97,7 +97,7 @@ public class SplunkRum: ObservableObject {
     /// An object that holds preferred settings for the agent, an ``AgentPreferences`` instance.
     public private(set) lazy var preferences = AgentPreferences(for: self)
 
-    /// An object that contains global attributes (a ``MutableAttributes`` instance) added to all signals.
+    /// Global attributes (a ``MutableAttributes`` instance) added to all signals; `session.id` and `session.previous_id` in them are ignored.
     public private(set) lazy var globalAttributes: MutableAttributes = agentConfiguration.globalAttributes
 
     /// An object that reflects the current state and settings used for the recording (a ``RuntimeState`` instance).
