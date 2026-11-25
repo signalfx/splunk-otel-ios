@@ -89,7 +89,8 @@ enum WebViewBridgeScript {
     /// for `sessionId`, `sessionMetadata`, and `handlerName` are replaced with their actual values.
     ///
     /// - Parameters:
-    ///   - sessionId: The initial native session ID to be cached in the JavaScript context.
+    ///   - sessionId: The initial native session ID to be cached in the JavaScript context,
+    ///     or an empty string when no session exists.
     ///   - sessionMetadata: The initial Base64-encoded session metadata string, or `nil` if unavailable.
     ///   - handlerName: The name of the `WKScriptMessageHandler` used for asynchronous communication.
     ///
@@ -99,11 +100,30 @@ enum WebViewBridgeScript {
             return nil
         }
 
-        let metadataLiteral = sessionMetadata.map { "'\($0)'" } ?? "null"
         return
             scriptTemplate
             .replacingOccurrences(of: "__SESSION_ID__", with: "'\(sessionId)'")
-            .replacingOccurrences(of: "__SESSION_METADATA__", with: metadataLiteral)
+            .replacingOccurrences(of: "__SESSION_METADATA__", with: metadataLiteral(for: sessionMetadata))
             .replacingOccurrences(of: "__HANDLER_NAME__", with: handlerName)
+    }
+
+    /// Generates a JavaScript statement that pushes a new native session into an installed bridge.
+    ///
+    /// The bridge's synchronous getter returns the pushed ID at once. The bridge ignores a reply
+    /// to a session request that the page sent before the push, because native computed that reply
+    /// before the push. The statement does nothing in a page where the bridge is not installed.
+    ///
+    /// - Parameters:
+    ///   - sessionId: The current native session ID, or an empty string when no session exists.
+    ///   - sessionMetadata: The current Base64-encoded session metadata string, or `nil` if unavailable.
+    ///
+    /// - Returns: A JavaScript statement ready for evaluation.
+    static func update(sessionId: String, sessionMetadata: String?) -> String {
+        "if (window.SplunkRumNative && window.SplunkRumNative._setNativeSession) { "
+            + "window.SplunkRumNative._setNativeSession('\(sessionId)', \(metadataLiteral(for: sessionMetadata))); }"
+    }
+
+    private static func metadataLiteral(for sessionMetadata: String?) -> String {
+        sessionMetadata.map { "'\($0)'" } ?? "null"
     }
 }

@@ -25,6 +25,8 @@ if (window.SplunkRumNative && window.SplunkRumNative._isInitialized) {
             _isInitialized: false,
             _lastCheckTime: Date.now(),
             _updateInProgress: false,
+            _fetchCount: 0,
+            _pushCount: 0,
             onNativeSessionIdChanged: null,
 
             _fetchSessionId: function() {
@@ -65,7 +67,22 @@ if (window.SplunkRumNative && window.SplunkRumNative._isInitialized) {
                         throw error;
                     });
             },
+            // Called by the SDK on session creation, rotation and end; not for pages to call.
+            // A push also restarts the staleness window of the synchronous getter.
             _setNativeSession: function(newId, newMetadata) {
+                self._pushCount++;
+                self._lastCheckTime = Date.now();
+                self._storeNativeSession(newId, newMetadata);
+            },
+            // Stores a fetch reply, unless a push arrived after the request was sent. Native computed
+            // such a reply before the push, so it can be older than the pushed session.
+            _storeReply: function(pushCountAtRequest, reply) {
+                if (pushCountAtRequest !== self._pushCount) {
+                    return;
+                }
+                self._storeNativeSession(reply.sessionId, reply.sessionMetadata);
+            },
+            _storeNativeSession: function(newId, newMetadata) {
                 self.nativeSessionMetadata = (newMetadata !== undefined) ? newMetadata : null;
                 if (newId !== self.cachedSessionId) {
                     const oldId = self.cachedSessionId;
@@ -82,38 +99,51 @@ if (window.SplunkRumNative && window.SplunkRumNative._isInitialized) {
                             timestamp: Date.now()
                         });
                     } catch (error) {
-                        console.error("[SplunkRumNative] Error in application-provided callback for onNativeSessionIdChanged:", error);
+                        console.error("[SplunkRumNative] Error in the Browser RUM callback for onNativeSessionIdChanged:", error);
                     }
                 }
             },
+            // Starts a fetch from native and stores the reply. A fetch that has not settled within
+            // staleAfterDurationMs no longer blocks a new one, so a lost reply cannot stop all refreshes.
+            _refreshFromNative: function() {
+                const now = Date.now();
+                if (self._updateInProgress && (now - self._lastCheckTime) <= staleAfterDurationMs) {
+                    return;
+                }
+                const fetchNumber = ++self._fetchCount;
+                const pushCountAtRequest = self._pushCount;
+                self._updateInProgress = true;
+                self._lastCheckTime = now;
+                self._fetchSessionId()
+                    .then( function(reply) {
+                        self._storeReply(pushCountAtRequest, reply);
+                    })
+                    .catch( function(error) {
+                        console.error("[SplunkRumNative] Failed to fetch session info from native:", error);
+                    })
+                    .finally( function() {
+                        if (fetchNumber === self._fetchCount) {
+                            self._updateInProgress = false;
+                        }
+                    });
+            },
             // This must be synchronous for legacy BRUM compatibility.
             getNativeSessionId: function() {
-                const now = Date.now();
-                const stale = (now - self._lastCheckTime) > staleAfterDurationMs;
-                if (stale && !self._updateInProgress) {
-                    self._updateInProgress = true;
-                    self._lastCheckTime = now;
-                    self._fetchSessionId()
-                        .then( function(reply) {
-                            self._setNativeSession(reply.sessionId, reply.sessionMetadata);
-                        })
-                        .catch( function(error) {
-                            console.error("[SplunkRumNative] Failed to fetch session info from native:", error);
-                        })
-                        .finally( function() {
-                            self._updateInProgress = false;
-                        });
+                if ((Date.now() - self._lastCheckTime) > staleAfterDurationMs) {
+                    self._refreshFromNative();
                 }
-                // Here we finish before above promise is fulfilled, and
+                // Here we finish before the refresh is fulfilled, and
                 // return cached ID immediately for legacy compatibility.
                 return self.cachedSessionId;
             },
             // Recommended for BRUM use in new agents going forward.
             getNativeSessionIdAsync: async function() {
                 try {
+                    const pushCountAtRequest = self._pushCount;
                     const reply = await self._fetchSessionId();
-                    self._setNativeSession(reply.sessionId, reply.sessionMetadata);
-                    return reply.sessionId;
+                    self._storeReply(pushCountAtRequest, reply);
+                    // After a newer push, this is the pushed ID rather than the reply's.
+                    return self.cachedSessionId;
                 } catch (error) {
                     console.error("[SplunkRumNative] Failed to fetch native session info asynchronously:", error);
                 }
@@ -126,6 +156,16 @@ if (window.SplunkRumNative && window.SplunkRumNative._isInitialized) {
             window.webkit.messageHandlers.__HANDLER_NAME__
         );
         console.log("[SplunkRumNative] Bridge available:", bridgeAvailable);
+        // The session baked into this script can be older than native's current one, so ask at once.
+        if (bridgeAvailable) {
+            self._refreshFromNative();
+        }
+        // A page restored from the back-forward cache runs no user scripts and missed any push, so ask again.
+        window.addEventListener("pageshow", function(event) {
+            if (event.persisted) {
+                self._refreshFromNative();
+            }
+        });
         self._isInitialized = true;
         return self;
     }());
