@@ -78,4 +78,7 @@ enum CrashReportCustomDataKeys: String {
     case memory
     case screenName
     case buildId
+    case reactNativeFatalSchema
+    case reactNativeFatalSpanId
+    case reactNativeFatalArmedAtEpochMs
 }
